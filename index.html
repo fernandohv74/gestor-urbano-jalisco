@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestor Urbano Jalisco AMG</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080C14;--bg2:#0E1420;--bg3:#141C2E;--bg4:#1A2438;
+  --border:#1E2D48;--border2:#28395C;
+  --text:#E8EDF8;--text2:#8095C0;--text3:#3D5080;
+  --accent:#3D7BFF;--accent2:#6699FF;--accentL:#0F2356;
+  --green:#10B981;--greenL:#042E1C;
+  --yellow:#F59E0B;--yellowL:#2D1F00;
+  --red:#EF4444;--redL:#2D0808;
+  --teal:#06B6D4;--tealL:#042830;
+  --purple:#8B5CF6;--purpleL:#1A0F35;
+  --orange:#F97316;--orangeL:#2D1100;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+}
+
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--sans)}
+
+/* ── Fondo animado ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 800px 500px at 20% 20%, rgba(61,123,255,.06) 0%, transparent 70%),
+    radial-gradient(ellipse 600px 400px at 80% 80%, rgba(6,182,212,.04) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 300px at 60% 30%, rgba(139,92,246,.03) 0%, transparent 70%);
+  pointer-events:none;z-index:0
+}
+
+/* ── Grid de fondo ── */
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),
+    linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:40px 40px;opacity:.3;pointer-events:none;z-index:0
+}
+
+.wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:32px 24px}
+
+/* ── Header ── */
+header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:48px;gap:20px;flex-wrap:wrap}
+.logo-area{display:flex;align-items:center;gap:16px}
+.logo-icon{
+  width:52px;height:52px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(135deg,#1A3A8F,#0C4A6E);
+  border:1px solid rgba(61,123,255,.4);
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+  box-shadow:0 0 24px rgba(61,123,255,.15);
+}
+.logo-txt{font-size:22px;font-weight:700;letter-spacing:-.5px;line-height:1.1}
+.logo-sub{font-size:12px;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-top:3px}
+.logo-version{font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg3);
+  border:1px solid var(--border);padding:3px 8px;border-radius:4px;margin-top:6px;display:inline-block}
+
+/* Estado predio activo */
+.predio-card{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:12px;
+  padding:14px 18px;min-width:260px;max-width:340px;
+}
+.predio-label{font-size:10px;color:var(--text3);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.predio-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0}
+.predio-dot.activo{background:var(--green);box-shadow:0 0 6px var(--green)}
+.predio-dir{font-size:13px;font-weight:500;margin-bottom:4px;color:var(--text)}
+.predio-zona{font-family:var(--mono);font-size:11px;color:var(--accent2);margin-bottom:2px}
+.predio-mun{font-size:11px;color:var(--text3);text-transform:capitalize}
+.predio-empty{font-size:12px;color:var(--text3);line-height:1.5}
+
+/* ── Título sección ── */
+.section-hdr{margin-bottom:20px}
+.section-title{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;gap:10px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.section-count{font-family:var(--mono);font-size:10px;background:var(--bg3);border:1px solid var(--border);padding:2px 8px;border-radius:4px;color:var(--text3)}
+
+/* ── Grid de módulos ── */
+.modulos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:40px}
+
+/* ── Tarjeta de módulo ── */
+.modulo{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:18px 16px;cursor:pointer;text-decoration:none;color:inherit;
+  transition:all .2s ease;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;gap:10px;
+  animation:fadeUp .4s ease both;
+}
+.modulo::before{
+  content:'';position:absolute;inset:0;opacity:0;
+  background:linear-gradient(135deg,rgba(61,123,255,.08),transparent);
+  transition:opacity .2s;
+}
+.modulo:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.modulo:hover::before{opacity:1}
+.modulo.activo{border-color:var(--accent);background:linear-gradient(135deg,var(--accentL),var(--bg2))}
+.modulo.activo::before{opacity:1}
+.modulo.proximo{opacity:.55;cursor:default}
+.modulo.proximo:hover{transform:none;box-shadow:none}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.mod-num{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.4px}
+.mod-icon{font-size:26px;line-height:1}
+.mod-nombre{font-size:13px;font-weight:600;line-height:1.3;flex:1}
+.mod-desc{font-size:11px;color:var(--text2);line-height:1.5}
+
+.mod-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-family:var(--mono);padding:3px 8px;
+  border-radius:4px;width:fit-content;margin-top:2px;
+}
+.mod-badge.live{background:var(--greenL);color:var(--green);border:1px solid #065F46}
+.mod-badge.next{background:var(--accentL);color:var(--accent2);border:1px solid #1E4080}
+.mod-badge.soon{background:var(--bg3);color:var(--text3);border:1px solid var(--border)}
+.mod-badge.ia{background:var(--purpleL);color:#A78BFA;border:1px solid #3B1F8F}
+
+/* Acento de color por categoría */
+.modulo[data-cat="consulta"] .mod-icon-wrap{color:var(--accent)}
+.modulo[data-cat="tramites"] .mod-icon-wrap{color:var(--teal)}
+.modulo[data-cat="calculo"] .mod-icon-wrap{color:var(--yellow)}
+.modulo[data-cat="ia"] .mod-icon-wrap{color:var(--purple)}
+.modulo[data-cat="generador"] .mod-icon-wrap{color:var(--orange)}
+.modulo[data-cat="seguimiento"] .mod-icon-wrap{color:var(--green)}
+
+/* Barra de progreso */
+.progreso-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:32px}
+.progreso-label{font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;display:flex;justify-content:space-between}
+.progreso-bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.progreso-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--teal));border-radius:2px;transition:width .8s ease;width:8.7%}
+.progreso-stats{display:flex;gap:20px;margin-top:10px;flex-wrap:wrap}
+.prog-stat{font-family:var(--mono);font-size:11px;color:var(--text2)}
+.prog-stat span{color:var(--text)}
+
+/* Footer */
+footer{border-top:1px solid var(--border);padding-top:20px;margin-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.footer-txt{font-size:11px;color:var(--text3)}
+.footer-apis{display:flex;gap:8px;flex-wrap:wrap}
+.api-badge{font-size:10px;font-family:var(--mono);padding:3px 8px;border-radius:4px;background:var(--bg3);border:1px solid var(--border);color:var(--text3)}
+.api-badge.ok{border-color:#065F46;color:var(--green)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ═══ HEADER ═══ -->
+  <header>
+    <div class="logo-area">
+      <div class="logo-icon">🏙️</div>
+      <div>
+        <div class="logo-txt">Gestor Urbano Jalisco</div>
+        <div class="logo-sub">Área Metropolitana de Guadalajara · 5 municipios</div>
+        <div class="logo-version">v2.0 · 23 módulos · mayo 2026</div>
+      </div>
+    </div>
+
+    <!-- Predio activo -->
+    <div class="predio-card" id="predioCard">
+      <div class="predio-label">
+        <div class="predio-dot" id="predioDot"></div>
+        Predio en sesión
+      </div>
+      <div id="predioInfo" class="predio-empty">Sin predio consultado.<br>Abre el Módulo 01 para empezar.</div>
+    </div>
+  </header>
+
+  <!-- ═══ BARRA DE PROGRESO ═══ -->
+  <div class="progreso-wrap">
+    <div class="progreso-label">
+      <span>Progreso de desarrollo</span>
+      <span id="progresoTexto">2 / 23 módulos</span>
+    </div>
+    <div class="progreso-bar"><div class="progreso-fill" id="progresoFill"></div></div>
+    <div class="progreso-stats">
+      <div class="prog-stat">Completados: <span>2</span></div>
+      <div class="prog-stat">En desarrollo: <span>1</span></div>
+      <div class="prog-stat">Pendientes: <span>20</span></div>
+      <div class="prog-stat">Municipios cubiertos: <span>2 / 5</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ MÓDULOS ═══ -->
+  <div class="section-hdr">
+    <div class="section-title">Módulos de consulta <span class="section-count">23 total</span></div>
+  </div>
+
+  <div class="modulos-grid" id="modulosGrid"></div>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <div class="footer-txt">Gestor Urbano Jalisco AMG — Desarrollo interno · Fernando</div>
+    <div class="footer-apis">
+      <div class="api-badge ok">● Google Maps</div>
+      <div class="api-badge ok">● GeoServer GDL</div>
+      <div class="api-badge ok">● VUJ Jalisco</div>
+      <div class="api-badge ok">● ArcGIS Zapopan</div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+// ════════════════════════════════════════════
+// DEFINICIÓN DE LOS 23 MÓDULOS
+// ════════════════════════════════════════════
+const MODULOS = [
+  {
+    num:1, icon:'🗺️', nombre:'Consulta de uso de suelo',
+    desc:'Zonificación, normas, COS, CUS, alturas y restricciones patrimoniales.',
+    archivo:'GestorUrbano_Modulo01_61.html',
+    estado:'live', cat:'consulta',
+  },
+  {
+    num:2, icon:'🏪', nombre:'Verificador de giro comercial',
+    desc:'Compatibilidad de actividades económicas SCIAN con el uso de suelo.',
+    archivo:'GestorUrbano_Modulo02_22.html',
+    estado:'next', cat:'consulta',
+  },
+  {
+    num:3, icon:'📋', nombre:'Checklist de licencias',
+    desc:'Lista de trámites y requisitos según giro y municipio.',
+    archivo:null, estado:'soon', cat:'tramites',
+  },
+  {
+    num:4, icon:'🧮', nombre:'Calculadora de derechos',
+    desc:'Estimación de derechos municipales según Ley de Ingresos.',
+    archivo:null, estado:'soon', cat:'calculo',
+  },
+  {
+    num:5, icon:'🤖', nombre:'Asistente IA urbano',
+    desc:'Consulta en lenguaje natural sobre normas y trámites.',
+    archivo:null, estado:'ia', cat:'ia',
+  },
+  {
+    num:6, icon:'📐', nombre:'Simulador de potencial',
+    desc:'Cálculo de m² construibles, cajones y densidad por lote.',
+    archivo:null, estado:'soon', cat:'calculo',
+  },
+  {
+    num:7, icon:'📁', nombre:'Expediente digital',
+    desc:'Generación automática de expediente técnico del predio.',
+    archivo:null, estado:'soon', cat:'generador',
+  },
+  {
+    num:8, icon:'🔄', nombre:'Seguimiento de trámites',
+    desc:'Consulta de estado de trámites en tiempo real.',
+    archivo:null, estado:'soon', cat:'seguimiento',
+  },
+  {
+    num:9, icon:'🏗️', nombre:'Normas de construcción',
+    desc:'Reglamento de Construcción aplicable por municipio.',
+    archivo:null, estado:'soon', cat:'consulta',
+  },
+  {
+    num:10, icon:'🌳', nombre:'Áreas verdes y restricciones',
+    desc:'Zonas de preservación, arroyos, cauces y restricciones ambientales.',
+    archivo:null, estado:'soon', cat:'consulta',
+  },
+  {
+    num:11, icon:'🏛️', nombre:'Patrimonio histórico',
+    desc:'Zonas de patrimonio, monumentos y restricciones INAH.',
+    archivo:null, estado:'soon', cat:'consulta',
+  },
+  {
+    num:12, icon:'🚗', nombre:'Estacionamientos y vialidad',
+    desc:'Cajones requeridos, dimensiones y normas viales.',
+    archivo:null, estado:'soon', cat:'calculo',
+  },
+  {
+    num:13, icon:'💧', nombre:'Infraestructura hidráulica',
+    desc:'Cobertura de agua, drenaje y restricciones hidráulicas.',
+    archivo:null, estado:'soon', cat:'consulta',
+  },
+  {
+    num:14, icon:'⚡', nombre:'Infraestructura eléctrica',
+    desc:'Subestaciones, líneas de alta tensión y restricciones.',
+    archivo:null, estado:'soon', cat:'consulta',
+  },
+  {
+    num:15, icon:'🔊', nombre:'Niveles de ruido e impacto',
+    desc:'Zonas de impacto ambiental y niveles sonoros permitidos.',
+    archivo:null, estado:'soon', cat:'consulta',
+  },
+  {
+    num:16, icon:'📊', nombre:'Indicadores urbanos',
+    desc:'Estadísticas de uso de suelo, densidad y aprovechamiento por zona.',
+    archivo:null, estado:'soon', cat:'calculo',
+  },
+  {
+    num:17, icon:'🏠', nombre:'Consulta de predios',
+    desc:'Información catastral, área y colindancias del predio.',
+    archivo:null, estado:'soon', cat:'consulta',
+  },
+  {
+    num:18, icon:'📍', nombre:'Mapa comparativo AMG',
+    desc:'Vista comparativa de zonificación en los 5 municipios.',
+    archivo:null, estado:'soon', cat:'consulta',
+  },
+  {
+    num:19, icon:'📄', nombre:'Generador de oficios',
+    desc:'Plantillas de oficios y solicitudes para trámites municipales.',
+    archivo:null, estado:'soon', cat:'generador',
+  },
+  {
+    num:20, icon:'🔗', nombre:'Vinculación de trámites',
+    desc:'Conexión entre trámites municipales, estatales y federales.',
+    archivo:null, estado:'soon', cat:'tramites',
+  },
+  {
+    num:21, icon:'📱', nombre:'Consulta ciudadana',
+    desc:'Vista simplificada para consultas ciudadanas sin tecnicismos.',
+    archivo:null, estado:'soon', cat:'consulta',
+  },
+  {
+    num:22, icon:'🔍', nombre:'Auditor de normas',
+    desc:'Verificación de cumplimiento normativo de proyectos.',
+    archivo:null, estado:'soon', cat:'tramites',
+  },
+  {
+    num:23, icon:'📈', nombre:'Reportes y exportación',
+    desc:'Generación de reportes PDF y Excel de consultas.',
+    archivo:null, estado:'soon', cat:'generador',
+  },
+];
+
+// ════════════════════════════════════════════
+// LEER PREDIO ACTIVO DEL localStorage
+// (guardado por el Módulo 01)
+// ════════════════════════════════════════════
+function leerPredioActivo(){
+  try {
+    const raw = localStorage.getItem('GU_predio_activo');
+    return raw ? JSON.parse(raw) : null;
+  } catch(e){ return null; }
+}
+
+function renderPredioCard(){
+  const p = leerPredioActivo();
+  const dot  = document.getElementById('predioDot');
+  const info = document.getElementById('predioInfo');
+
+  if(p && p.zona){
+    dot.classList.add('activo');
+    info.innerHTML = `
+      <div class="predio-dir">${p.dir||'Sin dirección'}</div>
+      <div class="predio-zona">${p.zona} ${p.municipio ? '· '+p.municipio : ''}</div>
+      <div class="predio-mun">${p.municipio||''}</div>`;
+  } else {
+    dot.classList.remove('activo');
+    info.innerHTML = `<div class="predio-empty">Sin predio consultado.<br>Abre el Módulo 01 para empezar.</div>`;
+  }
+}
+
+// ════════════════════════════════════════════
+// ABRIR MÓDULO — pasa predio via localStorage
+// ════════════════════════════════════════════
+function abrirModulo(mod){
+  if(!mod.archivo) return;
+
+  // Si el módulo necesita predio y no hay → abrir igual
+  // El módulo destino leerá de localStorage
+  window.open(mod.archivo, '_blank');
+}
+
+// ════════════════════════════════════════════
+// RENDER GRID DE MÓDULOS
+// ════════════════════════════════════════════
+function renderModulos(){
+  const grid = document.getElementById('modulosGrid');
+  const badgeTxt = {
+    live:'● Activo',
+    next:'◎ En desarrollo',
+    soon:'○ Próximamente',
+    ia:'✦ Con IA',
+  };
+
+  grid.innerHTML = MODULOS.map((m, i) => {
+    const isClickable = !!m.archivo;
+    const delay = (i * 30) + 'ms';
+    return `
+    <div class="modulo ${m.estado==='soon'?'proximo':''} ${m.estado==='live'?'activo':''}"
+      data-cat="${m.cat}"
+      style="animation-delay:${delay}"
+      ${isClickable ? `onclick="abrirModulo(MODULOS[${i}])" role="link" tabindex="0"` : ''}
+      onkeydown="if(event.key==='Enter') abrirModulo(MODULOS[${i}])">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="mod-num">M${String(m.num).padStart(2,'0')}</div>
+        <div class="mod-badge ${m.estado}">${badgeTxt[m.estado]}</div>
+      </div>
+      <div class="mod-icon">${m.icon}</div>
+      <div class="mod-nombre">${m.nombre}</div>
+      <div class="mod-desc">${m.desc}</div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+renderModulos();
+renderPredioCard();
+
+// Escuchar cambios en localStorage (cuando el Módulo 01 guarda un predio)
+window.addEventListener('storage', e => {
+  if(e.key === 'GU_predio_activo') renderPredioCard();
+});
+
+// Refrescar cada 3s por si el Módulo 01 está en otra pestaña
+setInterval(renderPredioCard, 3000);
+</script>
+</body>
+</html>

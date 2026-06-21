@@ -1,0 +1,2964 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M04 — Revisor de Planos · Gestor Urbano Jalisco AMG</title>
+<style>
+:root {
+  --bg0: #0B0F1A;
+  --bg1: #111827;
+  --bg2: #1A2235;
+  --bg3: #212D42;
+  --border: #2D3F5A;
+  --border2: #3A5080;
+  --text1: #E8EEF8;
+  --text2: #A8B8D0;
+  --text3: #6A80A0;
+  --accent: #3B82F6;
+  --accent2: #1D4ED8;
+  --green: #22C55E;
+  --green2: #166534;
+  --green3: #052e16;
+  --yellow: #F59E0B;
+  --yellow2: #78350F;
+  --yellow3: #1c0a00;
+  --red: #EF4444;
+  --red2: #7F1D1D;
+  --red3: #1a0000;
+  --gray: #4B5563;
+  --mono: 'Courier New', monospace;
+  --sans: 'Segoe UI', system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg0);
+  color: var(--text1);
+  font-family: var(--sans);
+  font-size: 14px;
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(135deg, #0D1B2E 0%, #1A3A8F 100%);
+  border-bottom: 1px solid var(--border2);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.hlogo { font-size: 22px; }
+.htitle { font-size: 15px; font-weight: 700; color: var(--text1); letter-spacing: .3px; }
+.hsubt { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.hbadge {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+.hnav {
+  display: flex;
+  gap: 8px;
+  margin-left: 12px;
+}
+.hnav a {
+  font-size: 11px;
+  color: var(--text3);
+  text-decoration: none;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 20px;
+  transition: all .2s;
+}
+.hnav a:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ── LAYOUT ── */
+.main { max-width: 960px; margin: 0 auto; padding: 24px 16px 60px; }
+
+/* ── CONFIGURACIÓN ── */
+.config-card {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.config-card h2 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.form-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.form-group { flex: 1; min-width: 180px; }
+.form-group label {
+  display: block;
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  margin-bottom: 6px;
+}
+.form-group select, .form-group input {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text1);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: var(--sans);
+  outline: none;
+  transition: border-color .2s;
+}
+.form-group select:focus, .form-group input:focus { border-color: var(--accent); }
+
+/* ── UPLOAD ── */
+.upload-zone {
+  border: 2px dashed var(--border2);
+  border-radius: 10px;
+  padding: 36px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .3s;
+  background: var(--bg2);
+  margin-bottom: 16px;
+  user-select: none;
+}
+.upload-zone:hover {
+  border-color: var(--accent);
+  background: rgba(59,130,246,.06);
+}
+.btn-seleccionar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  background: var(--accent2);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition: all .2s;
+  letter-spacing: .2px;
+}
+.btn-seleccionar:hover { background: var(--accent); }
+/* input[type=file] ahora está fuera del upload-zone, sin CSS especial necesario */
+.upload-icon { font-size: 36px; margin-bottom: 10px; }
+.upload-title { font-size: 15px; font-weight: 600; color: var(--text1); margin-bottom: 6px; }
+.upload-hint { font-size: 12px; color: var(--text3); }
+
+/* Preview */
+.preview-wrap {
+  display: none;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+  background: var(--bg2);
+}
+.preview-wrap.visible { display: block; }
+.preview-wrap img {
+  width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  display: block;
+}
+.preview-toolbar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 6px;
+}
+.preview-toolbar button {
+  background: rgba(17,24,39,.85);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text2);
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.preview-toolbar button:hover { border-color: var(--accent); color: var(--accent); }
+.preview-label {
+  padding: 8px 14px;
+  font-size: 11px;
+  color: var(--text3);
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+}
+
+/* ── BOTÓN ANALIZAR ── */
+.btn-analizar {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px;
+  cursor: pointer;
+  transition: all .25s;
+  letter-spacing: .3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.btn-analizar:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(59,130,246,.35);
+}
+.btn-analizar:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-analizar.loading { pointer-events: none; }
+
+/* ── ANÁLISIS PREVIO (parámetros input) ── */
+.params-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.param-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.param-item label {
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  display: block;
+  margin-bottom: 4px;
+}
+.param-item input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text1);
+  font-size: 13px;
+  width: 100%;
+  padding: 2px 0;
+  outline: none;
+  font-family: var(--mono);
+}
+
+/* ── LOADING ── */
+.loading-panel {
+  display: none;
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px 20px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.loading-panel.visible { display: block; }
+.loading-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-steps { list-style: none; margin-top: 16px; }
+.loading-steps li {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 4px 0;
+  transition: color .3s;
+}
+.loading-steps li.active { color: var(--accent); font-weight: 600; }
+.loading-steps li.done { color: var(--green); }
+
+/* Barra de progreso por lotes */
+.loading-batch {
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--text3);
+}
+.loading-batch-bar-wrap {
+  background: var(--bg3);
+  border-radius: 20px;
+  height: 6px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.loading-batch-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  border-radius: 20px;
+  transition: width .4s ease;
+  width: 0%;
+}
+
+/* ── RESULTADOS ── */
+.result-panel { display: none; margin-bottom: 20px; }
+.result-panel.visible { display: block; }
+
+/* Semáforo */
+.semaforo-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.semaforo-header.rojo { border-left: 4px solid var(--red); }
+.semaforo-header.amarillo { border-left: 4px solid var(--yellow); }
+.semaforo-header.verde { border-left: 4px solid var(--green); }
+.semaforo-icon { font-size: 28px; flex-shrink: 0; }
+.semaforo-info { flex: 1; min-width: 180px; }
+.semaforo-titulo { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+.semaforo-titulo.verde { color: var(--green); }
+.semaforo-titulo.amarillo { color: var(--yellow); }
+.semaforo-titulo.rojo { color: var(--red); }
+.semaforo-subtitulo { font-size: 12px; color: var(--text3); margin-bottom: 10px; }
+.semaforo-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+.sstat { text-align: center; background: var(--bg2); border-radius: 8px; padding: 6px 14px; border: 1px solid var(--border); }
+.sstat-num { font-size: 20px; font-weight: 700; font-family: var(--mono); }
+.sstat-num.verde { color: var(--green); }
+.sstat-num.amarillo { color: var(--yellow); }
+.sstat-num.rojo { color: var(--red); }
+.sstat-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; }
+
+/* Elementos */
+.elementos-titulo {
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .8px; margin-bottom: 10px;
+}
+.elemento-card {
+  border-radius: 10px;
+  border: 0.5px solid var(--border);
+  border-left: 3px solid var(--border);
+  margin-bottom: 8px;
+  overflow: hidden;
+  background: var(--bg1);
+}
+.elemento-card.cumple { border-left-color: var(--green); }
+.elemento-card.atencion { border-left-color: var(--yellow); }
+.elemento-card.incumple { border-left-color: var(--red); }
+.elemento-card.nd { border-left-color: var(--border2); }
+.elemento-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px; cursor: pointer; user-select: none;
+  background: var(--bg1);
+}
+.elemento-icono { font-size: 16px; flex-shrink: 0; width: 22px; text-align: center; }
+.elemento-nombre { flex: 1; font-size: 13px; font-weight: 600; color: var(--text1); }
+.elemento-badge {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .5px; padding: 3px 10px; border-radius: 4px; flex-shrink: 0;
+}
+.cumple .elemento-badge { background: var(--green3); color: var(--green); }
+.atencion .elemento-badge { background: var(--yellow3); color: var(--yellow); }
+.incumple .elemento-badge { background: var(--red3); color: var(--red); }
+.nd .elemento-badge { background: var(--bg3); color: var(--text3); }
+.elemento-chevron { font-size: 11px; color: var(--text3); transition: transform .2s; flex-shrink: 0; }
+.elemento-header.open .elemento-chevron { transform: rotate(90deg); }
+.elemento-body { display: none; padding: 0 14px 14px; }
+.elemento-body.visible { display: block; }
+.observacion {
+  font-size: 12px; color: var(--text2); line-height: 1.65;
+  padding: 10px 12px; background: var(--bg2); border-radius: 6px;
+  margin: 10px 0 8px;
+}
+.norma-ref { font-size: 11px; color: var(--text3); font-family: var(--mono); margin-top: 4px; }
+.medidas-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 11px;
+}
+.medidas-table th {
+  background: rgba(0,0,0,.3);
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  padding: 6px 10px;
+  text-align: left;
+  font-size: 10px;
+}
+.medidas-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  color: var(--text2);
+}
+.medidas-table td.val { font-family: var(--mono); color: var(--text1); }
+.medidas-table td.ok { color: var(--green); font-weight: 700; }
+.medidas-table td.warn { color: var(--yellow); font-weight: 700; }
+.medidas-table td.fail { color: var(--red); font-weight: 700; }
+
+/* Dictamen IA */
+.dictamen-card {
+  background: linear-gradient(135deg, rgba(30,58,138,.12), rgba(15,23,42,.6));
+  border: 1px solid rgba(99,138,255,.22);
+  border-left: 3px solid var(--accent2);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+.dictamen-card h3 {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent2);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dictamen-texto {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.75;
+  white-space: normal;
+}
+
+/* Botones de acción */
+.actions-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.btn-excel {
+  background: #166534 !important;
+  color: #fff !important;
+  border-color: #166534 !important;
+}
+.btn-excel:hover { background: #14532d !important; }
+.btn-sec {
+  flex: 1;
+  min-width: 140px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-sec:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Error */
+.error-panel {
+  display: none;
+  background: var(--red3);
+  border: 1px solid var(--red2);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--red);
+}
+.error-panel.visible { display: block; }
+
+/* Disclaimer */
+.apikey-panel {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.apikey-panel.ok { border-color: var(--green2); background: var(--green3); }
+.apikey-panel.error { border-color: var(--red2); background: var(--red3); }
+.apikey-input-wrap { flex: 1; min-width: 220px; position: relative; }
+.apikey-input-wrap input {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text1);
+  padding: 8px 80px 8px 12px;
+  font-size: 13px;
+  font-family: var(--mono);
+  outline: none;
+  transition: border-color .2s;
+}
+.apikey-input-wrap input:focus { border-color: var(--accent); }
+.apikey-input-wrap input.saved { border-color: var(--green2); color: var(--green); }
+.apikey-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 6px;
+}
+.apikey-toggle:hover { color: var(--text1); }
+.btn-save-key {
+  background: var(--accent2);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all .2s;
+  flex-shrink: 0;
+}
+.btn-save-key:hover { background: var(--accent); }
+.apikey-status {
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.disclaimer {
+  background: rgba(59,130,246,.05);
+  border: 1px solid rgba(59,130,246,.2);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.6;
+  margin-top: 20px;
+}
+
+
+/* ── MULTI-IMAGEN ── */
+.files-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.file-thumb {
+  position: relative;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+}
+.file-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.file-thumb-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  font-size: 32px;
+  background: var(--bg3);
+}
+.file-thumb-label {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(0,0,0,.72);
+  font-size: 10px;
+  color: var(--text3);
+  padding: 3px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--mono);
+}
+.file-thumb-del {
+  position: absolute;
+  top: 4px; right: 4px;
+  background: rgba(0,0,0,.7);
+  border: none;
+  border-radius: 50%;
+  color: var(--text3);
+  width: 20px; height: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+  line-height: 1;
+}
+.file-thumb-del:hover { background: var(--red2); color: var(--red); }
+.files-count {
+  font-size: 11px;
+  color: var(--text3);
+  margin-bottom: 10px;
+  font-family: var(--mono);
+}
+.upload-zone-compact {
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 14px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .3s;
+  background: var(--bg2);
+  position: relative;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--text3);
+}
+.upload-zone-compact:hover { border-color: var(--accent); color: var(--accent); }
+/* upload-zone-compact usa onclick, sin input interno */
+.upload-zone-compact.maxed { opacity: .4; pointer-events: none; }
+
+/* ── DICTAMEN ESTRUCTURADO ── */
+.dictamen-parrafo {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.75;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.dictamen-parrafo:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+
+/* ── @MEDIA PRINT ── */
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+  body {
+    background: #fff !important;
+    color: #111 !important;
+    font-family: 'Segoe UI', Arial, sans-serif !important;
+    font-size: 11pt !important;
+  }
+
+  /* Ocultar controles */
+  .header, .apikey-panel, .config-card, .upload-zone, .upload-zone-compact,
+  .preview-wrap, .btn-analizar, .loading-panel, .error-panel,
+  .actions-row, .disclaimer, .hnav, .hbadge,
+  .elemento-chevron, .preview-toolbar, .files-grid, .files-count { display: none !important; }
+
+  /* Mostrar resultado aunque sea display:none */
+  .result-panel { display: block !important; }
+
+  /* PORTADA */
+  .print-header {
+    display: block !important;
+    border-bottom: 3px solid #1A3A8F;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+  }
+  .print-header-title {
+    font-size: 18pt;
+    font-weight: 800;
+    color: #0D1B2E;
+    margin-bottom: 4px;
+  }
+  .print-header-sub {
+    font-size: 10pt;
+    color: #555;
+  }
+  .print-header-meta {
+    margin-top: 10px;
+    font-size: 9pt;
+    color: #666;
+    font-family: 'Courier New', monospace;
+  }
+
+  /* Semáforo impresión */
+  .semaforo-header {
+    background: #f4f7ff !important;
+    border: 2px solid #1A3A8F !important;
+    border-radius: 8px !important;
+    color: #111 !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 16pt !important;
+  }
+  .semaforo-titulo { font-size: 16pt !important; }
+  .semaforo-titulo.verde { color: #166534 !important; }
+  .semaforo-titulo.amarillo { color: #78350F !important; }
+  .semaforo-titulo.rojo { color: #7F1D1D !important; }
+  .semaforo-subtitulo { color: #444 !important; font-size: 10pt !important; }
+  .sstat { background: #eef2ff !important; border: 1px solid #c7d2fe !important; }
+  .sstat-num { color: #1e3a8a !important; }
+  .sstat-num.verde { color: #166534 !important; }
+  .sstat-num.amarillo { color: #78350F !important; }
+  .sstat-num.rojo { color: #7F1D1D !important; }
+  .sstat-lbl { color: #555 !important; }
+
+  /* Título sección */
+  .elementos-titulo {
+    font-size: 11pt !important;
+    color: #333 !important;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 6px;
+    margin-bottom: 12pt !important;
+  }
+
+  /* Cards de elementos */
+  .elemento-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border-radius: 4px !important;
+    margin-bottom: 10pt !important;
+    border-width: 1.5px !important;
+  }
+  .elemento-card.cumple { background: #f0fdf4 !important; border-color: #166534 !important; }
+  .elemento-card.atencion { background: #fffbeb !important; border-color: #78350F !important; }
+  .elemento-card.incumple { background: #fef2f2 !important; border-color: #7F1D1D !important; }
+  .elemento-card.nd { background: #f9fafb !important; border-color: #9ca3af !important; }
+
+  .elemento-header { pointer-events: none; }
+  .elemento-nombre { color: #111 !important; font-size: 11pt !important; }
+  .cumple .elemento-badge { background: #dcfce7 !important; color: #166534 !important; font-size: 8pt !important; }
+  .atencion .elemento-badge { background: #fef3c7 !important; color: #78350F !important; font-size: 8pt !important; }
+  .incumple .elemento-badge { background: #fee2e2 !important; color: #7F1D1D !important; font-size: 8pt !important; }
+  .nd .elemento-badge { background: #f3f4f6 !important; color: #6b7280 !important; font-size: 8pt !important; }
+
+  /* Forzar que todos los cuerpos sean visibles en impresión */
+  .elemento-body { display: block !important; padding: 8pt 14pt 10pt !important; }
+
+  .observacion {
+    background: rgba(0,0,0,.04) !important;
+    color: #333 !important;
+    font-size: 10pt !important;
+    line-height: 1.5 !important;
+  }
+  .norma-ref { color: #555 !important; font-size: 9pt !important; }
+
+  /* Recuadro de recomendación */
+  .elemento-body div[style*="background:rgba(245,158,11"] {
+    background: #fef3c7 !important;
+    color: #78350F !important;
+    border-left: 3px solid #f59e0b !important;
+    font-size: 10pt !important;
+  }
+  .elemento-body div[style*="rgba(245"] {
+    background: #fef3c7 !important;
+    color: #78350F !important;
+  }
+
+  /* Dictamen IA */
+  .dictamen-card {
+    background: #f4f7ff !important;
+    border: 1.5px solid #1A3A8F !important;
+    border-radius: 6px !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-top: 14pt !important;
+  }
+  .dictamen-card h3 { color: #1A3A8F !important; font-size: 10pt !important; }
+  .dictamen-parrafo { color: #222 !important; font-size: 10pt !important; }
+
+  /* Pie de página */
+  .print-footer {
+    display: block !important;
+    margin-top: 20pt;
+    border-top: 1px solid #ccc;
+    padding-top: 8pt;
+    font-size: 8pt;
+    color: #888;
+    text-align: center;
+  }
+
+  /* Paginación */
+  @page {
+    size: Letter;
+    margin: 2cm 2.2cm 2cm 2.2cm;
+  }
+}
+
+/* Ocultar elementos de impresión en pantalla */
+.print-header, .print-footer { display: none; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .form-row { flex-direction: column; }
+  .semaforo-header { flex-direction: column; }
+  .params-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="hlogo">📐</div>
+  <div>
+    <div class="htitle">Gestor Urbano Jalisco AMG</div>
+    <div class="hsubt">Área Metropolitana de Guadalajara · 5 Municipios</div>
+  </div>
+  <div class="hnav">
+    <a href="index.html">⌂ Menú</a>
+    <a href="GestorUrbano_M01_2.html">M01</a>
+    <a href="GestorUrbano_M03_2.html">M03</a>
+  </div>
+  <div class="hbadge">Módulo 04 v2.0 — Revisor de Planos IA</div>
+</header>
+
+<div class="main">
+
+  <!-- ── API KEY ── -->
+  <div class="apikey-panel" id="apikey-panel">
+    <div style="font-size:18px; flex-shrink:0;">🔑</div>
+    <div style="flex:1; min-width:200px;">
+      <div style="font-size:12px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:.6px; margin-bottom:6px;">API Key de Claude (Anthropic)</div>
+      <div style="font-size:11px; color:var(--text3); margin-bottom:8px;">Se guarda solo en tu navegador. Nunca sale de tu computadora. Obtenla en <span style="color:var(--accent);">console.anthropic.com</span> → API Keys</div>
+      <div class="apikey-input-wrap">
+        <input type="password" id="apikey-input" placeholder="sk-ant-api03-..." autocomplete="off" oninput="onKeyInput()">
+        <button class="apikey-toggle" onclick="toggleKeyVisibility()" id="apikey-toggle">mostrar</button>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+      <button class="btn-save-key" onclick="guardarKey()">💾 Guardar key</button>
+      <div class="apikey-status" id="apikey-status"></div>
+    </div>
+  </div>
+
+  <!-- ── CONFIGURACIÓN ── -->
+  <div class="config-card">
+    <h2>⚙️ Configuración del análisis</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Municipio <span id="badge-municipio" style="display:none;font-size:10px;font-weight:600;color:var(--accent);background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);padding:1px 6px;border-radius:10px;margin-left:4px;">✦ auto-detectado</span></label>
+        <select id="sel-municipio" onchange="sincronizarMunicipio();">
+          <option value="" selected>— detectar automáticamente —</option>
+          <option value="GDL">Guadalajara</option>
+          <option value="ZPN">Zapopan</option>
+          <option value="TLQ">Tlaquepaque</option>
+          <option value="TLA">Tlajomulco de Zúñiga</option>
+          <option value="TON">Tonalá</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tipo de proyecto <span id="badge-tipo" style="display:none;font-size:10px;font-weight:600;color:var(--accent);background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);padding:1px 6px;border-radius:10px;margin-left:4px;">✦ auto-detectado</span></label>
+        <select id="sel-tipo" onchange="document.getElementById('badge-tipo').style.display='none';">
+          <option value="" selected>— detectar automáticamente —</option>
+          <option value="habitacional_unifamiliar">Habitacional unifamiliar</option>
+          <option value="habitacional_plurifamiliar">Habitacional plurifamiliar</option>
+          <option value="comercio_servicios">Comercio y servicios</option>
+          <option value="oficinas">Oficinas</option>
+          <option value="mixto">Mixto (hab + comercio)</option>
+          <option value="educacion">Educación</option>
+          <option value="salud">Salud / asistencia social</option>
+          <option value="industrial">Industrial</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Número de niveles <span id="badge-niveles" style="display:none;font-size:10px;font-weight:600;color:var(--accent);background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);padding:1px 6px;border-radius:10px;margin-left:4px;">✦ auto-detectado</span></label>
+        <select id="sel-niveles" onchange="document.getElementById('badge-niveles').style.display='none';">
+          <option value="" selected>— detectar automáticamente —</option>
+          <option value="1">1 nivel (planta baja)</option>
+          <option value="2">2 niveles</option>
+          <option value="3">3 niveles</option>
+          <option value="4">4 niveles</option>
+          <option value="5">5 niveles</option>
+          <option value="6">6 niveles</option>
+          <option value="7">7+ niveles</option>
+        </select>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:-8px;margin-bottom:4px;">
+      ✦ Estos campos se llenan automáticamente al analizar el plano. Puedes ajustarlos después si es necesario.
+    </div>
+    <div id="reanalizar-banner" style="display:none; margin-top:10px; padding:10px 14px; background:rgba(245,158,11,.10); border:1px solid rgba(245,158,11,.35); border-radius:8px; align-items:center; gap:12px;">
+      <span style="font-size:13px; color:var(--yellow);">⚠️ El municipio fue modificado. El análisis actual usa normas de <strong id="reanalizar-mun-anterior"></strong>.</span>
+      <button onclick="reanalizar()" style="margin-left:auto; flex-shrink:0; background:rgba(245,158,11,.18); border:1px solid var(--yellow); color:var(--yellow); border-radius:6px; padding:5px 14px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;">
+        🔄 Re-analizar con <span id="reanalizar-mun-nuevo"></span>
+      </button>
+    </div>
+
+    <!-- Parámetros del predio (opcionales) -->
+    <div style="margin-bottom:10px; font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:.6px;">
+      Parámetros del predio (opcionales — ayudan a verificar restricciones)
+    </div>
+    <div class="params-grid">
+      <div class="param-item">
+        <label>Superficie predio (m²)</label>
+        <input type="number" id="p-sup" placeholder="ej. 200">
+      </div>
+      <div class="param-item">
+        <label>Frente (ml)</label>
+        <input type="number" id="p-frente" placeholder="ej. 10">
+      </div>
+      <div class="param-item">
+        <label>Restricción frontal (ml)</label>
+        <input type="number" id="p-rf" placeholder="ej. 3">
+      </div>
+      <div class="param-item">
+        <label>Restricción lateral (ml)</label>
+        <input type="number" id="p-rl" placeholder="ej. 0">
+      </div>
+      <div class="param-item">
+        <label>Restricción posterior (ml)</label>
+        <input type="number" id="p-rp" placeholder="ej. 3">
+      </div>
+      <div class="param-item">
+        <label>COS autorizado</label>
+        <input type="number" id="p-cos" placeholder="ej. 0.70" step="0.01">
+      </div>
+    </div>
+
+    <!-- Datos del proyecto para validación cruzada con solapa -->
+    <div style="margin: 16px 0 10px; font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:.6px;">
+      Datos del cuadro de áreas — opcional · Claude los contrasta con lo que lee en la solapa del plano
+    </div>
+    <div class="params-grid">
+      <div class="param-item">
+        <label>Sup. total construcción (m²)</label>
+        <input type="number" id="p-sup-const" placeholder="ej. 850">
+      </div>
+      <div class="param-item">
+        <label>Número de viviendas / unidades</label>
+        <input type="number" id="p-num-viv" placeholder="ej. 10">
+      </div>
+      <div class="param-item">
+        <label>Cajones indicados en proyecto</label>
+        <input type="number" id="p-cajones" placeholder="ej. 12">
+      </div>
+      <div class="param-item">
+        <label>Cajones PMR indicados</label>
+        <input type="number" id="p-cajones-pmr" placeholder="ej. 1">
+      </div>
+      <div class="param-item">
+        <label>Altura de entrepiso (m)</label>
+        <input type="number" id="p-altura" placeholder="ej. 2.70" step="0.01">
+      </div>
+      <div class="param-item">
+        <label>Sup. vivienda tipo (m²)</label>
+        <input type="number" id="p-sup-viv" placeholder="ej. 75">
+      </div>
+    </div>
+
+    <!-- Nombre del proyecto / DRO (para el dictamen impreso) -->
+    <div style="margin: 14px 0 10px; font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:.6px;">
+      Datos para el dictamen impreso — opcional
+    </div>
+    <div class="params-grid">
+      <div class="param-item" style="grid-column: span 2;">
+        <label>Nombre del proyecto o cliente</label>
+        <input type="text" id="p-nombre-proyecto" placeholder="ej. Residencial Los Pinos — Torre A">
+      </div>
+      <div class="param-item" style="grid-column: span 2;">
+        <label>Nombre del DRO</label>
+        <input type="text" id="p-dro" placeholder="ej. Arq. Juan Pérez Martínez">
+      </div>
+    </div>
+  </div>
+
+  <!-- inputs ocultos — se activan solo con botón -->
+  <input type="file" id="file-input" accept="image/*,.pdf" multiple style="display:none;">
+  <input type="file" id="file-input-extra" accept="image/*,.pdf" multiple style="display:none;">
+
+  <!-- ── UPLOAD MULTI-IMAGEN ── -->
+  <div class="config-card">
+    <h2>📄 Planos arquitectónicos</h2>
+
+    <!-- Zona visual + botón explícito -->
+    <div class="upload-zone" id="upload-zone">
+      <div class="upload-icon">🗂️</div>
+      <div class="upload-title">Selecciona los planos desde tu computadora</div>
+      <div class="upload-hint">JPG · PNG · WEBP · PDF · Máx. 10 MB por archivo · Hasta 10 láminas</div>
+      <button class="btn-seleccionar" type="button" onclick="document.getElementById('file-input').click()">
+        📂 Seleccionar archivos
+      </button>
+    </div>
+
+    <!-- Contador + galería de miniaturas -->
+    <div id="files-count-label" class="files-count" style="display:none;"></div>
+    <div class="files-grid" id="files-grid"></div>
+
+    <!-- Botón agregar más -->
+    <button type="button" class="upload-zone-compact" id="upload-zone-compact" style="display:none;width:100%;border:none;cursor:pointer;"
+         onclick="document.getElementById('file-input-extra').click()">
+      ➕ Agregar más planos (quedan <span id="slots-restantes">9</span>)
+    </button>
+
+    <button class="btn-analizar" id="btn-analizar" disabled onclick="analizarPlano()">
+      <span>🔍</span>
+      <span id="btn-analizar-label">Analizar planos con IA normativa</span>
+    </button>
+  </div>
+
+  <!-- ── ERROR ── -->
+  <div class="error-panel" id="error-panel"></div>
+
+  <!-- ── LOADING ── -->
+  <div class="loading-panel" id="loading-panel">
+    <div class="loading-spinner"></div>
+    <div style="font-size:14px; font-weight:700; color:var(--text1); margin-bottom:8px;">Analizando plano…</div>
+    <div style="font-size:12px; color:var(--text3); margin-bottom:16px;">Claude lee el plano y verifica cada elemento contra la normativa vigente del municipio seleccionado</div>
+    <ul class="loading-steps" id="loading-steps">
+      <li id="step1">📷 Interpretando láminas del plano…</li>
+      <li id="step2">📏 Identificando dimensiones y elementos…</li>
+      <li id="step3">⚖️ Verificando contra normativa GDL…</li>
+      <li id="step4">📋 Consolidando dictamen final…</li>
+    </ul>
+    <div class="loading-batch" id="loading-batch" style="display:none;">
+      <div id="loading-batch-label">Procesando lote 1 de 1…</div>
+      <div class="loading-batch-bar-wrap">
+        <div class="loading-batch-bar" id="loading-batch-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RESULTADO ── -->
+  <div class="result-panel" id="result-panel">
+
+    <!-- Solo visible al imprimir -->
+    <div class="print-header" id="print-header">
+      <div class="print-header-title">Dictamen de Revisión Normativa de Planos</div>
+      <div class="print-header-sub">Gestor Urbano Jalisco AMG · Módulo 04 — Revisor de Planos IA</div>
+      <div class="print-header-meta" id="print-header-meta"></div>
+    </div>
+
+    <div class="semaforo-header" id="semaforo-header"></div>
+
+    <!-- Dictamen general: resumen ejecutivo ANTES de los elementos -->
+    <div class="dictamen-card" id="dictamen-card">
+      <h3>🤖 Análisis del expediente</h3>
+      <div class="dictamen-texto" id="dictamen-texto"></div>
+      <div id="solapa-datos" style="display:none; margin-top:12px; padding:10px 12px; background:rgba(0,0,0,.2); border-radius:6px; font-size:11px; color:var(--text3); line-height:1.7;"></div>
+    </div>
+
+    <!-- Verificación por elemento -->
+    <div class="elementos-titulo">📋 Verificación normativa por elemento</div>
+    <div id="elementos-list"></div>
+
+    <div class="actions-row">
+      <button class="btn-sec" onclick="nuevoAnalisis()">🔄 Nuevo análisis</button>
+      <button class="btn-sec btn-excel" onclick="descargarExcel()">⬇️ Descargar Excel</button>
+      <button class="btn-sec" onclick="imprimirResultado()">🖨️ Imprimir PDF</button>
+      <button class="btn-sec" id="btn-ir-m01" onclick="irAM01()" style="display:none; background:rgba(59,130,246,.12); border-color:var(--accent); color:var(--accent);">
+        🗺️ Consultar uso de suelo en M01
+      </button>
+    </div>
+
+    <!-- Solo visible al imprimir -->
+    <div class="print-footer" id="print-footer">
+      <span id="print-footer-texto">Documento generado por Gestor Urbano Jalisco AMG. Análisis orientativo basado en normativa municipal vigente. No sustituye dictamen oficial de la autoridad municipal correspondiente.</span>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ <strong>Aviso legal:</strong> <span id="disclaimer-texto">Este módulo proporciona orientación técnica basada en normativa municipal vigente. El análisis de IA puede contener errores de interpretación visual. No sustituye un dictamen oficial emitido por la autoridad municipal competente. Verifique siempre con el DRO antes de iniciar obra.</span>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════════════════
+// BD NORMATIVA — GUADALAJARA
+// Fuentes:
+//   1. Reglamento para la Gestión Integral del Municipio de Guadalajara
+//      (reforma dic. 2023, arts. 159 Bis, 249 Bis, 273, 276, 278)
+//   2. Reglamento de Zonificación Urbana de Guadalajara
+//      (arts. 221–226, cuadros 53–59)
+// ══════════════════════════════════════════════════════════════════════════
+const NORMAS_GDL = {
+
+  escaleras: {
+    nombre: 'Escaleras',
+    icono: '🪜',
+    fuente: 'Art. 249 Bis — Reg. Gestión Integral GDL (reform. dic. 2023)',
+    reglas: {
+      ancho_minimo_m: 1.50,           // Art. 249 Bis I — GDL más exigente que REZ (1.20)
+      huella_min_m: 0.30,             // Art. 249 Bis II
+      huella_max_m: 0.50,             // Art. 249 Bis II
+      contrahuella_max_m: 0.15,       // Art. 249 Bis III
+      contrahuella_min_m: 0.10,       // Art. 249 Bis III
+      escalones_max_entre_descansos: 12, // Art. 249 Bis VI — GDL más exigente que REZ (15)
+      descanso_min_m: 1.50,           // Art. 249 Bis VII (× ancho escalera)
+      pasamanos_alto_m: 0.90,         // Art. 249 Bis IV a)
+      pasamanos_bajo_m: 0.75,         // Art. 249 Bis IV b)
+      pasamanos_diametro_m: 0.04,     // Art. 249 Bis IV c)
+      altura_libre_min_m: 1.90,       // Reg. Zonif. Art. 224 II l)
+      borde_contraste_m: 0.025,       // Art. 249 Bis IX
+      sin_bocel: true,                // Art. 249 Bis VIII
+      relacion_2p_h_min: 0.63,        // Reg. Zonif. Art. 224 II e)
+      relacion_2p_h_max: 0.64,        // Reg. Zonif. Art. 224 II e)
+    },
+    descripcion: 'Ancho mín. 1.50 m · Huella 0.30–0.50 m · Contrahuella 0.10–0.15 m · Máx. 12 escalones entre descansos · Pasamanos a 0.90/0.75 m · Altura libre ≥ 1.90 m · Sin bocel · Franja contraste 2.5 cm'
+  },
+
+  pasillos: {
+    nombre: 'Pasillos y corredores',
+    icono: '🚶',
+    fuente: 'Art. 223 Cuadro 58 — Reg. Zonificación Urbana GDL',
+    reglas: {
+      habitacional_interior_m: 0.90,        // Corredores interiores en viviendas
+      habitacional_comun_m: 1.20,           // Corredores comunes a 2+ viviendas
+      oficinas_interno_m: 0.90,
+      oficinas_acceso_general_m: 1.20,
+      comercio_interno_m: 0.90,
+      comercio_acceso_general_m: 1.20,
+      educacion_comun_m: 1.20,
+      altura_minima_m: 2.30,
+    },
+    descripcion: 'Corredores interiores vivienda: 0.90 m · Comunes a 2+ viviendas: 1.20 m · Acceso general: 1.20 m · Altura libre: 2.30 m'
+  },
+
+  puertas: {
+    nombre: 'Puertas',
+    icono: '🚪',
+    fuente: 'Art. 222 Cuadro 57 — Reg. Zonificación Urbana GDL',
+    reglas: {
+      habitacional_acceso_principal_m: 0.90,
+      habitacional_local_habitable_m: 0.80,
+      habitacional_bano_m: 0.60,
+      habitacional_acceso_altura_m: 2.05,
+      habitacional_local_altura_m: 2.05,
+      habitacional_bano_altura_m: 2.05,
+      comercio_acceso_m: 0.90,
+      comercio_acceso_altura_m: 2.10,
+      oficinas_acceso_m: 0.90,
+      accesibilidad_min_m: 1.00,  // Art. 243/244 Reg. Zonif. — edificios públicos/accesibilidad
+    },
+    descripcion: 'Acceso principal habitacional: 0.90 m × 2.05 m · Locales habitables: 0.80 m · Baños: 0.60 m · Edificios públicos/accesibilidad: 1.00 m mín.'
+  },
+
+  patios_ventilacion: {
+    nombre: 'Patios de iluminación y ventilación',
+    icono: '🌿',
+    fuente: 'Art. 159 Bis — Reg. Gestión Integral GDL (reform. dic. 2023)',
+    reglas: {
+      habitable_hasta4m_min: 2.50,    // patio cuadrado mín. 2.50 × 2.50
+      habitable_hasta12m_min: 3.00,   // patio cuadrado mín. 3.00 × 3.00
+      habitable_mas12m_factor: 0.25,  // 25% de la altura
+      no_habitable_factor: 0.20,      // 20% de la altura, cualquier caso
+      lado_menor_absoluto_m: 2.50,    // lado menor NUNCA inferior a 2.50 m
+    },
+    descripcion: 'Habitables hasta 4 m: patio 2.50×2.50 m · Hasta 12 m: 3.00×3.00 m · Más de 12 m: 25% de la altura · No habitables: 20% de la altura · Lado menor siempre ≥ 2.50 m'
+  },
+
+  ventanas_iluminacion: {
+    nombre: 'Ventanas e iluminación natural',
+    icono: '☀️',
+    fuente: 'Art. 220 Cuadro 54 — Reg. Zonificación Urbana GDL',
+    reglas: {
+      habitables_iluminacion_pct: 15,  // ventana ≥ 15% del área del local
+      no_habitables_iluminacion_pct: 10, // ventana ≥ 10%
+      ventilacion_pct_ventana: 40,     // ventilación ≥ 40% del área de ventana
+      educacion_pct: 20,               // educación e internados: 20%
+    },
+    descripcion: 'Piezas habitables: ventana ≥ 15% del área del local · No habitables: ≥ 10% · Ventilación: ≥ 40% del área de ventana · Educación/internados: ≥ 20%'
+  },
+
+  elevadores: {
+    nombre: 'Elevadores',
+    icono: '🛗',
+    fuente: 'Art. 225 — Reg. Zonificación Urbana GDL / Art. 243 accesibilidad',
+    reglas: {
+      obligatorio_niveles: 4,           // más de 4 niveles incluida PB → elevador obligatorio
+      obligatorio_altura_m: 12,         // o altura > 12 m desde nivel de acceso
+      excepcion_plurifamiliar_niveles: 5, // plurifamiliar hasta 5 niveles sin elevador si vivienda ≤ 70 m²
+      excepcion_sup_max_m2: 70,
+      accesibilidad_interior_m: 1.50,  // Art. 243 III — 1.50 × 1.50 m interior libre
+      accesibilidad_puerta_m: 1.00,    // Art. 243 IV — puerta mín. 1.00 m
+      pasamanos_3_lados: true,         // Art. 243 V
+      controles_altura_m: 1.20,        // Art. 243 VI
+    },
+    descripcion: 'Obligatorio: +4 niveles (incl. PB) o +12 m de altura · Excepción plurifamiliar hasta 5 niveles si vivienda ≤ 70 m² · Cabina mín. 1.50×1.50 m · Puerta ≥ 1.00 m · Pasamanos 3 lados'
+  },
+
+  cajones_estacionamiento: {
+    nombre: 'Cajones de estacionamiento',
+    icono: '🚗',
+    fuente: 'Arts. 273, 276, 278 — Reg. Gestión Integral GDL (reform. 2023)',
+    reglas: {
+      auto_largo_m: 5.00,               // Art. 273 II
+      auto_ancho_m: 2.50,               // Art. 273 II
+      moto_largo_m: 2.50,               // Art. 273 I
+      moto_ancho_m: 1.50,               // Art. 273 I
+      discapacidad_largo_m: 5.00,       // Art. 273 III
+      discapacidad_ancho_m: 3.80,       // Art. 273 III — incluye zona transferencia
+      carga_ligera_largo_m: 6.00,       // Art. 273 IV
+      carga_ligera_ancho_m: 2.50,       // Art. 273 IV
+      discapacidad_1_por_cada: 25,      // Art. 276 I a) — 1 cajón discapacidad cada 25
+      ciclopuerto_1_por_cada: 20,       // Art. 276 I f) — 1 ciclopuerto cada 20 cajones
+      altura_libre_pb_m: 2.30,          // Art. 276 VII a)
+      altura_libre_pisos_m: 2.10,       // Art. 276 VII a)
+      altura_libre_cochera_m: 2.00,     // Art. 276 VII b)
+      carril_hasta_1500_m: 3.00,        // Art. 276 III a) carril simple < 1,500 m²
+      carril_curva_m: 3.50,             // Art. 276 III a) carril curvo
+      pendiente_rampa_max_pct: 18,      // Art. 276 V a)
+      // Art. 278 — cajones mínimos por zona habitacional
+      h1_min_por_viv: 1,  h1_max_sin_limite: true,
+      h2_min_por_viv: 1,  h2_max_por_viv: 3,
+      h3_min_por_viv: 1,  h3_max_por_viv: 2,
+      h4_min_por_viv: 1,  h4_max_por_viv: 1,
+      h5_min_por_viv: 0.25, h5_max_por_viv: 1,
+      // exenciones Art. 280
+      exento_sup_menor_m2: 90,
+      exento_frente_menor_m: 6.50,
+    },
+    descripcion: 'Auto: 5.00×2.50 m · Discapacidad: 5.00×3.80 m · 1 cajón discap. c/25 · 1 ciclopuerto c/20 · Altura libre: 2.30 m PB, 2.10 m pisos · Rampa máx. 18%'
+  },
+
+  restricciones: {
+    nombre: 'Restricciones de construcción',
+    icono: '📏',
+    fuente: 'Arts. 1332–1336 — Reg. Gestión Integral GDL / Plan Parcial vigente',
+    descripcion: 'Las restricciones frontal, lateral y posterior se definen en el Plan Parcial de Desarrollo Urbano según la zona. El plano debe mostrar las áreas libres de construcción conforme a la zona indicada.'
+  },
+
+  accesibilidad: {
+    nombre: 'Accesibilidad universal',
+    icono: '♿',
+    fuente: 'Arts. 241, 249 Bis, 276 — Reg. Gestión Integral GDL / Arts. 241–243 Reg. Zonif.',
+    reglas: {
+      rampa_ancho_min_m: 1.50,         // Art. 241 II — ancho libre mínimo rampa peatonal
+      rampa_pendiente_max_pct: 6,      // Art. 241 IV
+      rampa_pendiente_tramos_pct: 10,  // Art. 241 en tramos cortos
+      banqueta_antes_rampa_m: 1.60,    // Art. 241 I
+      escalera_accesible_ancho_m: 1.80, // Reg. Zonif. Art. 242 II — accesible libre de pasamanos
+      escalera_huellas_m: 0.34,        // Art. 242 VI — huellas escaleras accesibles
+      guias_tactiles: true,            // Art. 249 Bis V — Braille en pasamanos
+    },
+    descripcion: 'Rampas mín. 1.50 m ancho · Pendiente máx. 6% (10% en tramos cortos) · Banqueta previa ≥ 1.60 m · Escaleras accesibles ≥ 1.80 m libre · Huellas 0.34 m · Señalamiento Braille en pasamanos'
+  },
+
+  locales_habitables: {
+    nombre: 'Dimensiones mínimas de locales',
+    icono: '📐',
+    fuente: 'Art. 213 Cuadro 36 REZ / Art. 217 Cuadro 51 — Reg. Zonificación Urbana GDL',
+    reglas: {
+      // HABITACIÓN — Piezas habitables
+      recamara_principal_m2: 7.50,      // Cuadro 36/51 — área mínima
+      recamara_principal_lado1_m: 2.60, // lado menor
+      recamara_principal_lado2_m: 2.90, // lado mayor
+      recamara_adicional_m2: 7.00,
+      recamara_adicional_lado1_m: 2.40,
+      recamara_adicional_lado2_m: 2.90,
+      estancia_m2: 7.30,
+      estancia_lado_min_m: 2.60,
+      comedor_m2: 6.30,
+      comedor_lado_min_m: 2.60,
+      estancia_comedor_integrado_m2: 13.60,
+      // Piezas no habitables
+      cocina_m2: 3.00,
+      cocina_lado_min_m: 1.50,
+      cuarto_lavado_m2: 2.70,
+      cuarto_lavado_lado_min_m: 1.60,
+      bano_lado1_m: 1.15,        // dimensiones mínimas del baño
+      bano_altura_min_m: 2.10,
+      // Alturas mínimas de entrepiso
+      altura_local_habitable_m: 2.30,   // recámaras, sala, comedor, cocina, lavado
+      altura_bano_m: 2.10,
+      // Comercios y oficinas (Cuadro 36/51 B)
+      comercio_hasta20m2_altura_m: 2.30,
+      comercio_20a50_altura_m: 2.35,
+      comercio_50a100_altura_m: 2.40,
+      comercio_100a200_altura_m: 2.45,
+      comercio_200a500_altura_m: 2.50,
+      comercio_500a1000_altura_m: 2.70,
+    },
+    descripcion: 'Recámara principal: 7.50 m² · 2.60×2.90 m mín. · Recámaras adicionales: 7.00 m² · 2.40×2.90 m · Estancia: 7.30 m² · Comedor: 6.30 m² · Estancia-comedor: 13.60 m² · Cocina: 3.00 m² (1.50 m lado) · Baño: 1.15 m lado · Altura libre locales habitables: 2.30 m · Baños: 2.10 m'
+  },
+};
+
+// ══════════════════════════════════════════════════════════════════════════
+// PROMPT NORMATIVO — BASE PARA CLAUDE API
+// ══════════════════════════════════════════════════════════════════════════
+// ── NORMATIVA POR MUNICIPIO ───────────────────────────────────────────────
+const NORMATIVA = {
+  GDL: {
+    nombre: 'Guadalajara, Jalisco',
+    fuentes: 'Reglamento para la Gestión Integral del Municipio de Guadalajara (reforma dic. 2023) y Reglamento de Zonificación Urbana del Municipio de Guadalajara',
+    autoridad: 'Dirección de Licencias de Construcción del Ayuntamiento de Guadalajara',
+    bloques: `
+1. ESCALERAS (Art. 249 Bis, Reg. Gestión Integral GDL, reforma dic. 2023):
+   - Ancho mínimo: 1.50 m (GDL es más exigente que el REZ estatal de 1.20 m)
+   - Huella mínima: 0.30 m, máxima: 0.50 m
+   - Contrahuella: mínimo 0.10 m, máximo 0.15 m
+   - Relación 2 contrahuellas + huella = entre 0.63 y 0.64 m
+   - Máximo 12 escalones entre descansos (GDL es más exigente que REZ de 15)
+   - Descanso mínimo: 1.50 m de longitud por el ancho de la escalera
+   - Pasamanos: superior 0.90 m, inferior 0.75 m, diámetro 0.04 m
+   - Altura libre bajo rampa: mínimo 1.90 m
+   - Sin bocel en escalones; franja de contraste de 0.025 m en borde
+   - Escaleras de caracol: diámetro mínimo 1.20 m
+
+2. PASILLOS Y CORREDORES (Art. 223 Cuadro 58, Reg. Zonificación GDL):
+   - Corredores interiores en viviendas: mínimo 0.90 m
+   - Corredores comunes a 2 o más viviendas: mínimo 1.20 m
+   - Corredores de acceso general: mínimo 1.20 m
+   - Altura libre mínima: 2.30 m
+
+3. PUERTAS (Art. 222 Cuadro 57, Reg. Zonificación GDL):
+   - Acceso principal habitacional: mínimo 0.90 m × 2.05 m de altura
+   - Locales habitables, cocina: mínimo 0.80 m × 2.05 m
+   - Baños: mínimo 0.60 m × 2.05 m
+   - Acceso comercio/oficinas: mínimo 0.90 m × 2.10 m
+   - Accesibilidad en edificios públicos: mínimo 1.00 m de ancho
+
+4. PATIOS DE ILUMINACIÓN Y VENTILACIÓN (Art. 159 Bis, Reg. Gestión Integral GDL, reforma dic. 2023):
+   - Espacios habitables con muros hasta 4 m de altura: patio mínimo 2.50 × 2.50 m
+   - Espacios habitables con muros hasta 12 m: patio mínimo 3.00 × 3.00 m
+   - Espacios habitables con muros más de 12 m: patio ≥ 25% de la altura
+   - Espacios NO habitables (baños, cocinas, pasillos): 20% de la altura, cualquier caso
+   - El lado menor NUNCA puede ser inferior a 2.50 m absoluto
+
+5. VENTANAS E ILUMINACIÓN NATURAL (Art. 220 Cuadro 54, Reg. Zonificación GDL):
+   - Piezas habitables: ventana ≥ 15% del área del local
+   - Piezas no habitables: ventana ≥ 10% del área del local
+   - Ventilación: al menos 40% del área de la ventana debe ser operable
+   - Educación/internados: ventana ≥ 20% del área
+
+6. ELEVADORES (Art. 225, Reg. Zonificación GDL / Art. 243 accesibilidad):
+   - OBLIGATORIO en edificaciones con más de 4 niveles (incluyendo PB) o altura > 12 m
+   - Excepción: plurifamiliar hasta 5 niveles si cada vivienda ≤ 70 m²
+   - Dimensiones mínimas de cabina: 1.50 × 1.50 m interior libre
+   - Puerta mínima: 1.00 m de ancho
+   - Pasamanos en 3 lados internos
+   - Controles a 1.20 m de altura; botones con números en relieve
+
+7. CAJONES DE ESTACIONAMIENTO (Arts. 273, 276, 278, Reg. Gestión Integral GDL, reforma 2023):
+   - Auto estándar: 5.00 m × 2.50 m mínimo
+   - Motocicleta: 2.50 m × 1.50 m
+   - Personas con movilidad reducida (PMR): 5.00 m × 3.80 m con zona de transferencia de 1.50 m lateral
+   - 1 cajón PMR por cada 25 cajones regulares (mín. 1)
+   - 1 ciclopuerto por cada 20 cajones (mín. 1)
+   - Altura libre: 2.30 m planta baja, 2.10 m pisos superiores
+   - Pendiente máxima de rampa: 18%
+   - Carril de circulación a 90°: mínimo 5.00 m de ancho
+
+8. RESTRICCIONES DE CONSTRUCCIÓN (Arts. 1332–1336, Reg. Gestión Integral GDL):
+   - Las restricciones frontal, lateral y posterior están definidas en el Plan Parcial vigente
+   - Ninguna edificación puede construirse dentro de las restricciones
+
+9. ACCESIBILIDAD UNIVERSAL (Arts. 241, 249 Bis, 276, Reg. Gestión Integral GDL):
+   - Rampas peatonales: ancho mínimo 1.50 m libre, pendiente máxima 6%
+   - Banqueta previa a la rampa: mínimo 1.60 m de ancho libre
+   - Escaleras accesibles: ancho mínimo 1.80 m libre de pasamanos, huellas de 0.34 m
+   - Guías táctiles en circulaciones, escaleras y elevadores
+   - Pasamanos con señalamiento Braille en edificios de uso público
+
+10. DIMENSIONES MÍNIMAS DE LOCALES (Art. 213 Cuadro 36 REZ / Art. 217 Cuadro 51 Reg. Zonif. GDL):
+   - Recámara principal: mínimo 7.50 m², dimensiones libres mínimas 2.60 × 2.90 m, altura 2.30 m
+   - Recámaras adicionales: mínimo 7.00 m², dimensiones 2.40 × 2.90 m, altura 2.30 m
+   - Estancia (sala): mínimo 7.30 m², lado mínimo 2.60 m, altura 2.30 m
+   - Comedor: mínimo 6.30 m², lado mínimo 2.60 m, altura 2.30 m
+   - Cocina: mínimo 3.00 m², lado mínimo 1.50 m, altura 2.30 m
+   - Baños: lado menor 1.15 m, altura 2.10 m
+   NOTA: verifica en el plano si los locales muestran dimensiones acotadas. Si no hay cotas visibles, indica "nd".`
+  },
+
+  ZPN: {
+    nombre: 'Zapopan, Jalisco',
+    fuentes: 'Reglamento de Construcción para el Municipio de Zapopan, Jalisco (última reforma GMZ No. 120 de 09/05/2024) y Norma Técnica de Accesibilidad Universal para el Municipio de Zapopan, Jalisco (GMZ 13/12/2019)',
+    autoridad: 'Dirección de Permisos y Licencias de Construcción del Ayuntamiento de Zapopan',
+    bloques: `
+1. ESCALERAS (Art. 137, Reglamento de Construcción Zapopan, reforma 2024):
+   - Ancho mínimo: 0.90 m
+   - Huella mínima: 28 cm (0.28 m)
+   - Peralte (contrahuella) máximo: 18 cm hasta 2 niveles o 6 m; 16 cm para 3+ niveles
+   - Máximo 15 escalones entre descansos
+   - Descanso: ancho mínimo igual al de la escalera
+   - Escaleras de caracol: diámetro mínimo 1.40 m
+   - Escaleras compensadas: huella mínima 30 cm medida a 40 cm de la baranda interior, ancho máximo 1.50 m
+   - Barandales y pasamanos: altura 1.00 m respecto a nariz de escalón
+   - Altura libre mínima bajo rampa: 2.00 m (perpendicular a la línea de narices)
+   - Rampas para personas: pendiente máxima 6%, ancho mínimo 1.20 m, pavimento antiderrapante
+
+2. PASILLOS Y CORREDORES (Art. 124, Reglamento de Construcción Zapopan):
+   - Ancho mínimo: 1.20 m
+   - Ancho adicional: 0.60 m por cada 100 usuarios adicionales o fracción
+   - Altura mínima: 2.40 m (más exigente que GDL)
+
+3. PUERTAS Y SALIDAS (Arts. 129–135, Reglamento de Construcción Zapopan):
+   - Puertas de salida de emergencia: ancho mínimo 1.20 m (múltiplo de 0.60 m)
+   - Descanso mínimo antes de escalera: 1.20 m de ancho
+   - Las puertas no deben desembocar directamente a escaleras sin descanso previo
+   - Puertas de emergencia: abatimiento al exterior con barra de empuje
+   - Señalización "SALIDA" permanentemente iluminada, letras mínimo 15 cm de altura
+
+4. PATIOS DE ILUMINACIÓN Y VENTILACIÓN (Art. 122, Reglamento de Construcción Zapopan):
+   - Lado menor mínimo aceptable: 2.50 m
+   - La otra dimensión × 2.50 m debe resultar la superficie requerida según número de niveles
+   - Se aplica cuadro 40 del Art. 217 del Reglamento Estatal de Zonificación
+   - Espacios no habitables: ventilación artificial mediante extractores o ductos permitida (Art. 123)
+
+5. VENTANAS E ILUMINACIÓN NATURAL (Art. 122, Reglamento de Construcción Zapopan / REZ):
+   - Toda edificación debe contar con medios de ventilación e iluminación conforme a normatividad aplicable
+   - Se remite al Reglamento Estatal de Zonificación para porcentajes específicos
+   - Espacios no habitables: iluminación y ventilación artificial permitida
+
+6. ELEVADORES (Art. 138, Reglamento de Construcción Zapopan):
+   - OBLIGATORIO en edificaciones con más de 4 niveles cubiertos incluyendo planta baja
+   - Excepción: plurifamiliar hasta 5 niveles si cada vivienda ≤ 80 m² (excluye indivisos y áreas comunes)
+   - Cabina mínima interior libre: 1.50 × 1.50 m (Art. 251 REZ)
+   - Puerta mínima: 1.00 m de ancho
+   - Pasamanos en 3 lados internos
+   - Controles a 1.20 m de altura con botones en relieve
+   - Exactitud en parada respecto al nivel de piso
+
+7. CAJONES DE ESTACIONAMIENTO (Art. 141, Reglamento de Construcción Zapopan / Norma Accesibilidad ZPN):
+   - Habitacional en batería: 2.50 m ancho × 5.00 m longitud
+   - Habitacional en cordón: 2.50 m ancho × 6.00 m longitud
+   - No habitacional en batería a 90°: 2.75 m ancho × 5.00 m longitud (más ancho que GDL)
+   - No habitacional en batería a 60°, 45°, 30°: 2.50 m ancho × 5.00 m longitud
+   - No habitacional en cordón: 2.50 m ancho × 6.00 m longitud
+   - Cajón PMR (personas con discapacidad): 3.80 m de frente × 5.00 m de fondo
+   - Franja de maniobra PMR: 1.40 m; símbolo ISA de 1.60 m en medio del cajón
+   - 1 cajón PMR por cada 12 cajones (Norma Accesibilidad ZPN Art. 11)
+   - Si hay menos de 12 cajones: al menos 1 cajón PMR obligatorio
+   - Topes: 15 cm de altura; frente: a 0.80 m del límite; reversa: a 1.20 m del límite
+   - Pendiente mínima de escurrimiento: 2%
+   - Rampa PMR: pendiente máxima 6%
+
+8. RESTRICCIONES DE CONSTRUCCIÓN (Arts. 103–106, Reglamento de Construcción Zapopan):
+   - Restricciones definidas en el Plan Parcial vigente o por contexto inmediato
+   - Restricción posterior: solo se permite edificar hasta 3.00 m de altura
+   - En predios ≤ 200 m² de uso habitacional densidad alta/media: restricción posterior mínima 2.50 m en 2 niveles
+   - Sótanos: excluidos del cómputo de COS y CUS
+   - Pérgolas, cristales, acrílico y paneles solares no afectan COS ni CUS
+
+9. ACCESIBILIDAD UNIVERSAL (Art. 38 Fr. IX Reglamento Construcción ZPN / Norma Técnica Accesibilidad Universal ZPN 2019):
+   - Ruta accesible obligatoria desde el alineamiento del inmueble hasta cada área de servicio
+   - Rampas peatonales: ancho mínimo 1.00 m libre entre pasamanos, pendiente máxima 6%
+   - Longitud máxima de rampa: 6.00 m; si es mayor, descansos de 1.50 m
+   - Pasamanos: tubulares 1½ pulgadas, a 0.90 m y segundo a 0.75 m, separados 0.50 m de pared
+   - Cajón PMR: 3.80 × 5.00 m con franja de maniobra de 1.40 m; letrero a 2.50 m de altura
+   - Elevador cabina mínima 1.50 × 1.50 m, puerta 1.00 m, controles a 1.20 m con Braille
+   - Pavimento táctil en rutas accesibles, escaleras y cambios de nivel
+   - Señalamiento ISA en cajones, elevadores y sanitarios accesibles
+
+10. DIMENSIONES MÍNIMAS DE LOCALES (Arts. 107, 113, Reglamento de Construcción Zapopan):
+   - Altura interior libre mínima: 2.40 m en toda edificación cubierta (más exigente que GDL)
+   - Toda vivienda debe contar con: área de estar, comedor, cocina, baño, área de servicio y al menos una recámara con closet
+   - Plurifamiliar vertical: closet de lavado mínimo con espacio para secadora y lavadora (vertedero 50 × 40 cm)
+   - Loft plurifamiliar vertical: el comedor puede sustituirse por barra de servicios mínima 1.20 × 0.80 m
+   - Para porcentajes de ventana e iluminación, se aplica el Reglamento Estatal de Zonificación
+   NOTA: verifica en el plano si los locales muestran dimensiones acotadas. Si no hay cotas visibles, indica "nd".`
+  },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // TLQ, TLA, TON — Reglamento Estatal de Zonificación (REZ) 2003
+  // Fuente: Acuerdo del Gobernador Francisco Javier Ramírez Acuña
+  // Publicado en el Periódico Oficial "El Estado de Jalisco" del 27 oct 2001
+  // En vigor desde 29 de mayo de 2003
+  // Aplicable supletoriamente en municipios sin reglamento de construcción propio
+  // ══════════════════════════════════════════════════════════════════════════
+
+  TLQ: {
+    nombre: 'San Pedro Tlaquepaque, Jalisco',
+    fuentes: 'Reglamento Estatal de Zonificación del Estado de Jalisco (REZ 2003), aplicado supletoriamente conforme al Art. 5 del Reglamento de Construcciones del Municipio de Tlaquepaque',
+    autoridad: 'Dirección de Obras Públicas del Ayuntamiento de San Pedro Tlaquepaque',
+    bloques: `
+1. ESCALERAS (Art. 220 Cuadro 44, REZ 2003):
+   - Ancho mínimo escalera privada/interior: 0.75 m
+   - Ancho mínimo escalera común a 2 o más viviendas (máx. 4): 1.20 m
+   - Ancho mínimo escalera principal: 1.20 m
+   - Huella mínima: 0.28 m (Art. 250 REZ — accesibilidad exige 0.34 m)
+   - Contrahuella máxima: 0.18 m
+   - Máximo 15 escalones entre descansos (Art. 250 REZ)
+   - Pasamanos a ambos lados
+   - Altura libre bajo rampa: mínimo 1.90 m
+   NOTA: El REZ establece 1.20 m para escaleras comunes — menos exigente que GDL (1.50 m) y ZPN (1.50 m).
+
+2. PASILLOS Y CORREDORES (Art. 219 Cuadro 43 y Art. 146, REZ 2003):
+   - Corredores interiores en viviendas: mínimo 0.90 m
+   - Corredores comunes a 2 o más viviendas: mínimo 1.20 m
+   - Corredores de acceso general: mínimo 1.20 m
+   - Altura libre mínima: 2.30 m
+   - Barandales cuando existan: altura mínima 0.90 m (Art. 146 REZ)
+
+3. PUERTAS (Art. 218 Cuadro 41, REZ 2003):
+   - Acceso principal habitacional: mínimo 0.90 m × 2.05 m
+   - Locales habitables y cocinas: mínimo 0.80 m × 2.05 m
+   - Baños: mínimo 0.60 m × 2.05 m
+   - Acceso principal comercio/oficinas: mínimo 0.90 m × 2.10 m
+   - Accesibilidad: mínimo 1.00 m de ancho (Art. 252 REZ)
+
+4. PATIOS DE ILUMINACIÓN Y VENTILACIÓN (Art. 217 Cuadro 40, REZ 2003):
+   - Muros hasta 4 m de altura → piezas habitables: patio mínimo 2.50 × 2.50 m
+   - Muros hasta 6 m → piezas habitables: patio mínimo 3.00 × 3.00 m
+   - Muros hasta 9 m → piezas habitables: patio mínimo 3.50 × 3.50 m
+   - Muros hasta 12 m → piezas habitables: patio mínimo 4.00 × 4.00 m
+   - Muros >12 m → piezas habitables: patio ≥ 1/3 de la altura del muro
+   - Piezas no habitables (baños, cocinas, pasillos): ver Cuadro 40 — valores menores
+   - El lado menor del patio nunca puede ser inferior a 2.50 m absoluto
+
+5. VENTANAS E ILUMINACIÓN NATURAL (Art. 216, REZ 2003):
+   - Piezas habitables: ventana ≥ 15% del área del local
+   - Piezas no habitables: ventana ≥ 10% del área del local (domos: ≥ 4%)
+   - Ventilación: área de abertura ≥ 5% del área del local (Art. 215 REZ)
+   - Al menos 40% del área de ventana debe ser operable
+
+6. ELEVADORES (Art. 221, REZ 2003):
+   - OBLIGATORIO en edificaciones con más de 4 niveles (incluyendo PB) o altura > 12 m
+   - Excepción: plurifamiliar hasta 5 niveles si cada vivienda ≤ 70 m² y altura ≤ 15 m
+   - Dimensiones mínimas de cabina: 1.50 × 1.50 m interior libre (Art. 251 REZ)
+   - Puerta mínima: 1.00 m de ancho
+   - Pasamanos en 3 lados internos
+   - Controles a 1.20 m de altura; botones con números en relieve
+
+7. CAJONES DE ESTACIONAMIENTO (Arts. 240 y 345, REZ 2003):
+   - Auto estándar en batería: 5.00 m × 2.40 m (grandes/medianos)
+   - Auto chico en batería: 4.20 m × 2.20 m
+   - PMR: 5.00 m × 3.80 m — mínimo 2 cajones si hay menos de 50 en total; 1 c/25 si hay más
+   - Cajones PMR ubicados lo más cerca posible a la entrada (Art. 240 REZ)
+   - Altura libre: 2.30 m mínimo
+   - Carril de circulación 90°: mínimo 6.00 m
+
+8. RESTRICCIONES DE CONSTRUCCIÓN:
+   - Las restricciones frontal, lateral y posterior están definidas en el Plan Parcial/PDU vigente
+   - Ninguna edificación puede construirse dentro de las restricciones
+
+9. ACCESIBILIDAD UNIVERSAL (Arts. 247–253, REZ 2003):
+   - Rampas peatonales: ancho mínimo 1.00 m libre entre pasamanos, pendiente máxima 6%
+   - Longitud máxima de rampa sin descanso: 6 metros
+   - Banqueta previa a la rampa: mínimo 1.60 m de ancho
+   - Escaleras accesibles: pasamanos ambos lados, 15 peraltes máximo, huellas de 0.34 m (Art. 250)
+   - Guías táctiles en cambios de nivel y rutas peatonales
+   - Piso de textura diferente 1.20 m antes de rampas y escaleras (Art. 248 REZ)
+
+10. DIMENSIONES MÍNIMAS DE LOCALES (Art. 213 Cuadro 36, REZ 2003):
+   - Recámara principal: mínimo 7.50 m², dimensiones libres mínimas 2.60 × 2.90 m
+   - Recámaras adicionales: mínimo 7.00 m², dimensiones 2.40 × 2.90 m
+   - Estancia (sala): mínimo 7.30 m², lado mínimo 2.60 m
+   - Comedor: mínimo 6.30 m², lado mínimo 2.60 m
+   - Estancia-comedor integrado: mínimo 13.60 m²
+   - Cocina: mínimo 3.00 m², lado mínimo 1.50 m
+   - Baños: lado menor 1.15 m
+   - Altura libre mínima locales habitables: 2.30 m; baños: 2.10 m
+   NOTA: verifica en el plano si los locales muestran dimensiones acotadas. Si no hay cotas visibles, indica "nd".`
+  },
+
+  TLA: {
+    nombre: 'Tlajomulco de Zúñiga, Jalisco',
+    fuentes: 'Reglamento Estatal de Zonificación del Estado de Jalisco (REZ 2003), aplicado supletoriamente conforme al Art. 11 del Ordenamiento de Construcción del Municipio de Tlajomulco de Zúñiga',
+    autoridad: 'Dirección General de Obras Públicas del Ayuntamiento de Tlajomulco de Zúñiga',
+    bloques: `
+1. ESCALERAS (Art. 220 Cuadro 44, REZ 2003):
+   - Ancho mínimo escalera privada/interior: 0.75 m
+   - Ancho mínimo escalera común a 2 o más viviendas (máx. 4): 1.20 m
+   - Ancho mínimo escalera principal: 1.20 m
+   - Huella mínima: 0.28 m (accesibilidad exige 0.34 m — Art. 250 REZ)
+   - Contrahuella máxima: 0.18 m
+   - Máximo 15 escalones entre descansos
+   - Pasamanos a ambos lados
+   - Altura libre bajo rampa: mínimo 1.90 m
+
+2. PASILLOS Y CORREDORES (Art. 219 Cuadro 43 y Art. 146, REZ 2003):
+   - Corredores interiores en viviendas: mínimo 0.90 m
+   - Corredores comunes a 2 o más viviendas: mínimo 1.20 m
+   - Corredores de acceso general: mínimo 1.20 m
+   - Altura libre mínima: 2.30 m
+   - Barandales cuando existan: altura mínima 0.90 m
+
+3. PUERTAS (Art. 218 Cuadro 41, REZ 2003):
+   - Acceso principal habitacional: mínimo 0.90 m × 2.05 m
+   - Locales habitables y cocinas: mínimo 0.80 m × 2.05 m
+   - Baños: mínimo 0.60 m × 2.05 m
+   - Acceso principal comercio/oficinas: mínimo 0.90 m × 2.10 m
+   - Accesibilidad: mínimo 1.00 m de ancho (Art. 252 REZ)
+
+4. PATIOS DE ILUMINACIÓN Y VENTILACIÓN (Art. 217 Cuadro 40, REZ 2003):
+   - Muros hasta 4 m → piezas habitables: patio mínimo 2.50 × 2.50 m
+   - Muros hasta 6 m → piezas habitables: patio mínimo 3.00 × 3.00 m
+   - Muros hasta 9 m → piezas habitables: patio mínimo 3.50 × 3.50 m
+   - Muros hasta 12 m → piezas habitables: patio mínimo 4.00 × 4.00 m
+   - Muros >12 m → piezas habitables: patio ≥ 1/3 de la altura del muro
+   - Lado menor nunca inferior a 2.50 m absoluto
+
+5. VENTANAS E ILUMINACIÓN NATURAL (Arts. 215–216, REZ 2003):
+   - Piezas habitables: ventana ≥ 15% del área del local
+   - Piezas no habitables: ventana ≥ 10% del área del local
+   - Ventilación: área de abertura ≥ 5% del área del local
+   - Al menos 40% del área de ventana operable
+
+6. ELEVADORES (Art. 221, REZ 2003):
+   - OBLIGATORIO en edificaciones con más de 4 niveles (incluyendo PB) o altura > 12 m
+   - Excepción: plurifamiliar hasta 5 niveles si cada vivienda ≤ 70 m² y altura ≤ 15 m
+   - Dimensiones mínimas de cabina: 1.50 × 1.50 m interior libre
+   - Puerta mínima: 1.00 m de ancho
+   - Pasamanos en 3 lados internos
+
+7. CAJONES DE ESTACIONAMIENTO (Arts. 240 y 345, REZ 2003):
+   - Auto estándar en batería: 5.00 m × 2.40 m
+   - PMR: 5.00 m × 3.80 m — mínimo 2 cajones si hay menos de 50 en total; 1 c/25 si hay más
+   - Altura libre: 2.30 m mínimo
+   - Carril de circulación 90°: mínimo 6.00 m
+
+8. RESTRICCIONES DE CONSTRUCCIÓN:
+   - Las restricciones frontal, lateral y posterior están definidas en el Plan Parcial/PDU vigente
+   - Ninguna edificación puede construirse dentro de las restricciones
+
+9. ACCESIBILIDAD UNIVERSAL (Arts. 247–253, REZ 2003):
+   - Rampas peatonales: ancho mínimo 1.00 m libre entre pasamanos, pendiente máxima 6%
+   - Longitud máxima sin descanso: 6 metros
+   - Banqueta previa: mínimo 1.60 m de ancho
+   - Escaleras accesibles: pasamanos ambos lados, 15 peraltes máximo, huellas 0.34 m
+   - Piso de textura diferente 1.20 m antes de rampas y escaleras
+
+10. DIMENSIONES MÍNIMAS DE LOCALES (Art. 213 Cuadro 36, REZ 2003):
+   - Recámara principal: mínimo 7.50 m², dimensiones libres mínimas 2.60 × 2.90 m
+   - Recámaras adicionales: mínimo 7.00 m², dimensiones 2.40 × 2.90 m
+   - Estancia (sala): mínimo 7.30 m², lado mínimo 2.60 m
+   - Comedor: mínimo 6.30 m², lado mínimo 2.60 m
+   - Estancia-comedor integrado: mínimo 13.60 m²
+   - Cocina: mínimo 3.00 m², lado mínimo 1.50 m
+   - Baños: lado menor 1.15 m
+   - Altura libre mínima locales habitables: 2.30 m; baños: 2.10 m
+   NOTA: verifica en el plano si los locales muestran dimensiones acotadas. Si no hay cotas visibles, indica "nd".`
+  },
+
+  TON: {
+    nombre: 'Tonalá, Jalisco',
+    fuentes: 'Reglamento Estatal de Zonificación del Estado de Jalisco (REZ 2003), aplicado supletoriamente conforme al Art. 2 del Reglamento de Construcción del Municipio de Tonalá, Jalisco',
+    autoridad: 'Dirección General de Infraestructura, Servicios y Desarrollo Sustentable del Ayuntamiento de Tonalá',
+    bloques: `
+1. ESCALERAS (Art. 220 Cuadro 44, REZ 2003):
+   - Ancho mínimo escalera privada/interior: 0.75 m
+   - Ancho mínimo escalera común a 2 o más viviendas (máx. 4): 1.20 m
+   - Ancho mínimo escalera principal: 1.20 m
+   - Huella mínima: 0.28 m (accesibilidad exige 0.34 m — Art. 250 REZ)
+   - Contrahuella máxima: 0.18 m
+   - Máximo 15 escalones entre descansos
+   - Pasamanos a ambos lados
+   - Altura libre bajo rampa: mínimo 1.90 m
+
+2. PASILLOS Y CORREDORES (Art. 219 Cuadro 43 y Art. 146, REZ 2003):
+   - Corredores interiores en viviendas: mínimo 0.90 m
+   - Corredores comunes a 2 o más viviendas: mínimo 1.20 m
+   - Corredores de acceso general: mínimo 1.20 m
+   - Altura libre mínima: 2.30 m
+   - Barandales cuando existan: altura mínima 0.90 m
+
+3. PUERTAS (Art. 218 Cuadro 41, REZ 2003):
+   - Acceso principal habitacional: mínimo 0.90 m × 2.05 m
+   - Locales habitables y cocinas: mínimo 0.80 m × 2.05 m
+   - Baños: mínimo 0.60 m × 2.05 m
+   - Acceso principal comercio/oficinas: mínimo 0.90 m × 2.10 m
+   - Accesibilidad: mínimo 1.00 m de ancho (Art. 252 REZ)
+
+4. PATIOS DE ILUMINACIÓN Y VENTILACIÓN (Art. 217 Cuadro 40, REZ 2003):
+   - Muros hasta 4 m → piezas habitables: patio mínimo 2.50 × 2.50 m
+   - Muros hasta 6 m → piezas habitables: patio mínimo 3.00 × 3.00 m
+   - Muros hasta 9 m → piezas habitables: patio mínimo 3.50 × 3.50 m
+   - Muros hasta 12 m → piezas habitables: patio mínimo 4.00 × 4.00 m
+   - Muros >12 m → piezas habitables: patio ≥ 1/3 de la altura del muro
+   - Lado menor nunca inferior a 2.50 m absoluto
+
+5. VENTANAS E ILUMINACIÓN NATURAL (Arts. 215–216, REZ 2003):
+   - Piezas habitables: ventana ≥ 15% del área del local
+   - Piezas no habitables: ventana ≥ 10% del área del local
+   - Ventilación: área de abertura ≥ 5% del área del local
+   - Al menos 40% del área de ventana operable
+
+6. ELEVADORES (Art. 221, REZ 2003):
+   - OBLIGATORIO en edificaciones con más de 4 niveles (incluyendo PB) o altura > 12 m
+   - Excepción: plurifamiliar hasta 5 niveles si cada vivienda ≤ 70 m² y altura ≤ 15 m
+   - Dimensiones mínimas de cabina: 1.50 × 1.50 m interior libre
+   - Puerta mínima: 1.00 m de ancho
+   - Pasamanos en 3 lados internos
+
+7. CAJONES DE ESTACIONAMIENTO (Arts. 240 y 345, REZ 2003):
+   - Auto estándar en batería: 5.00 m × 2.40 m
+   - PMR: 5.00 m × 3.80 m — mínimo 2 cajones si hay menos de 50 en total; 1 c/25 si hay más
+   - Altura libre: 2.30 m mínimo
+   - Carril de circulación 90°: mínimo 6.00 m
+
+8. RESTRICCIONES DE CONSTRUCCIÓN:
+   - Las restricciones frontal, lateral y posterior están definidas en el Plan Parcial/PDU vigente
+   - Ninguna edificación puede construirse dentro de las restricciones
+
+9. ACCESIBILIDAD UNIVERSAL (Arts. 247–253, REZ 2003):
+   - Rampas peatonales: ancho mínimo 1.00 m libre entre pasamanos, pendiente máxima 6%
+   - Longitud máxima sin descanso: 6 metros
+   - Banqueta previa: mínimo 1.60 m de ancho
+   - Escaleras accesibles: pasamanos ambos lados, 15 peraltes máximo, huellas 0.34 m
+   - Piso de textura diferente 1.20 m antes de rampas y escaleras
+
+10. DIMENSIONES MÍNIMAS DE LOCALES (Art. 213 Cuadro 36, REZ 2003):
+   - Recámara principal: mínimo 7.50 m², dimensiones libres mínimas 2.60 × 2.90 m
+   - Recámaras adicionales: mínimo 7.00 m², dimensiones 2.40 × 2.90 m
+   - Estancia (sala): mínimo 7.30 m², lado mínimo 2.60 m
+   - Comedor: mínimo 6.30 m², lado mínimo 2.60 m
+   - Estancia-comedor integrado: mínimo 13.60 m²
+   - Cocina: mínimo 3.00 m², lado mínimo 1.50 m
+   - Baños: lado menor 1.15 m
+   - Altura libre mínima locales habitables: 2.30 m; baños: 2.10 m
+   NOTA: verifica en el plano si los locales muestran dimensiones acotadas. Si no hay cotas visibles, indica "nd".`
+  }
+
+};
+
+function buildPrompt(config, esLoteUnico = true) {
+  const numLam = config.numLaminas || 1;
+  const nomLam = config.nombreLaminas || '';
+
+  const contextoLote = !esLoteUnico
+    ? `Estas láminas forman parte de un expediente mayor de ${config.numLaminas} láminas en total. Analiza SOLO las láminas adjuntas en este grupo y emite un dictamen parcial. El sistema consolidará todos los grupos después.`
+    : (numLam > 1 ? 'Integra toda la información de las láminas para emitir un dictamen unificado del proyecto completo.' : '');
+
+  // Si el usuario ya seleccionó municipio explícitamente → solo esa normativa
+  // Si está vacío → enviar ambas para que la IA detecte
+  const munSelector = config.municipio !== 'GDL' || document.getElementById('sel-municipio').value !== ''
+    ? document.getElementById('sel-municipio').value
+    : '';
+  const munFijo = munSelector && NORMATIVA[munSelector] ? munSelector : null;
+  const normGDL = NORMATIVA['GDL'];
+  const normZPN = NORMATIVA['ZPN'];
+
+  // Bloque de normativa: solo la del municipio fijo, o ambas si hay detección automática
+  const normTLQ = NORMATIVA['TLQ'];
+  const normTLA = NORMATIVA['TLA'];
+  const normTON = NORMATIVA['TON'];
+
+  const bloqueNormativa = munFijo
+    ? `═══ NORMATIVA APLICABLE — ${NORMATIVA[munFijo].nombre.toUpperCase()} ═══
+Fuentes: ${NORMATIVA[munFijo].fuentes}
+${NORMATIVA[munFijo].bloques}
+
+⚠️ IMPORTANTE: El usuario confirmó que este plano es de ${NORMATIVA[munFijo].nombre}. Usa EXCLUSIVAMENTE la normativa de ${NORMATIVA[munFijo].nombre} indicada arriba. NO cites artículos de ningún otro municipio.`
+    : `NORMATIVA DISPONIBLE — USA LA QUE CORRESPONDA AL MUNICIPIO QUE DETECTES:
+
+═══ NORMATIVA GDL — GUADALAJARA ═══
+Fuentes: ${normGDL.fuentes}
+${normGDL.bloques}
+
+═══ NORMATIVA ZPN — ZAPOPAN ═══
+Fuentes: ${normZPN.fuentes}
+${normZPN.bloques}
+
+═══ NORMATIVA TLQ — TLAQUEPAQUE ═══
+Fuentes: ${normTLQ.fuentes}
+${normTLQ.bloques}
+
+═══ NORMATIVA TLA — TLAJOMULCO ═══
+Fuentes: ${normTLA.fuentes}
+${normTLA.bloques}
+
+═══ NORMATIVA TON — TONALÁ ═══
+Fuentes: ${normTON.fuentes}
+${normTON.bloques}`;
+
+  // Bloque PASO 0: solo aplica cuando NO hay municipio fijo
+  const bloquePaso0 = munFijo
+    ? `MUNICIPIO CONFIRMADO: ${NORMATIVA[munFijo].nombre} (${munFijo})
+municipio_detectado debe ser "${munFijo}" en tu respuesta JSON.
+Fuente normativa: ${NORMATIVA[munFijo].fuentes}`
+    : `⚠️ PASO 0 — DETECTA EL MUNICIPIO ANTES DE ANALIZAR (CRÍTICO):
+PRIMERO lee la solapa del plano y detecta el municipio. El municipio determina qué normativa aplicas.
+Busca en la solapa: nombre del municipio en la dirección, sello de la dependencia, membrete institucional, código postal.
+Códigos postales de referencia: 44xxx = Guadalajara · 45xxx = Zapopan · 45xxx/46xxx zona sur = Tlaquepaque · 45xxx/45600-45699 = Tlajomulco · 45400-45499 = Tonalá.
+Dependencias: "Dirección de Permisos y Licencias de Construcción del Ayuntamiento de Zapopan" / "Dirección de Obras Públicas de Guadalajara" / "Dirección de Obras Públicas de Tlaquepaque" / "Dirección General de Obras Públicas de Tlajomulco" / "Dirección General de Infraestructura, Servicios y Desarrollo Sustentable de Tonalá".
+- Si el plano es de ZAPOPAN → municipio_detectado: "ZPN"
+- Si el plano es de GUADALAJARA → municipio_detectado: "GDL"
+- Si el plano es de TLAQUEPAQUE → municipio_detectado: "TLQ"
+- Si el plano es de TLAJOMULCO → municipio_detectado: "TLA"
+- Si el plano es de TONALÁ → municipio_detectado: "TON"
+- Si no puedes determinarlo → municipio_detectado: null → aplica NORMATIVA GDL como fallback`;
+
+  return `Eres un perito en revisión de planos arquitectónicos con especialidad en normativa municipal del Área Metropolitana de Guadalajara (AMG). Analiza ${numLam > 1 ? 'las láminas adjuntas' : 'el plano adjunto'} y verifica su cumplimiento con la normativa vigente. ${contextoLote}
+
+${bloquePaso0}
+
+DATOS DEL PROYECTO (referencia del usuario — pueden estar vacíos si no se han llenado):
+- Tipo de proyecto: ${config.tipo && config.tipo !== 'Por detectar' ? config.tipo : 'detectar desde el plano'}
+- Número de niveles: ${config.niveles && config.niveles !== '0' ? config.niveles : 'detectar desde el plano'}
+- Superficie del predio: ${config.sup ? config.sup + ' m²' : 'no especificada'}
+- Frente del predio: ${config.frente ? config.frente + ' ml' : 'no especificado'}
+- Restricción frontal: ${config.rf ? config.rf + ' ml' : 'no especificada'}
+- Restricción lateral: ${config.rl ? config.rl + ' ml' : 'no especificada'}
+- Restricción posterior: ${config.rp ? config.rp + ' ml' : 'no especificada'}
+- COS autorizado: ${config.cos || 'no especificado'}
+${config.supConst ? '- Superficie total construcción (cuadro de áreas): ' + config.supConst + ' m²' : ''}
+${config.numViv ? '- Número de viviendas / unidades: ' + config.numViv : ''}
+${config.cajonesProyecto ? '- Cajones indicados en proyecto: ' + config.cajonesProyecto : ''}
+${config.cajonesPmr ? '- Cajones PMR indicados: ' + config.cajonesPmr : ''}
+${config.alturaEntrepiso ? '- Altura de entrepiso indicada: ' + config.alturaEntrepiso + ' m' : ''}
+${config.supVivTipo ? '- Superficie vivienda tipo: ' + config.supVivTipo + ' m²' : ''}
+${numLam > 1 ? '- Láminas analizadas: ' + nomLam : ''}
+
+${bloqueNormativa}
+
+INSTRUCCIONES DE ANÁLISIS:
+
+PASO 1 — LEE LA SOLAPA DEL PLANO PRIMERO:
+Antes de analizar cualquier elemento normativo, localiza y lee el cuadro de datos o solapa de cada lámina. La solapa normalmente aparece en la esquina inferior derecha o inferior izquierda del plano y contiene:
+- Nombre del proyecto, propietario, dirección del predio
+- Nombre y número de cédula del Director Responsable de Obra (DRO)
+- Tipo de obra (demolición, obra nueva, remodelación) y USO DE SUELO
+- Cuadro de áreas: superficie de terreno, superficie de construcción por nivel, total construido
+- Número y tipo de cajones de estacionamiento calculados
+- Clave de zona y uso de suelo autorizado
+- Escala del plano, fecha, número de lámina
+IMPORTANTE — DETECCIÓN AUTOMÁTICA (SIEMPRE OBLIGATORIA):
+Debes detectar y reportar en el JSON los siguientes 3 campos, independientemente de lo que el usuario haya indicado:
+
+1. municipio_detectado: Lee la solapa, sellos, leyendas o membrete del plano. Busca indicios del municipio (nombre de la colonia, código postal, dependencia tramitadora, sello de autorización). Si detectas Guadalajara → "GDL". Si detectas Zapopan → "ZPN". Si no puedes determinarlo con certeza → null.
+
+2. tipo_detectado: Determina el tipo leyendo la solapa y las plantas. Mapea al valor exacto del JSON:
+   - Casa habitación / vivienda unifamiliar → "habitacional_unifamiliar"
+   - Edificio de departamentos / vivienda plurifamiliar / conjunto habitacional → "habitacional_plurifamiliar"
+   - Local comercial / tienda / restaurante / bodega comercial / servicio → "comercio_servicios"
+   - Oficinas / despacho / corporativo → "oficinas"
+   - Edificio mixto (habitacional + comercio) → "mixto"
+   - Escuela / guardería / universidad → "educacion"
+   - Clínica / hospital / consultorio / asistencia social → "salud"
+   - Nave industrial / bodega industrial / manufactura → "industrial"
+
+3. niveles_detectados: Cuenta los niveles del proyecto incluyendo planta baja, sin contar sótano. Devuelve el número como string: "1", "2", "3", "4", "5", "6", o "7" (usa "7" para 7 o más). Si no puedes determinarlo → null.
+
+PASO 2 — APLICA CRITERIOS SEGÚN TIPO DE PROYECTO:
+Los 10 elementos normativos NO aplican igual para todos los proyectos. Usa estas reglas:
+
+VIVIENDA UNIFAMILIAR (1 sola vivienda, uso privado):
+- Escaleras: ancho mínimo 0.90 m (GDL/ZPN). Son de uso privado, no público.
+- Pasillos: son interiores privados. No aplica la norma de corredores comunes. Marca N/A.
+- Puertas: aplican dimensiones mínimas habitacionales.
+- Patios de ventilación: aplican igual.
+- Ventanas: aplican igual.
+- Elevadores: NO obligatorios salvo que supere 4 niveles Y el usuario lo indique. Para casa de 1-3 niveles: N/A.
+- Cajones: aplican dimensiones. PMR y ciclopuerto: solo si hay más de 1 cajón.
+- Restricciones: aplican igual.
+- Accesibilidad universal: REDUCIDA — solo aplica la rampa de acceso si hay desnivel en la entrada. No aplica accesibilidad interior completa.
+- Locales habitables: aplican dimensiones mínimas habitacionales.
+
+VIVIENDA PLURIFAMILIAR / EDIFICIO DE DEPARTAMENTOS:
+- Todos los 10 elementos aplican completamente.
+- Elevadores: obligatorios si supera 4 niveles incluyendo PB (GDL) o 4 niveles (ZPN).
+- Pasillos comunes: aplica norma completa (mín. 1.20 m GDL, 1.20 m ZPN).
+- Accesibilidad: aplica completa incluyendo ruta accesible a cada vivienda.
+- Cajones PMR: 1 por cada 25 cajones (GDL) o 1 por cada 12 (ZPN).
+
+COMERCIO / OFICINAS / SERVICIOS:
+- Escaleras: ancho mínimo 1.20 m. Si hay más de 250 personas: 1.50 m.
+- Pasillos: mín. 1.20 m + 0.60 m por cada 100 usuarios adicionales.
+- Elevadores: obligatorios si supera 4 niveles.
+- Accesibilidad: aplica completa — es uso público.
+- Cajones PMR: obligatorios.
+- Sanitarios separados por sexo: verificar en planta.
+
+BODEGA / INDUSTRIAL / ALMACÉN:
+- Escaleras: aplican para acceso a oficinas o áreas habitadas.
+- Pasillos: aplican en zonas de oficinas. En nave industrial: N/A.
+- Elevadores: solo si hay área de oficinas en 2+ niveles.
+- Accesibilidad: aplica en áreas de atención al público. En nave pura: reducida.
+- Locales habitables: N/A en nave. Aplica solo en área de oficinas.
+- Cajones: aplican. Verificar si incluye cajones para camiones/trailers.
+
+PROYECTO MIXTO:
+- Aplicar los criterios más exigentes de cada uso presente.
+- Indicar en el dictamen qué criterio aplica para cada zona.
+
+PASO 3 — CRUZA LAS TRES FUENTES DE INFORMACIÓN:
+Para cada elemento normativo, contrasta:
+a) Lo que el usuario capturó en los parámetros del proyecto
+b) Lo que dice la solapa del plano
+c) Lo que observas visualmente en las plantas, cortes y fachadas
+Cuando haya discrepancias entre estas fuentes, repórtalas explícitamente en la observación.
+
+PASO 4 — ANALIZA CADA ELEMENTO NORMATIVO:
+1. Examina detalladamente todas las láminas adjuntas. Cruza la información entre láminas.
+2. Para cada uno de los 10 elementos normativos:
+   - ¿Aplica este elemento para este tipo de proyecto? Si no aplica, usa estado "nd" y explica por qué no aplica.
+   - ¿El elemento es visible en alguna de las láminas?
+   - Si es visible, ¿cumple con la normativa? ¿En cuál lámina se observa?
+   - ¿Qué dimensiones o condiciones observas?
+   - ¿Qué artículo y norma aplica exactamente?
+3. Sé específico con medidas cuando puedas leerlas de cotas o de la solapa.
+4. Para una casa unifamiliar, NO marques INCUMPLE en elevadores si el edificio no supera 4 niveles — simplemente no aplica.
+5. En el dictamen menciona: tipo de proyecto identificado, láminas analizadas, datos clave de la solapa, y discrepancias detectadas.
+
+FORMATO DE RESPUESTA REQUERIDO:
+Responde ÚNICAMENTE con un objeto JSON válido. Sin markdown, sin texto antes o después, sin bloques de código. Solo el JSON puro.
+
+Estructura exacta:
+{
+  "municipio_detectado": "GDL|ZPN|TLQ|TLA|TON|null",
+  "tipo_detectado": "habitacional_unifamiliar|habitacional_plurifamiliar|comercio_servicios|oficinas|mixto|educacion|salud|industrial",
+  "niveles_detectados": "1|2|3|4|5|6|7",
+  "dictamen": ["Párrafo 1: tipo de láminas analizadas y datos generales.", "Párrafo 2: datos leídos de la solapa.", "Párrafo 3: discrepancias detectadas.", "Párrafo 4: conclusión y justificación del semáforo."],
+  "semaforo": "verde|amarillo|rojo",
+  "resumen": "Una sola frase corta de resumen",
+  "datos_solapa": {
+    "propietario": "nombre o null",
+    "dro": "nombre y registro o null",
+    "direccion": "calle número colonia municipio tal como aparece en la solapa o null",
+    "colonia": "solo el nombre de la colonia o null",
+    "cp": "código postal de 5 dígitos o null",
+    "zonificacion": "clave de zona o null",
+    "uso_suelo": "descripción o null",
+    "superficie_terreno": "valor con unidad o null",
+    "superficie_construccion": "valor con unidad o null",
+    "cajones_indicados": "número o null",
+    "viviendas": "número o null",
+    "escala": "1:100 o la que corresponda o null",
+    "num_laminas_total": "total de láminas del juego o null"
+  },
+  "elementos": [
+    {
+      "id": "escaleras|pasillos|puertas|patios_ventilacion|ventanas_iluminacion|elevadores|cajones_estacionamiento|restricciones|accesibilidad|locales_habitables",
+      "estado": "cumple|atencion|incumple|nd",
+      "observacion": "descripción específica de lo observado",
+      "medidas_observadas": "dimensiones detectadas o nd",
+      "articulo": "artículo y reglamento exacto",
+      "recomendacion": "acción correctiva concreta o null si cumple"
+    }
+  ]
+}
+
+REGLAS CRÍTICAS:
+- municipio_detectado, tipo_detectado, niveles_detectados: SIEMPRE incluirlos. Usa null solo si es imposible determinarlo.
+- dictamen: ARRAY de strings, máximo 4 elementos. Cada elemento es un párrafo. NO uses el campo dictamen_general.
+- Cada párrafo del dictamen debe ser texto plano sin comillas internas — si necesitas citar algo, usa comillas simples o elimínalas.
+- datos_solapa: extrae SOLO lo que puedas leer con certeza de la solapa. Usa null si no es visible.
+- El JSON debe ser válido y parseable. No incluyas comentarios ni texto fuera del JSON.
+- Estado "nd" = elemento no visible o no verificable en los planos presentados.
+- Estado "atencion" = cumple pero con incertidumbre o marginalmente.`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// API KEY — GESTIÓN
+// ══════════════════════════════════════════════════════════════════════════
+const APIKEY_STORAGE = 'gu_m04_apikey';
+
+function obtenerKey() {
+  return localStorage.getItem(APIKEY_STORAGE) || '';
+}
+
+function guardarKey() {
+  const input = document.getElementById('apikey-input');
+  const key = input.value.trim();
+  if (!key) {
+    mostrarStatusKey('⚠️ Ingresa una key primero', 'var(--yellow)');
+    return;
+  }
+  if (!key.startsWith('sk-ant-')) {
+    mostrarStatusKey('⚠️ La key debe empezar con sk-ant-', 'var(--yellow)');
+    return;
+  }
+  localStorage.setItem(APIKEY_STORAGE, key);
+  input.classList.add('saved');
+  document.getElementById('apikey-panel').classList.add('ok');
+  document.getElementById('apikey-panel').classList.remove('error');
+  mostrarStatusKey('✅ Key guardada', 'var(--green)');
+  setTimeout(() => mostrarStatusKey('', ''), 3000);
+}
+
+function onKeyInput() {
+  const input = document.getElementById('apikey-input');
+  input.classList.remove('saved');
+  document.getElementById('apikey-panel').classList.remove('ok', 'error');
+  mostrarStatusKey('', '');
+}
+
+function mostrarStatusKey(msg, color) {
+  const el = document.getElementById('apikey-status');
+  el.textContent = msg;
+  el.style.color = color;
+}
+
+function toggleKeyVisibility() {
+  const input = document.getElementById('apikey-input');
+  const btn = document.getElementById('apikey-toggle');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = 'ocultar';
+  } else {
+    input.type = 'password';
+    btn.textContent = 'mostrar';
+  }
+}
+
+// Estado global del análisis
+let _ultimoResultado = null;
+let _ultimoConfig = null;
+
+function initKey() {
+  const saved = obtenerKey();
+  if (saved) {
+    const input = document.getElementById('apikey-input');
+    input.value = saved;
+    input.classList.add('saved');
+    document.getElementById('apikey-panel').classList.add('ok');
+    mostrarStatusKey('✅ Key cargada', 'var(--green)');
+  }
+  // Actualizar disclaimer al cargar
+  actualizarDisclaimer();
+}
+
+// Función centralizada para cambio de municipio desde el selector
+// Diferencia dos estados: con resultado activo (no cambiar disclaimer) / sin resultado (sí cambiar)
+function sincronizarMunicipio() {
+  // Siempre: ocultar badge auto-detectado y mostrar banner si aplica
+  document.getElementById('badge-municipio').style.display = 'none';
+  actualizarBannerReanalizar();
+
+  // Si NO hay resultado activo, actualizar disclaimer y subtítulo con el municipio del selector
+  // Si SÍ hay resultado, el disclaimer debe quedarse mostrando el municipio del análisis actual
+  if (!_ultimoResultado) {
+    actualizarDisclaimer();
+  }
+}
+
+function actualizarDisclaimer() {
+  // Usa config del análisis si existe; si no, usa el selector
+  const munVal = (_ultimoConfig?.municipio) || document.getElementById('sel-municipio')?.value || 'GDL';
+  const norm = NORMATIVA[munVal] || NORMATIVA['GDL'];
+  const el = document.getElementById('disclaimer-texto');
+  if (el) {
+    el.textContent = `Este módulo proporciona orientación técnica basada en ${norm.fuentes}. El análisis de IA puede contener errores de interpretación visual. No sustituye un dictamen oficial emitido por la ${norm.autoridad}. Verifique siempre con el DRO antes de iniciar obra.`;
+  }
+  // También actualizar el subtítulo de la descripción
+  const subt = document.getElementById('modulo-subt');
+  if (subt) subt.textContent = `Claude lee el plano y verifica cada elemento contra la normativa vigente de ${norm.nombre}`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// ESTADO GLOBAL — MULTI-IMAGEN
+// ══════════════════════════════════════════════════════════════════════════
+const MAX_FILES = 10;
+// Cada entrada: { base64, mime, nombre, size }
+let archivos = [];
+
+// ══════════════════════════════════════════════════════════════════════════
+// UPLOAD MULTI-IMAGEN
+// ══════════════════════════════════════════════════════════════════════════
+const fileInput      = document.getElementById('file-input');
+const fileInputExtra = document.getElementById('file-input-extra');
+const uploadZone     = document.getElementById('upload-zone');
+const filesGrid      = document.getElementById('files-grid');
+const filesCountLabel= document.getElementById('files-count-label');
+const uploadCompact  = document.getElementById('upload-zone-compact');
+const btnAnalizar    = document.getElementById('btn-analizar');
+initKey();
+
+// Inputs de archivo (fuera del drop zone)
+fileInput.addEventListener('change', e => {
+  agregarArchivos(Array.from(e.target.files));
+  e.target.value = '';
+});
+fileInputExtra.addEventListener('change', e => {
+  agregarArchivos(Array.from(e.target.files));
+  e.target.value = '';
+});
+
+// Drag & drop eliminado — se usa botón de selección directa (más confiable en localhost)
+
+function agregarArchivos(files) {
+  const disponibles = MAX_FILES - archivos.length;
+  const aLeer = files.slice(0, disponibles);
+  if (files.length > disponibles) {
+    mostrarError(`Solo puedes subir hasta ${MAX_FILES} láminas. Se agregarán las primeras ${disponibles}.`);
+  }
+
+  let pendientes = aLeer.length;
+  if (pendientes === 0) return;
+
+  let erroresTamanio = [];
+
+  aLeer.forEach(file => {
+    if (file.size > 10 * 1024 * 1024) {
+      const pesoMB = (file.size / 1024 / 1024).toFixed(1);
+      erroresTamanio.push(`"${file.name}" pesa ${pesoMB} MB — máximo permitido: 10 MB. Comprime el PDF en ilovepdf.com antes de subirlo.`);
+      pendientes--;
+      if (pendientes === 0) {
+        actualizarUI();
+        if (erroresTamanio.length > 0) mostrarError(erroresTamanio.join(' | '));
+      }
+      return;
+    }
+    const mime = file.type === 'application/pdf' ? 'application/pdf'
+               : (file.type || 'image/jpeg');
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const b64 = ev.target.result.split(',')[1];
+      archivos.push({ base64: b64, mime, nombre: file.name, size: file.size, dataUrl: ev.target.result });
+      pendientes--;
+      if (pendientes === 0) {
+        actualizarUI();
+        if (erroresTamanio.length > 0) mostrarError(erroresTamanio.join(' | '));
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function actualizarUI() {
+  ocultarError();
+  ocultarResultado();
+
+  const n = archivos.length;
+
+  if (n === 0) {
+    uploadZone.style.display = '';
+    filesGrid.innerHTML = '';
+    filesCountLabel.style.display = 'none';
+    uploadCompact.style.display = 'none';
+    btnAnalizar.disabled = true;
+    document.getElementById('btn-analizar-label').textContent = 'Analizar planos con IA normativa';
+    return;
+  }
+
+  // Ocultar zona grande
+  uploadZone.style.display = 'none';
+
+  // Renderizar miniaturas
+  filesGrid.innerHTML = archivos.map((a, i) => {
+    const esImagen = a.mime.startsWith('image/');
+    const thumb = esImagen
+      ? `<img src="${a.dataUrl}" alt="${a.nombre}">`
+      : `<div class="file-thumb-icon">📄</div>`;
+    return `<div class="file-thumb" id="thumb-${i}">
+      ${thumb}
+      <div class="file-thumb-label">${i+1}. ${a.nombre}</div>
+      <button class="file-thumb-del" onclick="eliminarArchivo(${i})" title="Quitar">×</button>
+    </div>`;
+  }).join('');
+
+  // Contador
+  filesCountLabel.style.display = '';
+  filesCountLabel.textContent = `${n} lámina${n>1?'s':''} cargada${n>1?'s':''} · ${archivos.reduce((s,a)=>s+a.size,0)/1024 < 1024 ? (archivos.reduce((s,a)=>s+a.size,0)/1024).toFixed(0)+' KB' : (archivos.reduce((s,a)=>s+a.size,0)/1024/1024).toFixed(1)+' MB'} total`;
+
+  // Zona compacta de agregar más
+  if (n < MAX_FILES) {
+    uploadCompact.style.display = '';
+    uploadCompact.classList.remove('maxed');
+    document.getElementById('slots-restantes').textContent = MAX_FILES - n;
+  } else {
+    uploadCompact.classList.add('maxed');
+  }
+
+  // Botón analizar
+  btnAnalizar.disabled = false;
+  document.getElementById('btn-analizar-label').textContent =
+    n === 1 ? 'Analizar plano con IA normativa' : `Analizar ${n} láminas con IA normativa`;
+}
+
+function eliminarArchivo(idx) {
+  archivos.splice(idx, 1);
+  actualizarUI();
+}
+
+function cambiarArchivo() {
+  archivos = [];
+  _ultimoResultado = null;
+  _ultimoConfig = null;
+  // Resetear los 3 selectores a vacío (detección automática)
+  document.getElementById('sel-municipio').value = '';
+  document.getElementById('sel-tipo').value = '';
+  document.getElementById('sel-niveles').value = '';
+  // Ocultar badges auto-detectado
+  document.getElementById('badge-municipio').style.display = 'none';
+  document.getElementById('badge-tipo').style.display = 'none';
+  document.getElementById('badge-niveles').style.display = 'none';
+  // Ocultar banner re-análisis
+  const banner = document.getElementById('reanalizar-banner');
+  if (banner) banner.style.display = 'none';
+  // Ocultar botón M01
+  const btnM01 = document.getElementById('btn-ir-m01');
+  if (btnM01) btnM01.style.display = 'none';
+  // Restaurar disclaimer genérico
+  actualizarDisclaimer();
+  actualizarUI();
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// ANÁLISIS PRINCIPAL — procesamiento por lotes (máx. 3 láminas por llamada)
+// ══════════════════════════════════════════════════════════════════════════
+
+const LOTE_MAX = 3;          // máx. láminas por llamada API
+const MB_LIMITE_LOTE = 15;   // MB máx. por lote (seguridad extra)
+
+// Divide el array en sub-arrays de tamaño n
+function chunk(arr, n) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));
+  return out;
+}
+
+// Llama a la API con un lote de láminas y devuelve el resultado parseado
+async function llamarAPI(laminasLote, config, esLoteUnico) {
+  const prompt = buildPrompt(config, esLoteUnico);
+  const contentConLabels = [];
+  laminasLote.forEach((a, i) => {
+    const numGlobal = archivos.indexOf(a) + 1;
+    contentConLabels.push({ type: 'text', text: `--- LÁMINA ${numGlobal}: ${a.nombre} ---` });
+    contentConLabels.push({
+      type: a.mime === 'application/pdf' ? 'document' : 'image',
+      source: { type: 'base64', media_type: a.mime, data: a.base64 }
+    });
+  });
+  contentConLabels.push({ type: 'text', text: prompt });
+
+  const body = {
+    model: 'claude-sonnet-4-6',
+    max_tokens: 5000,
+    messages: [{ role: 'user', content: contentConLabels }]
+  };
+
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': obtenerKey(),
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Error API ${resp.status}`);
+  }
+
+  const data = await resp.json();
+  const rawText = data.content?.find(b => b.type === 'text')?.text || '';
+
+  // Parser robusto en 3 intentos
+  function parsearJSON(txt) {
+    // Intento 1: limpiar markdown y parsear directo
+    let s = txt
+      .replace(/^```json\s*/gm, '')
+      .replace(/^```\s*/gm, '')
+      .replace(/```$/gm, '')
+      .trim();
+    // Extraer desde { hasta }
+    const f = s.indexOf('{');
+    const l = s.lastIndexOf('}');
+    if (f !== -1 && l !== -1) s = s.slice(f, l + 1);
+    try { return JSON.parse(s); } catch(e1) {}
+
+    // Intento 2: extraer campos clave con regex si el JSON está malformado
+    // Extraer "dictamen" array
+    const dictamenMatch = txt.match(/"dictamen"\s*:\s*\[([\s\S]*?)\](?=\s*,|\s*})/);
+    const semaforoMatch = txt.match(/"semaforo"\s*:\s*"(verde|amarillo|rojo)"/);
+    const resumenMatch  = txt.match(/"resumen"\s*:\s*"([^"]+)"/);
+
+    if (semaforoMatch) {
+      // Extraer párrafos del dictamen de forma segura
+      let parrafos = [];
+      if (dictamenMatch) {
+        const arrTxt = dictamenMatch[1];
+        // Extraer strings individuales del array
+        const matches = arrTxt.match(/"((?:[^"\\]|\\.)*)"/g) || [];
+        parrafos = matches.map(m => m.slice(1,-1).replace(/\\n/g,'\n').replace(/\\"/g,'"'));
+      }
+      // Extraer elementos con regex
+      const elementosRaw = [];
+      const elRegex = /"id"\s*:\s*"([^"]+)"[\s\S]*?"estado"\s*:\s*"([^"]+)"[\s\S]*?"observacion"\s*:\s*"((?:[^"\\]|\\.)*)"/g;
+      let em;
+      while ((em = elRegex.exec(txt)) !== null) {
+        const artMatch = txt.slice(em.index).match(/"articulo"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+        const recMatch = txt.slice(em.index).match(/"recomendacion"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+        const medMatch = txt.slice(em.index).match(/"medidas_observadas"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+        elementosRaw.push({
+          id: em[1], estado: em[2], observacion: em[3],
+          medidas_observadas: medMatch ? medMatch[1] : 'nd',
+          articulo: artMatch ? artMatch[1] : '',
+          recomendacion: recMatch ? recMatch[1] : null,
+        });
+      }
+      // Extraer datos_solapa
+      const solapaMatch = txt.match(/"datos_solapa"\s*:\s*\{([\s\S]*?)\}/);
+      let datos_solapa = {};
+      if (solapaMatch) {
+        const campos = ['propietario','dro','direccion','colonia','cp','zonificacion','uso_suelo',
+          'superficie_terreno','superficie_construccion','cajones_indicados','viviendas','escala','num_laminas_total'];
+        campos.forEach(c => {
+          const m = solapaMatch[1].match(new RegExp('"' + c + '"\\s*:\\s*"([^"]*)"'));
+          if (m) datos_solapa[c] = m[1];
+        });
+      }
+      // Extraer municipio_detectado, tipo_detectado, niveles_detectados
+      const munDetMatch  = txt.match(/"municipio_detectado"\s*:\s*"([^"]*)"/) ;
+      const tipoDetMatch = txt.match(/"tipo_detectado"\s*:\s*"([^"]*)"/);
+      const nivDetMatch  = txt.match(/"niveles_detectados"\s*:\s*"([^"]*)"/);
+      return {
+        municipio_detectado: munDetMatch  ? munDetMatch[1]  : null,
+        tipo_detectado:      tipoDetMatch ? tipoDetMatch[1] : null,
+        niveles_detectados:  nivDetMatch  ? nivDetMatch[1]  : null,
+        dictamen: parrafos.length > 0 ? parrafos : [txt.replace(/[{}"\[\]]/g,'').slice(0,500)],
+        semaforo: semaforoMatch[1],
+        resumen: resumenMatch ? resumenMatch[1] : 'Análisis completado',
+        datos_solapa,
+        elementos: elementosRaw,
+      };
+    }
+
+    // Intento 3: fallback mínimo
+    return {
+      dictamen: ['El análisis se completó pero hubo un problema al procesar la respuesta. Revisa los elementos individuales.'],
+      semaforo: 'amarillo',
+      resumen: 'Análisis completado — error de formato',
+      datos_solapa: {},
+      elementos: [],
+    };
+  }
+
+  return parsearJSON(rawText);
+}
+
+// Consolida resultados de múltiples lotes en uno solo
+function consolidarResultados(resultados) {
+  if (resultados.length === 1) return resultados[0];
+
+  // Semáforo: tomar el peor
+  const prioSem = { rojo: 0, amarillo: 1, verde: 2 };
+  const semaforo = resultados.reduce((peor, r) => {
+    return (prioSem[r.semaforo] ?? 1) < (prioSem[peor] ?? 1) ? r.semaforo : peor;
+  }, 'verde');
+
+  // Elementos: consolidar por id tomando el peor estado
+  const prioEst = { incumple: 0, atencion: 1, nd: 2, cumple: 3 };
+  const mapaElementos = {};
+  resultados.forEach(r => {
+    (r.elementos || []).forEach(el => {
+      if (!mapaElementos[el.id]) {
+        mapaElementos[el.id] = { ...el };
+      } else {
+        const existente = mapaElementos[el.id];
+        // Tomar el peor estado
+        if ((prioEst[el.estado] ?? 2) < (prioEst[existente.estado] ?? 2)) {
+          mapaElementos[el.id] = { ...el };
+        } else if (el.estado === existente.estado && el.observacion !== existente.observacion) {
+          // Mismo estado: concatenar observaciones
+          existente.observacion += ' | ' + el.observacion;
+        }
+      }
+    });
+  });
+
+  // Dictamen: concatenar todos
+  const dictamen_general = resultados
+    .map((r, i) => resultados.length > 1 ? `[Láminas ${i*LOTE_MAX+1}–${Math.min((i+1)*LOTE_MAX, archivos.length)}] ${r.dictamen_general}` : r.dictamen_general)
+    .join('\n\n');
+
+  return {
+    semaforo,
+    resumen: `Análisis de ${archivos.length} láminas — ${semaforo === 'verde' ? 'sin incumplimientos' : semaforo === 'rojo' ? 'incumplimientos detectados' : 'requiere atención'}`,
+    dictamen_general,
+    elementos: Object.values(mapaElementos),
+  };
+}
+
+async function analizarPlano() {
+  if (archivos.length === 0) return;
+
+  const apiKey = obtenerKey();
+  if (!apiKey || !apiKey.startsWith('sk-ant-')) {
+    mostrarError('Ingresa tu API key de Anthropic primero. Obtenla en console.anthropic.com → API Keys');
+    document.getElementById('apikey-input').focus();
+    return;
+  }
+
+  // config inicial — municipio/tipo/niveles pueden estar vacíos (se detectan automáticamente por IA)
+  // Se usa 'GDL' como fallback para construir el prompt; se actualiza con los valores detectados tras el análisis
+  const config = {
+    municipio: document.getElementById('sel-municipio').value || 'GDL',
+    tipo: (() => { const s = document.getElementById('sel-tipo'); return s.value ? s.options[s.selectedIndex].text : 'Por detectar'; })(),
+    tipoVal: document.getElementById('sel-tipo').value || '',
+    niveles: document.getElementById('sel-niveles').value || '0',
+    sup: document.getElementById('p-sup').value,
+    frente: document.getElementById('p-frente').value,
+    rf: document.getElementById('p-rf').value,
+    rl: document.getElementById('p-rl').value,
+    rp: document.getElementById('p-rp').value,
+    cos: document.getElementById('p-cos').value,
+    // Datos del cuadro de áreas
+    supConst: document.getElementById('p-sup-const').value,
+    numViv: document.getElementById('p-num-viv').value,
+    cajonesProyecto: document.getElementById('p-cajones').value,
+    cajonesPmr: document.getElementById('p-cajones-pmr').value,
+    alturaEntrepiso: document.getElementById('p-altura').value,
+    supVivTipo: document.getElementById('p-sup-viv').value,
+    // Datos del dictamen
+    nombreProyecto: document.getElementById('p-nombre-proyecto').value,
+    dro: document.getElementById('p-dro').value,
+    numLaminas: archivos.length,
+    nombreLaminas: archivos.map((a,i) => `Lámina ${i+1}: ${a.nombre}`).join(', '),
+  };
+
+  ocultarError();
+  ocultarResultado();
+  // Limpiar resultado anterior para que el disclaimer use el selector durante el análisis
+  _ultimoResultado = null;
+  _ultimoConfig = null;
+  actualizarDisclaimer();
+  mostrarLoading(true);
+  btnAnalizar.disabled = true;
+
+  // Animación de pasos (solo pasos 1 y 2 al inicio)
+  const pasos = ['step1','step2','step3','step4'];
+  document.getElementById('step1').className = 'active';
+
+  // Dividir en lotes
+  const lotes = chunk(archivos, LOTE_MAX);
+  const totalLotes = lotes.length;
+
+  // Mostrar barra de progreso si hay más de 1 lote
+  const batchPanel = document.getElementById('loading-batch');
+  const batchLabel = document.getElementById('loading-batch-label');
+  const batchBar   = document.getElementById('loading-batch-bar');
+  if (totalLotes > 1) {
+    batchPanel.style.display = '';
+    batchLabel.textContent = `Procesando lote 1 de ${totalLotes}…`;
+    batchBar.style.width = '0%';
+  }
+
+  try {
+    const resultados = [];
+
+    for (let i = 0; i < lotes.length; i++) {
+      // Actualizar UI
+      if (i === 0) document.getElementById('step1').className = 'active';
+      if (i === 1) { document.getElementById('step1').className = 'done'; document.getElementById('step2').className = 'active'; }
+      if (i >= 2) { document.getElementById('step2').className = 'done'; document.getElementById('step3').className = 'active'; }
+
+      if (totalLotes > 1) {
+        batchLabel.textContent = `Analizando lote ${i+1} de ${totalLotes} (láminas ${i*LOTE_MAX+1}–${Math.min((i+1)*LOTE_MAX, archivos.length)})…`;
+        batchBar.style.width = `${((i) / totalLotes) * 100}%`;
+      }
+
+      const resultado = await llamarAPI(lotes[i], config, totalLotes === 1);
+      resultados.push(resultado);
+    }
+
+    // Finalizar UI
+    pasos.forEach(p => document.getElementById(p).className = 'done');
+    if (totalLotes > 1) {
+      batchLabel.textContent = `Consolidando ${totalLotes} análisis…`;
+      batchBar.style.width = '90%';
+    }
+
+    // Pequeña pausa visual antes de mostrar resultado
+    await new Promise(r => setTimeout(r, 400));
+    if (totalLotes > 1) batchBar.style.width = '100%';
+
+    const resultado = consolidarResultados(resultados);
+
+    mostrarLoading(false);
+    batchPanel.style.display = 'none';
+    renderResultado(resultado, config);
+
+  } catch (err) {
+    mostrarLoading(false);
+    batchPanel.style.display = 'none';
+    mostrarError(`Error al analizar: ${err.message}. Verifica tu conexión y que la API key de Claude esté configurada.`);
+    btnAnalizar.disabled = false;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// RENDER RESULTADO
+// ══════════════════════════════════════════════════════════════════════════
+function renderResultado(r, config) {
+  _ultimoResultado = r;
+
+  // ── PASO 1: Inyectar los 3 campos detectados por la IA en los selects ──
+  // Debe hacerse PRIMERO, antes de cualquier render, para que config tenga los valores correctos
+  function setSelect(id, val) {
+    if (!val || val === 'null') return;
+    const el = document.getElementById(id);
+    if (!el) return;
+    const opciones = Array.from(el.options).map(o => o.value);
+    if (opciones.includes(String(val))) {
+      el.value = String(val);
+      el.dispatchEvent(new Event('change'));
+    }
+  }
+  if (r.municipio_detectado) {
+    setSelect('sel-municipio', r.municipio_detectado);
+    if (r.municipio_detectado !== 'null') document.getElementById('badge-municipio').style.display = '';
+  }
+  if (r.tipo_detectado) {
+    setSelect('sel-tipo', r.tipo_detectado);
+    if (r.tipo_detectado !== 'null') document.getElementById('badge-tipo').style.display = '';
+  }
+  if (r.niveles_detectados) {
+    setSelect('sel-niveles', r.niveles_detectados);
+    if (r.niveles_detectados !== 'null') document.getElementById('badge-niveles').style.display = '';
+  }
+
+  // ── PASO 2: Reconstruir config con los valores ya inyectados ──
+  const munFinal  = document.getElementById('sel-municipio').value || 'GDL';
+  const tipoSel   = document.getElementById('sel-tipo');
+  const tipoFinal = tipoSel.value ? tipoSel.options[tipoSel.selectedIndex].text : 'No determinado';
+  const nivFinal  = document.getElementById('sel-niveles').value || '0';
+  config = Object.assign({}, config, { municipio: munFinal, tipo: tipoFinal, niveles: nivFinal });
+  _ultimoConfig = config;
+
+  // Contar estados
+  const elems = r.elementos || [];
+  const cumple = elems.filter(e => e.estado === 'cumple').length;
+  const atencion = elems.filter(e => e.estado === 'atencion').length;
+  const incumple = elems.filter(e => e.estado === 'incumple').length;
+  const nd = elems.filter(e => e.estado === 'nd').length;
+
+  // Semáforo header
+  const semColor = { verde: 'verde', amarillo: 'amarillo', rojo: 'rojo' }[r.semaforo] || 'amarillo';
+  const semIcono = { verde: '✅', amarillo: '⚠️', rojo: '🚫' }[r.semaforo] || '⚠️';
+  const semTexto = { verde: 'Cumple normativa', amarillo: 'Requiere atención', rojo: 'Incumplimientos detectados' }[r.semaforo] || 'Revisión requerida';
+
+  const semEl = document.getElementById('semaforo-header');
+  semEl.className = 'semaforo-header ' + semColor;
+  semEl.innerHTML = `
+    <div class="semaforo-icon">${semIcono}</div>
+    <div class="semaforo-info">
+      <div class="semaforo-titulo ${semColor}">${semTexto}</div>
+      <div class="semaforo-subtitulo">
+        <span style="display:inline-block;background:rgba(59,130,246,.18);border:1px solid rgba(59,130,246,.4);color:#93C5FD;font-size:11px;font-weight:700;padding:1px 8px;border-radius:10px;margin-right:6px;letter-spacing:.3px;">🏛 ${(NORMATIVA[document.getElementById('sel-municipio').value]||NORMATIVA['GDL']).nombre.toUpperCase()}</span>${r.resumen || ''} · ${(()=>{ const tipoS=document.getElementById('sel-tipo'); return tipoS.value?tipoS.options[tipoS.selectedIndex].text:'Por determinar'; })()} · ${document.getElementById('sel-niveles').value||'?'} niveles
+      </div>
+      <div class="semaforo-stats">
+        <div class="sstat"><div class="sstat-num verde">${cumple}</div><div class="sstat-lbl">Cumple</div></div>
+        <div class="sstat"><div class="sstat-num amarillo">${atencion}</div><div class="sstat-lbl">Atención</div></div>
+        <div class="sstat"><div class="sstat-num rojo">${incumple}</div><div class="sstat-lbl">Incumple</div></div>
+        <div class="sstat"><div class="sstat-num" style="color:var(--text3)">${nd}</div><div class="sstat-lbl">N/D</div></div>
+      </div>
+    </div>`;
+
+  // Elementos
+  const nombres = {
+    escaleras: 'Escaleras', pasillos: 'Pasillos y corredores',
+    puertas: 'Puertas', patios_ventilacion: 'Patios ventilación/iluminación',
+    ventanas_iluminacion: 'Ventanas e iluminación', elevadores: 'Elevadores',
+    cajones_estacionamiento: 'Cajones estacionamiento',
+    restricciones: 'Restricciones', accesibilidad: 'Accesibilidad universal',
+    locales_habitables: 'Dimensiones mínimas de locales'
+  };
+  const iconos = {
+    escaleras:'🪜', pasillos:'🚶', puertas:'🚪', patios_ventilacion:'🌿',
+    ventanas_iluminacion:'☀️', elevadores:'🛗', cajones_estacionamiento:'🚗',
+    restricciones:'📏', accesibilidad:'♿',
+    locales_habitables:'📐'
+  };
+  const estadoBadge = {
+    cumple: 'CUMPLE', atencion: 'ATENCIÓN', incumple: 'INCUMPLE', nd: 'N/D'
+  };
+
+  // Orden de prioridad: incumple primero
+  const ordenados = [...elems].sort((a, b) => {
+    const prio = { incumple: 0, atencion: 1, cumple: 2, nd: 3 };
+    return (prio[a.estado]||3) - (prio[b.estado]||3);
+  });
+
+  let html = '';
+  ordenados.forEach((el, idx) => {
+    const normaBase = NORMAS_GDL[el.id];
+    const desc = normaBase?.descripcion || '';
+    html += `
+    <div class="elemento-card ${el.estado}" id="el-${idx}">
+      <div class="elemento-header" onclick="toggleEl(${idx})">
+        <div class="elemento-icono">${iconos[el.id] || '📋'}</div>
+        <div class="elemento-nombre">${nombres[el.id] || el.id}</div>
+        <div class="elemento-badge">${estadoBadge[el.estado] || el.estado}</div>
+        <div class="elemento-chevron">▶</div>
+      </div>
+      <div class="elemento-body" id="body-${idx}">
+        <div class="observacion">${el.observacion || '—'}</div>
+        ${el.medidas_observadas ? `<div style="font-size:11px; color:var(--text3); margin-top:6px; font-family:var(--mono);">📐 ${el.medidas_observadas}</div>` : ''}
+        ${el.recomendacion ? `<div style="margin-top:8px; padding:8px 12px; background:rgba(245,158,11,.1); border-radius:6px; font-size:12px; color:var(--yellow);">💡 ${el.recomendacion}</div>` : ''}
+        ${desc ? `<div class="norma-ref">📖 Norma: ${desc}</div>` : ''}
+        ${el.articulo ? `<div class="norma-ref" style="margin-top:3px;">⚖️ Fundamento: ${el.articulo}</div>` : ''}
+      </div>
+    </div>`;
+  });
+  document.getElementById('elementos-list').innerHTML = html;
+
+  // Dictamen: array de párrafos (campo "dictamen") con fallback a dictamen_general
+  let parrafos = [];
+  if (Array.isArray(r.dictamen) && r.dictamen.length > 0) {
+    parrafos = r.dictamen.filter(Boolean);
+  } else if (r.dictamen_general) {
+    parrafos = r.dictamen_general.split(/\n\n+/).map(p => p.trim()).filter(Boolean);
+  }
+  document.getElementById('dictamen-texto').innerHTML = parrafos
+    .map(p => `<p class="dictamen-parrafo">${p}</p>`)
+    .join('');
+
+  // (inyección de selects movida al inicio de renderResultado)
+
+  // Inyectar datos de solapa en los campos del formulario
+  const sol = r.datos_solapa || {};
+  function setIfEmpty(id, val) {
+    const el = document.getElementById(id);
+    if (el && !el.value && val && val !== 'null') el.value = val;
+  }
+  if (sol.dro) setIfEmpty('p-dro', sol.dro);
+  if (sol.superficie_terreno) {
+    const num = parseFloat(sol.superficie_terreno);
+    if (!isNaN(num)) setIfEmpty('p-sup', num);
+  }
+  if (sol.superficie_construccion) {
+    const num = parseFloat(sol.superficie_construccion);
+    if (!isNaN(num)) setIfEmpty('p-sup-const', num);
+  }
+  if (sol.cajones_indicados) {
+    const num = parseInt(sol.cajones_indicados);
+    if (!isNaN(num)) setIfEmpty('p-cajones', num);
+  }
+  if (sol.viviendas) {
+    const num = parseInt(sol.viviendas);
+    if (!isNaN(num)) setIfEmpty('p-num-viv', num);
+  }
+  // Actualizar aviso legal, banner y botón M01 con el municipio ya confirmado
+  actualizarDisclaimer();
+  actualizarBannerReanalizar();
+  actualizarBotonM01();
+
+  // Mostrar badge con datos de solapa bajo el dictamen si hay datos
+  const solapaFields = [
+    sol.propietario ? `Propietario: ${sol.propietario}` : null,
+    sol.dro ? `DRO: ${sol.dro}` : null,
+    sol.zonificacion ? `Zona: ${sol.zonificacion}` : null,
+    sol.superficie_terreno ? `Terreno: ${sol.superficie_terreno}` : null,
+    sol.superficie_construccion ? `Construcción: ${sol.superficie_construccion}` : null,
+    sol.cajones_indicados ? `Cajones solapa: ${sol.cajones_indicados}` : null,
+    sol.escala ? `Escala: ${sol.escala}` : null,
+  ].filter(Boolean);
+  const solapaEl = document.getElementById('solapa-datos');
+  if (solapaEl && solapaFields.length > 0) {
+    solapaEl.style.display = '';
+    solapaEl.innerHTML = '<strong>📋 Datos leídos de la solapa:</strong> ' + solapaFields.join(' · ');
+  }
+
+  // Actualizar cabecera de impresión con datos del proyecto
+  const ahora = new Date();
+  const fechaStr = ahora.toLocaleDateString('es-MX', {day:'2-digit',month:'long',year:'numeric'});
+  const horaStr = ahora.toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'});
+  const metaEl = document.getElementById('print-header-meta');
+  if (metaEl) {
+    const laminasStr = `${archivos.length} lámina${archivos.length!==1?'s':''}`;
+    const munNombre = (NORMATIVA[config.municipio] || NORMATIVA['GDL']).nombre;
+    metaEl.innerHTML = [
+      config.nombreProyecto ? `<strong>Proyecto:</strong> ${config.nombreProyecto}` : null,
+      config.dro ? `<strong>DRO:</strong> ${config.dro}` : null,
+      `<strong>Municipio:</strong> ${munNombre}`,
+      `<strong>Tipo:</strong> ${config.tipo}`,
+      `<strong>Niveles:</strong> ${config.niveles}`,
+      config.sup ? `Predio: ${config.sup} m²` : null,
+      config.supConst ? `Construcción: ${config.supConst} m²` : null,
+      config.numViv ? `Unidades: ${config.numViv}` : null,
+      config.cajonesProyecto ? `Cajones proyecto: ${config.cajonesProyecto}` : null,
+      config.cos ? `COS: ${config.cos}` : null,
+      `Láminas: ${laminasStr}`,
+      `Generado: ${fechaStr}, ${horaStr}`,
+    ].filter(Boolean).join('  ·  ');
+  }
+
+  // Abrir incumplimientos automáticamente
+  ordenados.forEach((el, idx) => {
+    if (el.estado === 'incumple' || el.estado === 'atencion') {
+      toggleEl(idx);
+    }
+  });
+
+  document.getElementById('result-panel').classList.add('visible');
+  document.getElementById('result-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  btnAnalizar.disabled = false;
+}
+
+function toggleEl(idx) {
+  const header = document.querySelector(`#el-${idx} .elemento-header`);
+  const body = document.getElementById(`body-${idx}`);
+  header.classList.toggle('open');
+  body.classList.toggle('visible');
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// HELPERS UI
+// ══════════════════════════════════════════════════════════════════════════
+function mostrarLoading(v) {
+  document.getElementById('loading-panel').classList.toggle('visible', v);
+  if (v) {
+    ['step1','step2','step3','step4'].forEach(s => document.getElementById(s).className = '');
+    // Actualizar step3 con el municipio actual del selector
+    const munVal = document.getElementById('sel-municipio').value || 'GDL';
+    const munNom = (NORMATIVA[munVal] || NORMATIVA['GDL']).nombre;
+    const step3 = document.getElementById('step3');
+    if (step3) step3.textContent = '⚖️ Verificando contra normativa ' + munNom + '…';
+  }
+}
+function ocultarResultado() {
+  document.getElementById('result-panel').classList.remove('visible');
+}
+function mostrarError(msg) {
+  const p = document.getElementById('error-panel');
+  p.textContent = '⚠️ ' + msg;
+  p.classList.add('visible');
+}
+function ocultarError() {
+  document.getElementById('error-panel').classList.remove('visible');
+}
+// ══════════════════════════════════════════════════════════════════════════
+// DESCARGA EXCEL — 3 hojas
+// ══════════════════════════════════════════════════════════════════════════
+// _ultimoResultado y _ultimoConfig declarados al inicio del script
+
+function descargarExcel() {
+  if (!_ultimoResultado || !_ultimoConfig) {
+    mostrarError('Primero realiza un análisis para poder descargar el Excel.');
+    return;
+  }
+  if (typeof XLSX === 'undefined') {
+    mostrarError('La librería de Excel no está disponible. Verifica tu conexión e intenta de nuevo.');
+    return;
+  }
+
+  const r = _ultimoResultado;
+  const config = _ultimoConfig;
+  const norm = NORMATIVA[config.municipio] || NORMATIVA['GDL'];
+  const ahora = new Date();
+  const fechaStr = ahora.toLocaleDateString('es-MX', {day:'2-digit', month:'long', year:'numeric'});
+  const horaStr = ahora.toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
+
+  const nombres = {
+    escaleras:'Escaleras', pasillos:'Pasillos y corredores', puertas:'Puertas',
+    patios_ventilacion:'Patios ventilación/iluminación', ventanas_iluminacion:'Ventanas e iluminación',
+    elevadores:'Elevadores', cajones_estacionamiento:'Cajones estacionamiento',
+    restricciones:'Restricciones', accesibilidad:'Accesibilidad universal',
+    locales_habitables:'Dimensiones mínimas de locales'
+  };
+  const estadoLabel = { cumple:'CUMPLE', atencion:'ATENCIÓN', incumple:'INCUMPLE', nd:'N/D' };
+
+  const wb = XLSX.utils.book_new();
+
+  // ── HOJA 1: Dictamen por elemento ────────────────────────────────────────
+  const elems = r.elementos || [];
+  const ordenados = [...elems].sort((a,b) => {
+    const p = {incumple:0, atencion:1, cumple:2, nd:3};
+    return (p[a.estado]||3) - (p[b.estado]||3);
+  });
+
+  const h1data = [
+    ['N°','Elemento normativo','Estado','Medidas observadas','Observación','Recomendación','Fundamento legal']
+  ];
+  ordenados.forEach((el, i) => {
+    h1data.push([
+      i+1,
+      nombres[el.id] || el.id,
+      estadoLabel[el.estado] || el.estado,
+      el.medidas_observadas || '—',
+      el.observacion || '—',
+      el.recomendacion || '—',
+      el.articulo || '—'
+    ]);
+  });
+
+  const ws1 = XLSX.utils.aoa_to_sheet(h1data);
+  ws1['!cols'] = [
+    {wch:4}, {wch:28}, {wch:12}, {wch:28}, {wch:60}, {wch:50}, {wch:50}
+  ];
+  // Estilo de encabezado (SheetJS CE solo soporta ancho, no colores — eso es PRO)
+  XLSX.utils.book_append_sheet(wb, ws1, 'Dictamen');
+
+  // ── HOJA 2: Datos del proyecto ───────────────────────────────────────────
+  const sol = r.datos_solapa || {};
+  // Combinar: solapa tiene prioridad sobre campos vacíos del usuario
+  const v = (userVal, solapaVal) => userVal || solapaVal || '—';
+
+  const h2data = [
+    ['Parámetro', 'Valor', 'Fuente'],
+    ['— DATOS GENERALES —', '', ''],
+    ['Nombre del proyecto', config.nombreProyecto || '—', 'Usuario'],
+    ['Propietario (solapa)', sol.propietario || '—', 'Solapa'],
+    ['DRO', v(config.dro, sol.dro), config.dro ? 'Usuario' : 'Solapa'],
+    ['Municipio', norm.nombre, 'Selector'],
+    ['Tipo de proyecto', config.tipo, 'Selector'],
+    ['Número de niveles', config.niveles, 'Selector'],
+    ['Zonificación (solapa)', sol.zonificacion || '—', 'Solapa'],
+    ['Uso de suelo (solapa)', sol.uso_suelo || '—', 'Solapa'],
+    ['— PREDIO —', '', ''],
+    ['Superficie del predio', v(config.sup ? config.sup + ' m²' : '', sol.superficie_terreno), config.sup ? 'Usuario' : 'Solapa'],
+    ['Frente', config.frente ? config.frente + ' ml' : '—', 'Usuario'],
+    ['Restricción frontal', config.rf ? config.rf + ' ml' : '—', 'Usuario'],
+    ['Restricción lateral', config.rl ? config.rl + ' ml' : '—', 'Usuario'],
+    ['Restricción posterior', config.rp ? config.rp + ' ml' : '—', 'Usuario'],
+    ['COS autorizado', config.cos || '—', 'Usuario'],
+    ['— CUADRO DE ÁREAS —', '', ''],
+    ['Superficie total construcción', v(config.supConst ? config.supConst + ' m²' : '', sol.superficie_construccion), config.supConst ? 'Usuario' : 'Solapa'],
+    ['Número de viviendas/unidades', v(config.numViv, sol.viviendas), config.numViv ? 'Usuario' : 'Solapa'],
+    ['Cajones indicados', v(config.cajonesProyecto, sol.cajones_indicados), config.cajonesProyecto ? 'Usuario' : 'Solapa'],
+    ['Cajones PMR indicados', config.cajonesPmr || '—', 'Usuario'],
+    ['Altura de entrepiso', config.alturaEntrepiso ? config.alturaEntrepiso + ' m' : '—', 'Usuario'],
+    ['Superficie vivienda tipo', config.supVivTipo ? config.supVivTipo + ' m²' : '—', 'Usuario'],
+    ['Escala del plano', sol.escala || '—', 'Solapa'],
+    ['— SEMÁFORO GENERAL —', '', ''],
+    ['Resultado', (r.semaforo || '').toUpperCase(), 'IA'],
+    ['Resumen', r.resumen || '—', 'IA'],
+    ['Láminas analizadas', archivos.length + ' láminas', 'Sistema'],
+    ['Normativa aplicada', norm.fuentes, 'Sistema'],
+    ['Fecha del análisis', fechaStr + ', ' + horaStr, 'Sistema'],
+  ];
+
+  const ws2 = XLSX.utils.aoa_to_sheet(h2data);
+  ws2['!cols'] = [{wch:30}, {wch:45}, {wch:14}];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Datos del proyecto');
+
+  // ── HOJA 3: Resumen ejecutivo ────────────────────────────────────────────
+  let parrafosExcel = [];
+  if (Array.isArray(r.dictamen) && r.dictamen.length > 0) {
+    parrafosExcel = r.dictamen.filter(Boolean);
+  } else if (r.dictamen_general) {
+    parrafosExcel = r.dictamen_general.split(/\n\n+/).map(p => p.trim()).filter(Boolean);
+  }
+
+  const h3data = [['Dictamen general — análisis del expediente']];
+  parrafosExcel.forEach(p => { h3data.push([p]); h3data.push(['']); });
+
+  const ws3 = XLSX.utils.aoa_to_sheet(h3data);
+  ws3['!cols'] = [{wch:120}];
+  XLSX.utils.book_append_sheet(wb, ws3, 'Resumen ejecutivo');
+
+  // Nombre del archivo
+  const nombreProyecto = (config.nombreProyecto || 'dictamen').replace(/[^a-zA-Z0-9_\-áéíóúÁÉÍÓÚñÑ ]/g, '').trim().replace(/ /g, '_');
+  const fecha = ahora.toISOString().slice(0,10);
+  XLSX.writeFile(wb, `M04_${nombreProyecto}_${fecha}.xlsx`);
+}
+
+function nuevoAnalisis() {
+  archivos = [];
+  _ultimoResultado = null;
+  _ultimoConfig = null;
+  // Resetear los 3 selectores a vacío
+  document.getElementById('sel-municipio').value = '';
+  document.getElementById('sel-tipo').value = '';
+  document.getElementById('sel-niveles').value = '';
+  // Ocultar badges
+  document.getElementById('badge-municipio').style.display = 'none';
+  document.getElementById('badge-tipo').style.display = 'none';
+  document.getElementById('badge-niveles').style.display = 'none';
+  // Ocultar banner re-análisis
+  const banner = document.getElementById('reanalizar-banner');
+  if (banner) banner.style.display = 'none';
+  // Ocultar botón M01
+  const btnM01 = document.getElementById('btn-ir-m01');
+  if (btnM01) btnM01.style.display = 'none';
+  // Restaurar disclaimer genérico
+  actualizarDisclaimer();
+  actualizarUI();
+  ocultarResultado();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function imprimirResultado() {
+  // Forzar apertura de todos los cuerpos antes de imprimir
+  // (el CSS @media print ya los muestra, pero por si acaso)
+  document.querySelectorAll('.elemento-header').forEach(h => h.classList.add('open'));
+  document.querySelectorAll('.elemento-body').forEach(b => b.classList.add('visible'));
+  setTimeout(() => window.print(), 120);
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// RE-ANÁLISIS CON MUNICIPIO CORREGIDO
+// ══════════════════════════════════════════════════════════════════════════
+function actualizarBannerReanalizar() {
+  const banner = document.getElementById('reanalizar-banner');
+  if (!banner) return;
+  if (!_ultimoResultado || archivos.length === 0) {
+    banner.style.display = 'none';
+    return;
+  }
+  const munActual   = document.getElementById('sel-municipio').value;
+  const munAnalisis = _ultimoConfig?.municipio || '';
+  if (munActual && munActual !== munAnalisis) {
+    const nombreAnterior = (NORMATIVA[munAnalisis] || NORMATIVA['GDL']).nombre;
+    const nombreNuevo    = (NORMATIVA[munActual]   || NORMATIVA['GDL']).nombre;
+    document.getElementById('reanalizar-mun-anterior').textContent = nombreAnterior;
+    document.getElementById('reanalizar-mun-nuevo').textContent    = nombreNuevo;
+    banner.style.display = 'flex';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+async function reanalizar() {
+  if (archivos.length === 0) {
+    alert('No hay archivos cargados para re-analizar.');
+    return;
+  }
+  const banner = document.getElementById('reanalizar-banner');
+  if (banner) banner.style.display = 'none';
+  await analizarPlano();
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// ENLACE M04 → M01  (clave localStorage: GU_m04_a_m01)
+// ══════════════════════════════════════════════════════════════════════════
+function irAM01() {
+  if (!_ultimoResultado) {
+    alert('Primero realiza un análisis de plano.');
+    return;
+  }
+  const sol = _ultimoResultado.datos_solapa || {};
+
+  // Construir la dirección desde la solapa — preferir el campo completo, fallback a partes
+  const dir = sol.direccion || '';
+  const colonia = sol.colonia || '';
+  const cp = sol.cp || '';
+
+  // Municipio: mapear GDL/ZPN al formato que usa M01
+  const munM04 = _ultimoResultado.municipio_detectado || document.getElementById('sel-municipio').value || '';
+  const munM01Map = { 'GDL': 'guadalajara', 'ZPN': 'zapopan', 'TLQ': 'tlaquepaque', 'TLA': 'tlajomulco', 'TON': 'tonala' };
+  const municipio = munM01Map[munM04] || 'guadalajara';
+
+  // Nombre del proyecto para mostrar como contexto en M01
+  const nombreProyecto = document.getElementById('p-nombre-proyecto')?.value || '';
+
+  try {
+    localStorage.setItem('GU_m04_a_m01', JSON.stringify({
+      dir,
+      colonia,
+      cp,
+      municipio,
+      nombreProyecto,
+      ts: Date.now()
+    }));
+  } catch(e) {
+    alert('Error al guardar datos para M01: ' + e.message);
+    return;
+  }
+  window.location.href = 'GestorUrbano_M01_2.html';
+}
+
+// Mostrar/ocultar botón M01 según si hay dirección disponible post-análisis
+function actualizarBotonM01() {
+  const btn = document.getElementById('btn-ir-m01');
+  if (!btn) return;
+  const sol = _ultimoResultado?.datos_solapa || {};
+  // Mostrar si hay alguna información de dirección detectada
+  const tieneDir = !!(sol.direccion || sol.colonia || sol.cp);
+  btn.style.display = tieneDir ? '' : 'none';
+}
+</script>
+</body>
+</html>

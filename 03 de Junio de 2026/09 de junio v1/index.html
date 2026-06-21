@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gestor Urbano Jalisco AMG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+/* ── TOKENS ── */
+:root{
+  --bg:       #F9FAFB;
+  --bg2:      #FFFFFF;
+  --bg3:      #F0F0EE;
+  --border:   rgba(0,0,0,0.08);
+  --border2:  rgba(0,0,0,0.14);
+  --text:     #0F0F0E;
+  --text2:    #666666;
+  --text3:    #999999;
+  --logo-bg:  #0F0F0E;
+  --logo-ico: #F9FAFB;
+  --btn-bg:   #0F0F0E;
+  --btn-txt:  #F9FAFB;
+  --nav-bg:   rgba(249,250,251,0.9);
+  --card-bg:  #FFFFFF;
+  --stat-bg:  #FFFFFF;
+  --stat-sep: rgba(0,0,0,0.06);
+  --tag-bg:   #F0F0EE;
+  --muni-bg:  #FFFFFF;
+  --toggle-track: #E0E0DE;
+  --toggle-thumb: #FFFFFF;
+  --toggle-active:#3D7BFF;
+  --flagship-bg:  #FFFDF7;
+  --flagship-brd: rgba(186,117,23,0.22);
+  --flagship-btn: #956400;
+  --flagship-ico: #FBF3DB;
+  --sans:'Outfit','Helvetica Neue',sans-serif;
+  --mono:'Geist Mono',monospace;
+}
+[data-theme="dark"]{
+  --bg:       #0B0F1A;
+  --bg2:      #111827;
+  --bg3:      #1A2235;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.13);
+  --text:     #E2E8F0;
+  --text2:    #94A3B8;
+  --text3:    #4B5563;
+  --logo-bg:  #E2E8F0;
+  --logo-ico: #0B0F1A;
+  --btn-bg:   #E2E8F0;
+  --btn-txt:  #0B0F1A;
+  --nav-bg:   rgba(11,15,26,0.92);
+  --card-bg:  #111827;
+  --stat-bg:  #111827;
+  --stat-sep: rgba(255,255,255,0.05);
+  --tag-bg:   #1A2235;
+  --muni-bg:  #111827;
+  --toggle-track: #3D7BFF;
+  --flagship-bg:  #16110A;
+  --flagship-brd: rgba(186,117,23,0.28);
+  --flagship-btn: #BA7517;
+  --flagship-ico: #2A1E05;
+}
+
+/* ── BASE ── */
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100dvh;
+  font-size:14px;
+  line-height:1.6;
+  display:flex;
+  flex-direction:column;
+  transition:background .3s ease,color .3s ease;
+}
+
+/* ── NAV ── */
+nav{
+  background:var(--nav-bg);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:0.5px solid var(--border);
+  padding:13px 32px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  position:sticky;
+  top:0;
+  z-index:100;
+  transition:background .3s,border-color .3s;
+}
+.nav-logo{
+  width:30px;height:30px;
+  background:var(--logo-bg);
+  border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  transition:background .3s;
+}
+.nav-logo svg{width:16px;height:16px;fill:var(--logo-ico);transition:fill .3s}
+.nav-name{font-size:13px;font-weight:500;letter-spacing:-.2px;color:var(--text);transition:color .3s}
+.nav-sep{color:var(--border2);font-size:14px;transition:color .3s}
+.nav-sub{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;transition:color .3s}
+
+/* toggle */
+.nav-toggle{
+  margin-left:auto;
+  display:flex;align-items:center;gap:8px;
+  padding:5px 12px;
+  border-radius:20px;
+  border:0.5px solid var(--border2);
+  background:var(--card-bg);
+  cursor:pointer;
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--text3);
+  letter-spacing:.04em;
+  transition:background .3s,border-color .3s,color .3s;
+  user-select:none;
+}
+.nav-toggle:hover{opacity:.8}
+.toggle-track{
+  width:28px;height:16px;border-radius:8px;
+  background:var(--toggle-track);
+  position:relative;
+  flex-shrink:0;
+  transition:background .3s;
+}
+.toggle-thumb{
+  position:absolute;top:2px;left:2px;
+  width:12px;height:12px;border-radius:50%;
+  background:var(--toggle-thumb);
+  box-shadow:0 1px 3px rgba(0,0,0,.25);
+  transition:left .3s cubic-bezier(.16,1,.3,1),background .3s;
+}
+[data-theme="dark"] .toggle-thumb{left:14px}
+
+/* ── HERO ── */
+.hero{
+  display:grid;
+  grid-template-columns:1.15fr 0.85fr;
+  border-bottom:0.5px solid var(--border);
+  transition:border-color .3s;
+}
+.hero-left{
+  padding:52px 36px 52px 32px;
+  border-right:0.5px solid var(--border);
+  display:flex;flex-direction:column;justify-content:center;
+  transition:border-color .3s;
+  opacity:0;transform:translateX(-18px);
+  animation:slideInL .7s cubic-bezier(.16,1,.3,1) .08s forwards;
+}
+.hero-right{
+  padding:52px 32px 52px 36px;
+  display:flex;flex-direction:column;gap:16px;justify-content:center;
+  opacity:0;transform:translateX(18px);
+  animation:slideInR .7s cubic-bezier(.16,1,.3,1) .18s forwards;
+}
+.eyebrow{
+  font-family:var(--mono);
+  font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text3);
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+  transition:color .3s;
+}
+.eyebrow-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:#3B6D11;
+  box-shadow:0 0 0 3px rgba(59,109,17,.15);
+  flex-shrink:0;
+  animation:pulse 2s ease infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 3px rgba(59,109,17,.15)}
+  50%{box-shadow:0 0 0 7px rgba(59,109,17,.07)}
+}
+h1{
+  font-size:clamp(28px,3.8vw,42px);
+  font-weight:600;
+  letter-spacing:-.04em;
+  line-height:1.1;
+  color:var(--text);
+  margin-bottom:14px;
+  transition:color .3s;
+}
+.hero-sub{
+  font-size:14px;color:var(--text2);
+  line-height:1.65;max-width:360px;
+  margin-bottom:28px;
+  transition:color .3s;
+}
+.hero-cta{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--btn-bg);color:var(--btn-txt);
+  font-family:var(--sans);font-size:13px;font-weight:500;
+  padding:11px 22px;border-radius:5px;border:none;
+  cursor:pointer;
+  transition:opacity .15s,transform .15s,background .3s,color .3s;
+  width:fit-content;
+}
+.hero-cta:hover{opacity:.85}
+.hero-cta:active{transform:scale(.97)}
+.hero-cta svg{width:14px;height:14px;fill:var(--btn-txt);transition:fill .3s}
+
+/* stat grid */
+.stat-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:1px;
+  background:var(--stat-sep);
+  border:0.5px solid var(--border);
+  border-radius:10px;overflow:hidden;
+  transition:background .3s,border-color .3s;
+}
+.stat{
+  background:var(--stat-bg);
+  padding:16px 18px;
+  transition:background .3s;
+}
+.stat-n{
+  font-family:var(--mono);
+  font-size:24px;font-weight:500;
+  letter-spacing:-.03em;line-height:1;
+  color:var(--text);
+  transition:color .3s;
+}
+.stat-l{font-size:11px;color:var(--text3);margin-top:3px;transition:color .3s}
+
+/* muni list */
+.muni-list{display:flex;flex-direction:column;gap:5px}
+.muni-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;
+  background:var(--muni-bg);
+  border:0.5px solid var(--border);
+  border-radius:6px;
+  font-size:12px;font-weight:500;
+  color:var(--text);
+  transition:background .3s,border-color .2s,color .3s;
+}
+.muni-row:hover{border-color:var(--border2)}
+.muni-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.muni-tag{
+  margin-left:auto;
+  font-family:var(--mono);font-size:9px;
+  color:var(--text3);
+  transition:color .3s;
+}
+
+/* ── MÓDULOS ── */
+.modules-section{padding:36px 32px 48px;transition:background .3s}
+.section-head{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:20px;
+  padding-bottom:10px;
+  border-bottom:0.5px solid var(--border);
+  transition:border-color .3s;
+}
+.section-title{
+  font-family:var(--mono);
+  font-size:10px;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--text3);
+  transition:color .3s;
+}
+.section-count{
+  font-family:var(--mono);font-size:10px;
+  color:var(--text3);
+  background:var(--tag-bg);
+  padding:2px 8px;border-radius:4px;
+  border:0.5px solid var(--border);
+  transition:background .3s,color .3s,border-color .3s;
+}
+.section-line{flex:1;border:none;border-bottom:0.5px solid var(--border);transition:border-color .3s}
+.section-pending{
+  font-family:var(--mono);font-size:10px;
+  color:var(--text3);opacity:.5;
+  transition:color .3s;
+}
+
+/* bento grid */
+.bento{
+  display:grid;
+  grid-template-columns:1.35fr 1fr;
+  gap:10px;
+}
+
+/* cards */
+.card{
+  background:var(--card-bg);
+  border:0.5px solid var(--border);
+  border-radius:10px;overflow:hidden;
+  display:flex;flex-direction:column;
+  transition:background .3s,border-color .2s,box-shadow .2s;
+  opacity:0;transform:translateY(12px);
+  text-decoration:none;color:inherit;
+}
+.card:hover{
+  border-color:var(--border2);
+  box-shadow:0 4px 20px rgba(0,0,0,.07);
+}
+.card:active{transform:scale(.995) translateY(0)}
+[data-theme="dark"] .card:hover{box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.card.disabled{opacity:.35!important;pointer-events:none}
+.card.full{grid-column:1/-1}
+
+/* card animations — stagger */
+.card:nth-child(1){animation:fadeUp .6s cubic-bezier(.16,1,.3,1) calc(.38s + 0*.07s) forwards}
+.card:nth-child(2){animation:fadeUp .6s cubic-bezier(.16,1,.3,1) calc(.38s + 1*.07s) forwards}
+.card:nth-child(3){animation:fadeUp .6s cubic-bezier(.16,1,.3,1) calc(.38s + 2*.07s) forwards}
+.card:nth-child(4){animation:fadeUp .6s cubic-bezier(.16,1,.3,1) calc(.38s + 3*.07s) forwards}
+.card:nth-child(5){animation:fadeUp .6s cubic-bezier(.16,1,.3,1) calc(.38s + 4*.07s) forwards}
+.card:nth-child(6){animation:fadeUp .6s cubic-bezier(.16,1,.3,1) calc(.38s + 5*.07s) forwards}
+
+.card-head{
+  padding:18px 20px 14px;
+  border-bottom:0.5px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+  transition:border-color .3s;
+}
+.card-icon{
+  width:36px;height:36px;
+  background:var(--tag-bg);
+  border:0.5px solid var(--border);
+  border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  transition:background .3s,border-color .3s;
+}
+.card-icon svg{width:17px;height:17px;fill:var(--text);transition:fill .3s}
+.card-meta{flex:1}
+.card-num{
+  font-family:var(--mono);font-size:9px;
+  color:var(--text3);letter-spacing:.08em;
+  text-transform:uppercase;margin-bottom:3px;
+  transition:color .3s;
+}
+.card-name{
+  font-size:13px;font-weight:600;
+  color:var(--text);letter-spacing:-.2px;line-height:1.25;
+  transition:color .3s;
+}
+.badge{
+  font-family:var(--mono);font-size:9px;
+  padding:3px 8px;border-radius:4px;
+  text-transform:uppercase;letter-spacing:.05em;
+  white-space:nowrap;flex-shrink:0;
+}
+.badge-live{background:#EDF3EC;color:#346538;border:0.5px solid #C5DFC4}
+.badge-soon{background:var(--tag-bg);color:var(--text3);border:0.5px solid var(--border)}
+
+.card-body{
+  padding:14px 20px 18px;
+  display:flex;flex-direction:column;gap:12px;flex:1;
+}
+.card-desc{
+  font-size:12px;color:var(--text2);
+  line-height:1.6;flex:1;
+  transition:color .3s;
+}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{
+  font-family:var(--mono);font-size:9px;
+  background:var(--tag-bg);
+  border:0.5px solid var(--border);
+  color:var(--text3);
+  padding:2px 7px;border-radius:3px;
+  transition:background .3s,color .3s,border-color .3s;
+}
+
+/* CTA button — style B (todos los módulos) */
+.card-btn{
+  width:100%;padding:10px 14px;
+  background:var(--btn-bg);color:var(--btn-txt);
+  font-family:var(--sans);font-size:12px;font-weight:500;
+  border:none;border-radius:5px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:opacity .15s,transform .15s,background .3s,color .3s;
+}
+.card-btn:hover{opacity:.85}
+.card-btn:active{transform:scale(.98)}
+.card-btn svg{width:13px;height:13px;fill:var(--btn-txt);transition:fill .3s}
+
+/* ── M04 FLAGSHIP ── */
+.flagship-label{
+  font-family:var(--mono);font-size:9px;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:#956400;
+  background:var(--flagship-ico);
+  border:0.5px solid rgba(186,117,23,.25);
+  padding:3px 10px;border-radius:9999px;
+  display:inline-block;
+  margin:12px 0 0 20px;
+  transition:background .3s,color .3s;
+}
+[data-theme="dark"] .flagship-label{color:#EF9F27}
+.card.flagship{background:var(--flagship-bg);border-color:var(--flagship-brd);transition:background .3s,border-color .3s}
+.card.flagship .card-icon{background:var(--flagship-ico);border-color:rgba(186,117,23,.2);transition:background .3s}
+.card.flagship .card-icon svg{fill:#956400}
+[data-theme="dark"] .card.flagship .card-icon svg{fill:#EF9F27}
+
+/* flagship — horizontal layout inside */
+.flagship-inner{
+  display:grid;
+  grid-template-columns:1.5fr 1fr;
+  gap:0;
+}
+.flagship-left{
+  padding:14px 20px 18px;
+  border-right:0.5px solid var(--flagship-brd);
+  transition:border-color .3s;
+}
+.flagship-right{
+  padding:14px 20px 18px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.flagship-kpi{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;
+  background:var(--bg);
+  border:0.5px solid var(--border);
+  border-radius:6px;
+  transition:background .3s,border-color .3s;
+}
+.flagship-kpi-icon svg{width:18px;height:18px;fill:#956400}
+[data-theme="dark"] .flagship-kpi-icon svg{fill:#EF9F27}
+.flagship-kpi-n{
+  font-family:var(--mono);font-size:20px;
+  font-weight:500;color:var(--text);line-height:1;
+  transition:color .3s;
+}
+.flagship-kpi-l{font-size:10px;color:var(--text3);transition:color .3s}
+
+/* flagship CTA — style C (especial amber) */
+.flagship-btn{
+  width:100%;padding:10px 14px;
+  background:var(--flagship-btn);color:#FFFFFF;
+  font-family:var(--sans);font-size:12px;font-weight:500;
+  border:none;border-radius:5px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:opacity .15s,transform .15s,background .3s;
+}
+.flagship-btn:hover{opacity:.88}
+.flagship-btn:active{transform:scale(.98)}
+.flagship-btn svg{width:13px;height:13px;fill:#FFFFFF}
+
+/* disabled card (próximamente) */
+.card.disabled .card-head{opacity:.6}
+.card.disabled .card-body{opacity:.6}
+.card-btn.muted{
+  background:var(--tag-bg);color:var(--text3);
+  border:0.5px solid var(--border);
+}
+.card-btn.muted svg{fill:var(--text3)}
+.card-btn.muted:hover{opacity:1;cursor:not-allowed}
+
+/* ── FOOTER ── */
+footer{
+  margin-top:auto;
+  border-top:0.5px solid var(--border);
+  background:var(--card-bg);
+  padding:18px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:10px;
+  transition:background .3s,border-color .3s;
+}
+.footer-txt{
+  font-family:var(--mono);font-size:10px;
+  color:var(--text3);transition:color .3s;
+}
+.footer-stack{display:flex;flex-wrap:wrap;gap:6px}
+.stack-tag{
+  font-family:var(--mono);font-size:9px;
+  color:var(--text3);
+  background:var(--tag-bg);
+  border:0.5px solid var(--border);
+  padding:3px 8px;border-radius:3px;
+  transition:background .3s,color .3s,border-color .3s;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes slideInL{to{opacity:1;transform:translateX(0)}}
+@keyframes slideInR{to{opacity:1;transform:translateX(0)}}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  nav{padding:12px 18px}
+  .nav-sub,.nav-sep{display:none}
+  .hero{grid-template-columns:1fr}
+  .hero-right{display:none}
+  .hero-left{padding:36px 18px}
+  .bento{grid-template-columns:1fr}
+  .card.full{grid-column:1}
+  .flagship-inner{grid-template-columns:1fr}
+  .flagship-right{display:none}
+  .modules-section{padding:24px 18px 36px}
+  footer{padding:16px 18px}
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-logo">
+    <!-- building icon -->
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4M9 9h1m4 0h1M9 13h1m4 0h1"/></svg>
+  </div>
+  <span class="nav-name">Gestor Urbano Jalisco</span>
+  <span class="nav-sep">/</span>
+  <span class="nav-sub">AMG · 5 municipios</span>
+  <button class="nav-toggle" onclick="toggleTheme()" aria-label="Cambiar tema">
+    <div class="toggle-track"><div class="toggle-thumb"></div></div>
+    <span id="toggle-label">Modo oscuro</span>
+  </button>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="eyebrow">
+      <span class="eyebrow-dot"></span>
+      Área Metropolitana de Guadalajara
+    </div>
+    <h1>Consulta de uso<br>de suelo, licencias<br>y trámites</h1>
+    <p class="hero-sub">Normativa de los Planes Parciales de Desarrollo Urbano de los 5 municipios del AMG. Fundamento legal verificable en cada consulta.</p>
+    <button class="hero-cta" onclick="location.href='GestorUrbano_M01_2.html'">
+      <!-- search icon -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;fill:none;stroke:var(--btn-txt)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Consultar predio
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;fill:none;stroke:var(--btn-txt)"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+  <div class="hero-right">
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-n">05</div><div class="stat-l">Módulos activos</div></div>
+      <div class="stat"><div class="stat-n">05</div><div class="stat-l">Municipios AMG</div></div>
+      <div class="stat"><div class="stat-n">53</div><div class="stat-l">Subdistritos GDL</div></div>
+      <div class="stat"><div class="stat-n">23</div><div class="stat-l">Módulos planeados</div></div>
+    </div>
+    <div class="muni-list">
+      <div class="muni-row"><span class="muni-dot" style="background:#3B6D11"></span>Guadalajara<span class="muni-tag">GDL · munId 39</span></div>
+      <div class="muni-row"><span class="muni-dot" style="background:#185FA5"></span>Zapopan<span class="muni-tag">ZPN · munId 120</span></div>
+      <div class="muni-row"><span class="muni-dot" style="background:#BA7517"></span>Tlaquepaque<span class="muni-tag">TLQ · munId 98</span></div>
+      <div class="muni-row"><span class="muni-dot" style="background:#993556"></span>Tlajomulco<span class="muni-tag">TLA · munId 97</span></div>
+      <div class="muni-row"><span class="muni-dot" style="background:#534AB7"></span>Tonalá<span class="muni-tag">TON · munId 101</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MÓDULOS ── -->
+<div class="modules-section">
+
+  <div class="section-head">
+    <span class="section-title">Módulos disponibles</span>
+    <span class="section-count">5 activos</span>
+    <div class="section-line"></div>
+    <span class="section-pending">18 en desarrollo</span>
+  </div>
+
+  <div class="bento">
+
+    <!-- M04 FLAGSHIP — full width -->
+    <a class="card flagship full" href="GestorUrbano_M04_2.html">
+      <div class="flagship-label">Producto insignia</div>
+      <div class="card-head" style="padding-top:12px">
+        <div class="card-icon">
+          <!-- file-search icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;fill:none;stroke:#956400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="11" cy="15" r="2"/><path d="m13.5 17.5 1.5 1.5"/></svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-num">Módulo 04 · Claude AI</div>
+          <div class="card-name">Revisor de planos con IA</div>
+        </div>
+        <span class="badge badge-live">Activo</span>
+      </div>
+      <div class="flagship-inner">
+        <div class="flagship-left">
+          <p class="card-desc" style="font-size:13px;margin-bottom:12px">Análisis normativo de planos arquitectónicos mediante inteligencia artificial. Verifica escaleras, restricciones, accesibilidad, elevadores y cajones. Dictamen con semáforo por elemento y fundamento legal exacto. Soporta PDF e imágenes, exporta a Excel.</p>
+          <div class="tags">
+            <span class="tag">GDL</span><span class="tag">ZPN</span><span class="tag">TLQ</span><span class="tag">TLA</span><span class="tag">TON</span><span class="tag">PDF + imágenes</span><span class="tag">SheetJS export</span><span class="tag">Hasta 10 archivos</span>
+          </div>
+          <button class="flagship-btn" style="margin-top:14px" onclick="event.preventDefault();location.href='GestorUrbano_M04_2.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="11" cy="15" r="2"/><path d="m13.5 17.5 1.5 1.5"/></svg>
+            Analizar planos
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+        <div class="flagship-right">
+          <div class="flagship-kpi">
+            <div class="flagship-kpi-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#956400" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+            </div>
+            <div>
+              <div class="flagship-kpi-n">10</div>
+              <div class="flagship-kpi-l">archivos por análisis</div>
+            </div>
+          </div>
+          <div class="flagship-kpi">
+            <div class="flagship-kpi-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#956400" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <div>
+              <div class="flagship-kpi-n">10</div>
+              <div class="flagship-kpi-l">elementos normativos</div>
+            </div>
+          </div>
+          <div class="flagship-kpi">
+            <div class="flagship-kpi-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#956400" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div>
+              <div class="flagship-kpi-n">5</div>
+              <div class="flagship-kpi-l">municipios cubiertos</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+
+    <!-- M01 -->
+    <a class="card" href="GestorUrbano_M01_2.html">
+      <div class="card-head">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;fill:none;stroke:var(--text)"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-num">Módulo 01</div>
+          <div class="card-name">Consulta de uso de suelo</div>
+        </div>
+        <span class="badge badge-live">Activo</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Zonificación, COS/CUS/iCOS/iCUS, restricciones y usos permitidos para cualquier predio del AMG. GeoServer WFS + BD local.</p>
+        <div class="tags">
+          <span class="tag">GDL</span><span class="tag">ZPN</span><span class="tag">TLQ</span><span class="tag">TLA</span><span class="tag">TON</span><span class="tag">GeoServer WFS</span>
+        </div>
+        <button class="card-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--btn-txt)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/></svg>
+          Abrir módulo
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--btn-txt)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </a>
+
+    <!-- M02 -->
+    <a class="card" href="GestorUrbano_M02_2.html">
+      <div class="card-head">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;fill:none;stroke:var(--text)"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2"/><line x1="12" y1="12" x2="12" y2="18"/></svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-num">Módulo 02</div>
+          <div class="card-name">Verificador de giro comercial</div>
+        </div>
+        <span class="badge badge-live">Activo</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Semáforo permitido / condicionado / prohibido según plan parcial y reglamento de giros. Catálogo SCIAN con fundamento legal.</p>
+        <div class="tags">
+          <span class="tag">GDL</span><span class="tag">ZPN</span><span class="tag">TLQ</span><span class="tag">TLA</span><span class="tag">TON</span><span class="tag">SCIAN INEGI</span>
+        </div>
+        <button class="card-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--btn-txt)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Abrir módulo
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--btn-txt)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </a>
+
+    <!-- M03 -->
+    <a class="card" href="GestorUrbano_M03_2.html">
+      <div class="card-head">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;fill:none;stroke:var(--text)"><path d="M21 3H3l7 9v6l4 2v-8z"/></svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-num">Módulo 03</div>
+          <div class="card-name">Potencial constructivo</div>
+        </div>
+        <span class="badge badge-live">Activo</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Superficie máx. edificable por escenario, niveles, depas por IDE, contribución ICUS. Hasta 3 predios simultáneos con comparativa Excel.</p>
+        <div class="tags">
+          <span class="tag">COS · CUS · iCUS</span><span class="tag">ICUS $</span><span class="tag">IDE · Depas</span><span class="tag">Excel</span>
+        </div>
+        <button class="card-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--btn-txt)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Abrir módulo
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--btn-txt)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </a>
+
+    <!-- M15 -->
+    <a class="card" href="GestorUrbano_M15_1.html">
+      <div class="card-head">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;fill:none;stroke:var(--text)"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-num">Módulo 15</div>
+          <div class="card-name">Monitor normativo</div>
+        </div>
+        <span class="badge badge-live">Activo</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Calendario inhábiles 2026, calculadora de plazos hábiles, alertas normativas y tarifas ICUS para los 5 municipios.</p>
+        <div class="tags">
+          <span class="tag">Días inhábiles</span><span class="tag">Plazos hábiles</span><span class="tag">Alertas</span><span class="tag">ICUS $</span><span class="tag">FIFA 2026</span>
+        </div>
+        <button class="card-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--btn-txt)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Abrir módulo
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--btn-txt)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </a>
+
+    <!-- PRÓXIMAMENTE -->
+    <div class="card disabled full">
+      <div class="card-head">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;fill:none;stroke:var(--text)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-num">En desarrollo</div>
+          <div class="card-name">Módulos M05 – M23 · Roadmap activo</div>
+        </div>
+        <span class="badge badge-soon">Pendiente</span>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Dictamen y costos de licencia, vistos buenos, checklist de trámites, impacto vial, análisis de plusvalía, inteligencia de densidades, gestión de expedientes y más.</p>
+        <div class="tags">
+          <span class="tag">M05 Vistos buenos</span><span class="tag">M07+13 Checklist</span><span class="tag">M08+10 Licencias</span><span class="tag">M16+17 Plusvalía</span><span class="tag">M18+19 Densidades</span>
+        </div>
+        <button class="card-btn muted">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          No disponible aún
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <span class="footer-txt">© 2026 Gestor Urbano Jalisco AMG · v3.0</span>
+  <div class="footer-stack">
+    <span class="stack-tag">HTML standalone</span>
+    <span class="stack-tag">GeoServer WMS/WFS</span>
+    <span class="stack-tag">Google Maps API</span>
+    <span class="stack-tag">Visor Urbano Jalisco</span>
+    <span class="stack-tag">Claude API</span>
+  </div>
+</footer>
+
+<script>
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',isDark?'light':'dark');
+  document.getElementById('toggle-label').textContent=isDark?'Modo oscuro':'Modo claro';
+  localStorage.setItem('gu_theme',isDark?'light':'dark');
+}
+// persistir preferencia
+(function(){
+  const saved=localStorage.getItem('gu_theme');
+  if(saved){
+    document.documentElement.setAttribute('data-theme',saved);
+    if(saved==='dark'){
+      const lbl=document.getElementById('toggle-label');
+      if(lbl)lbl.textContent='Modo claro';
+    }
+  }
+})();
+</script>
+</body>
+</html>

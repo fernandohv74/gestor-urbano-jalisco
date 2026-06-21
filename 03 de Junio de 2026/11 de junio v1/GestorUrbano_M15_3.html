@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestor Urbano Jalisco — Monitor Normativo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="gu-design-system.css">
+<script>
+(function(){
+  var t=localStorage.getItem('gu_theme');
+  if(t) document.documentElement.setAttribute('data-theme',t);
+})();
+</script>
+<style>
+/* ── M15 layout ── */
+.m15-wrap{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 48px)}
+@media(max-width:860px){.m15-wrap{grid-template-columns:1fr}}
+.m15-side{background:var(--panel-bg);border-right:0.5px solid var(--border);padding:16px;overflow-y:auto;max-height:calc(100vh - 48px);position:sticky;top:48px;display:flex;flex-direction:column;gap:12px;transition:background var(--t),border-color var(--t)}
+@media(max-width:860px){.m15-side{position:relative;top:0;max-height:none}}
+.m15-main{padding:20px 24px;background:var(--bg);overflow-y:auto;display:flex;flex-direction:column;gap:16px;transition:background var(--t)}
+
+/* Tabs de sección */
+.sec-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px}
+.sec-tab{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);color:var(--text2);padding:7px 14px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--t-fast)}
+.sec-tab:hover:not(.active){border-color:var(--brand);color:var(--text)}
+.sec-tab.active{background:var(--brand-pale);border-color:var(--brand);color:var(--brand)}
+
+/* Calendario */
+.cal-mes{border:0.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:8px;transition:border-color var(--t)}
+.cal-mes-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:var(--panel-bg);transition:background var(--t-fast),color var(--t);user-select:none}
+.cal-mes-hdr:hover{background:var(--bg3)}
+.cal-mes-hdr.mes-activo{background:var(--brand-pale);border-bottom:0.5px solid var(--brand-light)}
+.cal-mes-nombre{font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);flex:1;transition:color var(--t)}
+.cal-mes-hdr.mes-activo .cal-mes-nombre{color:var(--brand)}
+.cal-mes-badge{font-size:10px;font-family:var(--mono);color:var(--text3);background:var(--bg3);padding:1px 7px;border-radius:var(--r-sm);transition:background var(--t),color var(--t)}
+.cal-mes-hdr.mes-activo .cal-mes-badge{background:var(--card-bg);color:var(--brand)}
+.cal-mes-hoy{font-size:10px;font-weight:500;color:var(--brand);background:var(--brand-pale);padding:1px 8px;border-radius:var(--r-sm);border:0.5px solid var(--brand-light)}
+.cal-mes-chev{color:var(--text3);transition:transform .2s,color var(--t);flex-shrink:0}
+.cal-mes-hdr.mes-activo .cal-mes-chev{color:var(--brand)}
+.cal-mes-chev.open{transform:rotate(180deg)}
+.cal-mes-body{display:none}
+.cal-mes-body.open{display:block}
+.cal-item{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:var(--r-md);margin-bottom:5px;border:0.5px solid var(--border);background:var(--bg3);transition:background var(--t),border-color var(--t)}
+.cal-fecha{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text);flex-shrink:0;min-width:60px;transition:color var(--t)}
+.cal-motivo{font-size:12px;color:var(--text2);flex:1;line-height:1.4;transition:color var(--t)}
+.cal-muns{font-size:10px;color:var(--text3);margin-top:2px;transition:color var(--t)}
+.cal-nivel{font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 7px;border-radius:var(--r-sm);flex-shrink:0;margin-top:1px}
+.niv-fed{background:var(--brand-pale);color:var(--brand)}
+.niv-edo{background:var(--sem-am-bg);color:var(--sem-am-txt)}
+.niv-mun{background:var(--uso-p-bg);color:var(--uso-p-txt)}
+.niv-vac{background:var(--bg3);color:var(--text3);border:0.5px solid var(--border)}
+.niv-esp{background:var(--sem-r-bg);color:var(--sem-r-txt)}
+
+/* Filtros de calendario */
+.fil-badge{padding:3px 10px;border-radius:var(--r-md);font-family:var(--mono);font-size:10px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--bg3);color:var(--text3);transition:all var(--t-fast)}
+.fil-badge:hover{border-color:var(--brand);color:var(--brand)}
+.fil-active{background:var(--brand-pale);border-color:var(--brand);color:var(--brand)}
+.fil-todos.fil-active{background:var(--brand-pale);color:var(--brand)}
+.fil-fed.fil-active{background:var(--brand-pale);color:var(--brand)}
+.fil-edo.fil-active{background:var(--sem-am-bg);color:var(--sem-am-txt);border-color:var(--sem-am-brd)}
+.fil-mun.fil-active{background:var(--uso-p-bg);color:var(--uso-p-txt);border-color:var(--uso-p-brd)}
+.fil-vac.fil-active{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
+.fil-esp.fil-active{background:var(--sem-r-bg);color:var(--sem-r-txt);border-color:var(--sem-r-brd)}
+
+/* Alertas */
+.alerta{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:var(--r-md);margin-bottom:8px;border:0.5px solid}
+.alerta-roja{background:var(--sem-r-bg);border-color:var(--sem-r-brd)}
+.alerta-amarilla{background:var(--sem-am-bg);border-color:var(--sem-am-brd)}
+.alerta-verde{background:var(--sem-v-bg);border-color:var(--sem-v-brd)}
+.alerta-gray{background:var(--bg3);border-color:var(--border)}
+.alerta-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.alerta-ttl{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;transition:color var(--t)}
+.alerta-desc{font-size:11px;color:var(--text2);line-height:1.5;transition:color var(--t)}
+.alerta-fecha{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px;transition:color var(--t)}
+.alerta-src{font-size:10px;color:var(--text3);margin-top:2px;font-style:italic;transition:color var(--t)}
+
+/* Próximas fechas */
+.prox-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r-md);margin-bottom:5px;border:0.5px solid var(--border);background:var(--bg3);transition:background var(--t),border-color var(--t)}
+.prox-hoy{background:var(--sem-am-bg);border-color:var(--sem-am-brd)}
+.prox-prox{background:var(--bg3);border-color:var(--border)}
+.prox-dias{font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 7px;border-radius:var(--r-sm);flex-shrink:0}
+.dias-hoy{background:var(--sem-am-dot);color:#fff}
+.dias-prox{background:var(--brand-pale);color:var(--brand)}
+
+/* Tarifas */
+.tarifa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:10px}
+.tarifa-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);padding:12px;transition:background var(--t),border-color var(--t)}
+.tarifa-mun{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--brand);margin-bottom:6px}
+.tarifa-lbl{font-size:10px;color:var(--text3);margin-bottom:2px;transition:color var(--t)}
+.tarifa-val{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--text);margin-bottom:6px;transition:color var(--t)}
+.tarifa-src{font-size:10px;color:var(--text3);border-top:0.5px solid var(--border);padding-top:6px;margin-top:4px;font-style:italic;transition:color var(--t),border-color var(--t)}
+
+/* Botones especiales */
+.btn-refresh{display:flex;align-items:center;gap:7px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);color:var(--text2);padding:8px 14px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--t-fast)}
+.btn-refresh:hover{border-color:var(--brand);color:var(--brand)}
+.btn-ver{background:var(--brand-pale);border:0.5px solid var(--brand-light);border-radius:var(--r-md);color:var(--brand);padding:5px 12px;font-family:var(--sans);font-size:11px;font-weight:500;cursor:pointer;transition:all var(--t-fast)}
+.btn-ver:hover{opacity:.8}
+
+/* Plazos */
+.plazo-form{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.plazo-result{background:var(--brand-pale);border:0.5px solid var(--brand-light);border-radius:var(--r-lg);padding:16px;margin-top:10px}
+.plazo-val{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--brand);margin:6px 0 4px}
+.plazo-sub{font-size:12px;color:var(--text2);transition:color var(--t)}
+
+/* Resumen sidebar */
+.res-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border);font-size:12px;transition:border-color var(--t)}
+.res-item:last-child{border-bottom:none}
+.res-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.res-lbl{color:var(--text2);flex:1;transition:color var(--t)}
+.res-val{font-family:var(--mono);font-size:11px;color:var(--text3);transition:color var(--t)}
+</style>
+</head>
+<body>
+
+<!-- ── NAVEGACIÓN ── -->
+<nav class="gu-nav">
+  <div class="gu-nav-logo">
+    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 1L1 5v9h5v-4h4v4h5V5L8 1z"/></svg>
+  </div>
+  <span class="gu-nav-name">Gestor Urbano Jalisco</span>
+  <span class="gu-nav-sep">/</span>
+  <span class="gu-nav-mod">M15 · Monitor normativo</span>
+  <div style="display:flex;align-items:center;gap:4px;margin-left:auto">
+    <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">v1.5 · datos: jun 2026</span>
+    <div id="hdrAviso2027" style="display:none;font-family:var(--mono);font-size:10px;color:var(--sem-am-txt);margin-left:8px">⚠️ Actualizar datos 2027</div>
+  </div>
+  <a href="index.html" class="gu-nav-back" style="margin-left:8px">
+    <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    Menú principal
+  </a>
+  <a href="GestorUrbano_M01_3.html" class="gu-nav-back" style="margin-left:4px">
+    <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    Uso de suelo
+  </a>
+  <a href="GestorUrbano_M03_3.html" class="gu-nav-back" style="margin-left:4px">
+    <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    Potencial
+  </a>
+  <button class="gu-toggle" onclick="guToggleTheme()" aria-label="Cambiar tema" style="margin-left:8px">
+    <div class="gu-toggle-track"><div class="gu-toggle-thumb"></div></div>
+    <span id="gu-toggle-label">Modo oscuro</span>
+  </button>
+</nav>
+
+<!-- ── LAYOUT M15 ── -->
+<div class="m15-wrap">
+
+  <!-- ── SIDEBAR ── -->
+  <div class="m15-side">
+
+    <!-- Resumen alertas -->
+    <div class="gu-rcard" id="resumenCard">
+      <div class="gu-rcard-hdr">Estado actual</div>
+      <div class="gu-rcard-body" id="resumenLista"></div>
+    </div>
+
+    <!-- Próximas fechas -->
+    <div class="gu-rcard">
+      <div class="gu-rcard-hdr">Próximas fechas críticas</div>
+      <div class="gu-rcard-body" id="proxFechas"></div>
+    </div>
+
+    <!-- Última verificación -->
+    <div class="gu-rcard">
+      <div class="gu-rcard-body">
+        <div class="gu-field-label" style="margin-bottom:6px">Última verificación</div>
+        <div id="ultimaVer" style="font-size:11px;font-family:var(--mono);color:var(--text2);margin-bottom:10px">—</div>
+        <button class="btn-refresh" onclick="verificarAhora()" style="width:100%;justify-content:center">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 2.5A7 7 0 102.5 13.5M13.5 2.5V6.5M13.5 2.5H9.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          Verificar ahora
+        </button>
+      </div>
+    </div>
+
+    <!-- Fuentes -->
+    <div class="gu-rcard">
+      <div class="gu-rcard-hdr">Fuentes consultadas</div>
+      <div class="gu-rcard-body" style="font-size:10px;color:var(--text3);line-height:1.9">
+        <strong style="color:var(--text2)">Automáticas:</strong><br>
+        · DOF — días inhábiles federales<br>
+        · INEGI API — UMA y salario mínimo<br>
+        · Periódico Oficial Jalisco — índice<br><br>
+        <strong style="color:var(--text2)">Manuales (actualizar ene cada año):</strong><br>
+        · tjajal.gob.mx — calendario estatal<br>
+        · Gaceta municipal GDL, ZPN, TLQ<br>
+        · Ley de Ingresos por municipio<br>
+        · portal.zapopan.gob.mx — PDU
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MAIN ── -->
+  <div class="m15-main">
+
+    <!-- Tabs -->
+    <div class="sec-tabs">
+      <button class="sec-tab active" onclick="mostrarSec('calendario',this)">Calendario inhábiles</button>
+      <button class="sec-tab" onclick="mostrarSec('alertas',this)">Alertas normativas</button>
+      <button class="sec-tab" onclick="mostrarSec('tarifas',this)">Tarifas y derechos</button>
+      <button class="sec-tab" onclick="mostrarSec('plazos',this)">Calculadora plazos</button>
+    </div>
+
+    <!-- SECCIÓN CALENDARIO -->
+    <div id="sec-calendario" class="gu-rcard">
+      <div class="gu-rcard-hdr" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <span>Calendario de días inhábiles 2026</span>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+          <select id="fil-mun-cal" onchange="renderCalendario()" style="background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);padding:3px 8px;color:var(--text2);font-size:11px;cursor:pointer;outline:none">
+            <option value="todos">Todos los municipios</option>
+            <option value="gdl">Guadalajara</option>
+            <option value="zpn">Zapopan</option>
+            <option value="tlq">Tlaquepaque</option>
+            <option value="tla">Tlajomulco</option>
+            <option value="ton">Tonalá</option>
+          </select>
+          <button onclick="filtrarCal('todos',this)" id="fil-todos" class="fil-badge fil-todos fil-active">Todos</button>
+          <button onclick="filtrarCal('fed',this)" id="fil-fed" class="fil-badge fil-fed">Federal</button>
+          <button onclick="filtrarCal('edo',this)" id="fil-edo" class="fil-badge fil-edo">Jalisco</button>
+          <button onclick="filtrarCal('mun',this)" id="fil-mun" class="fil-badge fil-mun">Municipal</button>
+          <button onclick="filtrarCal('vac',this)" id="fil-vac" class="fil-badge fil-vac">Vacacional</button>
+          <button onclick="filtrarCal('esp',this)" id="fil-esp" class="fil-badge fil-esp">Especial</button>
+        </div>
+      </div>
+      <div id="calendarContent" style="padding-top:8px;max-height:600px;overflow-y:auto"></div>
+    </div>
+
+    <!-- SECCIÓN ALERTAS -->
+    <div id="sec-alertas" class="gu-rcard" style="display:none">
+      <div class="gu-rcard-hdr" style="display:flex;align-items:center;justify-content:space-between">
+        <span>Alertas normativas activas</span>
+        <button class="btn-ver" onclick="agregarAlerta()">+ Agregar alerta</button>
+      </div>
+      <div id="alertasContent" style="padding-top:8px"></div>
+    </div>
+
+    <!-- SECCIÓN TARIFAS -->
+    <div id="sec-tarifas" class="gu-rcard" style="display:none">
+      <div class="gu-rcard-hdr">Tarifas y derechos 2026</div>
+      <div id="tarifasContent" style="padding-top:8px"></div>
+      <div style="margin-top:18px;border-top:0.5px solid var(--border);padding-top:16px">
+        <div class="gu-field-label" style="margin-bottom:10px">Calculadora de derechos ICUS</div>
+        <div class="gu-nota" style="margin-bottom:12px;color:var(--sem-v-txt);background:var(--sem-v-bg);border-color:var(--sem-v-brd)">
+          Solo referencia. Este cálculo es un estimado orientativo. No constituye un dictamen oficial. El monto real lo determina el municipio al momento de la resolución.
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div>
+            <label class="gu-field-label" style="margin-bottom:4px">Municipio</label>
+            <select id="calcMun" onchange="calcDerechos()" style="width:100%;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);padding:7px 10px;color:var(--text);font-size:12px;outline:none">
+              <option value="gdl">Guadalajara</option>
+              <option value="zpn">Zapopan</option>
+            </select>
+          </div>
+          <div>
+            <label class="gu-field-label" style="margin-bottom:4px">m² autorizados (CUS)</label>
+            <input type="number" id="calcM2Auth" min="0" placeholder="Ej: 800" oninput="calcDerechos()" class="gu-input">
+          </div>
+          <div>
+            <label class="gu-field-label" style="margin-bottom:4px">m² a construir</label>
+            <input type="number" id="calcM2Const" min="0" placeholder="Ej: 1,200" oninput="calcDerechos()" class="gu-input">
+          </div>
+          <div id="calcEcpdRow">
+            <label class="gu-field-label" style="margin-bottom:4px">ECPD (Zapopan)</label>
+            <div style="background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);padding:7px 10px;font-size:12px;font-family:var(--mono);color:var(--brand)">$14,830.00 fijo</div>
+          </div>
+        </div>
+        <div id="calcResult" style="display:none;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-lg);padding:14px">
+          <div class="gu-field-label" style="margin-bottom:8px">Desglose del cálculo</div>
+          <div id="calcDesglose" style="font-size:12px;color:var(--text2);line-height:2"></div>
+          <div style="border-top:0.5px solid var(--border);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:11px;color:var(--text3)">Total estimado a pagar</div>
+            <div id="calcTotal" style="font-size:20px;font-weight:700;font-family:var(--mono);color:var(--brand)"></div>
+          </div>
+          <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
+            <div id="calcNota" style="font-size:10px;color:var(--text3);line-height:1.5;flex:1"></div>
+            <button onclick="copiarCalculo()" style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);color:var(--text2);font-size:10px;padding:3px 9px;cursor:pointer;white-space:nowrap;margin-left:10px;transition:all var(--t-fast)" onmouseover="this.style.borderColor='var(--brand)'" onmouseout="this.style.borderColor='var(--border2)'">Copiar</button>
+          </div>
+        </div>
+        <div id="calcAviso" style="display:none;font-size:11px;padding:8px 10px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);color:var(--text3);margin-top:8px"></div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN PLAZOS -->
+    <div id="sec-plazos" class="gu-rcard" style="display:none">
+      <div class="gu-rcard-hdr">Calculadora de plazos hábiles</div>
+      <div class="gu-rcard-body">
+        <p style="font-size:12px;color:var(--text2);margin:0 0 14px;line-height:1.6">Calcula la fecha de vencimiento contando únicamente días hábiles (excluye sábados, domingos, días inhábiles federales, estatales y municipales).</p>
+        <div style="margin-bottom:10px">
+          <label class="gu-field-label" style="margin-bottom:4px">Nombre del trámite (opcional)</label>
+          <input type="text" id="pNombreTramite" placeholder="Ej: Licencia de construcción — Av. Vallarta 123" class="gu-input">
+        </div>
+        <div class="plazo-form">
+          <div>
+            <label class="gu-field-label" style="margin-bottom:4px">Fecha de ingreso</label>
+            <input type="date" id="pFechaInicio" class="gu-input">
+          </div>
+          <div>
+            <label class="gu-field-label" style="margin-bottom:4px">Días hábiles</label>
+            <select id="pDiasHabiles" onchange="toggleCustomDias(this)" style="width:100%;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);padding:7px 10px;color:var(--text);font-size:12px;outline:none">
+              <option value="5">5 días — resolución exprés</option>
+              <option value="15" selected>15 días — trámite estándar</option>
+              <option value="20">20 días — licencia construcción</option>
+              <option value="30">30 días — plazo general</option>
+              <option value="45">45 días — trámite complejo</option>
+              <option value="60">60 días — resolución especial</option>
+              <option value="90">90 días — resolución nulidad</option>
+              <option value="custom">Personalizado...</option>
+            </select>
+            <input type="number" id="pDiasCustom" min="1" max="365" placeholder="Núm. de días" class="gu-input" style="display:none;margin-top:6px">
+          </div>
+          <div>
+            <label class="gu-field-label" style="margin-bottom:4px">Municipio</label>
+            <select id="pMunicipio" style="width:100%;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);padding:7px 10px;color:var(--text);font-size:12px;outline:none">
+              <option value="guadalajara">Guadalajara</option>
+              <option value="zapopan">Zapopan</option>
+              <option value="tlaquepaque">Tlaquepaque</option>
+              <option value="tlajomulco">Tlajomulco</option>
+              <option value="tonala">Tonalá</option>
+            </select>
+          </div>
+        </div>
+        <div id="plazoAvisoInicio" style="display:none" class="gu-nota" style="margin-bottom:10px"></div>
+        <button class="btn-refresh" onclick="calcularPlazo()" style="margin-bottom:14px;width:100%;justify-content:center">Calcular fecha de vencimiento</button>
+        <div id="plazoHistorial" style="margin-top:18px"></div>
+        <div id="plazoResult" style="display:none" class="plazo-result">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div style="font-size:11px;color:var(--text3)">Fecha de vencimiento</div>
+            <button onclick="copiarPlazo()" id="btnCopiarPlazo" style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);color:var(--text2);font-size:10px;padding:3px 9px;cursor:pointer;transition:all var(--t-fast)" onmouseover="this.style.borderColor='var(--brand)'" onmouseout="this.style.borderColor='var(--border2)'">Copiar</button>
+          </div>
+          <div class="plazo-val" id="plazoFecha">—</div>
+          <div class="plazo-sub" id="plazoDetalle">—</div>
+          <div id="plazoInhabiles" style="font-size:11px;color:var(--text2);margin-top:8px;border-top:0.5px solid var(--border-light);padding-top:8px"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /wrap -->
+
+
+<script>
+// ── DATOS: Días inhábiles 2026 completos ──────────────────────────────────
+// FUENTE JURÍDICA:
+// • Federales: Art. 74 Ley Federal del Trabajo → aplican a todos
+// • Estatales/Municipales Jalisco: Art. 38 Ley para Servidores Públicos del Estado de Jalisco
+//   y sus Municipios → aplica a Estado + los 5 municipios AMG (GDL, ZPN, TLQ, TLA, TON)
+// • TJAJAL: calendario propio — solo aplica al tribunal, no a municipios
+// • Días exclusivos municipales: solo el municipio que los decretó
+const INHABILES_2026 = [
+
+  // ── ENERO ──────────────────────────────────────────────────────────────
+  {f:'2026-01-01',m:'Año Nuevo',n:'fed',muns:'todos',
+   nota:'Art. 74 LFT · Art. 38 Ley Servidores Públicos Jalisco — aplica Estado y 5 municipios AMG'},
+
+  // ── FEBRERO ────────────────────────────────────────────────────────────
+  {f:'2026-02-02',m:'Día de la Constitución (traslado lunes)',n:'fed',muns:'todos',
+   nota:'Art. 74 LFT (conmemoración 5 feb) · Art. 38 Ley Serv. Púb. Jalisco — aplica Estado y 5 municipios AMG'},
+
+  // ── MARZO ──────────────────────────────────────────────────────────────
+  {f:'2026-03-16',m:'Natalicio de Benito Juárez (traslado lunes)',n:'fed',muns:'todos',
+   nota:'Art. 74 LFT (conmemoración 21 mar) · Art. 38 Ley Serv. Púb. Jalisco — aplica Estado y 5 municipios AMG'},
+
+  // ── ABRIL ──────────────────────────────────────────────────────────────
+  {f:'2026-04-01',m:'Día inhábil — decreto TJAJAL (miércoles)',n:'edo',muns:'todos',
+   nota:'ACU/JA/04/03/O/2026 · Aplica TJAJAL y por extensión oficinas estatales. Municipios verificar decreto propio.'},
+  {f:'2026-04-02',m:'Jueves Santo',n:'edo',muns:'todos',
+   nota:'Asueto estatal Jalisco (TJAJAL) · Art. 38 Ley Serv. Púb. Jalisco — aplica Estado y 5 municipios AMG'},
+  {f:'2026-04-03',m:'Viernes Santo',n:'edo',muns:'todos',
+   nota:'Asueto estatal Jalisco · Art. 38 Ley Serv. Púb. Jalisco — aplica Estado y 5 municipios AMG'},
+
+  // ── MAYO ───────────────────────────────────────────────────────────────
+  {f:'2026-05-01',m:'Día del Trabajo',n:'fed',muns:'todos',
+   nota:'Art. 74 LFT · Art. 38 Ley Serv. Púb. Jalisco — aplica Estado y 5 municipios AMG'},
+  {f:'2026-05-05',m:'Batalla de Puebla',n:'fed',muns:'todos',
+   nota:'Art. 74 LFT · Art. 38 Ley Serv. Púb. Jalisco — aplica Estado y 5 municipios AMG'},
+
+  // ── JUNIO ──────────────────────────────────────────────────────────────
+  {f:'2026-06-08',m:'Día del Estado de Jalisco (2° lunes de junio)',n:'edo',muns:'todos',
+   nota:'Art. 38 Ley Serv. Púb. Jalisco (conmemoración 16 jun) — aplica Estado + GDL, ZPN, TLQ, TLA, TON'},
+  // FIFA — restricciones operativas (no inhábiles oficiales)
+  {f:'2026-06-10',m:'FIFA — Restricción vial 48h previas (partido 11 jun)',n:'esp',muns:'zpn,gdl',
+   nota:'Operativo Última Milla: cierres inician 48h antes del partido. Fuente: Policía Vial Jalisco 05 jun 2026'},
+  {f:'2026-06-11',m:'FIFA Mundial — Corea del Sur vs. Rep. Checa · Estadio Akron, Zapopan',n:'esp',muns:'zpn,gdl',
+   nota:'Cierres totales +7h: Periférico, Vallarta, Bajío, Bosque, Torres. Suspensión clases. Veda carga/descarga GDL.'},
+  {f:'2026-06-17',m:'FIFA — Restricción vial 48h previas (partido 18 jun)',n:'esp',muns:'zpn,gdl',
+   nota:'Operativo Última Milla: cierres inician 48h antes del partido.'},
+  {f:'2026-06-18',m:'FIFA Mundial — México vs. Corea del Sur · Estadio Akron, Zapopan',n:'esp',muns:'zpn,gdl',
+   nota:'Partido de México. Cierres totales vialidades Bajío +7h. Suspensión clases. Veda carga/descarga GDL.'},
+  {f:'2026-06-22',m:'FIFA — Restricción vial 48h previas (partido 23 jun)',n:'esp',muns:'zpn,gdl',
+   nota:'Operativo Última Milla: cierres inician 48h antes del partido.'},
+  {f:'2026-06-23',m:'FIFA Mundial — Colombia vs. JAM/NCL · Estadio Akron, Zapopan',n:'esp',muns:'zpn,gdl',
+   nota:'Cierres totales vialidades Bajío +7h. Veda carga/descarga GDL.'},
+  {f:'2026-06-25',m:'FIFA — Restricción vial 48h previas (partido 26 jun)',n:'esp',muns:'zpn,gdl',
+   nota:'Operativo Última Milla: cierres inician 48h antes del partido.'},
+  {f:'2026-06-26',m:'FIFA Mundial — Uruguay vs. España · Estadio Akron, Zapopan',n:'esp',muns:'zpn,gdl',
+   nota:'Último partido sede GDL. Cierres totales vialidades Bajío +7h. Veda carga/descarga GDL.'},
+
+  // ── JULIO — Vacaciones verano TJAJAL / obra FIFA ────────────────────────
+  {f:'2026-07-13',m:'Inicio pre-vacacional TJAJAL (lunes)',n:'vac',muns:'todos',
+   nota:'TJAJAL: 13, 14 y 15 jul son días pre-vacacionales. Ventanillas con actividad reducida.'},
+  {f:'2026-07-14',m:'Pre-vacacional TJAJAL',n:'vac',muns:'todos'},
+  {f:'2026-07-15',m:'Pre-vacacional TJAJAL',n:'vac',muns:'todos'},
+  {f:'2026-07-16',m:'Inicio periodo vacacional verano',n:'vac',muns:'todos',
+   nota:'TJAJAL: 16–31 jul — ventanillas cerradas · FIFA: obra pública pausada hasta 19 jul'},
+  {f:'2026-07-17',m:'Periodo vacacional verano',n:'vac',muns:'todos'},
+  {f:'2026-07-20',m:'Periodo vacacional verano',n:'vac',muns:'todos'},
+  {f:'2026-07-21',m:'Periodo vacacional verano',n:'vac',muns:'todos'},
+  {f:'2026-07-22',m:'Periodo vacacional verano',n:'vac',muns:'todos'},
+  {f:'2026-07-23',m:'Periodo vacacional verano',n:'vac',muns:'todos'},
+  {f:'2026-07-24',m:'Periodo vacacional verano',n:'vac',muns:'todos'},
+  {f:'2026-07-27',m:'Periodo vacacional verano',n:'vac',muns:'todos'},
+  {f:'2026-07-28',m:'Periodo vacacional verano',n:'vac',muns:'todos'},
+  {f:'2026-07-29',m:'Periodo vacacional verano',n:'vac',muns:'todos'},
+  {f:'2026-07-30',m:'Periodo vacacional verano',n:'vac',muns:'todos'},
+  {f:'2026-07-31',m:'Fin periodo vacacional verano',n:'vac',muns:'todos'},
+
+  // ── SEPTIEMBRE ─────────────────────────────────────────────────────────
+  {f:'2026-09-16',m:'Día de la Independencia',n:'fed',muns:'todos',
+   nota:'Art. 74 LFT · Art. 38 Ley Serv. Púb. Jalisco — aplica Estado y 5 municipios AMG'},
+  {f:'2026-09-28',m:'Día del Servidor Público Jalisco / Aniversario GDL',n:'edo',muns:'todos',
+   nota:'Art. 38 Ley Serv. Púb. Jalisco (28 sep) — aplica Estado + 5 municipios AMG · GDL: también aniversario de fundación'},
+
+  // ── OCTUBRE ────────────────────────────────────────────────────────────
+  {f:'2026-10-12',m:'Día de la Nación Pluricultural (Día de la Raza)',n:'edo',muns:'todos',
+   nota:'Art. 38 Ley Serv. Púb. Jalisco · 12 oct — aplica Estado y 5 municipios AMG'},
+
+  // ── NOVIEMBRE ──────────────────────────────────────────────────────────
+  {f:'2026-11-02',m:'Día de Muertos',n:'edo',muns:'todos',
+   nota:'Art. 38 Ley Serv. Púb. Jalisco — aplica Estado y 5 municipios AMG'},
+  {f:'2026-11-16',m:'Revolución Mexicana (traslado lunes)',n:'fed',muns:'todos',
+   nota:'Art. 74 LFT (conmemoración 20 nov) · Art. 38 Ley Serv. Púb. Jalisco — aplica Estado y 5 municipios AMG'},
+
+  // ── DICIEMBRE — Vacaciones invierno ────────────────────────────────────
+  {f:'2026-12-14',m:'Inicio periodo vacacional invierno',n:'vac',muns:'todos',
+   nota:'TJAJAL: 14 dic–31 dic+1 ene 2027 — ventanillas cerradas'},
+  {f:'2026-12-15',m:'Periodo vacacional invierno',n:'vac',muns:'todos'},
+  {f:'2026-12-16',m:'Periodo vacacional invierno',n:'vac',muns:'todos'},
+  {f:'2026-12-17',m:'Periodo vacacional invierno',n:'vac',muns:'todos'},
+  {f:'2026-12-18',m:'Periodo vacacional invierno',n:'vac',muns:'todos'},
+  {f:'2026-12-21',m:'Periodo vacacional invierno',n:'vac',muns:'todos'},
+  {f:'2026-12-22',m:'Periodo vacacional invierno',n:'vac',muns:'todos'},
+  {f:'2026-12-23',m:'Periodo vacacional invierno',n:'vac',muns:'todos'},
+  {f:'2026-12-24',m:'Periodo vacacional invierno',n:'vac',muns:'todos'},
+  {f:'2026-12-25',m:'Navidad',n:'fed',muns:'todos',
+   nota:'Art. 74 LFT · Art. 38 Ley Serv. Púb. Jalisco — aplica Estado y 5 municipios AMG'},
+  {f:'2026-12-28',m:'Periodo vacacional invierno',n:'vac',muns:'todos'},
+  {f:'2026-12-29',m:'Periodo vacacional invierno',n:'vac',muns:'todos'},
+  {f:'2026-12-30',m:'Periodo vacacional invierno',n:'vac',muns:'todos'},
+  {f:'2026-12-31',m:'Fin de año — periodo vacacional',n:'vac',muns:'todos'},
+];
+
+// ── ALERTAS NORMATIVAS ────────────────────────────────────────────────────
+const ALERTAS = [
+  // ── FIFA MUNDIAL 2026 ──
+  {tipo:'danger',icono:'⚽',ttl:'MUNDIAL 2026 — Obra pública pausada por FIFA hasta el 19 de julio',
+   desc:'Por exigencia del manual FIFA Stadium Guidelines, toda obra pública en perímetros del estadio, aeropuertos y rutas conectoras debe suspenderse durante el torneo. El Gobierno de Jalisco (SIOP) confirmó que la pausa aplica hasta el cierre del Mundial el 19 de julio. Esto puede afectar trámites que dependan de obra activa en vía pública (permisos de excavación, carga en arroyo, usos temporales de banqueta).',
+   src:'El Informador 22 may 2026 · FIFA Stadium Guidelines · SIOP Jalisco',
+   fecha:'Vigente: 11 jun – 19 jul 2026', municipios:'GDL · ZPN · AMG'},
+  {tipo:'danger',icono:'🚧',ttl:'MUNDIAL 2026 — Operativo "Última Milla": restricciones viales y de acceso',
+   desc:'Operativo activo desde el 28 may hasta el 3 jul 2026. Tres fases: (1) Montaje 28 may–10 jun: cierres parciales Circuito JVC, reducción de carriles. (2) Días de partido (11, 18, 23 y 26 jun): cierre total laterales Periférico Poniente, Av. Vallarta, Av. del Bajío y Av. del Bosque — 7 horas antes y después del partido. Acceso a zona restringido 24 h antes a personas sin boleto. Sin estacionamiento público en Estadio Guadalajara. (3) Desmontaje 28 jun–3 jul: cierres intermitentes. Fan Fest Centro Histórico GDL: Plaza de Armas/Liberación y estacionamiento subterráneo Plaza Liberación cerrados del 11 may al 31 jul.',
+   src:'Policía Vial Jalisco (Comisario Arizpe) · Milenio 28 may 2026 · Infobae 28 may 2026',
+   fecha:'Vigente: 28 may – 3 jul 2026', municipios:'ZPN · GDL'},
+  {tipo:'danger',icono:'🚛',ttl:'MUNDIAL 2026 — Veda temporal cierres viales por obra, protección de obra y carga/descarga · GDL',
+   desc:'La Dirección de Movilidad y Transporte del Municipio de Guadalajara implementa veda temporal para autorización de: (1) cierres viales por protección de obra, (2) protección de obra en banqueta, y (3) maniobras de carga y descarga. Aplica en: (a) radio de 1 km alrededor del polígono del FIFA Fan Fest, y (b) vialidades primarias, corredores de movilidad estratégica y vías principales determinadas por la autoridad municipal. Vigencia: 11 junio al 19 julio 2026. Cierres con autorización previa ya emitida deben cumplir el lineamiento no. 17 (liberación total del área en caso de eventos deportivos). Las áreas municipales deben considerar esta restricción en revisión y autorización de trámites de protección de obra y ocupación de vía pública. ZAPOPAN Y ESTADO: No se localizó comunicado equivalente publicado al 05 jun 2026. Verificar en portal.zapopan.gob.mx y Secretaría de Movilidad Jalisco.',
+   src:'Comunicado oficial — Dirección de Movilidad y Transporte, Municipio de Guadalajara · Guadalajara.gob.mx',
+   fecha:'Vigente: 11 jun – 19 jul 2026 · ⚠️ Solo GDL confirmado. Zapopan: pendiente verificar', municipios:'GDL (confirmado) · ZPN (pendiente)'},
+  {tipo:'warn',icono:'🗺️',ttl:'MUNDIAL 2026 — Vialidades afectadas en zona Bajío (Zapopan) todo junio',
+   desc:'Durante todo junio: Circuito JVC cerrado de Villas Panamericanas a Av. del Bosque. Con cierres adicionales en días de partido: Periférico Poniente (laterales), Av. Vallarta (laterales), Av. del Bajío, Av. del Bosque, Av. Las Torres, Av. Inglaterra, Av. Aviación. Aplica también operativo en Centro Histórico GDL por Fan Fest: Morelos, Hidalgo, Liceo, Ramón Corona, Maestranza, Degollado.',
+   src:'Policía Vial Jalisco · El Informador 28 may 2026 · Azteca Jalisco',
+   fecha:'Todo junio 2026 (intensidad variable)', municipios:'ZPN · GDL'},
+  // ── NORMATIVA PERMANENTE ──
+  {tipo:'warn',icono:'⚠️',ttl:'Tarifas ICUS 2027 — verificar en diciembre 2026',
+   desc:'Las tarifas ICUS GDL ($1,516/m²) y Zapopan ($1,541/m² + $14,830 ECPD) son de 2026. Actualizar en enero 2027 con la nueva Ley de Ingresos municipal.',
+   src:'Art. 37 Ley Ingresos GDL 2026 · Art. 93 Ley Ingresos Zapopan 2026',
+   fecha:'Revisión pendiente: diciembre 2026', municipios:'GDL · ZPN'},
+  {tipo:'info',icono:'ℹ️',ttl:'PDU ZPN-01 Zapopan 2023 — vigente',
+   desc:'El Plan de Desarrollo Urbano de Zapopan (ZPN-01 2023) está vigente. Verificar en portal.zapopan.gob.mx si se publican modificaciones en las tablas E3a/E3b de coeficientes.',
+   src:'portal.zapopan.gob.mx/planes-parciales',
+   fecha:'Última revisión: 04 jun 2026', municipios:'Zapopan'},
+  {tipo:'info',icono:'ℹ️',ttl:'Planes Parciales GDL — D1 a D7 vigentes',
+   desc:'Los planes parciales D1 Reforma, D2 Minerva, D3 Huentitán, D4 Olímpica, D5 Tetlán, D6 Oblatos y D7 Abastos están vigentes. Monitorear Gaceta Municipal GDL.',
+   src:'guadalajara.gob.mx/planes-parciales',
+   fecha:'Última revisión: 04 jun 2026', municipios:'Guadalajara'},
+  {tipo:'warn',icono:'⚠️',ttl:'TLQ, TLA y TON — PDU pendiente de procesamiento',
+   desc:'Los planes parciales de Tlaquepaque, Tlajomulco y Tonalá aún no han sido procesados en la plataforma. Los módulos M01, M02 y M03 no tienen BD local para estos municipios.',
+   src:'Pendiente interno — subir PDFs al chat',
+   fecha:'Pendiente', municipios:'TLQ · TLA · TON'},
+  {tipo:'danger',icono:'🔴',ttl:'Google Maps API Key — configurar límite de presupuesto',
+   desc:'La API key AIzaSy... tiene $300 USD de crédito por 90 días. Antes del lanzamiento público: configurar límite de gasto en Google Cloud Console y restringir al dominio de producción.',
+   src:'console.cloud.google.com → APIs & Services → Credentials',
+   fecha:'⚠️ Urgente antes del lanzamiento', municipios:'Todos'},
+];
+
+// ── TARIFAS 2026 ──────────────────────────────────────────────────────────
+const TARIFAS = [
+  {mun:'Guadalajara',tipo:'ICUS / TDD',val:'$1,516',unidad:'por m² excedente',src:'Art. 37 Ley Ingresos GDL 2026',color:'var(--sem-am-txt)'},
+  {mun:'Zapopan',tipo:'ICUS',val:'$1,541',unidad:'por m² excedente',src:'Art. 93 Ley Ingresos ZPN 2026',color:'var(--sem-am-txt)'},
+  {mun:'Zapopan',tipo:'ECPD',val:'$14,830',unidad:'pago fijo (Estudio de Capacidades)',src:'Art. 93 Ley Ingresos ZPN 2026',color:'var(--brand-light)'},
+];
+const UMA_2026  = 113.14;
+const SMGDF_2026 = 278.80;
+
+// ── FILTRO CALENDARIO ─────────────────────────────────────────────────────
+let _calFiltro = 'todos';
+
+function filtrarCal(tipo, btn){
+  _calFiltro = tipo;
+  document.querySelectorAll('.fil-badge').forEach(b => b.classList.remove('fil-active'));
+  btn.classList.add('fil-active');
+  renderCalendario();
+}
+
+// Municipal = fed + edo (Art. 38 aplica a municipios) + mun exclusivos
+function matchFiltro(d){
+  if(_calFiltro === 'todos') return true;
+  if(_calFiltro === 'mun') return d.n === 'fed' || d.n === 'edo' || d.n === 'mun';
+  return d.n === _calFiltro;
+}
+
+function matchMunicipio(d){
+  const sel = document.getElementById('fil-mun-cal');
+  const mun = sel ? sel.value : 'todos';
+  if(mun === 'todos') return true;
+  if(d.muns === 'todos') return true;
+  return d.muns && d.muns.includes(mun);
+}
+
+// ── INPUT DÍAS PERSONALIZADO ──────────────────────────────────────────────
+function toggleCustomDias(sel){
+  const inp = document.getElementById('pDiasCustom');
+  if(sel.value === 'custom'){
+    inp.style.display = 'block';
+    inp.focus();
+  } else {
+    inp.style.display = 'none';
+  }
+}
+
+// ── COPIAR RESULTADO PLAZO ────────────────────────────────────────────────
+function copiarPlazo(){
+  const fecha  = document.getElementById('plazoFecha').textContent;
+  const detalle= document.getElementById('plazoDetalle').textContent;
+  const mun    = document.getElementById('pMunicipio');
+  const munNom = mun ? mun.options[mun.selectedIndex].text : '';
+  const txt = `Vencimiento: ${fecha}\n${detalle}\nMunicipio: ${munNom}`;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn = document.getElementById('btnCopiarPlazo');
+    btn.textContent = '✅ Copiado';
+    setTimeout(()=>{ btn.textContent = '📋 Copiar'; }, 2000);
+  }).catch(()=>{
+    prompt('Copia este texto:', txt);
+  });
+}
+
+// ── MARCAR ALERTA RESUELTA ────────────────────────────────────────────────
+function toggleResuelta(idx){
+  let resueltas = JSON.parse(localStorage.getItem('m15_resueltas')||'[]');
+  if(resueltas.includes(idx)){
+    resueltas = resueltas.filter(i=>i!==idx);
+  } else {
+    resueltas.push(idx);
+  }
+  localStorage.setItem('m15_resueltas', JSON.stringify(resueltas));
+  renderAlertas();
+}
+
+// ── RENDER CALENDARIO ─────────────────────────────────────────────────────
+function renderCalendario(){
+  const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+               'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const hoy=new Date();
+  let html='';
+  let totalVisible=0;
+  for(let m=0;m<12;m++){
+    const items=INHABILES_2026.filter(d=>{
+      const mes=parseInt(d.f.split('-')[1])-1;
+      if(mes!==m) return false;
+      if(!matchFiltro(d)) return false;
+      if(!matchMunicipio(d)) return false;
+      return true;
+    });
+    if(!items.length) continue;
+    totalVisible+=items.length;
+    const mesIdx=parseInt(items[0].f.split('-')[1])-1;
+    const esActual=mesIdx===hoy.getMonth();
+    html+=`<div class="cal-mes" id="cal-mes-${mesIdx}">
+      <div class="cal-mes-hdr${esActual?' mes-activo':''}" onclick="toggleMes(this)">
+        <span class="cal-mes-nombre">${meses[mesIdx]} 2026</span>
+        <div style="display:flex;gap:5px;align-items:center">
+          ${esActual?'<span class="cal-mes-hoy">Mes actual</span>':''}
+          <span class="cal-mes-badge">${items.length} día${items.length!==1?'s':''}</span>
+        </div>
+        <svg class="cal-mes-chev${esActual?' open':''}" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;transition:transform .2s"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="cal-mes-body${esActual?' open':''}">`;
+    items.forEach(d=>{
+      const fecha=new Date(d.f+'T12:00:00');
+      const esHoy=fecha.toDateString()===hoy.toDateString();
+      const esPasado=fecha<hoy;
+      const diasFalta=Math.ceil((fecha-hoy)/(1000*60*60*24));
+      const fmtFecha=fecha.toLocaleDateString('es-MX',{weekday:'short',day:'2-digit',month:'short'});
+      const alertClass=esHoy?'background:var(--bg3);border:1px solid var(--sem-am-txt);border-radius:7px;padding:4px 6px;':(esPasado?'opacity:.5':'');
+      const nivMap={'fed':'niv-fed','edo':'niv-edo','mun':'niv-mun','vac':'niv-vac','esp':'niv-esp'};
+      const etiqMap={'fed':'Federal','mun':'Municipal','vac':'Vacacional','esp':'Especial'};
+      let badgesHtml;
+      if(d.n==='fed'){
+        badgesHtml=`<span class="cal-nivel niv-fed">Federal</span> <span class="cal-nivel niv-edo">Jalisco</span> <span class="cal-nivel niv-mun">Municipal</span>`;
+      } else if(d.n==='edo'){
+        badgesHtml=`<span class="cal-nivel niv-edo">Jalisco</span> <span class="cal-nivel niv-mun">Municipal</span>`;
+      } else {
+        badgesHtml=`<span class="cal-nivel ${nivMap[d.n]||'niv-fed'}">${etiqMap[d.n]||d.n}</span>`;
+      }
+      html+=`<div class="cal-item" style="${alertClass}">
+        <div class="cal-fecha">${fmtFecha}${esHoy?' <span style="color:var(--sem-am-txt)">← HOY</span>':diasFalta>0&&diasFalta<=7?` <span style="color:var(--brand-light)">en ${diasFalta}d</span>`:''}</div>
+        <div>
+          <div class="cal-motivo">${d.m}</div>
+          ${d.nota?`<div class="cal-muns">${d.nota}</div>`:''}
+          ${d.muns&&d.muns!=='todos'?`<div class="cal-muns">Solo: ${d.muns}</div>`:''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end">${badgesHtml}</div>
+      </div>`;
+    });
+    html+='</div></div>';
+  }
+  if(!totalVisible){
+    html='<div style="text-align:center;padding:30px;color:var(--text3);font-size:12px">Sin días inhábiles para este filtro.</div>';
+  }
+  const cont = document.getElementById('calendarContent');
+  cont.innerHTML=html;
+  // Scroll al mes actual
+  const mesActualId = 'cal-mes-' + new Date().getMonth();
+  const elMes = cont.querySelector('#'+mesActualId);
+  if(elMes) setTimeout(()=>{ elMes.scrollIntoView({behavior:'smooth',block:'nearest'}); },80);
+}
+
+// ── RENDER ALERTAS ────────────────────────────────────────────────────────
+function renderAlertas(){
+  const tipoClass={danger:'alerta-danger',warn:'alerta-warn',info:'alerta-info',success:'alerta-success'};
+  const resueltas = JSON.parse(localStorage.getItem('m15_resueltas')||'[]');
+  const html=ALERTAS.map((a,idx)=>{
+    const esResuelta = resueltas.includes(idx);
+    return `
+    <div class="alerta ${tipoClass[a.tipo]||'alerta-gray'}" id="alerta-${idx}" style="${esResuelta?'opacity:.4;filter:grayscale(.6)':''}">
+      <div class="alerta-icon">${a.icono}</div>
+      <div style="flex:1">
+        <div class="alerta-ttl" style="color:${a.tipo==='danger'?'#fca5a5':a.tipo==='warn'?'#fcd34d':a.tipo==='info'?'#93c5fd':'#86efac'}">${a.ttl}</div>
+        <div class="alerta-desc">${a.desc}</div>
+        <div class="alerta-src">📎 ${a.src}</div>
+        <div class="alerta-fecha">🗓️ ${a.fecha}${a.municipios?' · 📍 '+a.municipios:''}</div>
+        <div style="margin-top:6px">
+          <button onclick="toggleResuelta(${idx})" style="background:none;border:1px solid ${esResuelta?'#14532d':'var(--border2)'};border-radius:5px;color:${esResuelta?'#86efac':'var(--text3)'};font-size:10px;padding:2px 9px;cursor:pointer;font-family:var(--sans)">
+            ${esResuelta?'✅ Resuelta — desmarcar':'☐ Marcar como resuelta'}
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('alertasContent').innerHTML=html||'<div style="font-size:12px;color:var(--text3);padding:10px">Sin alertas activas.</div>';
+}
+
+// ── RENDER TARIFAS ────────────────────────────────────────────────────────
+function renderTarifas(){
+  const cards=TARIFAS.map(t=>`
+    <div class="tarifa-card">
+      <div class="tarifa-mun">${t.mun}</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:3px">${t.tipo}</div>
+      <div class="tarifa-val" style="color:${t.color}">${t.val}</div>
+      <div class="tarifa-lbl">${t.unidad}</div>
+      <div class="tarifa-src">${t.src}</div>
+    </div>`).join('');
+  const umaHtml=`
+    <div class="gu-rcard" style="margin-top:14px">
+      <div class="gu-rcard-hdr">Unidades de referencia 2026</div>
+      <div class="uma-row"><span style="color:var(--text2)">UMA 2026</span><span style="font-family:var(--mono);color:var(--brand-light)">$${UMA_2026.toLocaleString('es-MX',{minimumFractionDigits:2})}/día</span></div>
+      <div class="uma-row"><span style="color:var(--text2)">Salario mínimo 2026</span><span style="font-family:var(--mono);color:var(--brand-light)">$${SMGDF_2026.toLocaleString('es-MX',{minimumFractionDigits:2})}/día</span></div>
+      <div class="uma-row" style="border:none"><span style="font-size:10px;color:var(--text3)">Fuente: INEGI / CONASAMI 2026 · Actualizar febrero de cada año</span></div>
+    </div>`;
+  document.getElementById('tarifasContent').innerHTML=`
+    <div style="margin-bottom:8px;font-size:11px;color:var(--sem-am-txt)">⚠️ Tarifas vigentes 2026. Actualizar cada enero con la nueva Ley de Ingresos municipal.</div>
+    <div class="tarifa-grid">${cards}</div>${umaHtml}`;
+}
+
+// ── CALCULADORA DE PLAZOS ─────────────────────────────────────────────────
+function esInhabil(fecha, municipio){
+  const fStr=fecha.toISOString().split('T')[0];
+  const dow=fecha.getDay();
+  if(dow===0||dow===6) return {es:true,motivo:'Fin de semana'};
+  const item=INHABILES_2026.find(d=>{
+    if(d.f!==fStr) return false;
+    if(d.muns==='todos') return true;
+    if(d.muns.includes(municipio.substring(0,3))) return true;
+    return false;
+  });
+  if(item) return {es:true,motivo:item.m,nivel:item.n};
+  return {es:false};
+}
+
+function calcularPlazo(){
+  const fechaStr=document.getElementById('pFechaInicio').value;
+  const diasSel=document.getElementById('pDiasHabiles').value;
+  const mun=document.getElementById('pMunicipio').value;
+  if(!fechaStr){alert('Selecciona una fecha de inicio.');return;}
+  let dias;
+  if(diasSel==='custom'){
+    dias=parseInt(document.getElementById('pDiasCustom').value);
+    if(isNaN(dias)||dias<1){alert('Ingresa un número de días válido.');return;}
+  } else {
+    dias=parseInt(diasSel);
+  }
+  if(isNaN(dias)){alert('Selecciona los días hábiles.');return;}
+
+  // Validar que la fecha de inicio no sea inhábil
+  let inicio=new Date(fechaStr+'T12:00:00');
+  const chkInicio=esInhabil(inicio,mun);
+  if(chkInicio.es){
+    const motivo=chkInicio.motivo==='Fin de semana'?'fin de semana':chkInicio.motivo;
+    const aviso=document.getElementById('plazoAvisoInicio');
+    // Buscar siguiente día hábil
+    let sig=new Date(inicio.getTime());
+    for(let i=0;i<10;i++){
+      sig=new Date(sig.getTime()+86400000);
+      if(!esInhabil(sig,mun).es) break;
+    }
+    const sigFmt=sig.toLocaleDateString('es-MX',{weekday:'long',day:'2-digit',month:'long'});
+    if(aviso){
+      aviso.innerHTML=`⚠️ La fecha de inicio es inhábil (${motivo}). El primer día hábil disponible es <strong>${sigFmt}</strong>.`;
+      aviso.style.display='block';
+    }
+  } else {
+    const aviso=document.getElementById('plazoAvisoInicio');
+    if(aviso) aviso.style.display='none';
+  }
+
+  let fecha=new Date(fechaStr+'T12:00:00');
+  let conteo=0;
+  const inhabiles=[];
+  let intentos=0;
+  while(conteo<dias && intentos<500){
+    fecha=new Date(fecha.getTime()+86400000);
+    intentos++;
+    const chk=esInhabil(fecha,mun);
+    if(chk.es){
+      if(chk.motivo!=='Fin de semana') inhabiles.push({f:fecha.toLocaleDateString('es-MX',{day:'2-digit',month:'short'}),m:chk.motivo});
+    } else {
+      conteo++;
+    }
+  }
+
+  const munSel=document.getElementById('pMunicipio');
+  const munNom=munSel?munSel.options[munSel.selectedIndex].text:'';
+  const nombreTramite=(document.getElementById('pNombreTramite').value||'').trim();
+  const fmtVenc=fecha.toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const diasCal=Math.ceil((fecha-inicio)/86400000);
+  const fechaStr2=fecha.toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
+
+  document.getElementById('plazoFecha').textContent=fechaStr2;
+  document.getElementById('plazoDetalle').textContent=`${fmtVenc} · ${diasCal} días calendario · ${munNom}`;
+  document.getElementById('plazoInhabiles').innerHTML=inhabiles.length
+    ?`Días inhábiles excluidos (${inhabiles.length}): ${inhabiles.map(i=>`<strong>${i.f}</strong> ${i.m}`).join(' · ')}`
+    :'Sin días inhábiles en el periodo.';
+  document.getElementById('plazoResult').style.display='block';
+
+  // Guardar en historial localStorage
+  const entrada={
+    nombre:nombreTramite||'Sin nombre',
+    fechaInicio:inicio.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}),
+    fechaVenc:fechaStr2,
+    dias,munNom,
+    ts:Date.now()
+  };
+  let hist=JSON.parse(localStorage.getItem('m15_historial')||'[]');
+  hist.unshift(entrada);
+  if(hist.length>8) hist=hist.slice(0,8);
+  localStorage.setItem('m15_historial',JSON.stringify(hist));
+  renderHistorial();
+}
+
+// ── RENDER RESUMEN SIDEBAR ────────────────────────────────────────────────
+function renderResumen(){
+  const hoy=new Date();
+  const alertasCrit=ALERTAS.filter(a=>a.tipo==='danger').length;
+  const alertasWarn=ALERTAS.filter(a=>a.tipo==='warn').length;
+  const proxInhab=INHABILES_2026.filter(d=>{
+    const f=new Date(d.f+'T12:00:00');
+    const diff=Math.ceil((f-hoy)/86400000);
+    return diff>0&&diff<=30;
+  }).length;
+
+  document.getElementById('resumenLista').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:6px;padding-top:2px">
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+        <span style="color:var(--text2)">🔴 Alertas críticas</span>
+        <span style="font-family:var(--mono);color:${alertasCrit>0?'#fca5a5':'var(--text3)'};font-weight:${alertasCrit>0?'600':'400'}">${alertasCrit}</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+        <span style="color:var(--text2)">⚠️ Avisos</span>
+        <span style="font-family:var(--mono);color:${alertasWarn>0?'#fcd34d':'var(--text3)'}">${alertasWarn}</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+        <span style="color:var(--text2)">📅 Inhábiles próx. 30d</span>
+        <span style="font-family:var(--mono);color:var(--brand-light)">${proxInhab}</span>
+      </div>
+    </div>`;
+}
+
+// ── PRÓXIMAS FECHAS SIDEBAR ───────────────────────────────────────────────
+function renderProxFechas(){
+  const hoy=new Date();
+  const prox=INHABILES_2026.filter(d=>{
+    const f=new Date(d.f+'T12:00:00');
+    const diff=Math.ceil((f-hoy)/86400000);
+    return diff>=0&&diff<=15;
+  }).slice(0,5);
+
+  if(!prox.length){
+    document.getElementById('proxFechas').innerHTML='<div style="font-size:11px;color:var(--text3);padding:4px 0">Sin días inhábiles en los próximos 15 días.</div>';
+    return;
+  }
+  const html=prox.map(d=>{
+    const f=new Date(d.f+'T12:00:00');
+    const diff=Math.ceil((f-hoy)/86400000);
+    const esHoy=diff===0;
+    return `<div class="prox-item ${esHoy?'prox-hoy':'prox-prox'}">
+      <div class="prox-dias ${esHoy?'dias-hoy':'dias-prox'}">${esHoy?'HOY':diff===1?'MAÑANA':diff+'d'}</div>
+      <div>
+        <div style="font-size:11px;font-weight:500">${f.toLocaleDateString('es-MX',{day:'2-digit',month:'short'})}</div>
+        <div style="font-size:10px;color:var(--text3)">${d.m.substring(0,40)}${d.m.length>40?'…':''}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('proxFechas').innerHTML=html;
+}
+
+// ── CALCULADORA DE DERECHOS ICUS ─────────────────────────────────────────
+const TARIFAS_CALC = {
+  gdl: { icus: 1516, nombre: 'Guadalajara', src: 'Art. 37 Ley Ingresos GDL 2026' },
+  zpn: { icus: 1541, ecpd: 14830, nombre: 'Zapopan', src: 'Art. 93 Ley Ingresos ZPN 2026' },
+};
+
+function calcDerechos(){
+  const mun  = document.getElementById('calcMun').value;
+  const auth = parseFloat(document.getElementById('calcM2Auth').value);
+  const cons = parseFloat(document.getElementById('calcM2Const').value);
+  const res  = document.getElementById('calcResult');
+  const aviso= document.getElementById('calcAviso');
+  const ecpdRow = document.getElementById('calcEcpdRow');
+
+  // Mostrar/ocultar ECPD
+  ecpdRow.style.display = mun === 'zpn' ? 'block' : 'none';
+
+  if(isNaN(auth) || isNaN(cons) || auth <= 0 || cons <= 0){
+    res.style.display = 'none';
+    aviso.style.display = 'none';
+    return;
+  }
+
+  const t = TARIFAS_CALC[mun];
+  const excedente = Math.max(0, cons - auth);
+  const montoIcus = excedente * t.icus;
+  const montoEcpd = mun === 'zpn' && excedente > 0 ? t.ecpd : 0;
+  const total = montoIcus + montoEcpd;
+
+  const fmt = v => '$' + v.toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  let desglose = '';
+  desglose += `<div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">m² autorizados (CUS)</span><span style="font-family:var(--mono)">${auth.toLocaleString('es-MX')} m²</span></div>`;
+  desglose += `<div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">m² a construir</span><span style="font-family:var(--mono)">${cons.toLocaleString('es-MX')} m²</span></div>`;
+  desglose += `<div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">m² excedentes</span><span style="font-family:var(--mono);color:${excedente>0?'#fca5a5':'#86efac'}">${excedente.toLocaleString('es-MX')} m²</span></div>`;
+
+  if(excedente === 0){
+    desglose += `<div style="color:#86efac;font-size:11px;margin-top:4px">✅ Sin excedente — no genera derecho ICUS.</div>`;
+    document.getElementById('calcDesglose').innerHTML = desglose;
+    document.getElementById('calcTotal').textContent = '$0.00';
+    document.getElementById('calcNota').textContent = `Construcción dentro del CUS autorizado. ${t.src}`;
+    res.style.display = 'block';
+    aviso.style.display = 'none';
+    return;
+  }
+
+  desglose += `<div style="display:flex;justify-content:space-between;margin-top:4px"><span style="color:var(--text3)">ICUS: ${excedente.toLocaleString('es-MX')} m² × ${fmt(t.icus)}</span><span style="font-family:var(--mono);color:var(--sem-am-txt)">${fmt(montoIcus)}</span></div>`;
+  if(mun === 'zpn'){
+    desglose += `<div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">ECPD (pago fijo ZPN)</span><span style="font-family:var(--mono);color:var(--brand-light)">${fmt(montoEcpd)}</span></div>`;
+  }
+
+  document.getElementById('calcDesglose').innerHTML = desglose;
+  document.getElementById('calcTotal').textContent = fmt(total);
+  document.getElementById('calcNota').textContent = `Estimado. Sujeto a dictamen municipal. ${t.src} · Tarifas 2026.`;
+  res.style.display = 'block';
+
+  // Aviso si excedente es muy alto
+  if(excedente > auth * 0.5){
+    aviso.innerHTML = `⚠️ El excedente (${excedente.toLocaleString('es-MX')} m²) supera el 50% del CUS autorizado. Verificar viabilidad con el municipio antes de ingresar el trámite.`;
+    aviso.style.display = 'block';
+  } else {
+    aviso.style.display = 'none';
+  }
+}
+
+function copiarCalculo(){
+  const mun  = document.getElementById('calcMun');
+  const munNom = mun.options[mun.selectedIndex].text;
+  const auth = document.getElementById('calcM2Auth').value;
+  const cons = document.getElementById('calcM2Const').value;
+  const total= document.getElementById('calcTotal').textContent;
+  const nota = document.getElementById('calcNota').textContent;
+  const txt = `Cálculo ICUS — ${munNom}\nm² autorizados: ${auth}\nm² a construir: ${cons}\nTotal estimado: ${total}\n${nota}`;
+  navigator.clipboard.writeText(txt).then(()=>{
+    event.target.textContent='✅ Copiado';
+    setTimeout(()=>{ event.target.textContent='📋 Copiar'; },2000);
+  }).catch(()=>{ prompt('Copia este texto:',txt); });
+}
+
+// ── HISTORIAL DE PLAZOS ──────────────────────────────────────────────────
+function renderHistorial(){
+  const cont=document.getElementById('plazoHistorial');
+  if(!cont) return;
+  const hist=JSON.parse(localStorage.getItem('m15_historial')||'[]');
+  if(!hist.length){ cont.innerHTML=''; return; }
+  const rows=hist.map((h,i)=>`
+    <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--border);font-size:11px">
+      <div>
+        <div style="font-weight:500;color:var(--text)">${h.nombre}</div>
+        <div style="color:var(--text3);margin-top:1px">Ingreso: ${h.fechaInicio} · ${h.dias}d hábiles · ${h.munNom}</div>
+      </div>
+      <div style="font-family:var(--mono);color:var(--brand-light);white-space:nowrap">${h.fechaVenc}</div>
+      <button onclick="borrarHistorial(${i})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:0 4px" title="Eliminar">×</button>
+    </div>`).join('');
+  cont.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.5px">Historial reciente</div>
+      <button onclick="borrarTodoHistorial()" style="background:none;border:none;color:var(--text3);font-size:10px;cursor:pointer;font-family:var(--sans)">Limpiar todo</button>
+    </div>
+    <div>${rows}</div>`;
+}
+
+function borrarHistorial(idx){
+  let hist=JSON.parse(localStorage.getItem('m15_historial')||'[]');
+  hist.splice(idx,1);
+  localStorage.setItem('m15_historial',JSON.stringify(hist));
+  renderHistorial();
+}
+
+function borrarTodoHistorial(){
+  if(!confirm('¿Eliminar todo el historial?')) return;
+  localStorage.removeItem('m15_historial');
+  renderHistorial();
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────
+function mostrarSec(id,btn){
+  ['calendario','alertas','tarifas','plazos'].forEach(s=>{
+    document.getElementById('sec-'+s).style.display=s===id?'block':'none';
+  });
+  document.querySelectorAll('.sec-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── VERIFICAR AHORA ───────────────────────────────────────────────────────
+function verificarAhora(){
+  const btn=document.querySelector('.btn-refresh');
+  btn.textContent='⏳ Verificando...';
+  btn.disabled=true;
+  // Simular verificación — en producción haría fetch a las fuentes
+  setTimeout(()=>{
+    const now=new Date().toLocaleString('es-MX');
+    document.getElementById('ultimaVer').textContent=now;
+    localStorage.setItem('gu_m15_ultima_ver',now);
+    btn.innerHTML='🔄 Verificar ahora';
+    btn.disabled=false;
+    alert('Verificación completada. Las alertas manuales requieren actualización por parte del administrador de la plataforma.');
+  },1500);
+}
+
+// ── AGREGAR ALERTA ────────────────────────────────────────────────────────
+function agregarAlerta(){
+  const ttl=prompt('Título de la alerta:');
+  if(!ttl) return;
+  const desc=prompt('Descripción:');
+  const src=prompt('Fuente (URL o documento):');
+  const nueva={tipo:'warn',icono:'⚠️',ttl,desc:desc||'',src:src||'Sin fuente especificada',fecha:new Date().toLocaleDateString('es-MX'),municipios:'Todos',custom:true};
+  ALERTAS.unshift(nueva);
+  guardarAlertasCustom();
+  renderAlertas();
+  renderResumen();
+}
+
+function guardarAlertasCustom(){
+  const custom=ALERTAS.filter(a=>a.custom);
+  localStorage.setItem('m15_alertas_custom',JSON.stringify(custom));
+}
+
+function cargarAlertasCustom(){
+  const saved=JSON.parse(localStorage.getItem('m15_alertas_custom')||'[]');
+  saved.reverse().forEach(a=>ALERTAS.unshift(a));
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  cargarAlertasCustom();
+  // Aviso actualización 2027 en noviembre y diciembre
+  const mesActual = new Date().getMonth(); // 0-based
+  if(mesActual >= 10){ // nov=10, dic=11
+    const avHdr = document.getElementById('hdrAviso2027');
+    if(avHdr) avHdr.style.display='block';
+  }
+  renderCalendario();
+  renderAlertas();
+  renderTarifas();
+  renderResumen();
+  renderProxFechas();
+  renderHistorial();
+  // Fecha de inicio por defecto = hoy
+  document.getElementById('pFechaInicio').value=new Date().toISOString().split('T')[0];
+  // Última verificación guardada
+  const ult=localStorage.getItem('gu_m15_ultima_ver');
+  if(ult) document.getElementById('ultimaVer').textContent=ult;
+  // Validar fecha inicio al cambiarla
+  document.getElementById('pFechaInicio').addEventListener('change',function(){
+    const mun=document.getElementById('pMunicipio').value;
+    const f=new Date(this.value+'T12:00:00');
+    const chk=esInhabil(f,mun);
+    const aviso=document.getElementById('plazoAvisoInicio');
+    if(chk.es && aviso){
+      const motivo=chk.motivo==='Fin de semana'?'fin de semana':chk.motivo;
+      let sig=new Date(f.getTime());
+      for(let i=0;i<10;i++){
+        sig=new Date(sig.getTime()+86400000);
+        if(!esInhabil(sig,mun).es) break;
+      }
+      const sigFmt=sig.toLocaleDateString('es-MX',{weekday:'long',day:'2-digit',month:'long'});
+      aviso.innerHTML=`⚠️ La fecha de inicio es inhábil (${motivo}). El primer día hábil disponible es <strong>${sigFmt}</strong>.`;
+      aviso.style.display='block';
+    } else if(aviso){
+      aviso.style.display='none';
+    }
+  });
+});
+
+// ── TOGGLE DARK/LIGHT MODE ────────────────────────────────────────────────
+function guToggleTheme(){
+  var html=document.documentElement;
+  var isDark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',isDark?'light':'dark');
+  var lbl=document.getElementById('gu-toggle-label');
+  if(lbl) lbl.textContent=isDark?'Modo oscuro':'Modo claro';
+  localStorage.setItem('gu_theme',isDark?'light':'dark');
+}
+
+
+// ── ACORDEÓN CALENDARIO ───────────────────────────────────────────────────
+function toggleMes(hdr){
+  const chev = hdr.querySelector('.cal-mes-chev');
+  const body = hdr.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
+}
+</script>
+</body>
+</html>

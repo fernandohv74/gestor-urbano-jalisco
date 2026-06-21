@@ -1,0 +1,902 @@
+/* ============================================================
+   GU DESIGN SYSTEM — Gestor Urbano Jalisco AMG
+   Versión: 1.0 · Junio 2026
+   Uso: <link rel="stylesheet" href="gu-design-system.css">
+   Requiere: Outfit + Geist Mono via Google Fonts
+   ============================================================ */
+
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ── FUENTES ── */
+/* Agregar en el <head> de cada módulo:
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+*/
+
+/* ============================================================
+   1. TOKENS — MODO CLARO
+   ============================================================ */
+:root{
+  /* Marca */
+  --brand:        #1A2744;
+  --brand-light:  #2D3A6B;
+  --brand-pale:   #E6EAF4;
+
+  /* Fondos */
+  --bg:           #F9FAFB;
+  --bg2:          #FFFFFF;
+  --bg3:          #F0F0EE;
+
+  /* Bordes */
+  --border:       rgba(0,0,0,0.08);
+  --border2:      rgba(0,0,0,0.14);
+  --border3:      rgba(0,0,0,0.22);
+
+  /* Texto */
+  --text:         #0F0F0E;
+  --text2:        #666666;
+  --text3:        #999999;
+
+  /* Nav */
+  --nav-bg:       rgba(249,250,251,0.92);
+  --logo-bg:      #1A2744;
+  --logo-ico:     #FFFFFF;
+
+  /* Botones */
+  --btn-bg:       #1A2744;
+  --btn-txt:      #FFFFFF;
+  --btn-hover:    #2D3A6B;
+
+  /* Cards */
+  --card-bg:      #FFFFFF;
+  --card-shadow:  0 4px 20px rgba(0,0,0,0.07);
+
+  /* Tags / Badges */
+  --tag-bg:       #F0F0EE;
+
+  /* Toggle */
+  --toggle-track: #E0E0DE;
+  --toggle-thumb: #FFFFFF;
+
+  /* Semáforos */
+  --sem-v-bg:     #EDF3EC;
+  --sem-v-brd:    #C5DFC4;
+  --sem-v-txt:    #346538;
+  --sem-v-dot:    #3B6D11;
+  --sem-am-bg:    #FBF3DB;
+  --sem-am-brd:   #F0E0A0;
+  --sem-am-txt:   #956400;
+  --sem-am-dot:   #BA7517;
+  --sem-r-bg:     #FDEBEC;
+  --sem-r-brd:    #F7C1C1;
+  --sem-r-txt:    #9F2F2D;
+  --sem-r-dot:    #E24B4A;
+
+  /* Estado carga */
+  --load-bg:      #E6EAF4;
+  --load-brd:     #B0BDD8;
+  --load-txt:     #1A2744;
+
+  /* Flagship M04 */
+  --flagship-bg:  #FFFDF7;
+  --flagship-brd: rgba(186,117,23,0.22);
+  --flagship-btn: #956400;
+  --flagship-ico: #FBF3DB;
+
+  /* Usos permitidos */
+  --uso-p-bg:     #EDF3EC;
+  --uso-p-txt:    #346538;
+  --uso-p-brd:    #C5DFC4;
+  --uso-c-bg:     #FBF3DB;
+  --uso-c-txt:    #956400;
+  --uso-c-brd:    #F0E0A0;
+  --uso-proh-bg:  #FDEBEC;
+  --uso-proh-txt: #9F2F2D;
+  --uso-proh-brd: #F7C1C1;
+
+  /* Municipios */
+  --muni-gdl:     #3B6D11;
+  --muni-zpn:     #185FA5;
+  --muni-tlq:     #BA7517;
+  --muni-tla:     #993556;
+  --muni-ton:     #534AB7;
+
+  /* Tipografía */
+  --sans:         'Outfit','Helvetica Neue',sans-serif;
+  --mono:         'Geist Mono',monospace;
+
+  /* Espaciado */
+  --space-xs:     4px;
+  --space-sm:     8px;
+  --space-md:     12px;
+  --space-lg:     20px;
+  --space-xl:     32px;
+  --space-2xl:    48px;
+
+  /* Radios */
+  --r-sm:         4px;
+  --r-md:         6px;
+  --r-lg:         10px;
+  --r-xl:         12px;
+  --r-pill:       9999px;
+
+  /* Transición base */
+  --ease:         cubic-bezier(.16,1,.3,1);
+  --t:            .3s ease;
+  --t-fast:       .15s ease;
+}
+
+/* ============================================================
+   2. TOKENS — MODO OSCURO
+   ============================================================ */
+[data-theme="dark"]{
+  --brand:        #6B82C4;
+  --brand-light:  #8A9ED4;
+  --brand-pale:   #1A2235;
+
+  --bg:           #0B0F1A;
+  --bg2:          #111827;
+  --bg3:          #1A2235;
+
+  --border:       rgba(255,255,255,0.07);
+  --border2:      rgba(255,255,255,0.13);
+  --border3:      rgba(255,255,255,0.20);
+
+  --text:         #E2E8F0;
+  --text2:        #94A3B8;
+  --text3:        #4B5563;
+
+  --nav-bg:       rgba(11,15,26,0.92);
+  --logo-bg:      #E2E8F0;
+  --logo-ico:     #0B0F1A;
+
+  --btn-bg:       #E2E8F0;
+  --btn-txt:      #0B0F1A;
+  --btn-hover:    #CBD5E1;
+
+  --card-bg:      #111827;
+  --card-shadow:  0 4px 20px rgba(0,0,0,0.3);
+
+  --tag-bg:       #1A2235;
+
+  --toggle-track: #3D7BFF;
+  --toggle-thumb: #FFFFFF;
+
+  --sem-v-bg:     #0A1A0F;
+  --sem-v-brd:    #166534;
+  --sem-v-txt:    #34D399;
+  --sem-v-dot:    #10B981;
+  --sem-am-bg:    #1A0F00;
+  --sem-am-brd:   #92400E;
+  --sem-am-txt:   #FCD34D;
+  --sem-am-dot:   #F59E0B;
+  --sem-r-bg:     #1A0303;
+  --sem-r-brd:    #991B1B;
+  --sem-r-txt:    #FCA5A5;
+  --sem-r-dot:    #EF4444;
+
+  --load-bg:      #111E33;
+  --load-brd:     #1E4080;
+  --load-txt:     #6699FF;
+
+  --flagship-bg:  #16110A;
+  --flagship-brd: rgba(186,117,23,0.28);
+  --flagship-btn: #BA7517;
+  --flagship-ico: #2A1E05;
+
+  --uso-p-bg:     #0A1A0F;
+  --uso-p-txt:    #34D399;
+  --uso-p-brd:    #166534;
+  --uso-c-bg:     #1A0F00;
+  --uso-c-txt:    #FCD34D;
+  --uso-c-brd:    #92400E;
+  --uso-proh-bg:  #1A0303;
+  --uso-proh-txt: #FCA5A5;
+  --uso-proh-brd: #991B1B;
+}
+
+/* ============================================================
+   3. BASE
+   ============================================================ */
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100dvh;
+  font-size:14px;
+  line-height:1.6;
+  display:flex;
+  flex-direction:column;
+  transition:background var(--t),color var(--t);
+}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:var(--sans)}
+input,textarea,select{font-family:var(--sans)}
+
+/* ============================================================
+   4. NAVEGACIÓN
+   ============================================================ */
+.gu-nav{
+  background:var(--nav-bg);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:0.5px solid var(--border);
+  padding:13px 32px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  position:sticky;
+  top:0;
+  z-index:100;
+  transition:background var(--t),border-color var(--t);
+}
+.gu-nav-logo{
+  width:30px;height:30px;
+  background:var(--logo-bg);
+  border-radius:var(--r-md);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  transition:background var(--t);
+}
+.gu-nav-logo svg{
+  width:16px;height:16px;
+  fill:var(--logo-ico);
+  transition:fill var(--t);
+}
+.gu-nav-name{
+  font-size:13px;font-weight:500;
+  letter-spacing:-.2px;
+  color:var(--text);
+  transition:color var(--t);
+}
+.gu-nav-sep{
+  color:var(--border2);
+  font-size:14px;
+  transition:color var(--t);
+}
+.gu-nav-mod{
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--text3);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  transition:color var(--t);
+}
+.gu-nav-back{
+  margin-left:auto;
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--text3);
+  background:var(--card-bg);
+  border:0.5px solid var(--border2);
+  padding:4px 10px;
+  border-radius:var(--r-md);
+  transition:background var(--t),border-color var(--t),color var(--t);
+}
+.gu-nav-back:hover{border-color:var(--border3);color:var(--text2)}
+.gu-nav-back svg{width:11px;height:11px}
+
+/* Toggle dark/light */
+.gu-toggle{
+  margin-left:auto;
+  display:flex;align-items:center;gap:8px;
+  padding:5px 12px;
+  border-radius:var(--r-pill);
+  border:0.5px solid var(--border2);
+  background:var(--card-bg);
+  cursor:pointer;
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--text3);
+  letter-spacing:.04em;
+  transition:background var(--t),border-color var(--t),color var(--t);
+  user-select:none;
+}
+.gu-toggle:hover{opacity:.8}
+.gu-toggle-track{
+  width:28px;height:16px;
+  border-radius:8px;
+  background:var(--toggle-track);
+  position:relative;
+  flex-shrink:0;
+  transition:background var(--t);
+}
+.gu-toggle-thumb{
+  position:absolute;top:2px;left:2px;
+  width:12px;height:12px;
+  border-radius:50%;
+  background:var(--toggle-thumb);
+  box-shadow:0 1px 3px rgba(0,0,0,.25);
+  transition:left .3s var(--ease),background var(--t);
+}
+[data-theme="dark"] .gu-toggle-thumb{left:14px}
+
+/* ============================================================
+   5. LAYOUT — MÓDULOS (panel izq + panel der)
+   ============================================================ */
+.gu-layout{
+  display:grid;
+  grid-template-columns:320px 1fr;
+  min-height:calc(100dvh - 56px);
+  flex:1;
+}
+.gu-panel-left{
+  background:var(--card-bg);
+  border-right:0.5px solid var(--border);
+  padding:20px;
+  overflow-y:auto;
+  max-height:calc(100dvh - 56px);
+  position:sticky;
+  top:56px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  transition:background var(--t),border-color var(--t);
+}
+.gu-panel-right{
+  padding:24px 28px;
+  background:var(--bg);
+  overflow-y:auto;
+  transition:background var(--t);
+}
+
+/* ============================================================
+   6. FORMULARIO — COMPONENTES
+   ============================================================ */
+.gu-field-group{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.gu-field-label{
+  font-family:var(--mono);
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--text3);
+  transition:color var(--t);
+}
+.gu-input{
+  width:100%;
+  background:var(--bg3);
+  border:0.5px solid var(--border2);
+  border-radius:var(--r-md);
+  padding:9px 12px;
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:13px;
+  outline:none;
+  transition:border-color var(--t-fast),background var(--t),color var(--t);
+}
+.gu-input:focus{border-color:var(--brand)}
+.gu-input::placeholder{color:var(--text3)}
+.gu-input-icon{
+  position:relative;
+}
+.gu-input-icon input{padding-left:34px}
+.gu-input-icon svg{
+  position:absolute;left:11px;top:50%;
+  transform:translateY(-50%);
+  width:14px;height:14px;
+  opacity:.4;
+  pointer-events:none;
+}
+.gu-coord-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.gu-nota{
+  font-size:11px;
+  color:var(--text3);
+  background:var(--bg3);
+  border-left:2px solid var(--border2);
+  border-radius:0 var(--r-md) var(--r-md) 0;
+  padding:8px 10px;
+  line-height:1.55;
+  transition:background var(--t),color var(--t),border-color var(--t);
+}
+
+/* Tabs */
+.gu-tabs{
+  display:flex;
+  background:var(--bg3);
+  border:0.5px solid var(--border);
+  border-radius:var(--r-md);
+  overflow:hidden;
+  transition:background var(--t),border-color var(--t);
+}
+.gu-tab{
+  flex:1;
+  background:none;border:none;
+  color:var(--text2);
+  padding:8px 6px;
+  font-family:var(--sans);
+  font-size:12px;font-weight:500;
+  cursor:pointer;
+  text-align:center;
+  transition:background var(--t-fast),color var(--t-fast);
+}
+.gu-tab.active{background:var(--btn-bg);color:var(--btn-txt)}
+.gu-tab:hover:not(.active){color:var(--text)}
+
+/* Municipios grid */
+.gu-muni-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:5px;
+}
+.gu-muni-btn{
+  background:var(--bg3);
+  border:0.5px solid var(--border);
+  border-radius:var(--r-md);
+  padding:7px 6px;
+  font-family:var(--sans);
+  font-size:12px;font-weight:500;
+  color:var(--text2);
+  text-align:center;
+  cursor:pointer;
+  transition:background var(--t-fast),border-color var(--t-fast),color var(--t-fast);
+}
+.gu-muni-btn:hover:not(.disabled){border-color:var(--brand);color:var(--text)}
+.gu-muni-btn.active{
+  background:var(--brand-pale);
+  border-color:var(--brand);
+  color:var(--brand);
+  font-weight:600;
+}
+.gu-muni-btn.disabled{opacity:.35;cursor:not-allowed}
+
+/* ============================================================
+   7. BOTONES
+   ============================================================ */
+.gu-btn{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:11px 20px;
+  border-radius:var(--r-md);
+  border:none;
+  font-family:var(--sans);
+  font-size:13px;font-weight:500;
+  cursor:pointer;
+  transition:opacity var(--t-fast),transform var(--t-fast),background var(--t),color var(--t);
+  width:100%;
+}
+.gu-btn:hover{opacity:.85}
+.gu-btn:active{transform:scale(.97)}
+.gu-btn svg{width:14px;height:14px;flex-shrink:0}
+
+.gu-btn-primary{
+  background:var(--btn-bg);
+  color:var(--btn-txt);
+}
+.gu-btn-primary svg{fill:var(--btn-txt)}
+
+.gu-btn-secondary{
+  background:var(--bg3);
+  color:var(--text2);
+  border:0.5px solid var(--border2);
+}
+.gu-btn-secondary:hover{border-color:var(--border3);color:var(--text);opacity:1}
+
+.gu-btn-flagship{
+  background:var(--flagship-btn);
+  color:#FFFFFF;
+}
+.gu-btn-flagship svg{fill:#FFFFFF}
+
+.gu-btn-muted{
+  background:var(--bg3);
+  color:var(--text3);
+  border:0.5px solid var(--border);
+  cursor:not-allowed;
+}
+.gu-btn-muted:hover{opacity:1}
+
+/* Deep-link button */
+.gu-deeplink{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px;
+  background:var(--bg3);
+  border:0.5px solid var(--border2);
+  border-radius:var(--r-md);
+  font-size:12px;font-weight:500;
+  color:var(--text);
+  cursor:pointer;
+  transition:border-color var(--t-fast),background var(--t),color var(--t);
+  width:100%;text-align:left;
+}
+.gu-deeplink:hover{border-color:var(--brand);background:var(--brand-pale)}
+.gu-deeplink svg{width:14px;height:14px;flex-shrink:0;opacity:.6}
+.gu-deeplink-lbl{flex:1}
+.gu-deeplink-arrow{opacity:.35}
+
+/* ============================================================
+   8. ESTADOS DE CARGA Y ERROR
+   ============================================================ */
+.gu-loading{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;
+  background:var(--load-bg);
+  border:0.5px solid var(--load-brd);
+  border-radius:var(--r-md);
+  font-size:12px;
+  color:var(--load-txt);
+  transition:background var(--t),border-color var(--t),color var(--t);
+}
+.gu-spinner{
+  width:14px;height:14px;
+  border:2px solid var(--border2);
+  border-top-color:var(--brand);
+  border-radius:50%;
+  animation:gu-spin .7s linear infinite;
+  flex-shrink:0;
+  transition:border-color var(--t);
+}
+@keyframes gu-spin{to{transform:rotate(360deg)}}
+.gu-loading-title{font-size:12px;font-weight:500;margin-bottom:1px}
+.gu-loading-step{font-family:var(--mono);font-size:10px;opacity:.8}
+
+.gu-error{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 14px;
+  background:var(--sem-r-bg);
+  border:0.5px solid var(--sem-r-brd);
+  border-radius:var(--r-md);
+  font-size:12px;
+  color:var(--sem-r-txt);
+  transition:background var(--t),border-color var(--t),color var(--t);
+}
+.gu-error svg{width:14px;height:14px;flex-shrink:0;margin-top:1px}
+
+/* Empty state */
+.gu-empty{
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  min-height:320px;
+  text-align:center;
+  gap:10px;
+}
+.gu-empty-icon{
+  width:48px;height:48px;
+  background:var(--bg3);
+  border:0.5px solid var(--border);
+  border-radius:var(--r-lg);
+  display:flex;align-items:center;justify-content:center;
+  opacity:.5;
+  transition:background var(--t),border-color var(--t);
+}
+.gu-empty-icon svg{width:22px;height:22px}
+.gu-empty-title{font-size:13px;font-weight:500;color:var(--text2);transition:color var(--t)}
+.gu-empty-sub{font-size:12px;color:var(--text3);transition:color var(--t)}
+
+/* ============================================================
+   9. SEMÁFOROS
+   ============================================================ */
+.gu-sem{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 16px;
+  border-radius:var(--r-md);
+  border:0.5px solid;
+  transition:background var(--t),border-color var(--t);
+}
+.gu-sem-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.gu-sem-label{
+  font-family:var(--mono);
+  font-size:9px;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--text3);margin-bottom:2px;
+  transition:color var(--t);
+}
+.gu-sem-val{font-size:13px;font-weight:600}
+.gu-sem-zona{
+  margin-left:auto;
+  font-family:var(--mono);
+  font-size:13px;font-weight:500;
+  color:var(--text);
+  transition:color var(--t);
+}
+
+.gu-sem-verde{
+  background:var(--sem-v-bg);
+  border-color:var(--sem-v-brd);
+}
+.gu-sem-verde .gu-sem-dot{background:var(--sem-v-dot)}
+.gu-sem-verde .gu-sem-val{color:var(--sem-v-txt)}
+
+.gu-sem-amarillo{
+  background:var(--sem-am-bg);
+  border-color:var(--sem-am-brd);
+}
+.gu-sem-amarillo .gu-sem-dot{background:var(--sem-am-dot)}
+.gu-sem-amarillo .gu-sem-val{color:var(--sem-am-txt)}
+
+.gu-sem-rojo{
+  background:var(--sem-r-bg);
+  border-color:var(--sem-r-brd);
+}
+.gu-sem-rojo .gu-sem-dot{background:var(--sem-r-dot)}
+.gu-sem-rojo .gu-sem-val{color:var(--sem-r-txt)}
+
+/* ============================================================
+   10. CARDS DE RESULTADOS
+   ============================================================ */
+.gu-rcard{
+  background:var(--card-bg);
+  border:0.5px solid var(--border);
+  border-radius:var(--r-lg);
+  overflow:hidden;
+  transition:background var(--t),border-color var(--t);
+}
+.gu-rcard-hdr{
+  padding:8px 14px;
+  border-bottom:0.5px solid var(--border);
+  font-family:var(--mono);
+  font-size:9px;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--text3);
+  display:flex;align-items:center;justify-content:space-between;
+  transition:border-color var(--t),color var(--t);
+}
+.gu-rcard-hdr-src{
+  font-family:var(--mono);
+  font-size:9px;color:var(--text3);opacity:.6;
+  transition:color var(--t);
+}
+.gu-rcard-body{padding:12px 14px}
+
+/* Field grid */
+.gu-fgrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.gu-fgrid-3{grid-template-columns:1fr 1fr 1fr}
+.gu-field{
+  background:var(--bg3);
+  border:0.5px solid var(--border);
+  border-radius:var(--r-md);
+  padding:10px 12px;
+  transition:background var(--t),border-color var(--t);
+}
+.gu-field.full{grid-column:1/-1}
+.gu-field-lbl{
+  font-size:10px;
+  color:var(--text3);
+  margin-bottom:3px;
+  letter-spacing:.1px;
+  transition:color var(--t);
+}
+.gu-field-val{
+  font-family:var(--mono);
+  font-size:18px;font-weight:500;
+  color:var(--text);
+  line-height:1;
+  transition:color var(--t);
+}
+.gu-field-sub{
+  font-size:10px;
+  color:var(--text3);
+  margin-top:3px;
+  line-height:1.4;
+  transition:color var(--t);
+}
+
+/* ============================================================
+   11. BADGES — USOS Y ESTADOS
+   ============================================================ */
+.gu-badge{
+  display:inline-flex;align-items:center;
+  font-family:var(--mono);
+  font-size:10px;
+  padding:3px 8px;
+  border-radius:var(--r-sm);
+  border:0.5px solid;
+  letter-spacing:.02em;
+  transition:background var(--t),color var(--t),border-color var(--t);
+}
+.gu-badge-live{
+  background:#EDF3EC;color:#346538;
+  border-color:#C5DFC4;
+}
+.gu-badge-soon{
+  background:var(--tag-bg);color:var(--text3);
+  border-color:var(--border);
+}
+.gu-badge-flagship{
+  background:var(--flagship-ico);
+  color:var(--flagship-btn);
+  border-color:rgba(186,117,23,.25);
+}
+.gu-uso-p{
+  background:var(--uso-p-bg);color:var(--uso-p-txt);
+  border-color:var(--uso-p-brd);
+  cursor:pointer;
+  transition:transform var(--t-fast),background var(--t),color var(--t);
+}
+.gu-uso-p:hover{transform:scale(1.04)}
+.gu-uso-c{
+  background:var(--uso-c-bg);color:var(--uso-c-txt);
+  border-color:var(--uso-c-brd);
+  cursor:pointer;
+  transition:transform var(--t-fast),background var(--t),color var(--t);
+}
+.gu-uso-c:hover{transform:scale(1.04)}
+.gu-uso-proh{
+  background:var(--uso-proh-bg);color:var(--uso-proh-txt);
+  border-color:var(--uso-proh-brd);
+}
+
+/* Tags genéricos */
+.gu-tag{
+  font-family:var(--mono);
+  font-size:9px;
+  background:var(--tag-bg);
+  border:0.5px solid var(--border);
+  color:var(--text3);
+  padding:2px 7px;
+  border-radius:var(--r-sm);
+  transition:background var(--t),color var(--t),border-color var(--t);
+}
+.gu-tags{display:flex;flex-wrap:wrap;gap:4px}
+
+/* ============================================================
+   12. MUNICIPIOS — LISTA CON PUNTOS DE COLOR
+   ============================================================ */
+.gu-muni-list{display:flex;flex-direction:column;gap:5px}
+.gu-muni-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;
+  background:var(--card-bg);
+  border:0.5px solid var(--border);
+  border-radius:var(--r-md);
+  font-size:12px;font-weight:500;
+  color:var(--text);
+  transition:background var(--t),border-color var(--t-fast),color var(--t);
+}
+.gu-muni-row:hover{border-color:var(--border2)}
+.gu-muni-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.gu-muni-id{
+  margin-left:auto;
+  font-family:var(--mono);
+  font-size:9px;color:var(--text3);
+  transition:color var(--t);
+}
+
+/* ============================================================
+   13. SECCIÓN — ENCABEZADOS
+   ============================================================ */
+.gu-section-head{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:18px;
+  padding-bottom:10px;
+  border-bottom:0.5px solid var(--border);
+  transition:border-color var(--t);
+}
+.gu-section-title{
+  font-family:var(--mono);
+  font-size:10px;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--text3);
+  transition:color var(--t);
+}
+.gu-section-count{
+  font-family:var(--mono);font-size:10px;
+  color:var(--text3);
+  background:var(--tag-bg);
+  padding:2px 8px;border-radius:var(--r-sm);
+  border:0.5px solid var(--border);
+  transition:background var(--t),color var(--t),border-color var(--t);
+}
+.gu-section-line{
+  flex:1;border:none;
+  border-bottom:0.5px solid var(--border);
+  transition:border-color var(--t);
+}
+
+/* ============================================================
+   14. FOOTER
+   ============================================================ */
+.gu-footer{
+  margin-top:auto;
+  border-top:0.5px solid var(--border);
+  background:var(--card-bg);
+  padding:18px 32px;
+  display:flex;align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;gap:10px;
+  transition:background var(--t),border-color var(--t);
+}
+.gu-footer-txt{
+  font-family:var(--mono);
+  font-size:10px;color:var(--text3);
+  transition:color var(--t);
+}
+.gu-footer-stack{display:flex;flex-wrap:wrap;gap:6px}
+.gu-stack-tag{
+  font-family:var(--mono);font-size:9px;
+  color:var(--text3);
+  background:var(--tag-bg);
+  border:0.5px solid var(--border);
+  padding:3px 8px;border-radius:var(--r-sm);
+  transition:background var(--t),color var(--t),border-color var(--t);
+}
+
+/* ============================================================
+   15. ANIMACIONES
+   ============================================================ */
+@keyframes gu-fadeUp{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes gu-slideInL{
+  from{opacity:0;transform:translateX(-18px)}
+  to{opacity:1;transform:translateX(0)}
+}
+@keyframes gu-slideInR{
+  from{opacity:0;transform:translateX(18px)}
+  to{opacity:1;transform:translateX(0)}
+}
+@keyframes gu-pulse{
+  0%,100%{box-shadow:0 0 0 3px rgba(59,109,17,.15)}
+  50%{box-shadow:0 0 0 7px rgba(59,109,17,.07)}
+}
+.gu-anim-fadeUp{
+  opacity:0;transform:translateY(12px);
+  animation:gu-fadeUp .6s var(--ease) forwards;
+}
+.gu-anim-slideL{
+  opacity:0;transform:translateX(-18px);
+  animation:gu-slideInL .7s var(--ease) forwards;
+}
+.gu-anim-slideR{
+  opacity:0;transform:translateX(18px);
+  animation:gu-slideInR .7s var(--ease) forwards;
+}
+/* Stagger helpers */
+.gu-d1{animation-delay:.08s}
+.gu-d2{animation-delay:.16s}
+.gu-d3{animation-delay:.24s}
+.gu-d4{animation-delay:.32s}
+.gu-d5{animation-delay:.40s}
+.gu-d6{animation-delay:.48s}
+
+/* ============================================================
+   16. JAVASCRIPT — TOGGLE THEME
+   Copiar este bloque en el <head> de cada módulo (antes del </head>):
+
+   <script>
+   (function(){
+     var t=localStorage.getItem('gu_theme');
+     if(t) document.documentElement.setAttribute('data-theme',t);
+   })();
+   </script>
+
+   Y este en cada módulo para el botón toggle:
+
+   function guToggleTheme(){
+     var html=document.documentElement;
+     var isDark=html.getAttribute('data-theme')==='dark';
+     html.setAttribute('data-theme',isDark?'light':'dark');
+     var lbl=document.getElementById('gu-toggle-label');
+     if(lbl) lbl.textContent=isDark?'Modo oscuro':'Modo claro';
+     localStorage.setItem('gu_theme',isDark?'light':'dark');
+   }
+   ============================================================ */
+
+/* ============================================================
+   17. RESPONSIVE
+   ============================================================ */
+@media(max-width:900px){
+  .gu-layout{grid-template-columns:1fr}
+  .gu-panel-left{
+    position:relative;top:0;
+    max-height:none;
+  }
+}
+@media(max-width:600px){
+  .gu-nav{padding:12px 16px}
+  .gu-nav-sep,.gu-nav-mod{display:none}
+  .gu-panel-right{padding:16px}
+  .gu-footer{padding:16px}
+  .gu-fgrid-3{grid-template-columns:1fr 1fr}
+}

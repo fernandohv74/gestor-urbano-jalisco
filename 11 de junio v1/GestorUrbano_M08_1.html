@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M08 — Calculadora de Derechos · Gestor Urbano Jalisco AMG</title>
+<link rel="stylesheet" href="gu-design-system.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+(function(){
+  var t = localStorage.getItem('gu_theme');
+  if (t) document.documentElement.setAttribute('data-theme', t);
+})();
+
+function guToggleTheme(){
+  var h=document.documentElement;
+  var isDark=h.getAttribute('data-theme')==='dark';
+  var next=isDark?'light':'dark';
+  h.setAttribute('data-theme',next);
+  localStorage.setItem('gu_theme',next);
+  var lbl=document.getElementById('gu-toggle-label');
+  if(lbl) lbl.textContent=next==='dark'?'Modo claro':'Modo oscuro';
+}
+</script>
+<style>
+.m08-wrap { max-width: 760px; margin: 0 auto; padding: 20px 16px 60px }
+
+/* Municipio */
+.muni-row { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap }
+.muni-btn { padding: 6px 18px; border: 0.5px solid var(--border2); border-radius: 20px; font-size: 12px; color: var(--text2); background: var(--card-bg); cursor: pointer; transition: all var(--t-fast) }
+.muni-btn.active { background: var(--brand); border-color: var(--brand); color: #fff }
+.muni-btn.disabled { opacity: .4; cursor: not-allowed }
+
+/* Section header */
+.section-hdr { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; margin: 18px 0 8px }
+
+/* Form */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px }
+.form-grid.cols3 { grid-template-columns: 1fr 1fr 1fr }
+.form-grid.full { grid-template-columns: 1fr }
+.field label { display: block; font-size: 11px; color: var(--text2); margin-bottom: 4px }
+.field input, .field select { width: 100%; font-size: 13px; padding: 8px 10px; border: 0.5px solid var(--border2); border-radius: var(--r-md); background: var(--bg3); color: var(--text); font-family: var(--mono) }
+.field input:focus, .field select:focus { outline: none; border-color: var(--brand) }
+
+/* Tipo de obra */
+.tipo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px }
+.tipo-btn { padding: 12px 8px; border: 0.5px solid var(--border2); border-radius: var(--r-lg); background: var(--card-bg); font-size: 12px; color: var(--text2); text-align: center; cursor: pointer; transition: all var(--t-fast) }
+.tipo-btn:hover { border-color: var(--brand); color: var(--text) }
+.tipo-btn.active { border-color: var(--brand); background: rgba(26,39,68,.08); color: var(--brand); font-weight: 500 }
+.tipo-icon { font-size: 22px; margin-bottom: 5px }
+
+/* Checkboxes */
+.chk-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 0.5px solid var(--border2); border-radius: var(--r-md); margin-bottom: 5px; background: var(--card-bg); cursor: pointer; font-size: 12px; color: var(--text) }
+.chk-row input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--brand); flex-shrink: 0 }
+
+/* Botón calcular */
+.btn-calcular { width: 100%; background: var(--brand); color: #fff; border: none; border-radius: var(--r-md); padding: 13px; font-family: var(--sans); font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 16px; transition: opacity var(--t-fast) }
+.btn-calcular:hover:not(:disabled) { opacity: .88 }
+.btn-calcular:disabled { opacity: .4; cursor: not-allowed }
+
+/* Banner deep link */
+.banner-m05 { background: var(--bg3); border: 0.5px solid var(--brand); border-radius: var(--r-lg); padding: 10px 14px; margin-bottom: 16px; font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 8px }
+.banner-m05 strong { color: var(--brand) }
+
+/* Resultado */
+.result-card { background: var(--card-bg); border: 0.5px solid var(--border); border-radius: var(--r-lg); padding: 20px; margin-top: 16px; transition: background var(--t), border-color var(--t) }
+.result-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px }
+.result-sub { font-size: 11px; color: var(--text3); margin-bottom: 16px }
+
+/* Tabla desglose */
+.tabla-wrap { overflow-x: auto }
+.tabla-desglose { width: 100%; border-collapse: collapse; font-size: 12px }
+.tabla-desglose th { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; padding: 6px 10px; border-bottom: 0.5px solid var(--border); text-align: left }
+.tabla-desglose th.right { text-align: right }
+.tabla-desglose td { padding: 9px 10px; border-bottom: 0.5px solid var(--border2); vertical-align: top }
+.tabla-desglose td.right { text-align: right; font-family: var(--mono); font-size: 12px }
+.tabla-desglose td.art { font-size: 10px; color: var(--text3); font-family: var(--mono) }
+.tabla-desglose tr.total-row td { border-top: 1.5px solid var(--border); border-bottom: none; font-weight: 700; padding-top: 12px }
+.tabla-desglose tr.total-row td.right { font-size: 16px; color: var(--brand) }
+.tabla-desglose tr.exento td { color: var(--text3) }
+.tabla-desglose tr.exento td.right { color: var(--text3) }
+.subtotal-badge { display: inline-block; background: var(--bg3); border-radius: var(--r-sm); padding: 1px 6px; font-family: var(--mono); font-size: 11px; color: var(--text2) }
+
+/* Vigencia y ventanilla */
+.info-strip { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px }
+.info-chip { background: var(--bg3); border: 0.5px solid var(--border2); border-radius: var(--r-md); padding: 8px 12px; font-size: 11px; color: var(--text2); flex: 1; min-width: 180px }
+.info-chip strong { display: block; font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px }
+
+/* Refrendo */
+.refrendo-card { margin-top: 16px; border: 1px dashed var(--border); border-radius: var(--r-md); padding: 14px 16px; background: var(--bg2) }
+.refrendo-title { font-size: 12px; font-weight: 700; color: var(--text1); margin-bottom: 4px }
+.refrendo-vigbase { font-size: 11px; color: var(--text3); margin-bottom: 12px }
+.refrendo-grid { display: grid; grid-template-columns: 160px 1fr; gap: 12px; align-items: start }
+.refrendo-inp { display: flex; flex-direction: column; gap: 4px }
+.refrendo-inp label { font-size: 11px; font-weight: 600; color: var(--text2) }
+.refrendo-inp input { padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--bg1); color: var(--text1); font-family: var(--mono); font-size: 14px; width: 100%; box-sizing: border-box }
+.refrendo-result { font-size: 11px; color: var(--text2); line-height: 1.7 }
+.refrendo-result .rf-total { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--brand); display: block; margin-top: 6px }
+.refrendo-result .rf-detalle { color: var(--text3); font-size: 10px; font-family: var(--mono) }
+@media (max-width: 480px) { .refrendo-grid { grid-template-columns: 1fr } }
+
+/* Calculadora rapida de refrendo */
+.rf-quick-card { margin-top: 24px; border: 0.5px solid var(--border); border-radius: var(--r-lg); background: var(--card-bg); padding: 18px 20px }
+.rf-quick-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px }
+.rf-quick-sub { font-size: 11px; color: var(--text3); margin-bottom: 14px }
+.rf-quick-grid { display: grid; grid-template-columns: 1fr 1fr 120px; gap: 10px; align-items: end }
+.rf-quick-field label { display: block; font-size: 11px; color: var(--text2); margin-bottom: 4px }
+.rf-quick-field input, .rf-quick-field select { width: 100%; font-size: 13px; padding: 8px 10px; border: 0.5px solid var(--border2); border-radius: var(--r-md); background: var(--bg3); color: var(--text); font-family: var(--mono); box-sizing: border-box }
+.rf-quick-field input:focus, .rf-quick-field select:focus { outline: none; border-color: var(--brand) }
+.btn-rf-quick { width: 100%; background: var(--brand); color: #fff; border: none; border-radius: var(--r-md); padding: 9px 0; font-family: var(--sans); font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity var(--t-fast) }
+.btn-rf-quick:hover { opacity: .88 }
+.rf-quick-result { margin-top: 12px; padding: 12px 14px; background: var(--bg3); border-radius: var(--r-md); font-size: 12px; line-height: 1.7; display: none }
+.rf-quick-result .rf-total { font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--brand); display: block; margin-top: 6px }
+.rf-quick-result .rf-det { color: var(--text3); font-size: 10px; font-family: var(--mono) }
+@media (max-width: 540px) { .rf-quick-grid { grid-template-columns: 1fr 1fr; } .rf-quick-grid .btn-rf-quick { grid-column: 1/-1 } }
+
+/* Fila informativa (sin costo) */
+.tabla-desglose tr.info-row td { color: var(--text2); font-style: italic }
+.tabla-desglose tr.info-row td.right { color: var(--text3); font-size: 11px }
+
+/* Nota */
+.nota-legal { font-size: 10px; color: var(--text3); margin-top: 12px; padding: 8px 12px; background: var(--bg3); border-radius: var(--r-md); line-height: 1.6 }
+
+/* Imprimir */
+.btn-print { background: var(--bg3); border: 0.5px solid var(--border2); border-radius: var(--r-md); padding: 8px 16px; font-size: 12px; color: var(--text2); cursor: pointer; margin-top: 12px; font-family: var(--sans); transition: all var(--t-fast) }
+.btn-print:hover { border-color: var(--brand); color: var(--brand) }
+.btn-reset { background: var(--bg3); border: 0.5px solid var(--border2); border-radius: var(--r-md); padding: 13px; font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; width: 100%; margin-top: 8px; transition: all var(--t-fast) }
+.btn-reset:hover { border-color: var(--sem-r-dot,#EF4444); color: var(--sem-r-dot,#EF4444) }
+.btn-clear-rf { background: none; border: 0.5px solid var(--border2); border-radius: var(--r-sm); padding: 6px 10px; font-size: 11px; color: var(--text3); cursor: pointer; font-family: var(--sans); transition: all var(--t-fast); white-space: nowrap }
+.btn-clear-rf:hover { border-color: var(--sem-r-dot,#EF4444); color: var(--sem-r-dot,#EF4444) }
+
+/* Historial */
+.hist-save-row { display:flex; gap:8px; margin-top:10px; align-items:center }
+.hist-save-row input { flex:1; font-size:13px; padding:8px 10px; border:0.5px solid var(--border2); border-radius:var(--r-md); background:var(--bg3); color:var(--text); font-family:var(--sans) }
+.hist-save-row input:focus { outline:none; border-color:var(--brand) }
+.btn-guardar { background:var(--bg3); border:0.5px solid var(--brand); border-radius:var(--r-md); padding:8px 16px; font-size:12px; color:var(--brand); cursor:pointer; font-family:var(--sans); font-weight:600; white-space:nowrap; transition:all var(--t-fast) }
+.btn-guardar:hover { background:var(--brand); color:#fff }
+.hist-section { margin-top:24px }
+.hist-empty { font-size:12px; color:var(--text3); padding:12px 0; text-align:center }
+.hist-card { background:var(--card-bg); border:0.5px solid var(--border2); border-radius:var(--r-lg); padding:12px 14px; margin-bottom:8px; display:grid; grid-template-columns:1fr auto; gap:6px; align-items:center }
+.hist-card:hover { border-color:var(--brand) }
+.hist-nombre { font-size:13px; font-weight:600; color:var(--text); margin-bottom:2px }
+.hist-sub { font-size:11px; color:var(--text3) }
+.hist-total { font-family:var(--mono); font-size:14px; font-weight:700; color:var(--brand); text-align:right }
+.hist-fecha { font-size:10px; color:var(--text3); text-align:right; margin-bottom:6px }
+.hist-btns { display:flex; gap:6px; justify-content:flex-end }
+.btn-hist-load { background:var(--brand); color:#fff; border:none; border-radius:var(--r-sm); padding:5px 12px; font-size:11px; font-family:var(--sans); cursor:pointer }
+.btn-hist-del  { background:none; border:0.5px solid var(--border2); border-radius:var(--r-sm); padding:5px 10px; font-size:11px; color:var(--text3); cursor:pointer; font-family:var(--sans) }
+.btn-hist-del:hover { border-color:var(--sem-r-dot,#EF4444); color:var(--sem-r-dot,#EF4444) }
+
+@media print {
+  .gu-nav, .btn-calcular, .btn-print, .btn-reset, .muni-row, .tipo-grid,
+  .section-hdr, .field, .form-grid, .chk-row, .banner-m05,
+  .hist-section, .hist-save-row, .rf-quick-card, .refrendo-card,
+  #wrap-movilidad, .btn-clear-rf { display: none !important }
+  @page { size: Letter portrait; margin: 1.5cm; }
+  body { background: #fff !important; color: #111 !important; font-size: 10pt; }
+  .result-card { border: 1px solid #ccc !important; box-shadow: none !important;
+    background: #fff !important; padding: 12px !important; }
+  .result-title { font-size: 15pt !important; color: #1A2744 !important; }
+  .result-sub { color: #444 !important; }
+  .tabla-desglose thead { background: #1A2744 !important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .tabla-desglose thead th { color: #fff !important; }
+  .tabla-desglose tbody tr:nth-child(even) td { background: #f5f5f5 !important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .info-strip { background: #e8f0ff !important; border: 1px solid #c5d5ef !important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .nota-legal { background: #fffbe6 !important; border: 1px solid #fde68a !important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="gu-nav">
+  <div class="gu-nav-logo">
+    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 1L1 5v9h5v-4h4v4h5V5L8 1z"/></svg>
+  </div>
+  <span class="gu-nav-name">Gestor Urbano Jalisco</span>
+  <span class="gu-nav-sep">/</span>
+  <span class="gu-nav-mod">M08 · Calculadora de Derechos</span>
+  <a href="index.html" class="gu-nav-back">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    Menú principal
+  </a>
+  <a href="GestorUrbano_M05_2.html" class="gu-nav-back" style="margin-left:4px">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    M05 · Requisitos de Licencia
+  </a>
+  <a href="GestorUrbano_M01_3.html" class="gu-nav-back" style="margin-left:4px">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    M01 · Uso de suelo
+  </a>
+  <button class="gu-toggle" onclick="guToggleTheme()" aria-label="Cambiar tema">
+    <div class="gu-toggle-track"><div class="gu-toggle-thumb"></div></div>
+    <span id="gu-toggle-label">Modo oscuro</span>
+  </button>
+</nav>
+
+<div class="m08-wrap">
+
+  <!-- Banner deep link desde M05 -->
+  <div class="banner-m05" id="banner-m05" style="display:none">
+    <span>⚡</span>
+    <span>Datos importados desde <strong>M05 — Requisitos de Licencia</strong>. Verifica y ajusta si es necesario.</span>
+    <button onclick="document.getElementById('banner-m05').style.display='none'" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px">×</button>
+  </div>
+
+  <div id="banner-sin-tarifas" style="display:none;background:var(--sem-am-bg);border:0.5px solid var(--sem-am-brd);border-radius:var(--r-lg);padding:11px 14px;margin-bottom:14px;font-size:12px;color:var(--sem-am-txt)">
+    <strong>⚠ Tarifas municipales no disponibles en este gestor.</strong><br>
+    Las cuotas de licencias de construcción para este municipio están en su Ley de Ingresos Municipal vigente.
+    El resultado mostrará únicamente SIAPA (servicio intermunicipal).
+    Solicita la cédula de cálculo oficial directamente en la Dirección de Obras Públicas del municipio.
+  </div>
+
+  <div style="margin-bottom:20px">
+    <div style="font-size:20px;font-weight:600;color:var(--text);margin-bottom:4px">Calculadora de Derechos</div>
+    <div style="font-size:12px;color:var(--text2)">Estima el costo de la licencia de construcción con desglose por concepto y fundamento legal. Los valores son orientativos — confirmar en ventanilla.</div>
+  </div>
+
+  <!-- MUNICIPIO -->
+  <div class="section-hdr">Municipio</div>
+  <div class="muni-row">
+    <button class="muni-btn active" id="btn-mun-GDL" onclick="selMun('GDL',this)">Guadalajara</button>
+    <button class="muni-btn" id="btn-mun-ZPN" onclick="selMun('ZPN',this)">Zapopan</button>
+    <button class="muni-btn" id="btn-mun-TLQ" onclick="selMun('TLQ',this)">Tlaquepaque</button>
+    <button class="muni-btn" id="btn-mun-TLA" onclick="selMun('TLA',this)">Tlajomulco</button>
+    <button class="muni-btn" id="btn-mun-TON" onclick="selMun('TON',this)">Tonalá</button>
+  </div>
+
+  <!-- TIPO DE OBRA -->
+  <div class="section-hdr">Tipo de obra</div>
+  <div class="tipo-grid">
+    <div class="tipo-btn active" data-tipo="nueva" onclick="selTipo('nueva',this)">
+      <div class="tipo-icon">🏗</div>Obra nueva
+    </div>
+    <div class="tipo-btn" data-tipo="ampliacion" onclick="selTipo('ampliacion',this)">
+      <div class="tipo-icon">📐</div>Ampliación
+    </div>
+    <div class="tipo-btn" data-tipo="remodelacion" onclick="selTipo('remodelacion',this)">
+      <div class="tipo-icon">🔨</div>Remodelación
+    </div>
+    <div class="tipo-btn" data-tipo="demolicion" onclick="selTipo('demolicion',this)">
+      <div class="tipo-icon">🧱</div>Demolición
+    </div>
+    <div class="tipo-btn" data-tipo="bardeo" onclick="selTipo('bardeo',this)">
+      <div class="tipo-icon">🔲</div>Bardeo
+    </div>
+  </div>
+
+  <!-- DATOS DEL PROYECTO -->
+  <div class="section-hdr">Datos del proyecto</div>
+  <div class="form-grid">
+    <div class="field">
+      <label>Tipo de uso</label>
+      <select id="inp-uso" onchange="onUsoChange()">
+        <option value="unifamiliar">Habitacional unifamiliar</option>
+        <option value="plurifamiliar_v">Habitacional plurifamiliar vertical</option>
+        <option value="plurifamiliar_h">Habitacional plurifamiliar horizontal</option>
+        <option value="comercio">Comercio / Servicios</option>
+        <option value="industria">Industrial</option>
+        <option value="equipamiento">Equipamiento / Institucional</option>
+      </select>
+    </div>
+    <div class="field" id="wrap-sup" style="">
+      <label id="lbl-sup">Superficie de construcción (m²)</label>
+      <input type="number" id="inp-sup" placeholder="ej. 150" min="0" step="0.01" oninput="onInputChange()">
+    </div>
+  </div>
+  <div class="form-grid">
+    <div class="field" id="wrap-frente">
+      <label>Frente del predio (ml) <span style="font-size:10px;color:var(--text3)">— para alineamiento</span></label>
+      <input type="number" id="inp-frente" placeholder="ej. 10" min="0" step="0.01" oninput="onInputChange()">
+    </div>
+    <div class="field" id="wrap-ml" style="display:none">
+      <label id="lbl-ml">Metros lineales de bardeo</label>
+      <input type="number" id="inp-ml" placeholder="ej. 20" min="0" step="0.01" oninput="onInputChange()">
+    </div>
+  </div>
+  <div class="form-grid" id="wrap-sup-predio">
+    <div class="field">
+      <label>Sup. total del predio (m²) <span style="font-size:10px;color:var(--text3)">&#8212; para factibilidad SIAPA</span></label>
+      <input type="number" id="inp-sup-predio" placeholder="ej. 300" min="0" step="0.01" oninput="onInputChange()">
+    </div>
+  </div>
+  <div class="form-grid">
+    <div class="field">
+      <label>N&#250;mero de niveles <span style="font-size:10px;color:var(--text3)">&#8212; incluye s&#243;tanos</span></label>
+      <input type="number" id="inp-niveles" placeholder="ej. 3" min="1" max="99" step="1" oninput="onInputChange()">
+    </div>
+    <div class="field">
+      <label>Fecha de expedici&#243;n de licencia <span style="font-size:10px;color:var(--text3)">&#8212; para calcular vencimiento</span></label>
+      <input type="date" id="inp-fecha-inicio" oninput="onInputChange()" style="font-family:var(--sans)">
+    </div>
+  </div>
+
+  <!-- OPCIONES -->
+  <div class="section-hdr">Incluir en el cálculo</div>
+  <label class="chk-row"><input type="checkbox" id="chk-alineamiento" checked onchange="onInputChange()"> Alineamiento y número oficial</label>
+  <label class="chk-row"><input type="checkbox" id="chk-habitabilidad" checked onchange="onInputChange()"> Certificado de habitabilidad</label>
+  <div id="wrap-gdl-extras">
+    <label class="chk-row"><input type="checkbox" id="chk-dtude" checked onchange="onInputChange()"> DTUDE (Dictamen de Trazo, Usos y Destinos Específicos)</label>
+    <label class="chk-row"><input type="checkbox" id="chk-planos" checked onchange="onInputChange()"> Autorización de planos + pancarta de obra</label>
+    <label class="chk-row"><input type="checkbox" id="chk-bitacora" onchange="onInputChange()"> Bitácora de obra (doble hoja)</label>
+    <label class="chk-row"><input type="checkbox" id="chk-patrimonio" onchange="onInputChange()"> Predio en zona patrimonial A o B (descuento 20%)</label>
+  </div>
+  <div id="wrap-zpn-extras">
+    <label class="chk-row"><input type="checkbox" id="chk-revision" checked onchange="onInputChange()"> Revisión de proyecto (por revisión)</label>
+  </div>
+
+  <label class="chk-row"><input type="checkbox" id="chk-siapa" onchange="toggleSIAPADen();onInputChange()"> Factibilidad SIAPA (agua potable y drenaje) <span style="font-size:10px;color:var(--text3);margin-left:4px">&#8212; requiere sup. del predio</span></label>
+  <div id="wrap-siapa-den" style="display:none;padding:6px 12px 2px 36px">
+    <div class="field" style="max-width:320px">
+      <label style="font-size:11px">Clasificaci&#243;n de densidad <span style="color:var(--text3)">(del certificado de uso de suelo)</span></label>
+      <select id="sel-siapa-den" onchange="onInputChange()" style="font-size:12px;padding:6px 8px">
+        <option value="alta">Habitacional &#8212; densidad alta</option>
+        <option value="media">Habitacional &#8212; densidad media</option>
+        <option value="baja">Habitacional &#8212; densidad baja</option>
+        <option value="minima">Habitacional &#8212; densidad m&#237;nima</option>
+        <option value="vecinal">Comercio / Equip. &#8212; vecinal</option>
+        <option value="barrial">Comercio / Equip. &#8212; barrial</option>
+        <option value="distrital">Comercio / Equip. &#8212; distrital</option>
+        <option value="central">Comercio / Equip. &#8212; central</option>
+        <option value="regional">Comercio / Equip. &#8212; regional</option>
+        <option value="ligera">Industrial &#8212; ligera (riesgo bajo)</option>
+        <option value="media_ind">Industrial &#8212; media (riesgo medio)</option>
+        <option value="pesada">Industrial &#8212; pesada (riesgo alto)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- MOVILIDAD Y MEDIO AMBIENTE -->
+  <div id="wrap-movilidad" style="margin-top:8px">
+    <div class="section-hdr">Movilidad y medio ambiente <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--text3)">(opcional)</span></div>
+    <label class="chk-row"><input type="checkbox" id="chk-eit" onchange="onInputChange()"> Estudio de Impacto al Tr&#225;nsito (EIT) <span style="font-size:10px;color:var(--text3);margin-left:4px">&#8212; no habitacional o &gt;800 m&#178;</span></label>
+    <label class="chk-row"><input type="checkbox" id="chk-int-vial" onchange="onInputChange()"> Gr&#225;fico de Integraci&#243;n Vial / Ingresos y Salidas</label>
+    <label class="chk-row" id="row-imp-amb" style="display:none"><input type="checkbox" id="chk-imp-amb" onchange="onInputChange()"> Evaluaci&#243;n de Impacto Ambiental <span style="font-size:10px;color:var(--text3);margin-left:4px">&#8212; ZPN, escalonado por m&#178;</span></label>
+  </div>
+
+  <button class="btn-calcular" id="btn-calcular" onclick="calcular()">💰 Calcular derechos</button>
+  <button class="btn-reset" id="btn-reset" style="display:none" onclick="nuevoAnalisis()">🔄 Nuevo análisis — limpiar todo</button>
+
+  <!-- RESULTADO -->
+  <div class="result-card" id="result-panel" style="display:none">
+    <div class="result-title" id="result-titulo"></div>
+    <div class="result-sub" id="result-sub"></div>
+    <div class="tabla-wrap">
+      <table class="tabla-desglose" id="tabla-result">
+        <thead>
+          <tr>
+            <th>Concepto</th>
+            <th>Tarifa</th>
+            <th>Base</th>
+            <th class="right">Subtotal</th>
+            <th>Fundamento</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-result"></tbody>
+      </table>
+    </div>
+    <div class="info-strip" id="info-strip"></div>
+
+    <!-- REFRENDO / PRÓRROGA -->
+    <div class="refrendo-card" id="refrendo-panel" style="display:none">
+      <div class="refrendo-title">📅 Calcular prórroga de vigencia (refrendo)</div>
+      <div class="refrendo-vigbase" id="refrendo-vigbase"></div>
+      <div class="refrendo-grid">
+        <div class="refrendo-inp">
+          <label>Meses adicionales</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="number" id="inp-refrendo" min="1" max="120" placeholder="ej. 6" oninput="calcularRefrendo()" style="flex:1">
+            <button class="btn-clear-rf" onclick="limpiarRefrendo()" title="Limpiar refrendo">✕ Limpiar</button>
+          </div>
+        </div>
+        <div class="refrendo-result" id="refrendo-result" style="display:none"></div>
+      </div>
+    </div>
+
+    <div class="nota-legal">
+      ⚠️ Los valores son <strong>orientativos</strong> con base en las Leyes de Ingresos 2026 vigentes. El costo real lo determina la ventanilla oficial según las características exactas del proyecto. No incluye honorarios de DRO, perito, notario ni vistos buenos de otras dependencias.
+    </div>
+    <div style="margin-bottom:12px;padding:8px 12px;background:var(--bg2,#f0f0f0);border-left:3px solid var(--accent,#2563eb);border-radius:0 6px 6px 0;font-size:.78rem;color:var(--text,#222);opacity:.82;line-height:1.5">
+      ℹ️ <strong>Estimación orientativa.</strong> Los costos se calculan con base en tarifas y leyes de ingresos vigentes. Para cotizaciones definitivas, consulta con la dirección de Obras Públicas o Padrón y Licencias del municipio.
+    </div>
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+    <div class="hist-save-row">
+      <input type="text" id="inp-hist-nombre" placeholder="Nombre del proyecto para guardar..." maxlength="60">
+      <button type="button" class="btn-guardar" onclick="guardarEnHistorial()">&#128190; Guardar</button>
+    </div>
+  </div>
+
+  <!-- HISTORIAL -->
+  <div class="hist-section" id="hist-section" style="display:none">
+    <div class="section-hdr">Historial de c&#225;lculos <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--text3)">(m&#225;x. 5)</span></div>
+    <div id="hist-lista"></div>
+  </div>
+
+  <!-- CALCULADORA RAPIDA DE REFRENDO -->
+  <div class="rf-quick-card">
+    <div class="rf-quick-title">&#128197; Calculadora r&#225;pida de refrendo / pr&#243;rroga</div>
+    <div class="rf-quick-sub">Ingresa el <strong>costo de la licencia base</strong> (no el total del desglose) y los meses de pr&#243;rroga. El refrendo se calcula solo sobre ese subtotal.</div>
+    <div class="rf-quick-grid">
+      <div class="rf-quick-field">
+        <label>Municipio</label>
+        <select id="rq-mun">
+          <option value="GDL">Guadalajara</option>
+          <option value="ZPN">Zapopan</option>
+          <option value="TLQ">Tlaquepaque</option>
+          <option value="TLA">Tlajomulco</option>
+          <option value="TON">Tonalá</option>
+        </select>
+      </div>
+      <div class="rf-quick-field">
+        <label>Costo de la <strong>licencia base</strong> ($) <span style="font-size:10px;color:var(--text3)">&#8212; no el total</span></label>
+        <input type="number" id="rq-costo" placeholder="ej. 45000" min="0" step="0.01">
+      </div>
+      <div class="rf-quick-field">
+        <label>Meses de pr&#243;rroga</label>
+        <input type="number" id="rq-meses" placeholder="ej. 6" min="1" max="120">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button id="btn-rq-calc" style="flex:1;background:var(--brand);color:#fff;border:none;border-radius:var(--r-md);padding:13px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer">Calcular refrendo</button>
+      <button id="btn-rq-limpiar" style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:13px 20px;font-family:var(--sans);font-size:13px;color:var(--text2);cursor:pointer">Limpiar</button>
+    </div>
+    <div class="rf-quick-result" id="rq-result"></div>
+  </div>
+
+</div>
+
+<script>
+/* ── CALCULADORA RAPIDA DE REFRENDO — script independiente ── */
+(function() {
+  function fmtRQ(n) {
+    return '$' + Math.round(n).toLocaleString('es-MX');
+  }
+
+  function calcular() {
+    var mun   = document.getElementById('rq-mun').value;
+    var costo = parseFloat(document.getElementById('rq-costo').value) || 0;
+    var meses = parseInt(document.getElementById('rq-meses').value)   || 0;
+    var div   = document.getElementById('rq-result');
+
+    if (!costo || costo <= 0 || !meses || meses < 1) {
+      div.style.display = 'none';
+      return;
+    }
+
+    var costoRefrendo = 0;
+    var detalle = '';
+    var artRef  = '';
+
+    if (mun === 'GDL') {
+      var limite5A   = 30;
+      var mesesBajos = Math.min(meses, limite5A);
+      var mesesAltos = Math.max(0, meses - limite5A);
+      var rf1 = mesesBajos > 0 ? costo * 0.025 * mesesBajos : 0;
+      var rf2 = mesesAltos > 0 ? costo * 0.050 * mesesAltos : 0;
+      costoRefrendo = rf1 + rf2;
+      if (mesesBajos > 0 && mesesAltos > 0) {
+        detalle = mesesBajos + ' mes' + (mesesBajos > 1 ? 'es' : '') + ' &times; 2.5% = ' + fmtRQ(rf1)
+                + '&nbsp;+&nbsp;'
+                + mesesAltos + ' mes' + (mesesAltos > 1 ? 'es' : '') + ' &times; 5.0% = ' + fmtRQ(rf2);
+      } else if (mesesBajos > 0) {
+        detalle = mesesBajos + ' mes' + (mesesBajos > 1 ? 'es' : '') + ' &times; 2.5% sobre ' + fmtRQ(costo);
+      } else {
+        detalle = mesesAltos + ' mes' + (mesesAltos > 1 ? 'es' : '') + ' &times; 5.0% sobre ' + fmtRQ(costo);
+      }
+      artRef = 'Art. 49 Fracc. II &middot; Vigencia base: 30 meses';
+    } else if (mun === 'ZPN') {
+      var bimestres = Math.ceil(meses / 2);
+      costoRefrendo = costo * 0.05 * bimestres;
+      detalle = bimestres + ' bimestre' + (bimestres > 1 ? 's' : '') + ' &times; 5% sobre ' + fmtRQ(costo);
+      artRef = 'Art. 82, Ley Ingresos ZPN 2026 &middot; Vigencia base: 24 meses';
+    } else if (mun === 'TLQ') {
+      var bimestres = Math.ceil(meses / 2);
+      costoRefrendo = costo * 0.10 * bimestres;
+      detalle = bimestres + ' bimestre' + (bimestres > 1 ? 's' : '') + ' &times; 10% sobre ' + fmtRQ(costo);
+      artRef = 'Art. 63 Fracc. IV, Ley Ingresos TLQ 2026 &middot; Vigencia base: 24 meses';
+    } else {
+      // TLA / TON — tasa de prórroga no publicada en la ley vigente; remitir a ventanilla
+      var nombreMun = mun === 'TLA' ? 'Tlajomulco' : 'Tonalá';
+      div.innerHTML = '<span style="color:var(--sem-am-txt,#92400e);font-size:12px">'
+        + '&#9888; La tasa de prórroga de ' + nombreMun + ' no está especificada en la Ley de Ingresos 2026 disponible. '
+        + 'Solicita la cédula de cálculo directamente en ventanilla.'
+        + '</span>';
+      div.style.display = 'block';
+      return;
+    }
+
+    var vigBase  = mun === 'GDL' ? 30 : 24;
+    var vigTotal = vigBase + meses;
+
+    div.innerHTML = detalle
+      + '<br><span class="rf-det">'
+      + 'Vigencia total: ' + vigTotal + ' meses ('
+      + Math.floor(vigTotal / 12) + ' años ' + (vigTotal % 12) + ' meses)'
+      + ' &middot; ' + artRef
+      + '</span>'
+      + '<span class="rf-total">Refrendo estimado: ' + fmtRQ(costoRefrendo) + '</span>';
+    div.style.display = 'block';
+  }
+
+  function limpiar() {
+    document.getElementById('rq-costo').value = '';
+    document.getElementById('rq-meses').value = '';
+    document.getElementById('rq-result').style.display = 'none';
+    document.getElementById('rq-result').innerHTML = '';
+  }
+
+  document.getElementById('btn-rq-calc').addEventListener('click', calcular);
+  document.getElementById('btn-rq-limpiar').addEventListener('click', limpiar);
+})();
+</script>
+
+<script>
+// ── Estado global ──
+let munActual        = 'GDL';
+let tipoObra         = 'nueva';
+let costoLicenciaBase = 0;  // subtotal de la licencia (para refrendo)
+
+// ── TARIFAS ──────────────────────────────────────────────────────────────────
+const TARIFAS = {
+  GDL: {
+    nombre: 'Guadalajara',
+    licencia: {
+      unifamiliar:    { tarifa: 95,  label: 'Habitacional unifamiliar' },
+      plurifamiliar_v: { tarifa: 172, label: 'Habitacional plurifamiliar' },
+      plurifamiliar_h: { tarifa: 172, label: 'Habitacional plurifamiliar' },
+      comercio:       { tarifa: 251, label: 'Comercio / Servicios' },
+      industria:      { tarifa: 251, label: 'Industrial' },
+      equipamiento:   { tarifa: 251, label: 'Equipamiento' },
+    },
+    licenciaArt: 'Art. 49 Fracc. I, Ley Ingresos GDL 2026',
+    dtude: 2016,
+    dtudeArt: 'Art. 49 Fracc. XIV-b, Ley Ingresos GDL 2026',
+    dtudeExento: ['unifamiliar'],
+    alineamiento: {
+      unifamiliar:    { tarifa: 36 },
+      plurifamiliar_v: { tarifa: 134 },
+      plurifamiliar_h: { tarifa: 134 },
+      comercio:       { tarifa: 269 },
+      industria:      { tarifa: 269 },
+      equipamiento:   { tarifa: 269 },
+    },
+    alineamientoArt: 'Art. 51, Ley Ingresos GDL 2026',
+    numOficial: {
+      unifamiliar: 122, plurifamiliar_v: 122, plurifamiliar_h: 122,
+      comercio: 349, industria: 349, equipamiento: 349,
+    },
+    numOficialArt: 'Art. 51, Ley Ingresos GDL 2026',
+    autorizacionPlanos: 138,
+    autorizacionPlanosArt: 'Art. 49 Fracc. XVIII, Ley Ingresos GDL 2026',
+    pancarta: 290,
+    pancartaArt: 'Art. 49 Fracc. XIX, Ley Ingresos GDL 2026',
+    bitacoraSencilla: 91,
+    bitacoraDoble: 166,
+    habitabilidadPct: 5,
+    habitabilidadArt: 'Art. 49 Fracc. XII, Ley Ingresos GDL 2026',
+    patrimonioDescuentoPct: 20,
+    vigencia: '30 meses · Refrendo 2.5%/mes ≤5 años · 5%/mes >5 años · Art. 49 Fracc. II',
+    ventanilla: 'Dir. Licencias de Construcción — Hospital 50-Z, entre Independencia y Esmeralda',
+    tel: '(33) 3837-5000 ext. 5409',
+    horario: 'Lun-Vie 09:00-15:00',
+    eit: 8288,
+    eitArt: 'Art. 61 Fracc. XXI-1, Ley Ingresos GDL 2026',
+    integracionVial: 3946,
+    integracionVialArt: 'Art. 61 Fracc. XXI-3, Ley Ingresos GDL 2026',
+    siapa: {
+      unifamiliar:     { alta: 104.62, media: 107.29, baja: 118.05, minima: 112.69 },
+      plurifamiliar_h: { alta: 118.05, media: 120.72, baja: 123.41, minima: 126.08 },
+      plurifamiliar_v: { alta: 131.46, media: 134.14, baja: 136.83, minima: 139.50 },
+      comercio:        { vecinal: 107.95, barrial: 120.72, distrital: 123.41, central: 128.75, regional: 134.14 },
+      industria:       { ligera: 115.36, media: 120.72, pesada: 123.41 },
+      equipamiento:    { vecinal: 123.41, barrial: 126.08, distrital: 128.75, central: 131.46, regional: 134.14 },
+    },
+    siapaArt: 'Art. Cuadésimo Primero, Cap. IX, Res. Tarifario SIAPA 2026',
+  },
+  ZPN: {
+    nombre: 'Zapopan',
+    licencia: {
+      unifamiliar:    { tarifa: 95,  label: 'Habitacional unifamiliar' },
+      plurifamiliar_v: { tarifa: 136, label: 'Habitacional plurifamiliar vertical' },
+      plurifamiliar_h: { tarifa: 177, label: 'Habitacional plurifamiliar horizontal' },
+      comercio:       { tarifa: 262, label: 'Comercio / Servicios' },
+      industria:      { tarifa: 131, label: 'Industrial' },
+      equipamiento:   { tarifa: 41,  label: 'Equipamiento' },
+    },
+    licenciaArt: 'Art. 81 Fracc. I, Ley Ingresos ZPN 2026',
+    remodelacionPct: 40,
+    remodelacionArt: 'Art. 81 Fracc. IX, Ley Ingresos ZPN 2026',
+    demolicionPct: 30,
+    demolicionArt: 'Art. 81 Fracc. V, Ley Ingresos ZPN 2026',
+    bardeoMl: 43,
+    bardeoArt: 'Art. 81 Fracc. VI, Ley Ingresos ZPN 2026',
+    revisionProyecto: 237,
+    revisionArt: 'Art. 81 Fracc. XX, Ley Ingresos ZPN 2026',
+    alineamiento: {
+      unifamiliar: 146, plurifamiliar_v: 146, plurifamiliar_h: 146,
+      comercio: 293, industria: 293, equipamiento: 293,
+    },
+    alineamientoArt: 'Art. 86 Fracc. I, Ley Ingresos ZPN 2026',
+    numOficial: 129,
+    numOficialArt: 'Art. 86 Fracc. III, Ley Ingresos ZPN 2026',
+    habitabilidadPct: 15,
+    habitabilidadArt: 'Art. 134 Fracc. XIII, Ley Ingresos ZPN 2026',
+    habitabilidadNota: 'Se paga simultáneamente con la licencia',
+    vigencia: '24 meses · Refrendo 5% por bimestre de ampliación · Art. 82',
+    ventanilla: 'Dir. Permisos y Licencias (CISZ) — Prolongación Laureles 300 esq. Blvd. Panamericano, Col. El Tepeyac',
+    tel: '(33) 3818-2200 ext. 3174',
+    horario: 'Lun-Vie 08:00-18:00 · Sáb 09:00-13:00',
+    eit: 7568,
+    eitArt: 'Art. 93 Fracc. XXXIV, Ley Ingresos ZPN 2026',
+    integracionVial: 1567,
+    integracionVialArt: 'Art. 93 Fracc. XXXV, Ley Ingresos ZPN 2026',
+    siapa: {
+      unifamiliar:     { alta: 104.62, media: 107.29, baja: 118.05, minima: 112.69 },
+      plurifamiliar_h: { alta: 118.05, media: 120.72, baja: 123.41, minima: 126.08 },
+      plurifamiliar_v: { alta: 131.46, media: 134.14, baja: 136.83, minima: 139.50 },
+      comercio:        { vecinal: 107.95, barrial: 120.72, distrital: 123.41, central: 128.75, regional: 134.14 },
+      industria:       { ligera: 115.36, media: 120.72, pesada: 123.41 },
+      equipamiento:    { vecinal: 123.41, barrial: 126.08, distrital: 128.75, central: 131.46, regional: 134.14 },
+    },
+    siapaArt: 'Art. Cuadésimo Primero, Cap. IX, Res. Tarifario SIAPA 2026 (SIAPA intermunicipal)',
+    impactoAmbientalTiers: [
+      { max: 3400,     tarifa: 7837  },
+      { max: 15000,    tarifa: 15673 },
+      { max: 30000,    tarifa: 39183 },
+      { max: Infinity, tarifa: 65303 }
+    ],
+    impactoAmbientalNoReq: 5877,
+    impactoAmbientalArt: 'Art. 93 Fracc. XXX, Ley Ingresos ZPN 2026',
+  },
+  TLQ: {
+    nombre: 'Tlaquepaque',
+    licencia: {
+      unifamiliar:     { tarifa: 92,  label: 'Habitacional unifamiliar' },
+      plurifamiliar_h: { tarifa: 171, label: 'Habitacional plurifamiliar horizontal' },
+      plurifamiliar_v: { tarifa: 131, label: 'Habitacional plurifamiliar vertical' },
+      comercio:        { tarifa: 253, label: 'Comercio / Servicios' },
+      industria:       { tarifa: 135, label: 'Industrial' },
+      equipamiento:    { tarifa: 135, label: 'Equipamiento (ref. industrial)' },
+    },
+    licenciaArt: 'Art. 63 Fracc. I, Ley Ingresos TLQ 2026',
+    remodelacionPct: 30, remodelacionArt: 'Art. 63 Fracc. IX, Ley Ingresos TLQ 2026',
+    demolicionPct:   30, demolicionArt:   'Art. 63 Fracc. VI, Ley Ingresos TLQ 2026',
+    alineamiento: {
+      unifamiliar: 110, plurifamiliar_h: 136, plurifamiliar_v: 152,
+      comercio: 158, industria: 114, equipamiento: 114,
+    },
+    alineamientoArt: 'Art. 64 Fracc. I, Ley Ingresos TLQ 2026 (densidad media ref.)',
+    numOficial: { unifamiliar: 92, plurifamiliar_h: 92, plurifamiliar_v: 92, comercio: 249, industria: 184, equipamiento: 184 },
+    numOficialArt: 'Art. 64 Fracc. II, Ley Ingresos TLQ 2026',
+    habitabilidadPct: 10, habitabilidadArt: 'Art. 63 Fracc. X, Ley Ingresos TLQ 2026 · pago simultáneo con licencia',
+    vigencia: '24 meses · Prórroga 10%/bimestre (Fracc. IV) · Art. 17, Ley Ingresos TLQ 2026',
+    ventanilla: 'Secretaría de Obras Públicas — H. Ayuntamiento de San Pedro Tlaquepaque · confirmar módulo exacto',
+    tel: '(33) 3837-0100 — confirmar extensión', horario: 'Lun-Vie 09:00-15:00 (confirmar)',
+    siapa: {
+      unifamiliar:     { alta: 104.62, media: 107.29, baja: 118.05, minima: 112.69 },
+      plurifamiliar_h: { alta: 118.05, media: 120.72, baja: 123.41, minima: 126.08 },
+      plurifamiliar_v: { alta: 131.46, media: 134.14, baja: 136.83, minima: 139.50 },
+      comercio:        { vecinal: 107.95, barrial: 120.72, distrital: 123.41, central: 128.75, regional: 134.14 },
+      industria:       { ligera: 115.36, media: 120.72, pesada: 123.41 },
+      equipamiento:    { vecinal: 123.41, barrial: 126.08, distrital: 128.75, central: 131.46, regional: 134.14 },
+    },
+    siapaArt: 'Res. Tarifario SIAPA 2026 (intermunicipal)',
+  },
+  TLA: {
+    nombre: 'Tlajomulco',
+    licencia: {
+      unifamiliar:     { tarifa: 191, label: 'Habitacional (unifamiliar)' },
+      plurifamiliar_h: { tarifa: 191, label: 'Habitacional (plurifamiliar horizontal)' },
+      plurifamiliar_v: { tarifa: 191, label: 'Habitacional (plurifamiliar vertical)' },
+      comercio:        { tarifa: 214, label: 'Comercio / Servicios' },
+      industria:       { tarifa: 143, label: 'Industrial' },
+      equipamiento:    { tarifa: 29,  label: 'Equipamiento' },
+    },
+    licenciaArt: 'Art. 82 Fracc. I, Ley Ingresos TLA 2026',
+    remodelacionPct: 50, remodelacionArt: 'Art. 82 Fracc. VIII, Ley Ingresos TLA 2026',
+    demolicionPct:   20, demolicionArt:   'Art. 82 Fracc. IV, Ley Ingresos TLA 2026',
+    alineamiento: {
+      unifamiliar: 130, plurifamiliar_h: 130, plurifamiliar_v: 130,
+      comercio: 250, industria: 250, equipamiento: 250,
+    },
+    alineamientoArt: 'Art. 86 Fracc. I, Ley Ingresos TLA 2026',
+    numOficial: 383,
+    numOficialArt: 'Art. 86 Fracc. II, Ley Ingresos TLA 2026',
+    habitabilidadPct: 10, habitabilidadArt: 'Art. 122 Fracc. XII, Ley Ingresos TLA 2026 · 10% del valor de la licencia',
+    vigencia: '24 meses · prórroga 10% por bimestre (Art. 82 Fracc. XXIV, Ley Ingresos TLA 2026)',
+    ventanilla: 'Higuera 70 PB, Col. Centro, Tlajomulco de Zúñiga (Dir. Control de la Edificación)',
+    tel: '(33) 3283-4400 Ext. 3221', horario: 'Lun-Vie 09:00-15:00',
+    siapa: {
+      unifamiliar:     { alta: 104.62, media: 107.29, baja: 118.05, minima: 112.69 },
+      plurifamiliar_h: { alta: 118.05, media: 120.72, baja: 123.41, minima: 126.08 },
+      plurifamiliar_v: { alta: 131.46, media: 134.14, baja: 136.83, minima: 139.50 },
+      comercio:        { vecinal: 107.95, barrial: 120.72, distrital: 123.41, central: 128.75, regional: 134.14 },
+      industria:       { ligera: 115.36, media: 120.72, pesada: 123.41 },
+      equipamiento:    { vecinal: 123.41, barrial: 126.08, distrital: 128.75, central: 131.46, regional: 134.14 },
+    },
+    siapaArt: 'Res. Tarifario SIAPA 2026 (intermunicipal)',
+  },
+  TON: {
+    nombre: 'Tonalá',
+    licencia: {
+      unifamiliar:     { tarifa: 65,  label: 'Habitacional unifamiliar (densidad media)' },
+      plurifamiliar_h: { tarifa: 81,  label: 'Habitacional plurifamiliar horizontal (densidad media)' },
+      plurifamiliar_v: { tarifa: 100, label: 'Habitacional plurifamiliar vertical (densidad media)' },
+      comercio:        { tarifa: 144, label: 'Comercio (distrital / densidad media)' },
+      industria:       { tarifa: 79,  label: 'Industrial (media)' },
+      equipamiento:    { tarifa: 61,  label: 'Equipamiento' },
+    },
+    licenciaArt: 'Art. 64 Fracc. I, Ley Ingresos TON 2026 · Tarifa densidad media como referencia — confirmar densidad real en municipio',
+    remodelacionPct: 50, remodelacionArt: 'Art. 64 Fracc. VIII, Ley Ingresos TON 2026',
+    demolicionPct:   50, demolicionArt:   'Art. 64 Fracc. V, Ley Ingresos TON 2026',
+    alineamiento: {
+      unifamiliar: 131, plurifamiliar_h: 131, plurifamiliar_v: 131,
+      comercio: 149, industria: 116, equipamiento: 102,
+    },
+    alineamientoArt: 'Art. 66 Fracc. I, Ley Ingresos TON 2026 (densidad media ref.)',
+    numOficial: 79,
+    numOficialArt: 'Art. 66 Fracc. II, Ley Ingresos TON 2026',
+    habitabilidadPct: 10, habitabilidadArt: 'Art. 64 Fracc. XVI, Ley Ingresos TON 2026 · 10% del valor de cada concepto autorizado',
+    vigencia: '24 meses · confirmar prórroga en ventanilla',
+    ventanilla: 'Dir. de Obras Públicas — H. Ayuntamiento de Tonalá · confirmar módulo exacto',
+    tel: '(33) 3683-1040 — confirmar extensión', horario: 'Lun-Vie 09:00-15:00 (confirmar)',
+    siapa: {
+      unifamiliar:     { alta: 104.62, media: 107.29, baja: 118.05, minima: 112.69 },
+      plurifamiliar_h: { alta: 118.05, media: 120.72, baja: 123.41, minima: 126.08 },
+      plurifamiliar_v: { alta: 131.46, media: 134.14, baja: 136.83, minima: 139.50 },
+      comercio:        { vecinal: 107.95, barrial: 120.72, distrital: 123.41, central: 128.75, regional: 134.14 },
+      industria:       { ligera: 115.36, media: 120.72, pesada: 123.41 },
+      equipamiento:    { vecinal: 123.41, barrial: 126.08, distrital: 128.75, central: 131.46, regional: 134.14 },
+    },
+    siapaArt: 'Res. Tarifario SIAPA 2026 (intermunicipal)',
+  },
+};
+
+// ── NAVEGACIÓN ────────────────────────────────────────────────────────────────
+function selMun(mun, el) {
+  if (el.classList.contains('disabled')) return;
+  munActual = mun;
+  document.querySelectorAll('.muni-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  // Mostrar/ocultar extras por municipio
+  document.getElementById('wrap-gdl-extras').style.display = mun === 'GDL' ? '' : 'none';
+  document.getElementById('wrap-zpn-extras').style.display = mun === 'ZPN' ? '' : 'none';
+  // Mostrar evaluación impacto ambiental solo en ZPN
+  const rowImpAmb = document.getElementById('row-imp-amb');
+  if (rowImpAmb) rowImpAmb.style.display = mun === 'ZPN' ? '' : 'none';
+  // Aviso sin tarifas para TLQ/TLA/TON
+  const banSinTar = document.getElementById('banner-sin-tarifas');
+  if (banSinTar) banSinTar.style.display = TARIFAS[mun]?.sinTarifas ? '' : 'none';
+  onUsoChange();
+}
+
+function selTipo(tipo, el) {
+  tipoObra = tipo;
+  document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  // Bardeo: cambiar inputs
+  const esBardeo = tipo === 'bardeo';
+  document.getElementById('wrap-sup').style.display = esBardeo ? 'none' : '';
+  document.getElementById('wrap-ml').style.display = esBardeo ? '' : 'none';
+  document.getElementById('wrap-frente').style.display = esBardeo ? 'none' : '';
+  // Opciones que no aplican en bardeo
+  document.getElementById('chk-habitabilidad').parentElement.style.display = esBardeo ? 'none' : '';
+  if (document.getElementById('chk-dtude')) {
+    document.getElementById('chk-dtude').parentElement.style.display = esBardeo ? 'none' : '';
+    document.getElementById('chk-planos').parentElement.style.display = esBardeo ? 'none' : '';
+  }
+}
+
+function toggleSIAPADen() {
+  var chk = document.getElementById('chk-siapa');
+  var wrap = document.getElementById('wrap-siapa-den');
+  wrap.style.display = chk && chk.checked ? 'block' : 'none';
+}
+
+function onUsoChange() { /* live recalc si ya hay resultado */ }
+function onInputChange() {
+  // Recalcular automáticamente si el panel ya está visible
+  if (document.getElementById('result-panel').style.display !== 'none') {
+    calcular();
+  }
+}
+
+// ── FORMATO ───────────────────────────────────────────────────────────────────
+function fmt(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return '$' + Math.round(n).toLocaleString('es-MX');
+}
+function fmtTarifa(n, unidad) {
+  if (!n && n !== 0) return '—';
+  return '$' + n.toLocaleString('es-MX') + (unidad ? '/' + unidad : '');
+}
+
+// ── FECHAS ───────────────────────────────────────────────────────────────────
+function sumarMeses(fechaStr, meses) {
+  if (!fechaStr) return null;
+  var d = new Date(fechaStr + 'T00:00:00');
+  d.setMonth(d.getMonth() + meses);
+  return d;
+}
+function fmtFecha(d) {
+  if (!d) return null;
+  var dd = String(d.getDate()).padStart(2,'0');
+  var mm = String(d.getMonth()+1).padStart(2,'0');
+  var yy = d.getFullYear();
+  return dd + '/' + mm + '/' + yy;
+}
+function diasAlVenc(d) {
+  if (!d) return null;
+  var hoy  = new Date(); hoy.setHours(0,0,0,0);
+  var diff = Math.round((d - hoy) / 86400000);
+  return diff;
+}
+
+// ── CALCULAR ──────────────────────────────────────────────────────────────────
+function calcular() {
+  const t    = TARIFAS[munActual];
+
+  // Para municipios sin tarifas: calcular solo SIAPA y mostrar ventanilla
+  if (t && t.sinTarifas) {
+    calcularSoloSIAPA(t);
+    return;
+  }
+
+  const uso  = document.getElementById('inp-uso').value;
+  const sup  = parseFloat(document.getElementById('inp-sup').value) || 0;
+  const ml   = parseFloat(document.getElementById('inp-ml').value) || 0;
+  const frente = parseFloat(document.getElementById('inp-frente').value) || 0;
+  const supPredio    = parseFloat(document.getElementById('inp-sup-predio').value)  || 0;
+  const niveles      = parseInt(document.getElementById('inp-niveles').value)         || 0;
+  const incAlin = document.getElementById('chk-alineamiento').checked;
+  const incHab  = document.getElementById('chk-habitabilidad').checked;
+
+  const rows = [];
+  let total = 0;
+
+  // ── LICENCIA / PERMISO BASE ──
+  if (tipoObra === 'bardeo') {
+    // Solo ZPN tiene tarifa bardeo explícita; GDL usar Art. 49 Fracc. I (misma)
+    const tarifa = munActual === 'ZPN' ? t.bardeoMl : 43; // orientativo GDL
+    const art    = munActual === 'ZPN' ? t.bardeoArt : 'Art. 49 (verificar en ventanilla), Ley Ingresos GDL 2026';
+    const sub    = tarifa * ml;
+    total += sub;
+    rows.push({ concepto: 'Licencia de bardeo', tarifa: fmtTarifa(tarifa, 'ml'), base: ml ? ml + ' ml' : '—', sub, art });
+  } else {
+    const licInfo = t.licencia[uso] || t.licencia['comercio'];
+    let tarifaBase = licInfo.tarifa;
+    let factorLabel = '';
+
+    if (tipoObra === 'remodelacion' && munActual !== 'GDL' && t.remodelacionPct) {
+      tarifaBase = licInfo.tarifa * (t.remodelacionPct / 100);
+      factorLabel = ` (${t.remodelacionPct}% de $${licInfo.tarifa}/m²)`;
+    } else if (tipoObra === 'demolicion' && munActual !== 'GDL' && t.demolicionPct) {
+      tarifaBase = licInfo.tarifa * (t.demolicionPct / 100);
+      factorLabel = ` (${t.demolicionPct}% de $${licInfo.tarifa}/m²)`;
+    }
+
+    const sub = tarifaBase * sup;
+    costoLicenciaBase = sub;  // guardar para cálculo de refrendo
+    total += sub;
+    const nombreTipo = { nueva: 'Licencia de construcción', ampliacion: 'Licencia de ampliación', remodelacion: 'Licencia de remodelación', demolicion: 'Licencia de demolición' }[tipoObra] || 'Licencia';
+    rows.push({
+      concepto: nombreTipo + (factorLabel ? '<br><span class="subtotal-badge">' + uso + factorLabel + '</span>' : ''),
+      tarifa: fmtTarifa(tarifaBase, 'm²'),
+      base: sup ? sup.toLocaleString('es-MX') + ' m²' : '—',
+      sub, art: t.licenciaArt + (tipoObra === 'remodelacion' && t.remodelacionArt ? ' · ' + t.remodelacionArt : tipoObra === 'demolicion' && t.demolicionArt ? ' · ' + t.demolicionArt : '')
+    });
+
+    // ── GDL: DTUDE ──
+    if (munActual === 'GDL' && document.getElementById('chk-dtude').checked) {
+      const exento = t.dtudeExento.includes(uso);
+      rows.push({
+        concepto: 'DTUDE — Dictamen de Trazo, Usos y Destinos Específicos',
+        tarifa: exento ? 'Exento' : fmt(t.dtude),
+        base: '—',
+        sub: exento ? 0 : t.dtude,
+        art: t.dtudeArt + (exento ? ' · Exento para unifamiliar (Art. 157 Regl. Gestión Integral GDL)' : ''),
+        exento
+      });
+      if (!exento) total += t.dtude;
+    }
+
+    // ── ZPN: revisión de proyecto ──
+    if (munActual === 'ZPN' && document.getElementById('chk-revision').checked) {
+      total += t.revisionProyecto;
+      rows.push({ concepto: 'Revisión de proyecto', tarifa: fmt(t.revisionProyecto), base: 'Por revisión', sub: t.revisionProyecto, art: t.revisionArt });
+    }
+
+    // ── ALINEAMIENTO y NÚMERO OFICIAL ──
+    if (incAlin) {
+      const tarifaAlin = munActual === 'GDL'
+        ? (t.alineamiento[uso] || t.alineamiento['comercio']).tarifa
+        : (t.alineamiento[uso] || t.alineamiento['comercio']);
+      const subAlin = tarifaAlin * frente;
+      total += subAlin;
+      rows.push({
+        concepto: 'Alineamiento',
+        tarifa: fmtTarifa(tarifaAlin, 'ml'),
+        base: frente ? frente + ' ml' : '—',
+        sub: subAlin,
+        art: t.alineamientoArt
+      });
+
+      const tarifaNum = (typeof t.numOficial === 'object')
+        ? (t.numOficial[uso] || t.numOficial['comercio'])
+        : t.numOficial;
+      total += tarifaNum;
+      rows.push({ concepto: 'Número oficial', tarifa: fmt(tarifaNum), base: '—', sub: tarifaNum, art: t.numOficialArt });
+    }
+
+    // ── GDL: autorización de planos + pancarta ──
+    if (munActual === 'GDL' && document.getElementById('chk-planos').checked) {
+      total += t.autorizacionPlanos;
+      rows.push({ concepto: 'Autorización de planos (1ª revisión)', tarifa: fmtTarifa(t.autorizacionPlanos, ''), base: '—', sub: t.autorizacionPlanos, art: t.autorizacionPlanosArt });
+      total += t.pancarta;
+      rows.push({ concepto: 'Pancarta de obra', tarifa: fmt(t.pancarta), base: '—', sub: t.pancarta, art: t.pancartaArt });
+    }
+
+    // ── GDL: bitácora ──
+    if (munActual === 'GDL' && document.getElementById('chk-bitacora').checked) {
+      total += t.bitacoraDoble;
+      rows.push({ concepto: 'Bitácora de obra (doble hoja)', tarifa: fmt(t.bitacoraDoble), base: '—', sub: t.bitacoraDoble, art: 'Formato oficial · Sencilla $91 · Doble $166' });
+    }
+
+    // ── HABITABILIDAD ──
+    if (incHab) {
+      const licRow = rows.find(r => r.concepto.startsWith('Licencia'));
+      const baseLic = licRow ? licRow.sub : 0;
+      const subHab = baseLic * (t.habitabilidadPct / 100);
+      total += subHab;
+      rows.push({
+        concepto: 'Certificado de habitabilidad' + (t.habitabilidadNota ? '<br><span class="subtotal-badge">' + t.habitabilidadNota + '</span>' : ''),
+        tarifa: t.habitabilidadPct + '% de licencia',
+        base: fmt(baseLic),
+        sub: subHab,
+        art: t.habitabilidadArt
+      });
+    }
+  }
+
+  // -- SIAPA Factibilidad --
+  if (document.getElementById('chk-siapa').checked) {
+    const denSel  = document.getElementById('sel-siapa-den').value;
+    const sRates  = t.siapa;
+    const usoKey  = uso === 'plurifamiliar_v' ? 'plurifamiliar_v'
+                  : uso === 'plurifamiliar_h' ? 'plurifamiliar_h'
+                  : uso;
+    const rateMap = sRates[usoKey] || sRates['comercio'];
+    // Resolve density key (media_ind maps to 'media' in industria map)
+    const denKey  = denSel === 'media_ind' ? 'media' : denSel;
+    const tasaSIAPA = rateMap[denKey] || Object.values(rateMap)[0];
+    const denLabels = {
+      alta:'densidad alta', media:'densidad media', baja:'densidad baja', minima:'densidad mínima',
+      vecinal:'vecinal', barrial:'barrial', distrital:'distrital', central:'central', regional:'regional',
+      ligera:'ligera (riesgo bajo)', media_ind:'media (riesgo medio)', pesada:'pesada (riesgo alto)'
+    };
+    const denLabel = denLabels[denSel] || denSel;
+    if (supPredio > 0) {
+      const subSIAPA = tasaSIAPA * supPredio;
+      total += subSIAPA;
+      rows.push({
+        concepto: 'Factibilidad SIAPA &#8212; derecho de incorporación<br><span class="subtotal-badge">agua potable + alcantarillado + saneamiento &middot; ' + denLabel + '</span>',
+        tarifa: fmtTarifa(tasaSIAPA, 'm² predio'),
+        base: supPredio.toLocaleString('es-MX') + ' m²',
+        sub: subSIAPA,
+        art: t.siapaArt
+      });
+    } else {
+      rows.push({
+        concepto: 'Factibilidad SIAPA &#8212; derecho de incorporación<br><span class="subtotal-badge">Ingresa sup. del predio para calcular &middot; ' + denLabel + '</span>',
+        tarifa: fmtTarifa(tasaSIAPA, 'm² predio'),
+        base: '&#8212; sin sup. predio',
+        sub: 0,
+        art: t.siapaArt
+      });
+    }
+  }
+
+  // -- EIT (Estudio de Impacto al Transito) --
+  if (document.getElementById('chk-eit').checked && t.eit) {
+    const subEIT = t.eit;
+    total += subEIT;
+    rows.push({ concepto: 'Estudio de Impacto al Tránsito (EIT)', tarifa: fmt(subEIT), base: 'Por estudio', sub: subEIT, art: t.eitArt });
+  }
+
+  // -- Integracion Vial / Ingresos y Salidas --
+  if (document.getElementById('chk-int-vial').checked && t.integracionVial) {
+    const subIV = t.integracionVial;
+    total += subIV;
+    rows.push({ concepto: 'Gráfico de Integración Vial / Ingresos y Salidas', tarifa: fmt(subIV), base: 'Por estudio', sub: subIV, art: t.integracionVialArt });
+  }
+
+  // -- Evaluacion de Impacto Ambiental (ZPN only) --
+  if (munActual === 'ZPN' && document.getElementById('chk-imp-amb').checked) {
+    const tier = t.impactoAmbientalTiers.find(x => sup <= x.max) || t.impactoAmbientalTiers[t.impactoAmbientalTiers.length - 1];
+    const subAmb = tier.tarifa;
+    total += subAmb;
+    const rangoLabel = sup <= 3400 ? 'hasta 3,400 m²' : sup <= 15000 ? '3,401-15,000 m²' : sup <= 30000 ? '15,001-30,000 m²' : 'mayor de 30,000 m²';
+    rows.push({ concepto: 'Evaluación de Impacto Ambiental<br><span class="subtotal-badge">' + rangoLabel + '</span>', tarifa: fmt(subAmb), base: 'Por proyecto', sub: subAmb, art: t.impactoAmbientalArt });
+  }
+
+  // -- Filas informativas (sin costo) --
+  if (niveles > 0) {
+    rows.push({
+      concepto: 'Número de niveles',
+      tarifa: '&#8212;',
+      base: '&#8212;',
+      sub: null,
+      art: 'Dato requerido en solicitud de licencia',
+      infoVal: niveles + ' nivel' + (niveles > 1 ? 'es' : ''),
+      infoRow: true
+    });
+  }
+
+  // ── Descuento zona patrimonial GDL ──
+  let descuento = 0;
+  if (munActual === 'GDL' && document.getElementById('chk-patrimonio').checked) {
+    descuento = total * (t.patrimonioDescuentoPct / 100);
+    rows.push({ concepto: '⬇ Descuento zona patrimonial A o B (' + t.patrimonioDescuentoPct + '%)', tarifa: '-' + t.patrimonioDescuentoPct + '%', base: fmt(total), sub: -descuento, art: 'Ley Ingresos GDL 2026' });
+    total -= descuento;
+  }
+
+  // ── Render ──
+  const tbody = document.getElementById('tbody-result');
+  tbody.innerHTML = '';
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    if (r.exento)   tr.className = 'exento';
+    if (r.infoRow)  tr.className = 'info-row';
+    const valCell = r.infoRow
+      ? '<span style="font-size:12px;color:var(--text2)">' + r.infoVal + '</span>'
+      : r.exento ? '<span style="color:var(--text3);font-size:11px">Exento</span>' : fmt(r.sub);
+    tr.innerHTML = '<td>' + r.concepto + '</td>'
+      + '<td class="subtotal-badge" style="white-space:nowrap">' + r.tarifa + '</td>'
+      + '<td style="font-family:var(--mono);font-size:11px;color:var(--text3)">' + r.base + '</td>'
+      + '<td class="right">' + valCell + '</td>'
+      + '<td class="art">' + r.art + '</td>';
+    tbody.appendChild(tr);
+  });
+
+  // Fila total
+  const trTotal = document.createElement('tr');
+  trTotal.className = 'total-row';
+  trTotal.innerHTML = `<td colspan="3" style="font-size:13px">TOTAL ESTIMADO</td><td class="right">${fmt(total)}</td><td></td>`;
+  tbody.appendChild(trTotal);
+
+  // Título y subtítulo
+  const usoLabel = document.getElementById('inp-uso').options[document.getElementById('inp-uso').selectedIndex].text;
+  const tipoLabel = { nueva: 'Obra nueva', ampliacion: 'Ampliación', remodelacion: 'Remodelación', demolicion: 'Demolición', bardeo: 'Bardeo' }[tipoObra];
+  document.getElementById('result-titulo').textContent = 'Desglose de derechos — ' + t.nombre;
+  document.getElementById('result-sub').textContent = tipoLabel + ' · ' + usoLabel + (sup ? ' · ' + sup.toLocaleString('es-MX') + ' m²' : '');
+
+  // Info strip
+  const strip = document.getElementById('info-strip');
+  const fechaInicio = document.getElementById('inp-fecha-inicio').value;
+  const vBase     = munActual === 'GDL' ? 30 : 24;
+  const fechaVenc = sumarMeses(fechaInicio, vBase);
+  const diasV       = fechaVenc ? diasAlVenc(fechaVenc) : null;
+  let chipFecha     = '';
+  if (fechaVenc) {
+    const estadoColor = diasV < 0 ? 'var(--sem-r-dot,#EF4444)' : diasV < 60 ? '#F59E0B' : 'var(--sem-g-dot,#22C55E)';
+    const estadoTxt   = diasV < 0
+      ? 'Vencida hace ' + Math.abs(diasV) + ' días'
+      : diasV === 0 ? 'Vence hoy' : 'Vence en ' + diasV + ' días';
+    chipFecha = '<div class="info-chip" style="border-color:' + estadoColor + '">'
+      + '<strong>Vigencia / Vencimiento</strong>'
+      + 'Expedición: <strong>' + fechaInicio.split('-').reverse().join('/') + '</strong><br>'
+      + 'Vencimiento: <strong style="color:' + estadoColor + '">' + fmtFecha(fechaVenc) + '</strong>'
+      + ' &nbsp;<span style="font-size:10px;color:' + estadoColor + '">(' + estadoTxt + ')</span>'
+      + '</div>';
+  }
+  strip.innerHTML = '<div class="info-chip"><strong>Vigencia de la licencia</strong>' + t.vigencia + '</div>'
+    + chipFecha
+    + '<div class="info-chip"><strong>Ventanilla</strong>' + t.ventanilla + '<br>' + t.tel + ' · ' + t.horario + '</div>';
+
+  document.getElementById('result-panel').style.display = '';
+  document.getElementById('btn-reset').style.display = '';
+
+  // Inicializar bloque refrendo
+  const rPanel = document.getElementById('refrendo-panel');
+  rPanel.style.display = '';
+  document.getElementById('inp-refrendo').value = '';
+  document.getElementById('refrendo-result').style.display = 'none';
+  const vigBase = munActual === 'GDL' ? 30 : 24;
+  const tasa1Map = {
+    GDL: '2.5%/mes (hasta 5 años) / 5%/mes (más de 5 años)',
+    ZPN: '5% por bimestre (2 meses)',
+    TLQ: '10% por bimestre',
+    TLA: 'confirmar prórroga en ventanilla',
+    TON: 'confirmar prórroga en ventanilla',
+  };
+  const artMap = {
+    GDL: 'Art. 49 Fracc. II, Ley Ingresos GDL 2026',
+    ZPN: 'Art. 82, Ley Ingresos ZPN 2026',
+    TLQ: 'Art. 63 Fracc. IV, Ley Ingresos TLQ 2026',
+    TLA: 'Ley Ingresos TLA 2026 — verificar en ventanilla',
+    TON: 'Ley Ingresos TON 2026 — verificar en ventanilla',
+  };
+  const tasa1Txt = tasa1Map[munActual] || '5% por bimestre (2 meses)';
+  const artTxt   = artMap[munActual]   || 'Verificar en ventanilla';
+  document.getElementById('refrendo-vigbase').innerHTML =
+    'Vigencia base incluida: <strong>' + vigBase + ' meses</strong> &middot; Refrendo: ' + tasa1Txt + ' sobre costo de licencia &middot; ' + artTxt;
+}
+
+// ── CALCULAR SOLO SIAPA (TLQ / TLA / TON — sin tarifas municipales) ──────────
+function calcularSoloSIAPA(t) {
+  const uso       = document.getElementById('inp-uso').value;
+  const sup       = parseFloat(document.getElementById('inp-sup').value) || 0;
+  const supPredio = parseFloat(document.getElementById('inp-sup-predio').value) || 0;
+  const incSiapa  = document.getElementById('chk-siapa') && document.getElementById('chk-siapa').checked;
+  const rows = [];
+  let total = 0;
+
+  // Fila informativa: fees municipales no disponibles
+  rows.push({
+    concepto: '⚠ Derechos municipales de licencia — sin calcular',
+    tarifa: '—',
+    base: 'Solicita cédula de cálculo en ventanilla',
+    sub: null,
+    art: 'Ley de Ingresos Municipal ' + t.nombre + ' vigente'
+  });
+
+  // SIAPA — mismo tarifa que GDL/ZPN (servicio intermunicipal)
+  if (incSiapa && supPredio > 0 && t.siapa) {
+    const denEl = document.getElementById('sel-siapa-densidad');
+    const denKey = denEl ? denEl.value : 'alta';
+    const denLabel = denEl ? denEl.options[denEl.selectedIndex].text : 'Alta';
+    const siapaTbl = t.siapa[uso === 'unifamiliar' ? 'unifamiliar'
+      : uso === 'plurifamiliar_h' ? 'plurifamiliar_h'
+      : uso === 'plurifamiliar_v' ? 'plurifamiliar_v'
+      : uso === 'comercio' ? 'comercio'
+      : uso === 'industria' ? 'industria' : 'equipamiento'];
+    const siapaTarifa = siapaTbl ? (siapaTbl[denKey] || Object.values(siapaTbl)[0]) : null;
+    if (siapaTarifa) {
+      const sub = siapaTarifa * supPredio;
+      total += sub;
+      rows.push({
+        concepto: 'Factibilidad SIAPA — derecho de incorporación<br><span class="subtotal-badge">' + denLabel + ' densidad · ' + supPredio.toLocaleString('es-MX') + ' m² de predio</span>',
+        tarifa: fmtTarifa(siapaTarifa, 'm²'),
+        base: fmt(supPredio),
+        sub,
+        art: t.siapaArt
+      });
+    }
+  }
+
+  // Render tabla
+  const tabla = document.getElementById('tabla-desglose');
+  const tbody = tabla.querySelector('tbody');
+  tbody.innerHTML = '';
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + r.concepto + '</td>'
+      + '<td class="right">' + (r.tarifa || '—') + '</td>'
+      + '<td class="right">' + (r.base || '—') + '</td>'
+      + '<td class="right" style="font-weight:600">' + (r.sub !== null ? fmt(r.sub) : '—') + '</td>'
+      + '<td style="font-size:10px;color:var(--text3)">' + (r.art || '') + '</td>';
+    tbody.appendChild(tr);
+  });
+  if (total > 0) {
+    const trTotal = document.createElement('tr');
+    trTotal.className = 'total-row';
+    trTotal.innerHTML = '<td colspan="3" style="font-size:13px">SIAPA (parcial)</td><td class="right">' + fmt(total) + '</td><td></td>';
+    tbody.appendChild(trTotal);
+  }
+
+  document.getElementById('result-titulo').textContent = 'Resultado parcial — ' + t.nombre;
+  document.getElementById('result-sub').textContent = 'Tarifas municipales no cargadas · Solo SIAPA disponible';
+
+  const strip = document.getElementById('info-strip');
+  strip.innerHTML = '<div class="info-chip"><strong>⚠ Tarifas pendientes</strong>Derechos de licencia de ' + t.nombre + ' no están cargados en este sistema. Solicita la cédula de cálculo en ventanilla.</div>'
+    + '<div class="info-chip"><strong>Ventanilla</strong>' + t.ventanilla
+    + '<br>' + t.tel + ' · ' + t.horario + '</div>';
+
+  document.getElementById('result-panel').style.display = '';
+}
+
+// ── DEEP LINK M05 → M08 ───────────────────────────────────────────────────────
+(function leerDeepLinkM05(){
+  var raw = localStorage.getItem('GU_m05_a_m08');
+  if (!raw) return;
+  try {
+    var d = JSON.parse(raw);
+    if (!d || (Date.now() - d.ts) > 600000) { localStorage.removeItem('GU_m05_a_m08'); return; }
+
+    // Municipio
+    if (d.mun) {
+      var btnMun = document.querySelector('.muni-btn[onclick*="' + d.mun + '"]');
+      if (btnMun) selMun(d.mun, btnMun);
+    }
+
+    // Tipo de obra
+    if (d.tipoObra) {
+      var btnTipo = document.querySelector('.tipo-btn[data-tipo="' + d.tipoObra + '"]');
+      if (btnTipo) selTipo(d.tipoObra, btnTipo);
+    }
+
+    // Campos numéricos
+    if (d.tipoUso) {
+      var selUso = document.getElementById('inp-uso');
+      if (selUso) selUso.value = d.tipoUso;
+    }
+    if (d.sup)       { var el = document.getElementById('inp-sup');       if (el) el.value = d.sup; }
+    if (d.frente)    { var el = document.getElementById('inp-frente');    if (el) el.value = d.frente; }
+    if (d.supPredio) { var el = document.getElementById('inp-sup-predio'); if (el) el.value = d.supPredio; }
+    if (d.niveles)   { var el = document.getElementById('inp-niveles');   if (el) el.value = d.niveles; }
+
+    localStorage.removeItem('GU_m05_a_m08');
+
+    // Aviso visual
+    var banner = document.createElement('div');
+    banner.style.cssText = 'background:rgba(26,39,68,.06);border:0.5px solid var(--brand);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text2);margin-bottom:12px';
+    banner.innerHTML = '✅ <strong>Datos recibidos desde M05</strong> — revisa los campos y presiona Calcular.';
+    var wrap = document.querySelector('.m08-wrap');
+    if (wrap) wrap.insertBefore(banner, wrap.firstChild);
+  } catch(e) {
+    localStorage.removeItem('GU_m05_a_m08');
+  }
+})();
+</script>
+</body>
+</html>

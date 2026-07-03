@@ -1,0 +1,3226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M06 - Licencia de Funcionamiento - Gestor Urbano Jalisco</title>
+<style>
+/* ── CSS VARIABLES (embebidas, sin dependencia externa) ── */
+:root {
+  --brand:#1A2744; --brand-light:#2D3A6B; --brand-pale:#E6EAF4;
+  --bg:#F9FAFB; --bg2:#FFFFFF; --bg3:#F0F0EE;
+  --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.14);
+  --text:#0F0F0E; --text2:#666666; --text3:#999999;
+  --sans:'Outfit','Helvetica Neue',sans-serif;
+  --mono:'Geist Mono',monospace;
+  /* Aliases usados en M06 */
+  --accent:#1A2744; --text1:#0F0F0E;
+  /* gu-nav vars */
+  --nav-bg:rgba(249,250,251,0.92); --logo-bg:#1A2744; --logo-ico:#FFFFFF;
+  --card-bg:#FFFFFF; --toggle-track:#E0E0DE; --toggle-thumb:#FFFFFF;
+  --border3:rgba(0,0,0,0.22); --r-md:6px; --r-pill:9999px; --ease:cubic-bezier(.16,1,.3,1);
+}
+[data-theme="dark"] {
+  --brand:#6B82C4; --brand-light:#8A9ED4; --brand-pale:#1A2235;
+  --bg:#0B0F1A; --bg2:#111827; --bg3:#1A2235;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+  --text:#E2E8F0; --text2:#94A3B8; --text3:#4B5563;
+  /* Aliases usados en M06 */
+  --accent:#6B82C4; --text1:#E2E8F0;
+  /* gu-nav vars dark */
+  --nav-bg:rgba(11,15,26,0.92); --logo-bg:#E2E8F0; --logo-ico:#0B0F1A;
+  --card-bg:#111827; --toggle-track:#3D7BFF; --toggle-thumb:#FFFFFF;
+  --border3:rgba(255,255,255,0.20);
+}
+
+.gu-nav{background:var(--nav-bg);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:0.5px solid var(--border);padding:13px 32px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;transition:background .3s,border-color .3s;}
+.gu-nav-logo{width:30px;height:30px;background:var(--logo-bg);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.gu-nav-logo svg{width:16px;height:16px;fill:var(--logo-ico);}
+.gu-nav-name{font-size:13px;font-weight:500;letter-spacing:-.2px;color:var(--text);}
+.gu-nav-sep{color:var(--border2);font-size:14px;}
+.gu-nav-mod{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;}
+.gu-nav-back{margin-left:auto;display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--card-bg);border:0.5px solid var(--border2);padding:4px 10px;border-radius:var(--r-md);text-decoration:none;transition:background .3s,border-color .3s,color .3s;}
+.gu-nav-back:hover{border-color:var(--border3);color:var(--text2);}
+.gu-nav-back svg{width:11px;height:11px;fill:currentColor;}
+.gu-toggle{margin-left:auto;display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:var(--r-pill);border:0.5px solid var(--border2);background:var(--card-bg);cursor:pointer;font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.04em;transition:background .3s,border-color .3s,color .3s;user-select:none;}
+.gu-toggle:hover{opacity:.8;}
+.gu-toggle-track{width:28px;height:16px;border-radius:8px;background:var(--toggle-track);position:relative;flex-shrink:0;transition:background .3s;}
+.gu-toggle-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--toggle-thumb);box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .3s var(--ease);}
+[data-theme="dark"] .gu-toggle-thumb{left:14px;}
+@media(max-width:600px){.gu-nav{padding:12px 16px;}.gu-nav-sep,.gu-nav-mod{display:none;}}
+.scian-info {
+  display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap;
+  padding: 8px 12px; margin-top: 6px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; font-size: 12px; line-height: 1.4;
+  animation: fadeIn .2s ease;
+}
+.scian-badge {
+  font-size: 11px; font-weight: 700; letter-spacing: .5px;
+  color: var(--bg2); background: var(--accent);
+  padding: 2px 7px; border-radius: 4px; white-space: nowrap; flex-shrink: 0;
+}
+.scian-id {
+  font-weight: 700; color: var(--accent); white-space: nowrap; flex-shrink: 0;
+}
+.scian-nom { color: var(--text); flex: 1; min-width: 0; }
+.scian-link {
+  color: var(--text3); text-decoration: none; white-space: nowrap;
+  flex-shrink: 0; font-size: 11px;
+}
+.scian-link:hover { color: var(--accent); text-decoration: underline; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(-3px); } to { opacity:1; transform:none; } }
+
+/* ── HISTORIAL ─────────────────────────────────────────────────────── */
+.hist-section { margin-top: 24px; }
+.hist-title { font-size: 13px; font-weight: 700; color: var(--text2); letter-spacing: .5px; margin-bottom: 10px; text-transform: uppercase; }
+.hist-cards { display: flex; flex-direction: column; gap: 8px; }
+.hist-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; background: var(--bg2);
+  border: 1px solid var(--border); border-radius: 10px;
+  cursor: pointer; transition: border-color .15s, box-shadow .15s;
+}
+.hist-card:hover { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,39,68,.08); }
+.hist-card-ico { font-size: 18px; flex-shrink: 0; }
+.hist-card-body { flex: 1; min-width: 0; }
+.hist-card-nom { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hist-card-sub { font-size: 11px; color: var(--text3); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hist-card-del { flex-shrink: 0; background: none; border: none; cursor: pointer; color: var(--text3); font-size: 16px; padding: 4px; border-radius: 4px; line-height: 1; }
+.hist-card-del:hover { color: #e53e3e; background: rgba(229,62,62,.08); }
+.hist-empty { font-size: 12px; color: var(--text3); padding: 10px 0; }
+
+/* ── GUARDAR MODAL ─────────────────────────────────────────────────── */
+.hist-save-wrap { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+.hist-save-inp {
+  flex: 1; padding: 9px 12px; font-size: 13px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--bg2); color: var(--text); outline: none;
+}
+.hist-save-inp:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,39,68,.1); }
+.hist-save-inp::placeholder { color: var(--text3); }
+.btn-guardar {
+  padding: 9px 16px; background: var(--accent); color: #fff;
+  border: none; border-radius: 8px; font-size: 13px; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+}
+.btn-guardar:hover { opacity: .88; }
+.hist-saved-msg { font-size: 12px; color: #38a169; font-weight: 600; display: none; }
+
+/* == IMPRESION / PDF ================================================= */
+.btn-pdf {
+  display:flex; align-items:center; gap:6px;
+  padding:9px 16px; background:#e53e3e; color:#fff;
+  border:none; border-radius:8px; font-size:13px; font-weight:600;
+  cursor:pointer; margin-top:12px; width:fit-content;
+}
+.btn-pdf:hover { opacity:.88; }
+@media print {
+  .muni-bar,.hist-section,.btn-calc,.btn-limpiar,.btn-pdf,
+  .btn-guardar,.hist-save-wrap,.btn-nuevo,#btn-gdl,#btn-zpn,
+  #form-gdl,#form-zpn,.header-bar,.footer-note,
+  .header-bar,nav,.gu-nav { display:none !important; }
+
+  @page { margin: 1.5cm; }
+
+  body { background:#fff !important; color:#111 !important; font-size:11pt; }
+
+  .result-panel { display:block !important; box-shadow:none; border:none; max-width:100%; }
+
+  .result-hdr { background:#1A2744 !important;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    padding:14px 18px !important; border-radius:0 !important; }
+
+  .result-hdr::before {
+    content:"Gestor Urbano Jalisco AMG — Módulo 06: Licencia de Funcionamiento";
+    display:block; font-size:8pt; color:#94A3B8; margin-bottom:4px;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+
+  .doc-item { break-inside:avoid; border:0.5px solid #e2e8f0 !important; margin-bottom:4px !important; }
+  .checklist-section { break-inside:avoid; }
+  .doc-num { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .alert-box { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .fee-box { border:1px solid #e2e8f0 !important; }
+  .fee-row { border-bottom:0.5px solid #f1f5f9 !important; }
+  .section-hdr { color:#1A2744 !important; border-bottom:1px solid #1A2744 !important;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+
+  .result-panel::after {
+    content:"Generado con Gestor Urbano Jalisco AMG · gestor.jalisco.gob.mx · " attr(data-fecha);
+    display:block; font-size:7pt; color:#94A3B8; text-align:center;
+    margin-top:24px; padding-top:8px; border-top:0.5px solid #e2e8f0;
+  }
+}
+</style>
+<style>
+* { box-sizing: border-box; }
+body { display: block !important; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--text1); font-size: 14px; }
+.wrap { max-width: 820px; margin: 0 auto; padding: 20px 16px 60px; }
+/* NAV */
+.top-nav { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; }
+.top-nav-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.nav-back { font-size: 12px; color: var(--accent); padding: 4px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg3); text-decoration: none; }
+.nav-back:hover { background: var(--bg2); }
+.mod-badge { font-size: 11px; font-weight: 600; color: var(--text3); letter-spacing: .05em; }
+.theme-btn { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text2); }
+/* CARDS */
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; margin-bottom: 14px; }
+.card-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 14px; }
+/* PILLS */
+.muni-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.muni-btn { padding: 8px 18px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg3); color: var(--text1); font-size: 13px; cursor: pointer; font-weight: 500; transition: .15s; }
+.muni-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.muni-btn.disabled { opacity: .35; cursor: not-allowed; pointer-events: none; }
+/* FIELDS */
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px; font-weight: 600; }
+.field select, .field input[type=text], .field input[type=number] { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg3); color: var(--text1); font-size: 13px; }
+.field select:focus, .field input:focus { outline: none; border-color: var(--accent); }
+.field .hint { font-size: 11px; color: var(--text3); margin-top: 4px; }
+.field .hint a { color: var(--accent); }
+/* RADIO/CHECK */
+.radio-row { display: flex; gap: 24px; padding: 4px 0; }
+.radio-row label { display: flex; align-items: center; gap: 7px; font-size: 13px; cursor: pointer; font-weight: 500; }
+.radio-row input[type=radio] { accent-color: var(--accent); width: 15px; height: 15px; }
+.chk-row { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; font-size: 13px; cursor: pointer; line-height: 1.4; }
+.chk-row input { margin-top: 2px; accent-color: var(--accent); width: 14px; height: 14px; flex-shrink: 0; }
+/* GRID 2 COL */
+.col2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media(max-width:560px) { .col2 { grid-template-columns: 1fr; } }
+/* BOTONES */
+.btn-actions { display: flex; gap: 10px; margin-top: 6px; margin-bottom: 20px; }
+.btn-calc { flex: 2; padding: 13px 20px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.btn-calc:hover { opacity: .88; }
+.btn-limpiar { flex: 1; padding: 13px 16px; background: var(--bg3); color: var(--text2); border: 1px solid var(--border); border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.btn-limpiar:hover { background: var(--bg2); }
+/* AUTOCOMPLETE */
+.ac-wrap { position: relative; }
+.ac-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg3); color: var(--text1); font-size: 13px; }
+.ac-input:focus { outline: none; border-color: var(--accent); }
+.ac-input.has-value { border-color: var(--accent); }
+.ac-list { position: absolute; top: calc(100% - 1px); left: 0; right: 0; background: var(--bg2); border: 1px solid var(--accent); border-top: none; border-radius: 0 0 8px 8px; max-height: 340px; overflow-y: auto; z-index: 200; display: none; box-shadow: 0 6px 20px rgba(0,0,0,.12); }
+.ac-item { padding: 9px 13px; font-size: 13px; cursor: pointer; border-bottom: 1px solid var(--border); color: var(--text1); }
+.ac-item:hover, .ac-item.ac-active { background: var(--accent); color: #fff; }
+.ac-empty { padding: 10px 13px; font-size: 12px; color: var(--text3); font-style: italic; }
+.ac-count { font-size: 10px; color: var(--text3); padding: 4px 13px 6px; border-top: 1px solid var(--border); background: var(--bg3); }
+/* RESULTADO */
+.result-panel { display: none; margin-bottom: 20px; }
+.result-hdr { background: var(--accent); color: #fff; border-radius: 10px 10px 0 0; padding: 16px 20px; }
+.result-hdr-title { font-size: 16px; font-weight: 700; }
+.result-hdr-sub { font-size: 12px; opacity: .85; margin-top: 3px; }
+.result-body { background: var(--bg2); border: 1px solid var(--border); border-top: none; border-radius: 0 0 10px 10px; padding: 20px; }
+.checklist-section { margin-bottom: 18px; }
+.checklist-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+.doc-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.doc-item:last-child { border-bottom: none; }
+.doc-num { min-width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.doc-text { font-size: 13px; color: var(--text1); line-height: 1.45; }
+.doc-note { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.section-hdr { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid var(--border); padding-bottom: 5px; margin: 18px 0 12px; }
+.fee-box { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; }
+.fee-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.fee-row:last-child { border-bottom: none; }
+.fee-label { color: var(--text2); }
+.fee-val { font-weight: 600; color: var(--text1); font-family: monospace; }
+.fee-total-row { display: flex; justify-content: space-between; padding: 10px 0 0; font-size: 15px; font-weight: 700; border-top: 2px solid var(--border); margin-top: 4px; }
+.fee-total-val { color: var(--accent); font-family: monospace; }
+.badge-ok { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 6px; background: #e8f5e9; color: #1b5e20; }
+.badge-pc { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 6px; background: #e3f2fd; color: #0d47a1; }
+.alert-box { padding: 11px 14px; border-radius: 8px; font-size: 12px; line-height: 1.55; margin-bottom: 14px; }
+.alert-info { background: #e3f2fd; color: #0d47a1; border-left: 3px solid #1976d2; }
+.alert-warn { background: #fff8e1; color: #f57f17; border-left: 3px solid #f9a825; }
+details.ccf-details { margin-top: 16px; border: 1px solid #b0bec5; border-radius: 8px; overflow: hidden; font-size: 12px; }
+details.ccf-details summary { cursor: pointer; padding: 10px 14px; background: #eceff1; color: #37474f; font-weight: 600; list-style: none; display: flex; align-items: center; gap: 6px; user-select: none; }
+details.ccf-details summary::-webkit-details-marker { display: none; }
+details.ccf-details summary::after { content: '›'; margin-left: auto; font-size: 16px; transition: transform .2s; }
+details.ccf-details[open] summary::after { transform: rotate(90deg); }
+details.ccf-details .ccf-body { padding: 12px 14px; background: #fafafa; color: #455a64; line-height: 1.6; border-top: 1px solid #cfd8dc; }
+.deeplink-banner { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 12px; color: #1b5e20; display: none; }
+.fn { font-size: 10px; color: var(--text3); font-style: italic; margin-top: 2px; }
+.field-opt .field label::after { content: " (opcional)"; font-weight: 400; color: var(--text3); font-size: 10px; }
+.wrap-giro { display: none; }
+</style>
+</head>
+<body>
+
+<nav class="gu-nav">
+  <div class="gu-nav-logo">
+    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 1L1 5v9h5v-4h4v4h5V5L8 1z"/></svg>
+  </div>
+  <span class="gu-nav-name">Gestor Urbano Jalisco</span>
+  <span class="gu-nav-sep">/</span>
+  <span class="gu-nav-mod">M06 · Licencia de Funcionamiento</span>
+  <a href="index.html" class="gu-nav-back">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    Menú principal
+  </a>
+  <a href="GestorUrbano_M02_4.html" class="gu-nav-back" style="margin-left:4px">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    M02 · Giro comercial
+  </a>
+  <a href="GestorUrbano_M01_3.html" class="gu-nav-back" style="margin-left:4px">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    M01 · Uso de suelo
+  </a>
+  <button class="gu-toggle" onclick="guToggleTheme()" aria-label="Cambiar tema">
+    <div class="gu-toggle-track"><div class="gu-toggle-thumb"></div></div>
+    <span id="gu-toggle-label">Modo oscuro</span>
+  </button>
+</nav>
+
+<div class="wrap">
+
+  <div style="margin-bottom:22px">
+    <div style="font-size:23px;font-weight:700;color:var(--text1)">Licencia de Funcionamiento</div>
+    <div style="font-size:13px;color:var(--text2);margin-top:5px">Requisitos y derechos para operar un giro comercial, industrial o de servicios &mdash; GDL y Zapopan 2026</div>
+  </div>
+
+  <div id="deeplink-banner" class="deeplink-banner"></div>
+
+  <!-- MUNICIPIO -->
+  <div class="card">
+    <div class="card-title">Municipio</div>
+    <div class="muni-pills">
+      <button class="muni-btn active" id="btn-gdl" onclick="selMun(39,'GDL',this)">Guadalajara</button>
+      <button class="muni-btn" id="btn-zpn" onclick="selMun(120,'ZPN',this)">Zapopan</button>
+      <button class="muni-btn" id="btn-tlq" onclick="selMun(38,'TLQ',this)">Tlaquepaque</button>
+      <button class="muni-btn" id="btn-tla" onclick="selMun(97,'TLA',this)">Tlajomulco</button>
+      <button class="muni-btn" id="btn-ton" onclick="selMun(101,'TON',this)">Tonalá</button>
+    </div>
+  </div>
+    <!-- ── HISTORIAL ───────────────────────────────────────────────── -->
+    <div class="hist-section" id="hist-section">
+      <div class="hist-title">&#128337; Consultas guardadas</div>
+      <div class="hist-cards" id="hist-cards">
+        <div class="hist-empty" id="hist-empty">Sin consultas guardadas aún.</div>
+      </div>
+    </div><!-- /hist-section -->
+
+
+<div id="form-gdl">
+
+    <!-- Card 1: Giro + Tramite GDL -->
+    <div class="card">
+      <div class="card-title">Consulta nuevo giro o actividad negocio</div>
+      <div class="field">
+        <label>Giro</label>
+        <div class="ac-wrap">
+          <input type="text" id="inp-giro-gdl" class="ac-input"
+                 placeholder="Escribe el giro para buscar..." autocomplete="off"
+                 oninput="acFiltrarGDL()" onfocus="acFiltrarGDL()" onblur="acOcultarGDL()"
+                 onkeydown="acKeyDownGDL(event)">
+          <div id="ac-list-gdl" class="ac-list"></div>
+          <div id="scian-info-gdl" class="scian-info" style="display:none"><span class="scian-badge">SCIAN</span><span class="scian-id" id="scian-id-gdl"></span><span class="scian-nom" id="scian-nom-gdl"></span><a class="scian-link" href="https://portal.zapopan.gob.mx/otras_consultas/giros_scian.asp" target="_blank" rel="noopener">Ver catálogo ↗</a></div>
+        </div>
+        <input type="hidden" id="sel-giro-gdl" value="">
+      </div>
+      <div class="col2">
+        <div class="field">
+          <label>Tramite</label>
+          <select id="sel-tramite-gdl">
+            <option value="">Seleccione el tramite que desea realizar</option>
+            <option value="ALTA">ALTA</option>
+            <option value="AMPLIACION DE MEDIDAS">AMPLIACION DE MEDIDAS</option>
+            <option value="ANEXO">ANEXO</option>
+            <option value="BAJA">BAJA</option>
+            <option value="BAJA POR PRESIDENCIA">BAJA POR PRESIDENCIA</option>
+            <option value="CAMBIO DE GIRO O ANUNCIO">CAMBIO DE GIRO O ANUNCIO</option>
+            <option value="MODIFICACION">MODIFICACION</option>
+            <option value="REPOSICION">REPOSICION</option>
+            <option value="RENOVACION">RENOVACION</option>
+            <option value="TRASPASO">TRASPASO</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo de solicitante</label>
+          <div class="radio-row" style="margin-top:8px">
+            <label><input type="radio" name="tpers-gdl" value="fisica" checked> Fisica</label>
+            <label><input type="radio" name="tpers-gdl" value="moral"> Moral</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Datos del local -->
+    <div class="card">
+      <div class="card-title">Datos del local</div>
+      <div class="field">
+        <label>Superficie del local (m&#178;)</label>
+        <input type="number" id="inp-sup" min="1" placeholder="Ej. 80">
+        <div class="hint">Para calcular dictamen de Proteccion Civil</div>
+      </div>
+      <label class="chk-row">
+        <input type="checkbox" id="chk-zona-pat">
+        El local se ubica en zona patrimonial (Centro Historico u otra)
+      </label>
+    </div>
+
+    <!-- Botones GDL -->
+    <div class="btn-actions">
+      <button class="btn-calc" onclick="calcularGDL()">Calcular requisitos y derechos</button>
+      <button class="btn-limpiar" onclick="nuevoAnalisis()">&#10005; Limpiar</button>
+    </div>
+
+  </div><!-- /form-gdl -->
+
+  <!-- ══════════════════════════════════════════════════════════
+       FORMULARIO ZPN
+  ══════════════════════════════════════════════════════════ -->
+  <div id="form-zpn" style="display:none">
+
+    <!-- Card 1: Giro -->
+    <div class="card">
+      <div class="card-title">Consulta nuevo giro o actividad negocio</div>
+      <div class="field">
+        <label>Selecciona el giro</label>
+        <div class="ac-wrap">
+          <input type="text" id="inp-giro-zpn" class="ac-input"
+                 placeholder="Escribe el giro para buscar..." autocomplete="off"
+                 oninput="acFiltrar()" onfocus="acFiltrar()" onblur="acOcultar()"
+                 onkeydown="acKeyDown(event)">
+          <div id="ac-list-zpn" class="ac-list"></div>
+          <div id="scian-info-zpn" class="scian-info" style="display:none"><span class="scian-badge">SCIAN</span><span class="scian-id" id="scian-id-zpn"></span><span class="scian-nom" id="scian-nom-zpn"></span><a class="scian-link" href="https://portal.zapopan.gob.mx/otras_consultas/giros_scian.asp" target="_blank" rel="noopener">Ver catálogo ↗</a></div>
+        </div>
+        <input type="hidden" id="sel-giro-zpn" value="">
+        <div class="hint"><a href="https://portal.zapopan.gob.mx/otras_consultas/giros_scian.asp" target="_blank">Consultar catalogo SCIAN oficial de Zapopan &#8599;</a></div>
+      </div>
+      <div class="col2">
+        <div class="field">
+          <label>Tramite</label>
+          <select id="sel-tramite-zpn">
+<option value="">Seleccione el tramite que desea realizar</option>
+<option value="ALTA">ALTA</option>
+<option value="AMPLIACION DE MEDIDAS">AMPLIACION DE MEDIDAS</option>
+<option value="ANEXO">ANEXO</option>
+<option value="BAJA">BAJA</option>
+<option value="BAJA POR PRESIDENCIA">BAJA POR PRESIDENCIA</option>
+<option value="CAMBIO DE GIRO O ANUNCIO">CAMBIO DE GIRO O ANUNCIO</option>
+<option value="MODIFICACION">MODIFICACION</option>
+<option value="REPOSICION">REPOSICION</option>
+<option value="RENOVACION">RENOVACION</option>
+<option value="TRASPASO">TRASPASO</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo de persona</label>
+          <div class="radio-row" style="margin-top:8px">
+            <label><input type="radio" name="tpers-zpn" value="fisica" checked> Fisica</label>
+            <label><input type="radio" name="tpers-zpn" value="moral"> Moral</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Datos del local -->
+    <div class="card">
+      <div class="card-title">Datos del local</div>
+      <div class="col2">
+        <div class="field">
+          <label>Superficie (m&#178;)</label>
+          <input type="number" id="inp-sup-zpn" min="1" placeholder="Ej. 80">
+          <div class="hint">Para calcular Proteccion Civil y Bomberos</div>
+        </div>
+        <div class="field field-opt">
+          <label>Colonia</label>
+          <select id="sel-colonia-zpn">
+            <option value="">-- Selecciona la colonia --</option>
+<option value="">-- Selecciona la colonia --</option>
+<option value="EJIDO SAN ESTEBAN">EJIDO SAN ESTEBAN</option>
+<option value="12 DE DICIEMBRE">12 DE DICIEMBRE</option>
+<option value="27 DE SEPTIEMBRE">27 DE SEPTIEMBRE</option>
+<option value="AGUA BLANCA">AGUA BLANCA</option>
+<option value="AGUA BLANCA INDUSTRIAL">AGUA BLANCA INDUSTRIAL</option>
+<option value="AGUA BLANCA POBLADO">AGUA BLANCA POBLADO</option>
+<option value="AGUA FRIA">AGUA FRIA</option>
+<option value="ALTAGRACIA">ALTAGRACIA</option>
+<option value="ALTAMIRA">ALTAMIRA</option>
+<option value="ALTAVISTA">ALTAVISTA</option>
+<option value="ARBOLEDAS">ARBOLEDAS</option>
+<option value="ARBOLEDAS DE TESISTAN">ARBOLEDAS DE TESISTAN</option>
+<option value="ARCOS DE GUADALUPE">ARCOS DE GUADALUPE</option>
+<option value="ARCOS DE ZAPOPAN">ARCOS DE ZAPOPAN</option>
+<option value="ARCOS VALLARTA">ARCOS VALLARTA</option>
+<option value="ATEMAJAC DEL VALLE">ATEMAJAC DEL VALLE</option>
+<option value="ATLAS CHAPALITA">ATLAS CHAPALITA</option>
+<option value="ATLAS COLOMOS">ATLAS COLOMOS</option>
+<option value="AUDITORIO">AUDITORIO</option>
+<option value="AVIACION">AVIACION</option>
+<option value="BALCONES DEL COLLI">BALCONES DEL COLLI</option>
+<option value="BALCONES DEL SOL">BALCONES DEL SOL</option>
+<option value="BASE AEREA">BASE AEREA</option>
+<option value="BELENES LOS">BELENES LOS</option>
+<option value="BELLAVISTA">BELLAVISTA</option>
+<option value="BENITO JUAREZ">BENITO JUAREZ</option>
+<option value="BOSQUE DE LOS ENCINOS">BOSQUE DE LOS ENCINOS</option>
+<option value="BOSQUES DE SAN ISIDRO">BOSQUES DE SAN ISIDRO</option>
+<option value="BOSQUES DEL CENTINELA">BOSQUES DEL CENTINELA</option>
+<option value="BOSQUES VALLARTA">BOSQUES VALLARTA</option>
+<option value="BUGAMBILIAS">BUGAMBILIAS</option>
+<option value="BUGAMBILIAS COUNTRY">BUGAMBILIAS COUNTRY</option>
+<option value="CABECERA MUNICIPAL">CABECERA MUNICIPAL</option>
+<option value="CAMINO REAL">CAMINO REAL</option>
+<option value="CAMPESTRE LOS PINOS">CAMPESTRE LOS PINOS</option>
+<option value="CAMPO REAL">CAMPO REAL</option>
+<option value="CANOS DE SAN LORENZO">CANOS DE SAN LORENZO</option>
+<option value="CANTERA MORADA">CANTERA MORADA</option>
+<option value="CANTERAS DEL CENTINELA">CANTERAS DEL CENTINELA</option>
+<option value="CAPULLO EL">CAPULLO EL</option>
+<option value="CARLOS RIVERA ACEVES">CARLOS RIVERA ACEVES</option>
+<option value="CASA BLANCA">CASA BLANCA</option>
+<option value="CASA GRANDE">CASA GRANDE</option>
+<option value="CENTINELA EL">CENTINELA EL</option>
+<option value="CERRITOS LOS">CERRITOS LOS</option>
+<option value="CERRO DEL TESORO">CERRO DEL TESORO</option>
+<option value="CHAPALITA">CHAPALITA</option>
+<option value="CHAPALITA DE OCCIDENTE">CHAPALITA DE OCCIDENTE</option>
+<option value="CHAPALITA INN">CHAPALITA INN</option>
+<option value="CHAPALITA ORIENTE">CHAPALITA ORIENTE</option>
+<option value="CHAPALITA SUR">CHAPALITA SUR</option>
+<option value="CIMAFLORES">CIMAFLORES</option>
+<option value="CIUDAD BUGAMBILIAS">CIUDAD BUGAMBILIAS</option>
+<option value="CIUDAD DEL SOL">CIUDAD DEL SOL</option>
+<option value="CIUDAD DEL TEPEYAC">CIUDAD DEL TEPEYAC</option>
+<option value="CIUDAD GRANJA">CIUDAD GRANJA</option>
+<option value="CIUDAD UNIVERSITARIA">CIUDAD UNIVERSITARIA</option>
+<option value="COLINAS DE ATEMAJAC">COLINAS DE ATEMAJAC</option>
+<option value="COLINAS DE LA PRIMAVERA">COLINAS DE LA PRIMAVERA</option>
+<option value="COLINAS DE LAS AGUILAS">COLINAS DE LAS AGUILAS</option>
+<option value="COLINAS DE LOS BELENES">COLINAS DE LOS BELENES</option>
+<option value="COLINAS DE LOS ROBLES">COLINAS DE LOS ROBLES</option>
+<option value="COLINAS DE LOS VIRREYES">COLINAS DE LOS VIRREYES</option>
+<option value="COLINAS DE NUEVO MEXICO">COLINAS DE NUEVO MEXICO</option>
+<option value="COLINAS DE SAN ISIDRO I">COLINAS DE SAN ISIDRO I</option>
+<option value="COLINAS DE SAN JAVIER">COLINAS DE SAN JAVIER</option>
+<option value="COLINAS DE SAN MIGUEL">COLINAS DE SAN MIGUEL</option>
+<option value="COLINAS DE TABACHINES">COLINAS DE TABACHINES</option>
+<option value="COLINAS DEL CENTINELA">COLINAS DEL CENTINELA</option>
+<option value="COLINAS DEL REY">COLINAS DEL REY</option>
+<option value="COLINAS DEL RIO">COLINAS DEL RIO</option>
+<option value="COLLI EJIDAL">COLLI EJIDAL</option>
+<option value="COLLI EL">COLLI EL</option>
+<option value="COLLI PRIMAVERA">COLLI PRIMAVERA</option>
+<option value="COLLI URBANO">COLLI URBANO</option>
+<option value="COLOMOS PATRIA">COLOMOS PATRIA</option>
+<option value="COLONOS DE TESISTAN">COLONOS DE TESISTAN</option>
+<option value="COLORADA LA">COLORADA LA</option>
+<option value="COLOSIO LUIS DONALDO">COLOSIO LUIS DONALDO</option>
+<option value="COMUNIDAD AGRARIA TESISTAN">COMUNIDAD AGRARIA TESISTAN</option>
+<option value="CONSTITUCION">CONSTITUCION</option>
+<option value="CONSTITUYENTES">CONSTITUYENTES</option>
+<option value="COPALA">COPALA</option>
+<option value="COPALITA">COPALITA</option>
+<option value="CORONILLA LA">CORONILLA LA</option>
+<option value="COUNTRY">COUNTRY</option>
+<option value="CUMBRES LAS">CUMBRES LAS</option>
+<option value="DEL VALLE">DEL VALLE</option>
+<option value="DIVISION DEL NORTE">DIVISION DEL NORTE</option>
+<option value="DON BOSCO VALLARTA">DON BOSCO VALLARTA</option>
+<option value="ECOLOGICO SAN ISIDRO">ECOLOGICO SAN ISIDRO</option>
+<option value="EJIDAL GUAYABITOS">EJIDAL GUAYABITOS</option>
+<option value="EJIDO DE SAN JUAN DE OCOTAN">EJIDO DE SAN JUAN DE OCOTAN</option>
+<option value="EJIDO NEXTIPAC">EJIDO NEXTIPAC</option>
+<option value="EJIDO ZAPOPAN">EJIDO ZAPOPAN</option>
+<option value="EL BAJIO">EL BAJIO</option>
+<option value="EL BOSQUE RESIDENCIAL">EL BOSQUE RESIDENCIAL</option>
+<option value="EL CAMPANARIO">EL CAMPANARIO</option>
+<option value="EL CAMPESTRE I">EL CAMPESTRE I</option>
+<option value="EL CAMPESTRE III">EL CAMPESTRE III</option>
+<option value="EL MIRADOR">EL MIRADOR</option>
+<option value="EL PARAISO">EL PARAISO</option>
+<option value="EL REAL">EL REAL</option>
+<option value="EL SAUZ">EL SAUZ</option>
+<option value="EL TIGRE I">EL TIGRE I</option>
+<option value="EL VERGEL">EL VERGEL</option>
+<option value="EMILIANO ZAPATA">EMILIANO ZAPATA</option>
+<option value="ESTRADA">ESTRADA</option>
+<option value="EUCALIPTO VALLARTA">EUCALIPTO VALLARTA</option>
+<option value="EX EJIDO DE TESISTAN">EX EJIDO DE TESISTAN</option>
+<option value="FERRAN V">FERRAN V</option>
+<option value="FLORES LAS">FLORES LAS</option>
+<option value="FLORESTA LA">FLORESTA LA</option>
+<option value="FORET RESIDENCIAL">FORET RESIDENCIAL</option>
+<option value="FRACC. ALTABRISA">FRACC. ALTABRISA</option>
+<option value="FRACC. ARBOLEDAS">FRACC. ARBOLEDAS</option>
+<option value="FRACC. BELENES">FRACC. BELENES</option>
+<option value="FRACC. LA VICTORIA">FRACC. LA VICTORIA</option>
+<option value="FRACC. LOS ROBLES">FRACC. LOS ROBLES</option>
+<option value="FRACC. PARQUE HACIENDA TESISTAN">FRACC. PARQUE HACIENDA TESISTAN</option>
+<option value="FRACC. TERRANOVA">FRACC. TERRANOVA</option>
+<option value="FRACC. VALLE DEL SOL">FRACC. VALLE DEL SOL</option>
+<option value="FRACCIONAMIENTO BUGAMBILIAS 2 SECCION">FRACCIONAMIENTO BUGAMBILIAS 2 SECCION</option>
+<option value="FRACCIONAMIENTO SAN AGUSTIN">FRACCIONAMIENTO SAN AGUSTIN</option>
+<option value="FRANCISCO SARABIA">FRANCISCO SARABIA</option>
+<option value="FRESNO EL">FRESNO EL</option>
+<option value="GIRASOLES ACUEDUCTO">GIRASOLES ACUEDUCTO</option>
+<option value="GIRASOLES ELITE">GIRASOLES ELITE</option>
+<option value="GONZALEZ ORTEGA">GONZALEZ ORTEGA</option>
+<option value="GRAN CENTRO ACUEDUCTO">GRAN CENTRO ACUEDUCTO</option>
+<option value="GUADALAJARITA">GUADALAJARITA</option>
+<option value="GUADALUPE INN">GUADALUPE INN</option>
+<option value="GUADALUPE RESIDENCIAL">GUADALUPE RESIDENCIAL</option>
+<option value="GUADALUPE SUR">GUADALUPE SUR</option>
+<option value="GUADALUPE VICTORIA">GUADALUPE VICTORIA</option>
+<option value="HACIENDA DE LA MORA">HACIENDA DE LA MORA</option>
+<option value="HACIENDA DEL SOL">HACIENDA DEL SOL</option>
+<option value="HACIENDA DEL TEPEYAC">HACIENDA DEL TEPEYAC</option>
+<option value="HACIENDA LAS PALMAS">HACIENDA LAS PALMAS</option>
+<option value="HACIENDA LAS PALOMAS">HACIENDA LAS PALOMAS</option>
+<option value="HACIENDA NUEVO MEXICO">HACIENDA NUEVO MEXICO</option>
+<option value="HACIENDA SANTA FE">HACIENDA SANTA FE</option>
+<option value="HACIENDAS DE ATEMAJAC">HACIENDAS DE ATEMAJAC</option>
+<option value="HACIENDAS DE ZAPOPAN">HACIENDAS DE ZAPOPAN</option>
+<option value="HACIENDAS DEL SOL">HACIENDAS DEL SOL</option>
+<option value="HACIENDAS DEL VALLE">HACIENDAS DEL VALLE</option>
+<option value="HACIENDAS JUAREZ">HACIENDAS JUAREZ</option>
+<option value="HEROES NACIONALES">HEROES NACIONALES</option>
+<option value="HIDALGO MIGUEL">HIDALGO MIGUEL</option>
+<option value="HOGARES DE ATEMAJAC">HOGARES DE ATEMAJAC</option>
+<option value="HOGARES DE NUEVO MEXICO">HOGARES DE NUEVO MEXICO</option>
+<option value="HOGARES DEL BATAN">HOGARES DEL BATAN</option>
+<option value="HUAXTLA">HUAXTLA</option>
+<option value="IKAL">IKAL</option>
+<option value="INDIGENA DE MEZQUITAN">INDIGENA DE MEZQUITAN</option>
+<option value="INDIGENA SN. JUAN DE OCOTAN">INDIGENA SN. JUAN DE OCOTAN</option>
+<option value="INDUSTRIAL LOS BELENES">INDUSTRIAL LOS BELENES</option>
+<option value="INDUSTRIAL LOS LAURELES">INDUSTRIAL LOS LAURELES</option>
+<option value="INDUSTRIAL PERIFERICO NORTE">INDUSTRIAL PERIFERICO NORTE</option>
+<option value="INDUSTRIAL ZAPOPAN NORTE">INDUSTRIAL ZAPOPAN NORTE</option>
+<option value="IXCATAN">IXCATAN</option>
+<option value="JACARANDAS">JACARANDAS</option>
+<option value="JARD. DE LA CRUZ">JARD. DE LA CRUZ</option>
+<option value="JARD. DE LA PATRIA">JARD. DE LA PATRIA</option>
+<option value="JARD. DE LOS ARCOS">JARD. DE LOS ARCOS</option>
+<option value="JARD. DE LOS BELENES">JARD. DE LOS BELENES</option>
+<option value="JARD. DE NUEVO MEXICO">JARD. DE NUEVO MEXICO</option>
+<option value="JARD. DEL AUDITORIO">JARD. DEL AUDITORIO</option>
+<option value="JARD. DEL BOSQUE">JARD. DEL BOSQUE</option>
+<option value="JARD. DEL SOL">JARD. DEL SOL</option>
+<option value="JARD. DEL VERGEL">JARD. DEL VERGEL</option>
+<option value="JARD. SEATTLE">JARD. SEATTLE</option>
+<option value="JARD. TAPATIOS">JARD. TAPATIOS</option>
+<option value="JARD. TEPEYAC">JARD. TEPEYAC</option>
+<option value="JARDIN REAL">JARDIN REAL</option>
+<option value="JARDINES DE CHAPALITA RES.">JARDINES DE CHAPALITA RES.</option>
+<option value="JARDINES DE GUADALUPE">JARDINES DE GUADALUPE</option>
+<option value="JARDINES DE LA ESPERANZA">JARDINES DE LA ESPERANZA</option>
+<option value="JARDINES DE LA MAGDALENA">JARDINES DE LA MAGDALENA</option>
+<option value="JARDINES DE LA PRIMAVERA">JARDINES DE LA PRIMAVERA</option>
+<option value="JARDINES DE LA PROVIDENCIA">JARDINES DE LA PROVIDENCIA</option>
+<option value="JARDINES DE LAS FUENTES">JARDINES DE LAS FUENTES</option>
+<option value="JARDINES DE NUEVO MEXICO">JARDINES DE NUEVO MEXICO</option>
+<option value="JARDINES DE SAN ANTONIO">JARDINES DE SAN ANTONIO</option>
+<option value="JARDINES DE SAN IGNACIO">JARDINES DE SAN IGNACIO</option>
+<option value="JARDINES DE SANTA MARGARITA">JARDINES DE SANTA MARGARITA</option>
+<option value="JARDINES DE TABACHINES">JARDINES DE TABACHINES</option>
+<option value="JARDINES DEL COLLI">JARDINES DEL COLLI</option>
+<option value="JARDINES DEL VALLE">JARDINES DEL VALLE</option>
+<option value="JARDINES UNIVERSIDAD">JARDINES UNIVERSIDAD</option>
+<option value="JARDINES VALLARTA">JARDINES VALLARTA</option>
+<option value="JOCOTAN">JOCOTAN</option>
+<option value="JOYA LA">JOYA LA</option>
+<option value="JUAN GIL PRECIADO">JUAN GIL PRECIADO</option>
+<option value="JUAN MANUEL VALLARTA">JUAN MANUEL VALLARTA</option>
+<option value="LA CALMA">LA CALMA</option>
+<option value="LA CANTERA">LA CANTERA</option>
+<option value="LA CANTERA RESIDENCIAL">LA CANTERA RESIDENCIAL</option>
+<option value="LA CIMA">LA CIMA</option>
+<option value="LA ESTANCIA">LA ESTANCIA</option>
+<option value="LA ESTANCIA RESIDENCIAL">LA ESTANCIA RESIDENCIAL</option>
+<option value="LA EXPERIENCIA">LA EXPERIENCIA</option>
+<option value="LA FLORIDA">LA FLORIDA</option>
+<option value="LA MAGDALENA">LA MAGDALENA</option>
+<option value="LA MARTINICA">LA MARTINICA</option>
+<option value="LA MORALEJA">LA MORALEJA</option>
+<option value="LA PRIMAVERA">LA PRIMAVERA</option>
+<option value="LA SOBERANA">LA SOBERANA</option>
+<option value="LA SOLEDAD">LA SOLEDAD</option>
+<option value="LA VENTA DEL ASTILLERO">LA VENTA DEL ASTILLERO</option>
+<option value="LADERA DE LA PRIMAVERA">LADERA DE LA PRIMAVERA</option>
+<option value="LAURELES">LAURELES</option>
+<option value="LINDAVISTA">LINDAVISTA</option>
+<option value="LOMA BLANCA">LOMA BLANCA</option>
+<option value="LOMA BONITA">LOMA BONITA</option>
+<option value="LOMA BONITA EJIDAL">LOMA BONITA EJIDAL</option>
+<option value="LOMA BONITA RESIDENCIAL">LOMA BONITA RESIDENCIAL</option>
+<option value="LOMA REAL">LOMA REAL</option>
+<option value="LOMAS ALTAS">LOMAS ALTAS</option>
+<option value="LOMAS DE ATEMAJAC">LOMAS DE ATEMAJAC</option>
+<option value="LOMAS DE GUADALUPE">LOMAS DE GUADALUPE</option>
+<option value="LOMAS DE LA PRIMAVERA">LOMAS DE LA PRIMAVERA</option>
+<option value="LOMAS DE SAN JAVIER">LOMAS DE SAN JAVIER</option>
+<option value="LOMAS DE TABACHINES">LOMAS DE TABACHINES</option>
+<option value="LOMAS DE TESISTAN">LOMAS DE TESISTAN</option>
+<option value="LOMAS DE ZAPOPAN">LOMAS DE ZAPOPAN</option>
+<option value="LOMAS DEL BATAN">LOMAS DEL BATAN</option>
+<option value="LOMAS DEL BOSQUE">LOMAS DEL BOSQUE</option>
+<option value="LOMAS DEL CENTINELA">LOMAS DEL CENTINELA</option>
+<option value="LOMAS DEL CHAPARRAL">LOMAS DEL CHAPARRAL</option>
+<option value="LOMAS DEL COLLI">LOMAS DEL COLLI</option>
+<option value="LOMAS DEL SEMINARIO">LOMAS DEL SEMINARIO</option>
+<option value="LOMAS DEL VALLE">LOMAS DEL VALLE</option>
+<option value="LOMAS DEL VERGEL">LOMAS DEL VERGEL</option>
+<option value="LOMAS UNIVERSIDAD">LOMAS UNIVERSIDAD</option>
+<option value="LOS ALMENDROS">LOS ALMENDROS</option>
+<option value="LOS CAJETES">LOS CAJETES</option>
+<option value="LOS COLORINES">LOS COLORINES</option>
+<option value="LOS GIRASOLES">LOS GIRASOLES</option>
+<option value="LOS MOLINOS I">LOS MOLINOS I</option>
+<option value="LOS MOLINOS III">LOS MOLINOS III</option>
+<option value="LOS NISPEROS">LOS NISPEROS</option>
+<option value="MADEIRO I. FRANCISCO">MADEIRO I. FRANCISCO</option>
+<option value="MARIANO OTERO">MARIANO OTERO</option>
+<option value="MARIANO OTERO EJIDAL">MARIANO OTERO EJIDAL</option>
+<option value="MESA COLORADA">MESA COLORADA</option>
+<option value="MESA COLORADA ORIENTE">MESA COLORADA ORIENTE</option>
+<option value="MESA COLORADA PONIENTE">MESA COLORADA PONIENTE</option>
+<option value="MESA DE SAN JUAN">MESA DE SAN JUAN</option>
+<option value="MEXICO UNIDAD">MEXICO UNIDAD</option>
+<option value="MIRADOR DE SAN ISIDRO">MIRADOR DE SAN ISIDRO</option>
+<option value="MIRADOR DEL BOSQUE">MIRADOR DEL BOSQUE</option>
+<option value="MIRADOR DEL SOL">MIRADOR DEL SOL</option>
+<option value="MIRAMAR">MIRAMAR</option>
+<option value="MISION CAPISTRANO">MISION CAPISTRANO</option>
+<option value="MISION DEL BOSQUE">MISION DEL BOSQUE</option>
+<option value="MISION DEL VALLE">MISION DEL VALLE</option>
+<option value="MISION JARDINES">MISION JARDINES</option>
+<option value="MISION SAN GENARO">MISION SAN GENARO</option>
+<option value="MOCTEZUMA">MOCTEZUMA</option>
+<option value="MONTE VERDE">MONTE VERDE</option>
+<option value="MONTECHELO">MONTECHELO</option>
+<option value="MORENO PEDRO">MORENO PEDRO</option>
+<option value="NEXTIPAC">NEXTIPAC</option>
+<option value="NUEVO MEXICO">NUEVO MEXICO</option>
+<option value="NUEVO MEXICO SUR">NUEVO MEXICO SUR</option>
+<option value="OLIVOS LOS">OLIVOS LOS</option>
+<option value="OYAMEL">OYAMEL</option>
+<option value="PALMA REAL">PALMA REAL</option>
+<option value="PALMAS LAS">PALMAS LAS</option>
+<option value="PALMIRA">PALMIRA</option>
+<option value="PARAISOS DE ZAPOPAN">PARAISOS DE ZAPOPAN</option>
+<option value="PARAISOS DEL COLLI">PARAISOS DEL COLLI</option>
+<option value="PARAJE DE LOS PINOS">PARAJE DE LOS PINOS</option>
+<option value="PARQUE ARRAYANES">PARQUE ARRAYANES</option>
+<option value="PARQUE DE LAS AZALEAS">PARQUE DE LAS AZALEAS</option>
+<option value="PARQUE INDUSTRIAL EL COLLI">PARQUE INDUSTRIAL EL COLLI</option>
+<option value="PARQUE INDUSTRIAL LOS BELENES">PARQUE INDUSTRIAL LOS BELENES</option>
+<option value="PARQUE INDUSTRIAL LOS MOLINOS">PARQUE INDUSTRIAL LOS MOLINOS</option>
+<option value="PARQUE INDUSTRIAL SAN JOSE">PARQUE INDUSTRIAL SAN JOSE</option>
+<option value="PARQUE REAL">PARQUE REAL</option>
+<option value="PARQUES DE NUEVO MEXICO">PARQUES DE NUEVO MEXICO</option>
+<option value="PARQUES DE ZAPOPAN">PARQUES DE ZAPOPAN</option>
+<option value="PARQUES DEL AUDITORIO">PARQUES DEL AUDITORIO</option>
+<option value="PARQUES DEL CENTINELA">PARQUES DEL CENTINELA</option>
+<option value="PARQUES GUADALUPE">PARQUES GUADALUPE</option>
+<option value="PARQUES TEPEYAC">PARQUES TEPEYAC</option>
+<option value="PARQUES VALLARTA">PARQUES VALLARTA</option>
+<option value="PASEOS DE LA PRIMAVERA">PASEOS DE LA PRIMAVERA</option>
+<option value="PASEOS DE SANTA LUCIA">PASEOS DE SANTA LUCIA</option>
+<option value="PASEOS DEL SOL">PASEOS DEL SOL</option>
+<option value="PASEOS DEL SOL 1RA. SECCION">PASEOS DEL SOL 1RA. SECCION</option>
+<option value="PASEOS DEL SOL 2DA. SECCION">PASEOS DEL SOL 2DA. SECCION</option>
+<option value="PATRIA">PATRIA</option>
+<option value="PEDRO MORENO">PEDRO MORENO</option>
+<option value="PINAR DE LA CALMA">PINAR DE LA CALMA</option>
+<option value="PINAR INDUSTRIAL">PINAR INDUSTRIAL</option>
+<option value="PLAZA DEL ANGEL">PLAZA DEL ANGEL</option>
+<option value="POBLADO DE NEXTIPAC">POBLADO DE NEXTIPAC</option>
+<option value="POBLADO DE SAN ISIDRO">POBLADO DE SAN ISIDRO</option>
+<option value="POBLADO LA PRIMAVERA">POBLADO LA PRIMAVERA</option>
+<option value="PRADOS DEL BOSQUE">PRADOS DEL BOSQUE</option>
+<option value="PRADOS GUADALUPE">PRADOS GUADALUPE</option>
+<option value="PRADOS TEPEYAC">PRADOS TEPEYAC</option>
+<option value="PRADOS VALLARTA">PRADOS VALLARTA</option>
+<option value="PRIMAVERA LA">PRIMAVERA LA</option>
+<option value="PROVIDENCIA LA">PROVIDENCIA LA</option>
+<option value="PUERTA DE HIERRO">PUERTA DE HIERRO</option>
+<option value="PUERTA DEL BOSQUE">PUERTA DEL BOSQUE</option>
+<option value="PUERTA DEL SOL">PUERTA DEL SOL</option>
+<option value="PUERTA PLATA">PUERTA PLATA</option>
+<option value="QUINTAS DEL BOSQUE">QUINTAS DEL BOSQUE</option>
+<option value="REAL ACUEDUCTO">REAL ACUEDUCTO</option>
+<option value="REAL CANTABRIA">REAL CANTABRIA</option>
+<option value="REAL CASA BLANCA">REAL CASA BLANCA</option>
+<option value="REAL DE GUADALUPE">REAL DE GUADALUPE</option>
+<option value="REAL DEL BOSQUE">REAL DEL BOSQUE</option>
+<option value="REAL DEL PARQUE">REAL DEL PARQUE</option>
+<option value="REAL VALLARTA">REAL VALLARTA</option>
+<option value="RESIDENCIAL CHAPALITA">RESIDENCIAL CHAPALITA</option>
+<option value="RESIDENCIAL CONJUNTO PATRIA">RESIDENCIAL CONJUNTO PATRIA</option>
+<option value="RESIDENCIAL DEL PARQUE">RESIDENCIAL DEL PARQUE</option>
+<option value="RESIDENCIAL DEL VALLE">RESIDENCIAL DEL VALLE</option>
+<option value="RESIDENCIAL ELITE">RESIDENCIAL ELITE</option>
+<option value="RESIDENCIAL HACIENDAS DEL SOL">RESIDENCIAL HACIENDAS DEL SOL</option>
+<option value="RESIDENCIAL LA CALMA">RESIDENCIAL LA CALMA</option>
+<option value="RESIDENCIAL LAS MARGARITAS">RESIDENCIAL LAS MARGARITAS</option>
+<option value="RESIDENCIAL LOMA BONITA">RESIDENCIAL LOMA BONITA</option>
+<option value="RESIDENCIAL TABACHINES">RESIDENCIAL TABACHINES</option>
+<option value="RESIDENCIAL VALLARTA">RESIDENCIAL VALLARTA</option>
+<option value="RINCONADA ATEMAJAC">RINCONADA ATEMAJAC</option>
+<option value="RINCONADA BUGAMBILIAS">RINCONADA BUGAMBILIAS</option>
+<option value="RINCONADA DE LA CALMA">RINCONADA DE LA CALMA</option>
+<option value="RINCONADA DE LA PRIMAVERA">RINCONADA DE LA PRIMAVERA</option>
+<option value="RINCONADA DE LOS BELENES">RINCONADA DE LOS BELENES</option>
+<option value="RINCONADA DEL BOSQUE">RINCONADA DEL BOSQUE</option>
+<option value="RINCONADA DEL SOL">RINCONADA DEL SOL</option>
+<option value="RINCONADA DEL VALLE">RINCONADA DEL VALLE</option>
+<option value="RINCONADA GUADALUPE">RINCONADA GUADALUPE</option>
+<option value="RINCONADA SAN ANTONIO">RINCONADA SAN ANTONIO</option>
+<option value="RINCONADA VALLARTA FRACC.">RINCONADA VALLARTA FRACC.</option>
+<option value="RINCONADAS DEL AUDITORIO">RINCONADAS DEL AUDITORIO</option>
+<option value="RIO BLANCO">RIO BLANCO</option>
+<option value="ROYAL COUNTRY">ROYAL COUNTRY</option>
+<option value="SAN AGUSTIN">SAN AGUSTIN</option>
+<option value="SAN ANTONIO DEL VALLE">SAN ANTONIO DEL VALLE</option>
+<option value="SAN FRANCISCO">SAN FRANCISCO</option>
+<option value="SAN FRANCISCO TESISTAN">SAN FRANCISCO TESISTAN</option>
+<option value="SAN ISIDRO">SAN ISIDRO</option>
+<option value="SAN ISIDRO EJIDAL">SAN ISIDRO EJIDAL</option>
+<option value="SAN ISIDRO RESIDENCIAL">SAN ISIDRO RESIDENCIAL</option>
+<option value="SAN JAVIER">SAN JAVIER</option>
+<option value="SAN JERONIMO">SAN JERONIMO</option>
+<option value="SAN JOSE DEL BAJIO">SAN JOSE DEL BAJIO</option>
+<option value="SAN JUAN DE OCOTAN">SAN JUAN DE OCOTAN</option>
+<option value="SAN MIGUEL">SAN MIGUEL</option>
+<option value="SANTA ANA TEPETITLAN">SANTA ANA TEPETITLAN</option>
+<option value="SANTA CATALINA">SANTA CATALINA</option>
+<option value="SANTA CECILIA">SANTA CECILIA</option>
+<option value="SANTA FE">SANTA FE</option>
+<option value="SANTA ISABEL">SANTA ISABEL</option>
+<option value="SANTA LUCIA">SANTA LUCIA</option>
+<option value="SANTA MARGARITA">SANTA MARGARITA</option>
+<option value="SANTA MARGARITA 1A. SECCION">SANTA MARGARITA 1A. SECCION</option>
+<option value="SANTA MARGARITA 2DA. SECCION">SANTA MARGARITA 2DA. SECCION</option>
+<option value="SANTA MARIA DE JOCOTAN">SANTA MARIA DE JOCOTAN</option>
+<option value="SANTA MONICA">SANTA MONICA</option>
+<option value="SANTA PAULA">SANTA PAULA</option>
+<option value="SANTA ROSA EJIDAL">SANTA ROSA EJIDAL</option>
+<option value="SEATTLE">SEATTLE</option>
+<option value="SECTOR HIDALGO">SECTOR HIDALGO</option>
+<option value="SECTOR JUAREZ">SECTOR JUAREZ</option>
+<option value="SENDAS DEL VALLE">SENDAS DEL VALLE</option>
+<option value="SENDEROS DE NUEVO MEXICO">SENDEROS DE NUEVO MEXICO</option>
+<option value="SENDEROS DE TESISTAN">SENDEROS DE TESISTAN</option>
+<option value="SOLARES">SOLARES</option>
+<option value="SOLE">SOLE</option>
+<option value="SOMOS RESIDENCIAL">SOMOS RESIDENCIAL</option>
+<option value="TABACHINES">TABACHINES</option>
+<option value="TATEPOSCO">TATEPOSCO</option>
+<option value="TECNOLOGICO DE MONTERREY">TECNOLOGICO DE MONTERREY</option>
+<option value="TEPEYAC">TEPEYAC</option>
+<option value="TEPEYAC CASINO">TEPEYAC CASINO</option>
+<option value="TERRA VISTA RESIDENCIAL">TERRA VISTA RESIDENCIAL</option>
+<option value="TERRANOVA">TERRANOVA</option>
+<option value="TESISTAN">TESISTAN</option>
+<option value="TESISTAN COUNTRY">TESISTAN COUNTRY</option>
+<option value="TRIANGULO EL">TRIANGULO EL</option>
+<option value="TUZANIA">TUZANIA</option>
+<option value="TUZANIA EJIDAL">TUZANIA EJIDAL</option>
+<option value="TUZANIA INFONAVIT">TUZANIA INFONAVIT</option>
+<option value="UNIDAD AUDITORIO">UNIDAD AUDITORIO</option>
+<option value="UNIDAD HABITACIONAL LOS BELENES">UNIDAD HABITACIONAL LOS BELENES</option>
+<option value="VALLARTA LA PATRIA">VALLARTA LA PATRIA</option>
+<option value="VALLARTA PARQUE INDUSTRIAL">VALLARTA PARQUE INDUSTRIAL</option>
+<option value="VALLARTA PONIENTE">VALLARTA PONIENTE</option>
+<option value="VALLARTA SAN JORGE">VALLARTA SAN JORGE</option>
+<option value="VALLARTA UNIVERSIDAD">VALLARTA UNIVERSIDAD</option>
+<option value="VALLE DE ATEMAJAC">VALLE DE ATEMAJAC</option>
+<option value="VALLE DE BUGAMBILIAS">VALLE DE BUGAMBILIAS</option>
+<option value="VALLE DE LA PROVIDENCIA">VALLE DE LA PROVIDENCIA</option>
+<option value="VALLE DE LOS MOLINOS I">VALLE DE LOS MOLINOS I</option>
+<option value="VALLE DE LOS ROBLES">VALLE DE LOS ROBLES</option>
+<option value="VALLE DE NUEVO MEXICO">VALLE DE NUEVO MEXICO</option>
+<option value="VALLE DE SAN NICOLAS">VALLE DE SAN NICOLAS</option>
+<option value="VALLE DEL SOL">VALLE DEL SOL</option>
+<option value="VALLE ESMERALDA">VALLE ESMERALDA</option>
+<option value="VALLE IMPERIAL">VALLE IMPERIAL</option>
+<option value="VALLE REAL">VALLE REAL</option>
+<option value="VERDE VALLE">VERDE VALLE</option>
+<option value="VICENTE GUERRERO">VICENTE GUERRERO</option>
+<option value="VILLA BONITA">VILLA BONITA</option>
+<option value="VILLA DE GUADALUPE">VILLA DE GUADALUPE</option>
+<option value="VILLA LA">VILLA LA</option>
+<option value="VILLA MARSELLA">VILLA MARSELLA</option>
+<option value="VILLA PANAMERICANA">VILLA PANAMERICANA</option>
+<option value="VILLA SERENA">VILLA SERENA</option>
+<option value="VILLA UNIVERSITARIA">VILLA UNIVERSITARIA</option>
+<option value="VILLAS DE GUADALUPE">VILLAS DE GUADALUPE</option>
+<option value="VILLAS DE LOS BELENES">VILLAS DE LOS BELENES</option>
+<option value="VILLAS DE NUEVO MEXICO">VILLAS DE NUEVO MEXICO</option>
+<option value="VILLAS DE TESISTAN">VILLAS DE TESISTAN</option>
+<option value="VILLAS DE VALLARTA">VILLAS DE VALLARTA</option>
+<option value="VILLAS DEL CENTINELA">VILLAS DEL CENTINELA</option>
+<option value="VILLAS DEL PARQUE">VILLAS DEL PARQUE</option>
+<option value="VILLAS DEL TEPEYAC">VILLAS DEL TEPEYAC</option>
+<option value="VILLAS DEL VALLE">VILLAS DEL VALLE</option>
+<option value="VILLAS LA LOMA">VILLAS LA LOMA</option>
+<option value="VILLAS NUEVA GALICIA">VILLAS NUEVA GALICIA</option>
+<option value="VILLAS SAN JAVIER">VILLAS SAN JAVIER</option>
+<option value="VILLAS SAN JORGE">VILLAS SAN JORGE</option>
+<option value="VINATERA">VINATERA</option>
+<option value="VIRREYES">VIRREYES</option>
+<option value="VIRREYES II">VIRREYES II</option>
+<option value="VIRREYES RESIDENCIAL">VIRREYES RESIDENCIAL</option>
+<option value="VISTA DEL CENTINELA">VISTA DEL CENTINELA</option>
+<option value="VISTA HERMOSA">VISTA HERMOSA</option>
+<option value="VISTA NORTE RESIDENCIAL">VISTA NORTE RESIDENCIAL</option>
+<option value="VISTA REAL GUADALAJARA">VISTA REAL GUADALAJARA</option>
+<option value="VISTA RESIDENCIAL">VISTA RESIDENCIAL</option>
+<option value="VISTA ZAPOPAN">VISTA ZAPOPAN</option>
+<option value="VIVEROS DEL VALLE">VIVEROS DEL VALLE</option>
+<option value="VOLCAN DEL COLLI">VOLCAN DEL COLLI</option>
+<option value="ZAPOPAN">ZAPOPAN</option>
+<option value="ZAPOPAN CENTRO">ZAPOPAN CENTRO</option>
+<option value="ZAPOTE EL">ZAPOTE EL</option>
+<option value="ZOQUIPAN">ZOQUIPAN</option>
+<option value="ZOQUIPAN PRIMERA SECCION">ZOQUIPAN PRIMERA SECCION</option>
+<option value="ZOTOGRANDE RESIDENCIAL">ZOTOGRANDE RESIDENCIAL</option>
+          </select>
+        </div>
+      </div>
+      <div class="col2">
+        <div class="field field-opt">
+          <label>Plaza comercial</label>
+          <select id="sel-plaza-zpn">
+<option value="(SIN PLAZA COMERCIAL)">(SIN PLAZA COMERCIAL)</option>
+<option value="( FALTA HABITABILIDAD) PARQUE INDUSTRIAL NOGALES, SA DE CV">( FALTA HABITABILIDAD) PARQUE INDUSTRIAL NOGALES, SA DE CV</option>
+<option value="ABANICO LA CIMA">ABANICO LA CIMA</option>
+<option value="ADMINISTRADORA CENTRO COMERCIAL ANDARES">ADMINISTRADORA CENTRO COMERCIAL ANDARES</option>
+<option value="ALADA SHOPS">ALADA SHOPS</option>
+<option value="ALEGRA PLAZA">ALEGRA PLAZA</option>
+<option value="ALTALUZ">ALTALUZ</option>
+<option value="ANDARES CORPORATIVO">ANDARES CORPORATIVO</option>
+<option value="CENTRO COMERCIAL ARECA">CENTRO COMERCIAL ARECA</option>
+<option value="CENTRO COMERCIAL EL CARMEN">CENTRO COMERCIAL EL CARMEN</option>
+<option value="CENTRO COMERCIAL INEDITA">CENTRO COMERCIAL INEDITA</option>
+<option value="CENTRO COMERCIAL LA PLACITA">CENTRO COMERCIAL LA PLACITA</option>
+<option value="CENTRO COMERCIAL MOREA">CENTRO COMERCIAL MOREA</option>
+<option value="CENTRO COMERCIAL PLAZA GUADALUPE">CENTRO COMERCIAL PLAZA GUADALUPE</option>
+<option value="CENTRO COMERCIAL PLAZA LAS AGUILAS">CENTRO COMERCIAL PLAZA LAS AGUILAS</option>
+<option value="CENTRO COMERCIAL PLAZA NUEVA IMAGEN">CENTRO COMERCIAL PLAZA NUEVA IMAGEN</option>
+<option value="CENTRO COMERCIAL PLAZA PRESIDENTES">CENTRO COMERCIAL PLAZA PRESIDENTES</option>
+<option value="CENTRO COMERCIAL REAL DEL BOSQUE">CENTRO COMERCIAL REAL DEL BOSQUE</option>
+<option value="CENTRO COMERCIAL SANTA FE">CENTRO COMERCIAL SANTA FE</option>
+<option value="CIUDADELA">CIUDADELA</option>
+<option value="CONCENTRO">CONCENTRO</option>
+<option value="CONDO PLAZA COMERCIAL DEL SOL">CONDO PLAZA COMERCIAL DEL SOL</option>
+<option value="CONDOMINIO CENTRO COMERCIAL TEPEYAC">CONDOMINIO CENTRO COMERCIAL TEPEYAC</option>
+<option value="CONDOMINIO CITY PARK">CONDOMINIO CITY PARK</option>
+<option value="CONDOMINIO ORION">CONDOMINIO ORION</option>
+<option value="DUO AVIACION">DUO AVIACION</option>
+<option value="ECO MERCADO EL VIGIA">ECO MERCADO EL VIGIA</option>
+<option value="EL BOSQUE STRIP BANSI S.A.">EL BOSQUE STRIP BANSI S.A.</option>
+<option value="EL ROBLE">EL ROBLE</option>
+<option value="FEDERALISTAS SUR">FEDERALISTAS SUR</option>
+<option value="GALERIA COMERCIAL ROCK MALL">GALERIA COMERCIAL ROCK MALL</option>
+<option value="GRAN TERRAZA BELENES">GRAN TERRAZA BELENES</option>
+<option value="GUGA PLAZA COMERCIAL">GUGA PLAZA COMERCIAL</option>
+<option value="LA GRAN PLAZA FASHION MALL">LA GRAN PLAZA FASHION MALL</option>
+<option value="LA PERLA">LA PERLA</option>
+<option value="LA PLACITA TABACHINES">LA PLACITA TABACHINES</option>
+<option value="LA PLACITA TEPEYAC">LA PLACITA TEPEYAC</option>
+<option value="MEDICENTER">MEDICENTER</option>
+<option value="MERCADO ABASTOS DEL SOL">MERCADO ABASTOS DEL SOL</option>
+<option value="MERCADO DEL MAR">MERCADO DEL MAR</option>
+<option value="MERCADO LAS PALMAS">MERCADO LAS PALMAS</option>
+<option value="MERCADO MARIANO OTERO">MERCADO MARIANO OTERO</option>
+<option value="MERCADO MUNICIPAL ABASTOS DE ZAPOPAN">MERCADO MUNICIPAL ABASTOS DE ZAPOPAN</option>
+<option value="MERCADO MUNICIPAL AUDITORIO">MERCADO MUNICIPAL AUDITORIO</option>
+<option value="MERCADO MUNICIPAL CIUDAD GRANJA">MERCADO MUNICIPAL CIUDAD GRANJA</option>
+<option value="MERCADO MUNICIPAL CONSTITUCION">MERCADO MUNICIPAL CONSTITUCION</option>
+<option value="MERCADO MUNICIPAL DE ATEMAJAC">MERCADO MUNICIPAL DE ATEMAJAC</option>
+<option value="MERCADO MUNICIPAL DE LAS FLORES">MERCADO MUNICIPAL DE LAS FLORES</option>
+<option value="MERCADO MUNICIPAL DE LAS FUENTES">MERCADO MUNICIPAL DE LAS FUENTES</option>
+<option value="MERCADO MUNICIPAL FRANCISCO SARABIA">MERCADO MUNICIPAL FRANCISCO SARABIA</option>
+<option value="MERCADO MUNICIPAL LA TUZANIA">MERCADO MUNICIPAL LA TUZANIA</option>
+<option value="MERCADO MUNICIPAL LAZARO CARDENAS">MERCADO MUNICIPAL LAZARO CARDENAS</option>
+<option value="MERCADO MUNICIPAL OBREROS DE CANANEA">MERCADO MUNICIPAL OBREROS DE CANANEA</option>
+<option value="MERCADO MUNICIPAL SAN ISIDRO EJIDAL">MERCADO MUNICIPAL SAN ISIDRO EJIDAL</option>
+<option value="MERCADO MUNICIPAL SANTA ANA TEPETITLAN">MERCADO MUNICIPAL SANTA ANA TEPETITLAN</option>
+<option value="MERCADO MUNICIPAL SOLIDARIDAD">MERCADO MUNICIPAL SOLIDARIDAD</option>
+<option value="MERCADO MUNICIPAL TESISTAN">MERCADO MUNICIPAL TESISTAN</option>
+<option value="METRO PLAZA AMARANTO">METRO PLAZA AMARANTO</option>
+<option value="MICROPLAZA">MICROPLAZA</option>
+<option value="NACIONES UNIDAS">NACIONES UNIDAS</option>
+<option value="PARQUE INDUSTRIAL EL COLLI">PARQUE INDUSTRIAL EL COLLI</option>
+<option value="PARQUE INDUSTRIAL EL COLLI II">PARQUE INDUSTRIAL EL COLLI II</option>
+<option value="PARQUE INDUSTRIAL FERRAN II">PARQUE INDUSTRIAL FERRAN II</option>
+<option value="PARQUE INDUSTRIAL FERRAN III">PARQUE INDUSTRIAL FERRAN III</option>
+<option value="PARQUE INDUSTRIAL LOS BELENES">PARQUE INDUSTRIAL LOS BELENES</option>
+<option value="PARQUE INDUSTRIAL LOS MOLINOS">PARQUE INDUSTRIAL LOS MOLINOS</option>
+<option value="PARQUE INDUSTRIAL SAN ANGEL">PARQUE INDUSTRIAL SAN ANGEL</option>
+<option value="PARQUE INDUSTRIAL TREX LA VENTA">PARQUE INDUSTRIAL TREX LA VENTA</option>
+<option value="PARQUE PINAR EMPRESARIAL">PARQUE PINAR EMPRESARIAL</option>
+<option value="PASEO ALCALDE">PASEO ALCALDE</option>
+<option value="PASEO MAGNOLIA">PASEO MAGNOLIA</option>
+<option value="PLAZA 3325">PLAZA 3325</option>
+<option value="PLAZA ACUEDUCTO">PLAZA ACUEDUCTO</option>
+<option value="PLAZA ACUEDUCTO 2000">PLAZA ACUEDUCTO 2000</option>
+<option value="PLAZA AMISTAD">PLAZA AMISTAD</option>
+<option value="PLAZA ARMONIA HABITAT">PLAZA ARMONIA HABITAT</option>
+<option value="PLAZA ASTRAL">PLAZA ASTRAL</option>
+<option value="PLAZA AURA">PLAZA AURA</option>
+<option value="PLAZA AVIACION">PLAZA AVIACION</option>
+<option value="PLAZA AZTLAN">PLAZA AZTLAN</option>
+<option value="PLAZA BELENES">PLAZA BELENES</option>
+<option value="PLAZA BELENES NORTE">PLAZA BELENES NORTE</option>
+<option value="PLAZA BENETTO">PLAZA BENETTO</option>
+<option value="PLAZA BUGAMBILIAS">PLAZA BUGAMBILIAS</option>
+<option value="PLAZA CARREFOUR">PLAZA CARREFOUR</option>
+<option value="PLAZA CENTRO DE ZAPOPAN">PLAZA CENTRO DE ZAPOPAN</option>
+<option value="PLAZA CIBELES">PLAZA CIBELES</option>
+<option value="PLAZA COMERCIAL DEL SOL">PLAZA COMERCIAL DEL SOL</option>
+<option value="PLAZA COMERCIAL DISTRITO PONIENTE">PLAZA COMERCIAL DISTRITO PONIENTE</option>
+<option value="PLAZA COMERCIAL LAS AZALEAS">PLAZA COMERCIAL LAS AZALEAS</option>
+<option value="PLAZA COMERCIAL LAS FLORES">PLAZA COMERCIAL LAS FLORES</option>
+<option value="PLAZA COMERCIAL MOCTEZUMA">PLAZA COMERCIAL MOCTEZUMA</option>
+<option value="PLAZA COMERCIAL NACIONES UNIDAS 5400">PLAZA COMERCIAL NACIONES UNIDAS 5400</option>
+<option value="PLAZA COMERCIAL PATRIA">PLAZA COMERCIAL PATRIA</option>
+<option value="PLAZA COMERCIAL PUNTO VALLARTA">PLAZA COMERCIAL PUNTO VALLARTA</option>
+<option value="PLAZA DEL SOL">PLAZA DEL SOL</option>
+<option value="PLAZA EL PUEBLITO">PLAZA EL PUEBLITO</option>
+<option value="PLAZA ESPACIO ELITE">PLAZA ESPACIO ELITE</option>
+<option value="PLAZA ESPACIO OYAMEL">PLAZA ESPACIO OYAMEL</option>
+<option value="PLAZA FEDERALISTAS">PLAZA FEDERALISTAS</option>
+<option value="PLAZA FRESNOS">PLAZA FRESNOS</option>
+<option value="PLAZA FUSION">PLAZA FUSION</option>
+<option value="PLAZA GALERIAS">PLAZA GALERIAS</option>
+<option value="PLAZA GRAN PATIO LA CIMA">PLAZA GRAN PATIO LA CIMA</option>
+<option value="PLAZA GRAN PATIO PATRIA">PLAZA GRAN PATIO PATRIA</option>
+<option value="PLAZA GUADALUPE 5246">PLAZA GUADALUPE 5246</option>
+<option value="PLAZA GUADALUPE BUSINESS CENTER">PLAZA GUADALUPE BUSINESS CENTER</option>
+<option value="PLAZA HOME FASHION">PLAZA HOME FASHION</option>
+<option value="PLAZA IRLANDA">PLAZA IRLANDA</option>
+<option value="PLAZA JARALES">PLAZA JARALES</option>
+<option value="PLAZA JUAREZ">PLAZA JUAREZ</option>
+<option value="PLAZA LA CALMA">PLAZA LA CALMA</option>
+<option value="PLAZA LA CIMA">PLAZA LA CIMA</option>
+<option value="PLAZA LA HACIENDA">PLAZA LA HACIENDA</option>
+<option value="PLAZA LA LOMA">PLAZA LA LOMA</option>
+<option value="PLAZA LA MORALEJA">PLAZA LA MORALEJA</option>
+<option value="PLAZA LAS AMERICAS">PLAZA LAS AMERICAS</option>
+<option value="PLAZA LAS FLORES">PLAZA LAS FLORES</option>
+<option value="PLAZA LAS FUENTES">PLAZA LAS FUENTES</option>
+<option value="PLAZA LAS LOMAS">PLAZA LAS LOMAS</option>
+<option value="PLAZA LAS PALMAS">PLAZA LAS PALMAS</option>
+<option value="PLAZA LAS ROSAS">PLAZA LAS ROSAS</option>
+<option value="PLAZA LATINA">PLAZA LATINA</option>
+<option value="PLAZA LIBANO">PLAZA LIBANO</option>
+<option value="PLAZA LOMAS ALTAS">PLAZA LOMAS ALTAS</option>
+<option value="PLAZA LOS CANDADOS">PLAZA LOS CANDADOS</option>
+<option value="PLAZA LOS CUBOS">PLAZA LOS CUBOS</option>
+<option value="PLAZA LOS ROBLES">PLAZA LOS ROBLES</option>
+<option value="PLAZA LOS SAUCES">PLAZA LOS SAUCES</option>
+<option value="PLAZA MAZAMITLA">PLAZA MAZAMITLA</option>
+<option value="PLAZA METROCENTRO">PLAZA METROCENTRO</option>
+<option value="PLAZA MIRAMAR">PLAZA MIRAMAR</option>
+<option value="PLAZA MOCTEZUMA">PLAZA MOCTEZUMA</option>
+<option value="PLAZA MOL">PLAZA MOL</option>
+<option value="PLAZA NACIONES UNIDAS">PLAZA NACIONES UNIDAS</option>
+<option value="PLAZA ORION">PLAZA ORION</option>
+<option value="PLAZA OTERO">PLAZA OTERO</option>
+<option value="PLAZA PANORAMICA BUGAMBILIAS">PLAZA PANORAMICA BUGAMBILIAS</option>
+<option value="PLAZA PATRIA">PLAZA PATRIA</option>
+<option value="PLAZA PENINSULA">PLAZA PENINSULA</option>
+<option value="PLAZA PICACHO">PLAZA PICACHO</option>
+<option value="PLAZA PORTOBELO">PLAZA PORTOBELO</option>
+<option value="PLAZA PUNTA CENTINELA">PLAZA PUNTA CENTINELA</option>
+<option value="PLAZA PUNTA NORTE">PLAZA PUNTA NORTE</option>
+<option value="PLAZA PUNTO BEETHOVEN">PLAZA PUNTO BEETHOVEN</option>
+<option value="PLAZA PUNTO NACIONES">PLAZA PUNTO NACIONES</option>
+<option value="PLAZA PUNTO PONIENTE">PLAZA PUNTO PONIENTE</option>
+<option value="PLAZA PUNTO SAN ISIDRO">PLAZA PUNTO SAN ISIDRO</option>
+<option value="PLAZA PUNTO TEPEYAC">PLAZA PUNTO TEPEYAC</option>
+<option value="PLAZA REAL ACUEDUCTO">PLAZA REAL ACUEDUCTO</option>
+<option value="PLAZA REAL DEL SOL">PLAZA REAL DEL SOL</option>
+<option value="PLAZA SAN ESTEBAN">PLAZA SAN ESTEBAN</option>
+<option value="PLAZA SAN IGNACIO">PLAZA SAN IGNACIO</option>
+<option value="PLAZA SAN ISIDRO">PLAZA SAN ISIDRO</option>
+<option value="PLAZA SAN JERONIMO">PLAZA SAN JERONIMO</option>
+<option value="PLAZA SAN JORGE">PLAZA SAN JORGE</option>
+<option value="PLAZA SANTA MONICA">PLAZA SANTA MONICA</option>
+<option value="PLAZA SUR">PLAZA SUR</option>
+<option value="PLAZA TERRAZA PARK">PLAZA TERRAZA PARK</option>
+<option value="PLAZA TORRE LATITUD">PLAZA TORRE LATITUD</option>
+<option value="PLAZA TOSCANA">PLAZA TOSCANA</option>
+<option value="PLAZA TREBOLES">PLAZA TREBOLES</option>
+<option value="PLAZA TULIPAN">PLAZA TULIPAN</option>
+<option value="PLAZA TURQUESA DEL SOL">PLAZA TURQUESA DEL SOL</option>
+<option value="PLAZA UNIVERSIDAD">PLAZA UNIVERSIDAD</option>
+<option value="PLAZA URBANIA">PLAZA URBANIA</option>
+<option value="PLAZA VENECIA">PLAZA VENECIA</option>
+<option value="PLAZA VIRREYES">PLAZA VIRREYES</option>
+<option value="PLAZA YAZMIN">PLAZA YAZMIN</option>
+<option value="PUNTO CAMPO REAL">PUNTO CAMPO REAL</option>
+<option value="PUNTO TECNOLOGICO GALERIAS">PUNTO TECNOLOGICO GALERIAS</option>
+<option value="REAL CENTER Y/O RCENTER ENTERTAINMENT AND SHOPPING">REAL CENTER Y/O RCENTER ENTERTAINMENT AND SHOPPING</option>
+<option value="SANTA RITA PLAZA">SANTA RITA PLAZA</option>
+<option value="SILVER CENTER">SILVER CENTER</option>
+<option value="THE LANDMARK GUADALAJARA">THE LANDMARK GUADALAJARA</option>
+<option value="TORRE PUERTA PLATA">TORRE PUERTA PLATA</option>
+<option value="UBIKA CIUDAD GRANJA">UBIKA CIUDAD GRANJA</option>
+<option value="UBIKA MARIANO OTERO">UBIKA MARIANO OTERO</option>
+<option value="UBIKA SAN ISIDRO">UBIKA SAN ISIDRO</option>
+<option value="VILLA PLATA">VILLA PLATA</option>
+          </select>
+        </div>
+        <div class="field" style="display:flex;align-items:flex-end;padding-bottom:6px">
+          <label class="chk-row" style="margin:0">
+            <input type="checkbox" id="chk-zona-pat-zpn">
+            Zona patrimonial
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones ZPN -->
+    <div class="btn-actions">
+      <button class="btn-calc" onclick="calcularZPN()">Calcular requisitos y derechos</button>
+      <button class="btn-limpiar" onclick="nuevoAnalisis()">&#10005; Limpiar</button>
+    </div>
+
+  
+  </div><!-- /form-zpn -->
+
+  <!-- ══════════════════════════════════════════════════════════
+       FORMULARIO GENÉRICO — TLQ / TLA / TON
+  ══════════════════════════════════════════════════════════ -->
+  <div id="form-mun-gen" style="display:none">
+
+    <!-- Card 1: Giro -->
+    <div class="card">
+      <div class="card-title">Consulta nuevo giro o actividad de negocio</div>
+      <div class="field">
+        <label>Giro o actividad</label>
+        <div class="ac-wrap">
+          <input type="text" id="inp-giro-gen" class="ac-input"
+                 placeholder="Escribe el giro para buscar..." autocomplete="off"
+                 oninput="acFiltrarGen()" onfocus="acFiltrarGen()" onblur="acOcultarGen()"
+                 onkeydown="acKeyDownGen(event)">
+          <div id="ac-list-gen" class="ac-list"></div>
+        </div>
+        <div class="hint">Escribe el giro tal como aparecerá en tu licencia de funcionamiento</div>
+      </div>
+      <div class="col2">
+        <div class="field">
+          <label>Trámite</label>
+          <select id="sel-tramite-gen">
+            <option value="">Seleccione el trámite que desea realizar</option>
+            <option value="ALTA">ALTA</option>
+            <option value="AMPLIACION DE MEDIDAS">AMPLIACION DE MEDIDAS</option>
+            <option value="ANEXO">ANEXO</option>
+            <option value="BAJA">BAJA</option>
+            <option value="BAJA POR PRESIDENCIA">BAJA POR PRESIDENCIA</option>
+            <option value="CAMBIO DE GIRO O ANUNCIO">CAMBIO DE GIRO O ANUNCIO</option>
+            <option value="MODIFICACION">MODIFICACION</option>
+            <option value="REPOSICION">REPOSICION</option>
+            <option value="RENOVACION">RENOVACION</option>
+            <option value="TRASPASO">TRASPASO</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo de persona</label>
+          <div class="radio-row" style="margin-top:8px">
+            <label><input type="radio" name="tpers-gen" value="fisica" checked> Física</label>
+            <label><input type="radio" name="tpers-gen" value="moral"> Moral</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Datos del local -->
+    <div class="card">
+      <div class="card-title">Datos del local</div>
+      <div class="field">
+        <label>Superficie del local (m&#178;)</label>
+        <input type="number" id="inp-sup-gen" min="1" placeholder="Ej. 80">
+        <div class="hint">Para orientar los requisitos de Protección Civil</div>
+      </div>
+      <label class="chk-row">
+        <input type="checkbox" id="chk-zona-pat-gen">
+        El local se ubica en zona patrimonial o centro histórico
+      </label>
+    </div>
+
+    <!-- Botones -->
+    <div class="btn-actions">
+      <button class="btn-calc" onclick="calcularMunGen()">Calcular requisitos y derechos</button>
+      <button class="btn-limpiar" onclick="nuevoAnalisis()">&#10005; Limpiar</button>
+    </div>
+
+  </div><!-- /form-mun-gen -->
+
+  <!-- RESULTADO -->
+  <div id="result-panel" class="result-panel">
+    <div class="result-hdr">
+      <div class="result-hdr-title" id="res-titulo"></div>
+      <div class="result-hdr-sub" id="res-subtitulo"></div>
+    </div>
+    <div class="result-body">
+      <div id="res-alerta"></div>
+      <div id="res-checklist"></div>
+      <div id="res-derechos"></div>
+      <div id="res-ccf"></div>
+
+      <!-- Guardar consulta -->
+      <div class="hist-save-wrap" id="hist-save-wrap" style="display:none">
+        <input type="text" class="hist-save-inp" id="hist-nombre-inp"
+               placeholder="Nombre para esta consulta (ej: Farmacia Centro)" maxlength="50">
+        <button class="btn-guardar" onclick="histGuardar()">&#128190; Guardar</button>
+      </div>
+      <div class="hist-saved-msg" id="hist-saved-msg">&#10003; Consulta guardada</div>
+      <button class="btn-pdf" onclick="window.print()">&#128196; Descargar / Imprimir como PDF</button>
+    </div>
+  </div>
+  <button id="btn-nuevo" onclick="nuevoAnalisis()" style="display:none;margin-bottom:20px;padding:10px 20px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;color:var(--text2)">&#8592; Nuevo análisis</button>
+
+</div><!-- /wrap -->
+
+<script>
+
+// ── ESTADO ─────────────────────────────────────────────────────────
+var munId  = 39;
+var munNom = 'GDL';
+
+// ── TARIFAS ALCOHOL ─────────────────────────────────────────────────
+var TARIFAS_ALCOHOL = {
+  GDL: {
+    baja_abarrotes: {tarifa:0,      art:'Art. 6 Fracc. j - exento (Coordinacion Fiscal)'},
+    baja_deposito:  {tarifa:0,      art:'Art. 6 Fracc. j - exento (Coordinacion Fiscal)'},
+    alta_deposito:  {tarifa:0,      art:'Art. 6 Fracc. j - exento (Coordinacion Fiscal)'},
+    mini_alcohol:   {tarifa:0,      art:'Art. 6 Fracc. j - exento (Coordinacion Fiscal)'},
+    rest_baja:      {tarifa:0,      art:'Art. 6 Fracc. j - exento (Coordinacion Fiscal)'},
+    rest_alta:      {tarifa:0,      art:'Art. 6 Fracc. j - exento (Coordinacion Fiscal)'},
+    fonda_baja:     {tarifa:0,      art:'Art. 6 Fracc. j - exento (Coordinacion Fiscal)'},
+    cerveceria:     {tarifa:0,      art:'Art. 6 Fracc. j - exento (Coordinacion Fiscal)'},
+    bar:            {tarifa:78677,  art:'Art. 44 Fracc. VII, Ley Ingresos GDL 2026'},
+    rest_bar:       {tarifa:55557,  art:'Art. 44 Fracc. VIII, Ley Ingresos GDL 2026'},
+    discoteca:      {tarifa:117767, art:'Art. 44 Fracc. III, Ley Ingresos GDL 2026'},
+    cabaret:        {tarifa:151678, art:'Art. 44 Fracc. II, Ley Ingresos GDL 2026'},
+    terraza_a:      {tarifa:0,      art:'Art. 46, Ley Ingresos GDL 2026 (permiso horario)'},
+    ambiental_pct: 0.10
+  },
+  ZPN: {
+    baja_abarrotes: {tarifa:2624,   art:'Art. 77 Fracc. I-a, Ley Ingresos ZPN 2026'},
+    baja_deposito:  {tarifa:6286,   art:'Art. 77 Fracc. IV, Ley Ingresos ZPN 2026'},
+    alta_deposito:  {tarifa:17135,  art:'Art. 77 Fracc. IX-b, Ley Ingresos ZPN 2026'},
+    mini_alcohol:   {tarifa:4833,   art:'Art. 77 Fracc. I-b, Ley Ingresos ZPN 2026'},
+    rest_baja:      {tarifa:15483,  art:'Art. 77 Fracc. III, Ley Ingresos ZPN 2026'},
+    rest_alta:      {tarifa:34194,  art:'Art. 77 Fracc. X-a, Ley Ingresos ZPN 2026'},
+    fonda_baja:     {tarifa:8718,   art:'Art. 77 Fracc. II, Ley Ingresos ZPN 2026'},
+    cerveceria:     {tarifa:2253,   art:'Art. 77 Fracc. VI, Ley Ingresos ZPN 2026'},
+    bar:            {tarifa:116185, art:'Art. 77 Fracc. X-e, Ley Ingresos ZPN 2026'},
+    rest_bar:       {tarifa:34194,  art:'Art. 77 Fracc. X-a, Ley Ingresos ZPN 2026'},
+    discoteca:      {tarifa:133768, art:'Art. 77 Fracc. X-f, Ley Ingresos ZPN 2026'},
+    cabaret:        {tarifa:172287, art:'Art. 77 Fracc. X-c, Ley Ingresos ZPN 2026'},
+    terraza_a:      {tarifa:10442,  art:'Art. 77 Fracc. XI, Ley Ingresos ZPN 2026'},
+    terraza_b:      {tarifa:0,      art:'Art. 77 ZPN 2026 - verificar tarifa exacta'},
+    ambiental_pct: 0.03
+  },
+  TLQ: {
+    // Art. 51, Ley de Ingresos San Pedro Tlaquepaque 2026
+    baja_abarrotes: {tarifa:2700,   art:'Art. 51 Fracc. XIII, Ley Ingresos TLQ 2026'},
+    baja_deposito:  {tarifa:6303,   art:'Art. 51 Fracc. XI, Ley Ingresos TLQ 2026'},
+    alta_deposito:  {tarifa:6303,   art:'Art. 51 Fracc. XI, Ley Ingresos TLQ 2026'},
+    mini_alcohol:   {tarifa:11704,  art:'Art. 51 Fracc. XII, Ley Ingresos TLQ 2026'},
+    rest_baja:      {tarifa:8285,   art:'Art. 51 Fracc. X, Ley Ingresos TLQ 2026'},
+    rest_alta:      {tarifa:42352,  art:'Art. 51 Fracc. VIII, Ley Ingresos TLQ 2026'},
+    fonda_baja:     {tarifa:8285,   art:'Art. 51 Fracc. X, Ley Ingresos TLQ 2026'},
+    cerveceria:     {tarifa:2250,   art:'Art. 51 Fracc. IX, Ley Ingresos TLQ 2026'},
+    bar:            {tarifa:42232,  art:'Art. 51 Fracc. VII, Ley Ingresos TLQ 2026'},
+    rest_bar:       {tarifa:42352,  art:'Art. 51 Fracc. VIII, Ley Ingresos TLQ 2026'},
+    discoteca:      {tarifa:65278,  art:'Art. 51 Fracc. II, Ley Ingresos TLQ 2026'},
+    cabaret:        {tarifa:67270,  art:'Art. 51 Fracc. I, Ley Ingresos TLQ 2026'},
+    terraza_a:      {tarifa:42352,  art:'Art. 51 Fracc. VIII, Ley Ingresos TLQ 2026'},
+    terraza_b:      {tarifa:42352,  art:'Art. 51 Fracc. VIII, Ley Ingresos TLQ 2026'},
+    ambiental_pct: 0
+  },
+  TLA: {
+    // Art. 78, Ley de Ingresos Tlajomulco de Zuniga 2026
+    baja_abarrotes: {tarifa:3193,   art:'Art. 78 Fracc. I-a, Ley Ingresos TLA 2026'},
+    baja_deposito:  {tarifa:9128,   art:'Art. 78 Fracc. I-d, Ley Ingresos TLA 2026'},
+    alta_deposito:  {tarifa:20925,  art:'Art. 78 Fracc. X-c, Ley Ingresos TLA 2026'},
+    mini_alcohol:   {tarifa:7899,   art:'Art. 78 Fracc. I-c, Ley Ingresos TLA 2026'},
+    rest_baja:      {tarifa:16013,  art:'Art. 78 Fracc. III, Ley Ingresos TLA 2026'},
+    rest_alta:      {tarifa:25801,  art:'Art. 78 Fracc. XI-b, Ley Ingresos TLA 2026'},
+    fonda_baja:     {tarifa:7899,   art:'Art. 78 Fracc. II, Ley Ingresos TLA 2026'},
+    cerveceria:     {tarifa:13165,  art:'Art. 78 Fracc. VII, Ley Ingresos TLA 2026'},
+    bar:            {tarifa:35545,  art:'Art. 78 Fracc. XI-f, Ley Ingresos TLA 2026'},
+    rest_bar:       {tarifa:25801,  art:'Art. 78 Fracc. XI-b, Ley Ingresos TLA 2026'},
+    discoteca:      {tarifa:52421,  art:'Art. 78 Fracc. XI-g, Ley Ingresos TLA 2026'},
+    cabaret:        {tarifa:119081, art:'Art. 78 Fracc. XI-d, Ley Ingresos TLA 2026'},
+    terraza_a:      {tarifa:7751,   art:'Art. 78 Fracc. XII-a, Ley Ingresos TLA 2026'},
+    terraza_b:      {tarifa:17527,  art:'Art. 78 Fracc. XII-b, Ley Ingresos TLA 2026'},
+    ambiental_pct: 0
+  },
+  TON: {
+    // Art. 61, Ley de Ingresos Tonala 2026
+    baja_abarrotes: {tarifa:6900,   art:'Art. 61 Fracc. I, Ley Ingresos TON 2026'},
+    baja_deposito:  {tarifa:33989,  art:'Art. 61 Fracc. VII-h, Ley Ingresos TON 2026'},
+    alta_deposito:  {tarifa:14039,  art:'Art. 61 Fracc. VII-j, Ley Ingresos TON 2026'},
+    mini_alcohol:   {tarifa:14039,  art:'Art. 61 Fracc. II, Ley Ingresos TON 2026'},
+    rest_baja:      {tarifa:17909,  art:'Art. 61 Fracc. VII-g, Ley Ingresos TON 2026'},
+    rest_alta:      {tarifa:30000,  art:'Art. 61 Fracc. VII-c-1, Ley Ingresos TON 2026'},
+    fonda_baja:     {tarifa:14038,  art:'Art. 61 Fracc. V, Ley Ingresos TON 2026'},
+    cerveceria:     {tarifa:6900,   art:'Art. 61 Fracc. I, Ley Ingresos TON 2026'},
+    bar:            {tarifa:88626,  art:'Art. 61 Fracc. VII-f, Ley Ingresos TON 2026'},
+    rest_bar:       {tarifa:30000,  art:'Art. 61 Fracc. VII-c-1, Ley Ingresos TON 2026'},
+    discoteca:      {tarifa:88401,  art:'Art. 61 Fracc. VII-a, Ley Ingresos TON 2026'},
+    cabaret:        {tarifa:88401,  art:'Art. 61 Fracc. VII-a, Ley Ingresos TON 2026'},
+    terraza_a:      {tarifa:8025,   art:'Art. 61 Fracc. IV-f, Ley Ingresos TON 2026'},
+    terraza_b:      {tarifa:12041,  art:'Art. 61 Fracc. IV-c, Ley Ingresos TON 2026'},
+    ambiental_pct: 0
+  }
+};
+
+// ── PC GDL ──────────────────────────────────────────────────────────
+var PC_GDL = {
+  escuela:   [{max:200,t:704},{max:400,t:2168},{max:Infinity,t:3634}],
+  nocturno:  [{max:Infinity,t:3634}],
+  hotel:     [{max:500,t:2284},{max:1000,t:4475},{max:Infinity,t:6669}],
+  otros:     [{max:200,t:2284},{max:400,t:7857},{max:Infinity,t:13433}],
+  gasolinera:[{max:Infinity,t:5162}],
+  estacionam:[{max:500,t:2284},{max:Infinity,t:3635}],
+  programa:  3195
+};
+var PC_ZPN = {base:706, millar:3};
+
+// ── MAPEO GIROS ZPN -> tipoAlc ──────────────────────────────────────
+var ALC_ZPN = {
+  'BAR':'bar','BAR EN CABARET':'cabaret','BAR EN CENTRO NOCTURNO':'cabaret',
+  'BAR EN CLUB, CENTROS RECREATIVOS':'bar','BAR EN DISCOTEQUE':'discoteca',
+  'BAR EN HOTEL':'rest_bar','BAR EN MOTEL':'rest_bar','BAR EN MOTORHOTEL':'rest_bar',
+  'BAR EN RESTAURANTE':'rest_bar','BEBIDAS DE ALTA GRADUACION ANEXO ABARROTES':'alta_deposito',
+  'BILLAR CATEGORIA B CON VENTA DE BEBIDAS DE BAJA GRADUACION':'fonda_baja',
+  'CABARET':'cabaret','CANTINA':'bar','CENTRO NOCTURNO':'cabaret',
+  'CENTROS BOTANEROS':'cerveceria','DISCOTEQUES':'discoteca',
+  'ELABORACION DE VINOS Y LICORES':'alta_deposito',
+  'EXPENDIO DE BEBIDAS ALCOHOLICAS DE CUALQUIER TIPO':'alta_deposito',
+  'EXPENDIO DE BEBIDAS DE BAJA GRADUACION EN B.C.':'cerveceria',
+  'MINI RESTAURANTE BAR':'rest_bar','MINI SUSHI BAR':'rest_bar',
+  'PRODUCCION DE BEBIDAS ALCOHOLICAS CON VENTA AL MENUDEO':'alta_deposito',
+  'PULQUERIA':'cerveceria',
+  'REST-BAR CAMP.C/MUS.VIV PIST B':'rest_bar',
+  'REST-BAR CAMPESTRE CON MUSICA VIVO':'rest_bar',
+  'RESTAURANT- BAR CAMPESTRE,FOLKLORICO CON MUSICA EN VIVO':'rest_bar',
+  'RESTAURANTE BAR':'rest_bar',
+  'RESTAURANTE CON VENTA Y CONSUMO DE BEBIDAS DE BAJA GRADUACION':'rest_baja',
+  'RESTAURANTE-BAR CAMPESTRE':'rest_bar','RESTAURANTE-BAR FOLCKLORICO':'rest_bar',
+  'SALON CON MUSICA V. Y PISTA BAILE':'discoteca','SALON DE BAILE':'discoteca',
+  'SALON DE EVENTOS CON MUSICA EN VIVO':'discoteca','SALON DE EVENTOS CON PISTA DE BAILE':'discoteca',
+  'SERVI-BAR DE CUATRO A GRAN TURISMO':'bar','SERVI-BAR DE UNA A TRES ESTRELLAS':'bar',
+  'TERRAZA CAMPESTRE CON MUSICA VIVO Y PISTA BAILE':'discoteca',
+  'TERRAZA TIPO A':'terraza_a','TERRAZA TIPO B':'terraza_b',
+  'TERRAZA CAMPESTRE':'terraza_b','TERRAZA CAMPESTRE CON MUSICA EN VIVO':'terraza_b',
+  'VENTA BEBIDAS DE BAJA GRADUACION EN B.C.':'cerveceria',
+  'VENTA DE BEBIDAS DE BAJA GRADUACION':'baja_deposito',
+  'VENTA DE BEBIDAS DE BAJA GRADUACION ANEXO A ABARROTES Y MISCELANEAS':'baja_abarrotes',
+  'VENTA DE BEBIDAS DE BAJA GRADUACION ANEXO A MINI-SUPER':'mini_alcohol',
+  'VENTA DE BEBIDAS DE BAJA GRADUACION DEPOSITO':'baja_deposito',
+  'VENTA Y CONSUMO DE BEBIDAS DE BAJA GRADUACION ANEXO A RESTAURANTE':'rest_baja',
+  'VENTA Y CONSUMO DE BEBIDAS DE BAJA GRADUACION ANEXO A ALIMENTOS':'rest_baja',
+  'VENTA Y CONSUMO DE BEBIDAS DE BAJA GRADUACION ANEXO A CENTRO BOTANERO':'cerveceria',
+  'VENTA Y CONSUMO DE BEBIDAS DE BAJA GRADUACION ANEXO A ESTADIOS':'rest_baja',
+  'VENTA Y CONSUMO DE BEBIDAS DE BAJA GRADUACION ANEXO BILLARES O BOLICHE':'fonda_baja',
+  'VENTA Y CONSUMO DE BEBIDAS DE BAJA GRADUACION ANEXO CANCHAS DEPORTIVAS':'rest_baja',
+  'VENTA Y CONSUMO DE BEBIDAS DE BAJA GRADUACION CON ALIMENTOS':'rest_baja',
+  'VIDEO-BAR':'rest_bar','VINOS GENEROSOS EN B.A':'alta_deposito',
+  'VINOS GENEROSOS EN B.C.':'cerveceria','VINOS Y LICORES EN ABARROTES':'baja_abarrotes',
+  'VINOS Y LICORES EN MINI-SUPER':'mini_alcohol',
+  'VINOS Y LICORES EN TIENDAS DE AUTOSERVICIO Y SUPERMERCADOS':'mini_alcohol',
+  'VINOS Y LICORES EN VINATERIAS':'alta_deposito','VINOS Y LICORES P/CAFE':'rest_baja',
+  'VTA DE BEBIDAS DE BAJA GRAD. EN TIENDA DE AUTOSERVICIO Y SUPERMERCADOS':'mini_alcohol',
+  'ALIMENTOS CON VINOS GENEROSOS':'rest_baja'
+};
+
+// PC nivel ZPN (default: 'bajo')
+var PC_NIVEL_ZPN = {
+  'BAR':'alto','BAR EN CABARET':'alto','BAR EN CENTRO NOCTURNO':'alto',
+  'BAR EN CLUB, CENTROS RECREATIVOS':'alto','BAR EN DISCOTEQUE':'alto',
+  'CABARET':'alto','CANTINA':'alto','CENTRO NOCTURNO':'alto',
+  'DISCOTEQUES':'alto','PALENQUE':'alto','SALON DE BAILE':'alto',
+  'SALON CON MUSICA V. Y PISTA BAILE':'alto','SALON DE EVENTOS CON MUSICA EN VIVO':'alto',
+  'SALON DE EVENTOS CON PISTA DE BAILE':'alto','ESTADIOS':'alto',
+  'CENTRO DE ESPECTACULOS':'alto','TERRAZA CAMPESTRE CON MUSICA VIVO Y PISTA BAILE':'alto',
+  'HOTEL':'medio','MOTEL':'medio','MOTOR HOTEL':'medio',
+  'CLINICA':'medio','HOSPITALES Y CLINICAS':'medio',
+  'ESCUELA':'medio','ESCUELA DE ESTUDIOS SUPERIORES':'medio',
+  'ESCUELA DE LICENCIATURA':'medio','ESCUELA PREESCOLAR':'medio',
+  'ESCUELA PREPARATORIA':'medio','ESCUELA PRIMARIA':'medio','ESCUELA SECUNDARIA':'medio',
+  'GUARDERIA':'medio','ESTANCIA INFANTIL':'medio',
+  'SALAS CINEMATOGRAFICAS':'medio','TEATRO':'medio','SALON DE EVENTOS':'medio',
+  'SALON DE FIESTAS INFANTILES':'medio','TALLER MECANICO':'medio',
+  'TALLER DE LAMINADO Y PINTURA':'medio','FABRICAS E INDUSTRIAS':'medio',
+  'MADERERIA':'medio','RASTRO':'medio','RASTRO DE AVES (GIRO RESTRINGIDO)':'medio',
+  'ESTACION DE GAS':'alto','ESTACION DE GASOLINA':'alto',
+  'INCINERADOR DE DESECHOS':'alto','RELLENO SANITARIO TECNIFICADO':'alto',
+  'OFICINA ADMINISTRATIVA':'minimo','OFICINA CORPORATIVA':'minimo',
+  'OFICINA DE PROFESIONALES':'minimo','OFICINA VIRTUAL':'minimo',
+  'BUFETES JURIDICOS':'minimo','NOTARIAS PUBLICAS':'minimo',
+  'CASA DE BOLSA':'minimo','ASESORIA EN INVERSIONES':'minimo',
+  'INMOBILIARIA':'minimo','INMOBILIARIAS Y CORREDORES DE BIENES RAICES':'minimo',
+  'INST. BANCARIA Y DE CDTO.':'minimo','OTROS SERVICIOS RELACIONADOS CON LA CONTABILIDAD':'minimo'
+};
+
+// COFEPRIS ZPN
+var COFEPRIS_ZPN = ['FARMACIA','CONSULTORIO MEDICO','CONSULTORIO ODONTOLOGICO','CONSULTORIOS',
+  'LAB. DE ANALISIS CLINICOS','LABORATORIO','CLINICA','HOSPITALES Y CLINICAS','OPTICA',
+  'CLINICA VETERINARIA','VETERINARIA','CLINICA DE BELLEZA','CENTRO TERAPEUTICO',
+  'ESTABLECIMIENTO ESPECIALIZADO EN ADICCIONES','LABORATORIO DENTAL',
+  'ALIMENTOS','ALIMENTOS PARA CONSUMO INMEDIATO','ALIMENTOS PARA LLEVAR',
+  'CAFETERIA','FONDA','RESTAURANTE','COCINA ECONOMICA','PANADERIA',
+  'PASTELERIA Y POSTRES','CARNICERIA','CREMERIA','LECHERIA',
+  'MARISCOS PROCESADOS PARA CONSUMO HUMANO','ROSTICERIA','OBRADOR',
+  'PURIFICACION Y ENVASADO DE AGUA PARA CONSUMO HUMANO','EXP. DE AGUA PURIFICADA'];
+
+// RPBI ZPN
+var RPBI_ZPN = ['CONSULTORIO MEDICO','CONSULTORIO ODONTOLOGICO','CONSULTORIOS',
+  'LAB. DE ANALISIS CLINICOS','LABORATORIO','CLINICA','HOSPITALES Y CLINICAS',
+  'LABORATORIO DENTAL','CENTRO TERAPEUTICO','ESTABLECIMIENTO ESPECIALIZADO EN ADICCIONES'];
+
+// SEMARNAT ZPN
+var SEMARNAT_ZPN = ['TALLER MECANICO','TALLER AUTOELECTRICO','TALLER DE MOFLES',
+  'ESTACION DE GAS','ESTACION DE GASOLINA','FABRICAS E INDUSTRIAS',
+  'INCINERADOR DE DESECHOS','RELLENO SANITARIO TECNIFICADO','RASTRO',
+  'RASTRO DE AVES (GIRO RESTRINGIDO)','MAQUINAS TORTILLADORAS',
+  'BODEGA DE ACOPIO Y RECICLAJE DE RESIDUOS DIVERSOS'];
+
+// ── GDL: CATALOGO DE GIROS ───────────────────────────────────────────
+var GIROS_CAT = {
+  comercio:[
+    {id:'abarrotes',nom:'Abarrotes, miscelanea, tendejon',pc:'bajo',cofepris:false},
+    {id:'minisupe',nom:'Minisuper o tienda de conveniencia',pc:'bajo',cofepris:false},
+    {id:'farmacia',nom:'Farmacia o botica',pc:'bajo',cofepris:true},
+    {id:'papeleria',nom:'Papeleria, libreria, bazar',pc:'bajo',cofepris:false},
+    {id:'ropa',nom:'Ropa, calzado o accesorios',pc:'bajo',cofepris:false},
+    {id:'ferreteria',nom:'Ferreteria o tlapaleria',pc:'medio',cofepris:false},
+    {id:'muebles',nom:'Muebleria o articulos para el hogar',pc:'bajo',cofepris:false},
+    {id:'electronica',nom:'Electronica y electrodomesticos',pc:'bajo',cofepris:false},
+    {id:'supermercado',nom:'Supermercado o tienda de autoservicio',pc:'bajo',cofepris:false}
+  ],
+  comercio_alcohol:[
+    {id:'dep_cerveza',nom:'Deposito o venta de cerveza / baja graduacion',pc:'bajo',cofepris:false,alcohol:true,tipoAlc:'baja_deposito'},
+    {id:'dep_vinos',nom:'Deposito de vinos y licores (alta graduacion)',pc:'bajo',cofepris:false,alcohol:true,tipoAlc:'alta_deposito'},
+    {id:'abarro_alc',nom:'Abarrotes con venta de cerveza',pc:'bajo',cofepris:false,alcohol:true,tipoAlc:'baja_abarrotes'},
+    {id:'mini_alc',nom:'Minisuper con venta de bebidas alcoholicas',pc:'bajo',cofepris:false,alcohol:true,tipoAlc:'mini_alcohol'}
+  ],
+  alimentos:[
+    {id:'restaurante',nom:'Restaurante (sin venta de alcohol)',pc:'bajo',cofepris:true},
+    {id:'fonda',nom:'Fonda, cocina economica, comedor',pc:'bajo',cofepris:true},
+    {id:'taqueria',nom:'Taqueria, antojitos, loncheria',pc:'bajo',cofepris:true},
+    {id:'cafeteria',nom:'Cafe, cafeteria, pasteleria',pc:'bajo',cofepris:true},
+    {id:'panaderia',nom:'Panaderia o reposteria',pc:'bajo',cofepris:true}
+  ],
+  alimentos_alcohol:[
+    {id:'rest_baja',nom:'Restaurante con venta de baja graduacion (cerveza/vino)',pc:'bajo',cofepris:true,alcohol:true,tipoAlc:'rest_baja'},
+    {id:'rest_alta',nom:'Restaurante con venta de alta graduacion (licores)',pc:'bajo',cofepris:true,alcohol:true,tipoAlc:'rest_alta'},
+    {id:'fonda_alc',nom:'Fonda/taqueria con venta de baja graduacion',pc:'bajo',cofepris:true,alcohol:true,tipoAlc:'fonda_baja'},
+    {id:'botanero',nom:'Cerveceria, botanero o micheladas',pc:'bajo',cofepris:false,alcohol:true,tipoAlc:'cerveceria'}
+  ],
+  bar:[
+    {id:'bar',nom:'Bar o cantina',pc:'alto',cofepris:false,alcohol:true,tipoAlc:'bar'},
+    {id:'rest_bar',nom:'Restaurante-bar / video bar',pc:'medio',cofepris:true,alcohol:true,tipoAlc:'rest_bar'},
+    {id:'discoteca',nom:'Discoteca o salon de baile',pc:'alto',cofepris:false,alcohol:true,tipoAlc:'discoteca'},
+    {id:'cabaret',nom:'Cabaret o centro nocturno',pc:'alto',cofepris:false,alcohol:true,tipoAlc:'cabaret'},
+    {id:'terraza_a',nom:'Terraza tipo A (alcohol)',pc:'medio',cofepris:false,alcohol:true,tipoAlc:'terraza_a'}
+  ],
+  servicios:[
+    {id:'salon_bell',nom:'Salon de belleza o barberia',pc:'bajo',cofepris:false},
+    {id:'lavanderia',nom:'Lavanderia o tintoreria',pc:'bajo',cofepris:false},
+    {id:'taller_mec',nom:'Taller mecanico o vulcanizadora',pc:'medio',cofepris:false,semarnat:true,residuos:true},
+    {id:'estacion',nom:'Estacion de servicio / gasolinera',pc:'alto',cofepris:false,semarnat:true,residuos:true},
+    {id:'estacionam',nom:'Estacionamiento publico',pc:'medio',cofepris:false},
+    {id:'hotel',nom:'Hotel o motel',pc:'medio',cofepris:false}
+  ],
+  salud:[
+    {id:'consultorio',nom:'Consultorio medico o dental',pc:'bajo',cofepris:true,rpbi:true},
+    {id:'laboratorio',nom:'Laboratorio de analisis clinicos',pc:'bajo',cofepris:true,rpbi:true},
+    {id:'clinica',nom:'Clinica u hospital privado',pc:'medio',cofepris:true,rpbi:true},
+    {id:'veterinaria',nom:'Veterinaria o clinica animal',pc:'bajo',cofepris:false},
+    {id:'optica',nom:'Optica o consultorio visual',pc:'bajo',cofepris:true}
+  ],
+  educacion:[
+    {id:'escuela',nom:'Escuela o academia privada',pc:'medio',cofepris:false},
+    {id:'guarderia',nom:'Guarderia o estancia infantil',pc:'medio',cofepris:false},
+    {id:'gimnasio',nom:'Gimnasio o centro deportivo',pc:'bajo',cofepris:false}
+  ],
+  industria:[
+    {id:'bodega',nom:'Bodega o almacen',pc:'bajo',cofepris:false},
+    {id:'taller_carp',nom:'Carpinteria o taller de madera',pc:'medio',cofepris:false},
+    {id:'imprenta',nom:'Imprenta, serigrafia o rotulacion',pc:'medio',cofepris:false},
+    {id:'manufact',nom:'Manufactura / fabrica (bajo riesgo)',pc:'medio',cofepris:false,semarnat:true}
+  ],
+  profesional:[
+    {id:'despacho',nom:'Despacho u oficina profesional',pc:'minimo',cofepris:false},
+    {id:'agencia',nom:'Agencia de seguros, viajes u otros',pc:'minimo',cofepris:false},
+    {id:'inmobiliaria',nom:'Inmobiliaria o arrendadora',pc:'minimo',cofepris:false}
+  ],
+  entretenimiento:[
+    {id:'cine',nom:'Sala de cine',pc:'medio',cofepris:false},
+    {id:'billares',nom:'Billares o boliche (sin alcohol)',pc:'bajo',cofepris:false},
+    {id:'videojuegos',nom:'Salon de videojuegos',pc:'bajo',cofepris:false}
+  ]
+};
+
+// ── CHECKLIST ────────────────────────────────────────────────────────
+function getChecklist(giro, mun, moral, zonaPat, tramite) {
+  var docs = {base:[], previos:[], adicionales:[]};
+  var t = (tramite||'ALTA').toUpperCase();
+  var zpn = mun === 'ZPN';
+  var gdl = mun === 'GDL';
+
+  // ══════════════════════════════════════════════
+  // RENOVACION — requiere menos docs que ALTA
+  // ══════════════════════════════════════════════
+  if (t === 'RENOVACION') {
+    var ventanilla = zpn
+      ? 'Ventanilla Digital Zapopan o Dirección de Desarrollo Económico'
+      : mun === 'TLA' ? 'Oficialía Mayor de Padrón y Licencias, Tlajomulco — refrendo en enero-febrero (Art. 15, Reg. Giros TLA)'
+      : mun === 'TLQ' ? 'Dirección de Padrón y Licencias, H. Ayuntamiento de San Pedro Tlaquepaque'
+      : mun === 'TON' ? 'Dirección de Padrón y Licencias, Tonalá — pago anual de derechos (Art. 8, Reglamento de Comercio TON)'
+      : 'Padrón y Licencias GDL — ventanilladigital.guadalajara.gob.mx';
+    docs.base.push({txt:'Solicitud de renovación de licencia de funcionamiento (formato municipal)', nota:ventanilla});
+    docs.base.push({txt:'Identificación oficial vigente del titular (INE/IFE o pasaporte)'});
+    docs.base.push({txt:'Constancia de situación fiscal (RFC) actualizada'});
+    docs.base.push({txt:'Licencia de funcionamiento del ejercicio anterior (original)', nota:'Vigente o vencida del periodo inmediato anterior'});
+    docs.base.push({txt:'Comprobante de pago de derechos del ejercicio anterior', nota:'Recibo de pago de la licencia del año que se renueva'});
+    docs.base.push({txt:'Comprobante de domicilio del negocio (no mayor a 3 meses)', nota:'Puede ser recibo de luz, agua, teléfono o predial del local'});
+    if (moral) {
+      docs.base.push({txt:'Poder notarial del representante legal vigente', nota:'Solo si hubo cambio de representante durante el ejercicio'});
+      docs.base.push({txt:'Acta constitutiva actualizada con modificaciones', nota:'Solo si hubo cambios de razón social, socios o actividad'});
+    }
+    if (giro.alcohol) {
+      docs.adicionales.push({txt:'Comprobante de pago de licencia estatal de alcoholes SEPSAJ vigente', nota:'La renovación municipal requiere tener al corriente la licencia estatal'});
+    }
+    if (zonaPat && gdl) {
+      docs.adicionales.push({txt:'Visto bueno de Zona Patrimonial (IPLAN Guadalajara)', nota:'Requerido para negocios en Zona Centro Histórico y zonas patrimoniales'});
+    }
+    docs.previos.push({txt:'DTUDE (Dictamen de Trazos, Usos y Destinos Específicos) vigente', nota:'Si el dictamen anterior sigue vigente puede omitirse; verificar con Padrón y Licencias'});
+    return docs;
+  }
+
+  // ══════════════════════════════════════════════
+  // REPOSICION — solo documentos básicos + licencia
+  // ══════════════════════════════════════════════
+  if (t === 'REPOSICION') {
+    docs.base.push({txt:'Solicitud de reposición de licencia (formato municipal)', nota: zpn ? 'Ventanilla Digital Zapopan o Dirección de Desarrollo Económico' : 'Padrón y Licencias GDL'});
+    docs.base.push({txt:'Identificación oficial vigente del titular (INE/IFE o pasaporte)'});
+    docs.base.push({txt:'CURP del titular'});
+    docs.base.push({txt:'Constancia de situación fiscal (RFC) actualizada'});
+    docs.base.push({txt:'Licencia original o constancia de extravío (denuncia ante Ministerio Público)', nota:'En caso de robo o pérdida presentar acta de denuncia'});
+    return docs;
+  }
+
+  // ══════════════════════════════════════════════
+  // BAJA / BAJA POR PRESIDENCIA
+  // ══════════════════════════════════════════════
+  if (t === 'BAJA' || t === 'BAJA POR PRESIDENCIA') {
+    docs.base.push({txt:'Solicitud de baja de licencia (formato municipal)'});
+    docs.base.push({txt:'Identificación oficial vigente del titular (INE/IFE o pasaporte)'});
+    docs.base.push({txt:'CURP del titular'});
+    docs.base.push({txt:'Constancia de situación fiscal (RFC)'});
+    docs.base.push({txt:'Licencia de funcionamiento original vigente'});
+    if (moral) {
+      docs.base.push({txt:'Poder notarial del representante legal'});
+      docs.base.push({txt:'Acta constitutiva de la empresa'});
+    }
+    if (giro.alcohol) {
+      docs.adicionales.push({txt:'Baja o cancelación de licencia estatal de alcoholes ante SEPSAJ', nota:'Debe tramitarse la baja estatal simultáneamente'});
+    }
+    return docs;
+  }
+
+  // ══════════════════════════════════════════════
+  // TRASPASO
+  // ══════════════════════════════════════════════
+  if (t === 'TRASPASO') {
+    docs.base.push({txt:'Solicitud de traspaso (formato municipal)'});
+    docs.base.push({txt:'Identificación oficial del cedente (quien traspasa) y del cesionario (quien recibe)', nota:'Ambas partes deben presentar INE/IFE o pasaporte vigente'});
+    docs.base.push({txt:'CURP del cesionario'});
+    docs.base.push({txt:'Constancia de situación fiscal (RFC) del cesionario'});
+    docs.base.push({txt:'Licencia de funcionamiento original vigente'});
+    docs.base.push({txt:'Contrato de compraventa o traspaso del negocio', nota:'Debe estar firmado ante notario público o ratificado ante autoridad municipal'});
+    docs.base.push({txt:'Comprobante de domicilio del cesionario (no mayor a 3 meses)'});
+    if (moral) {
+      docs.base.push({txt:'Acta constitutiva de la nueva empresa (cesionario moral)'});
+      docs.base.push({txt:'Poder notarial del representante legal del cesionario'});
+    }
+    if (giro.alcohol) {
+      docs.adicionales.push({txt:'Traspaso de licencia estatal de alcoholes ante SEPSAJ', nota:'La licencia estatal también debe traspasar — trámite ante Secretaría de Política de Gobernación Jalisco'});
+    }
+    if (zpn) {
+      docs.adicionales.push({txt:'Certificado de uso de suelo vigente a nombre del cesionario', nota:'El nuevo titular debe verificar que el giro sigue siendo compatible con el uso de suelo'});
+    }
+    return docs;
+  }
+
+  // ══════════════════════════════════════════════
+  // MODIFICACION / CAMBIO DE GIRO O ANUNCIO / AMPLIACION
+  // ══════════════════════════════════════════════
+  if (t === 'MODIFICACION' || t === 'CAMBIO DE GIRO O ANUNCIO' || t === 'AMPLIACION DE MEDIDAS') {
+    docs.base.push({txt:'Solicitud de modificación (formato municipal)'});
+    docs.base.push({txt:'Identificación oficial vigente del titular (INE/IFE o pasaporte)'});
+    docs.base.push({txt:'CURP del titular'});
+    docs.base.push({txt:'Constancia de situación fiscal (RFC) actualizada'});
+    docs.base.push({txt:'Licencia de funcionamiento original vigente'});
+    if (moral) {
+      docs.base.push({txt:'Poder notarial del representante legal'});
+    }
+    if (t === 'CAMBIO DE GIRO O ANUNCIO') {
+      docs.previos.push({txt:'Dictamen de Trazo, Usos y Destinos Específicos (DTUDE) para el nuevo giro', nota:'El nuevo giro debe ser compatible con el uso de suelo del predio — Módulo 01'});
+      docs.previos.push({txt:'Constancia de Protección Civil y Bomberos actualizada para el nuevo giro', nota:'Si el nuevo giro implica mayor riesgo o aforo'});
+      if (giro.alcohol) {
+        docs.previos.push({txt:'Licencia estatal para el nuevo giro con alcohol (SEPSAJ)', nota:'Si el cambio implica adquisición de licencia de alcoholes'});
+      }
+    }
+    if (t === 'AMPLIACION DE MEDIDAS') {
+      docs.previos.push({txt:'Dictamen de Protección Civil y Bomberos para la nueva superficie', nota:'La ampliación modifica el cálculo de aforo y medidas de seguridad'});
+      docs.previos.push({txt:'Plano o croquis de la ampliación con medidas', nota:'Acotado y firmado por el propietario o responsable de obra'});
+      docs.previos.push({txt:'Predial vigente del local que incluya la superficie ampliada'});
+    }
+    return docs;
+  }
+
+  // ══════════════════════════════════════════════
+  // ALTA y ANEXO — lista completa
+  // ══════════════════════════════════════════════
+
+  // ─── DOCUMENTOS BASE ───────────────────────────
+  docs.base.push({
+    txt: 'Solicitud de licencia de funcionamiento (formato municipal)',
+    nota: zpn
+      ? 'Disponible en Ventanilla Digital: vdigital.zapopan.gob.mx o en Dirección de Desarrollo Económico'
+      : mun === 'TLA' ? 'Oficialía Mayor de Padrón y Licencias, Tlajomulco. Giros de bajo riesgo (SARE): resolución en 3 días hábiles con Afirmativa Ficta (Art. 13 Ter, Reg. Giros TLA 2021)'
+      : mun === 'TLQ' ? 'Dirección de Padrón y Licencias, H. Ayuntamiento de San Pedro Tlaquepaque (Reg. Giros TLQ 2019, últ. reforma oct 2023)'
+      : mun === 'TON' ? 'Dirección de Padrón y Licencias, Municipio de Tonalá (Código Municipal de Comercio TON, Acuerdo 135 — 2025)'
+      : 'Forma valorada $57.00 — Art. 74 Fracc. I-1, Ley Ingresos GDL 2026 — Padrón y Licencias'
+  });
+  docs.base.push({txt:'Identificación oficial vigente del titular', nota:'INE/IFE o pasaporte mexicano vigente. Si es extranjero: FM2 o FM3 con permiso para actividades lucrativas'});
+  docs.base.push({txt:'CURP del titular (persona física)', nota:'Impresión actualizada desde renapo.gob.mx'});
+  docs.base.push({txt:'Constancia de situación fiscal (RFC) actualizada', nota:'Emitida por el SAT — debe incluir el domicilio fiscal o actividad económica compatible con el giro'});
+  docs.base.push({txt:'Comprobante de domicilio del local (no mayor a 3 meses)', nota: gdl ? 'Recibo con fecha de expedición no mayor a tres meses a nombre del titular' : 'Recibo de agua, luz o teléfono fijo a nombre del titular o arrendador. Debe coincidir con la dirección del negocio'});
+  if (gdl) {
+    docs.base.push({txt:'Recibo predial del Municipio de Guadalajara a nombre del titular (domicilio del negocio)', nota:'Si es propietario: recibo predial vigente. Si NO es propietario: recibo predial + contrato de arrendamiento o comodato vigente firmado por el propietario de la finca + identificación oficial vigente del propietario de la finca'});
+  } else {
+    docs.base.push({txt:'Predial vigente del local (año en curso)', nota:'Expedido por el municipio — confirma que el inmueble está al corriente de pagos'});
+    docs.base.push({txt:'Título de propiedad o contrato de arrendamiento del local', nota:'Si es arrendatario: contrato vigente con firma del arrendador. Si es propietario: escritura o título de propiedad inscrito en el Registro Público'});
+  }
+  docs.base.push({txt:'Croquis de localización del negocio', nota:'Indicando calles circundantes, número exterior e interior, referencia de cruce más cercano'});
+  if (gdl) {
+    docs.base.push({txt:'3 fotografías del local a color (no de buscadores de internet)', nota:'a) Panorámica de la fachada completa incluyendo construcciones a la derecha, izquierda y banqueta. b) Misma toma con puerta o cortina abierta donde se aprecie el número oficial. c) Interior del local tomada desde el ingreso, mostrando el área que se utilizará'});
+  } else if (mun === 'TLA') {
+    docs.base.push({txt:'5 fotografías del local a color', nota:'Art. 29 Fracc. I Item 10, Reg. Giros TLA 2021: a) Fachada, b) Interior, c) Lateral izquierda, d) Lateral derecha, e) Estacionamiento'});
+  } else {
+    docs.base.push({txt:'Fotografías del local (interior y exterior)', nota:'Mínimo 2 fotos: fachada del local y área de atención al público'});
+  }
+
+  if (moral) {
+    docs.base.push({txt:'Acta constitutiva (copia clara y legible)', nota: gdl ? 'Persona Moral — Padrón y Licencias GDL' : 'Debe incluir el objeto social compatible con el giro solicitado'});
+    docs.base.push({txt:'Poder para actos de administración o dominio (copia clara y legible)', nota: gdl ? 'Persona Moral — Padrón y Licencias GDL' : 'Protocolizado ante notario público — debe facultar expresamente para actos de administración'});
+    docs.base.push({txt:'Identificación oficial vigente del representante legal (copia clara y legible)', nota: gdl ? 'INE/IFE o pasaporte vigente — Persona Moral GDL' : 'INE/IFE o pasaporte'});
+    if (!gdl) {
+      docs.base.push({txt:'Comprobante de domicilio del representante legal'});
+    }
+  }
+
+  // ─── DOCUMENTOS ESPECÍFICOS TLA ───────────────
+  if (mun === 'TLA') {
+    docs.base.push({txt:'Alineamiento y Número Oficial o comprobante de domicilio del local', nota:'Art. 29 Fracc. I Item 8, Reg. Giros TLA 2021 — expedido por la Dirección de Obras Públicas de Tlajomulco'});
+    docs.base.push({txt:'Carta de anuencia de vecinos colindantes directos (si aplica)', nota:'Art. 29 Fracc. I Item 9, Reg. Giros TLA 2021 — en caso de controversia: 5 días hábiles para obtenerla vía Consejo Social de Participación Ciudadana'});
+  }
+
+  // ─── TRÁMITES PREVIOS OBLIGATORIOS ────────────
+  docs.previos.push({
+    txt: 'Dictamen de Trazo, Usos y Destinos Específicos (DTUDE) o Certificado de Uso de Suelo',
+    nota: 'Emitido por la Dirección de Ordenamiento del Territorio — confirma que el giro está PERMITIDO o CONDICIONADO en el predio. Módulo 01 del Gestor Urbano te indica la zonificación'
+  });
+  if (zpn) {
+    docs.previos.push({txt:'Dictamen de Protección Civil y Bomberos de Zapopan', nota:'Emitido por la Coordinación de Protección Civil Municipal — incluye revisión de instalaciones, extintores, señalización y salidas de emergencia'});
+    docs.previos.push({txt:'Aviso de funcionamiento ante la Secretaría de Salud Jalisco (SSJ)', nota:'Para giros que manejan alimentos, bebidas, servicios de salud o actividades de riesgo sanitario — tramitar en la Jurisdicción Sanitaria correspondiente'});
+  }
+  if (gdl) {
+    docs.previos.push({txt:'Constancia de Protección Civil (GDL)', nota:'Coordinación Municipal de Protección Civil Guadalajara — Art. 17 Fracc. XVII, Ley Ingresos GDL 2026'});
+  }
+  if (zonaPat) {
+    docs.previos.push({txt:'Dictamen de Zona Patrimonial (IPLAN / Coordinación de Patrimonio Histórico)', nota:'Obligatorio para locales en el Centro Histórico de Guadalajara u otras zonas patrimoniales catalogadas'});
+  }
+  if (t === 'ANEXO') {
+    docs.previos.push({txt:'Licencia de funcionamiento principal vigente', nota:'El anexo se agrega a una licencia ya existente — presentar copia de la licencia principal'});
+    docs.previos.push({txt:'DTUDE que ampare el giro adicional (anexo)', nota:'Debe confirmar que el giro del anexo está permitido en el mismo predio'});
+  }
+
+  // ─── DOCUMENTOS ADICIONALES POR TIPO DE GIRO ──
+  if (giro.cofepris) {
+    docs.adicionales.push({
+      txt: 'Aviso de funcionamiento ante COFEPRIS (Federal)',
+      nota: 'Para alimentos, bebidas, farmacias, laboratorios, consultorios y establecimientos de salud — tramitar en COFEPRIS o vía SARE federal (gob.mx/cofepris)'
+    });
+  }
+  if (giro.rpbi) {
+    docs.adicionales.push({txt:'Licencia sanitaria COFEPRIS para manejo de RPBI', nota:'Residuos Peligrosos Biológico-Infecciosos — obligatorio para consultorios médicos, dentales, laboratorios clínicos y veterinarias'});
+    docs.adicionales.push({txt:'Contrato con empresa recolectora de RPBI autorizada por SEMARNAT', nota:'La empresa recolectora debe estar inscrita en el padrón de SEMARNAT'});
+  }
+  if (giro.alcohol) {
+    docs.adicionales.push({
+      txt: 'Licencia estatal para venta y/o consumo de bebidas alcohólicas (SEPSAJ)',
+      nota: 'Secretaría de Política de Gobernación de Jalisco — trámite PREVIO a la licencia municipal. Consultar: sepsaj.jalisco.gob.mx'
+    });
+    docs.adicionales.push({txt:'Constancia de no antecedentes penales del titular (no mayor a 90 días)', nota: gdl ? 'Expedida por el Instituto Jalisciense de Ciencias Forenses (IJCF) — requisito para giros con venta/consumo de alcohol en GDL' : 'Solicitada por SEPSAJ — expedida por la Fiscalía del Estado de Jalisco'});
+    docs.adicionales.push({txt:'Programa Interno de Protección Civil (PIPC) aprobado', nota:'Obligatorio para giros con venta de alcohol — incluye medidas contra incendio y aforo máximo permitido'});
+    if (zpn) {
+      docs.adicionales.push({txt:'Plano del local con distribución de área de venta y aforo', nota:'Indicando barra, área de mesas, cocina, baños y salidas de emergencia — con firma de responsable'});
+    }
+  }
+  if (giro.semarnat) {
+    docs.adicionales.push({txt:'Manifiesto o autorización SEMARNAT (impacto ambiental / residuos peligrosos)', nota:'Para talleres mecánicos, lavanderías industriales, gasolineras, imprentas y giros con residuos o emisiones contaminantes'});
+    docs.adicionales.push({txt:'Plan de manejo de residuos peligrosos', nota:'Aceites, solventes, anticongelantes, pinturas — conforme a la Ley General para la Prevención y Gestión Integral de Residuos'});
+  }
+  if (giro.pc === 'alto' || giro.pc === 'medio') {
+    docs.adicionales.push({txt:'Programa Interno de Protección Civil (PIPC) aprobado por autoridad municipal', nota:'Obligatorio para establecimientos con aforo mayor a 100 personas, giros de riesgo alto o que manejen sustancias peligrosas'});
+    docs.adicionales.push({txt:'Dictamen de instalaciones eléctricas (perito eléctrico certificado)', nota:'Para establecimientos de más de 150 m² o con maquinaria industrial'});
+  }
+  var nomUp = (giro.id||'').toUpperCase();
+  if (nomUp.indexOf('HOTEL') >= 0 || nomUp.indexOf('MOTEL') >= 0 || nomUp.indexOf('MOTOR HOTEL') >= 0) {
+    docs.adicionales.push({txt:'Registro ante la Secretaría de Turismo del Estado de Jalisco (SECTURJAL)', nota:'Obligatorio para establecimientos de hospedaje — tramitar en SECTURJAL antes de la licencia municipal'});
+    docs.adicionales.push({txt:'Visto bueno de la Comisión Estatal del Agua (CEA) si aplica'});
+  }
+  if (nomUp.indexOf('GUARDERIA') >= 0 || nomUp.indexOf('ESTANCIA INFANTIL') >= 0 || nomUp.indexOf('EDUCACION INICIAL') >= 0) {
+    docs.adicionales.push({txt:'Autorización de la Secretaría de Educación Jalisco (SEJ)', nota:'Obligatorio para guarderías y estancias infantiles — tramitar ante la Dirección de Educación Inicial SEJ'});
+    docs.adicionales.push({txt:'Certificado del IMSS si es Estancia del Programa IMSS-Bienestar'});
+    if (gdl) {
+      docs.adicionales.push({txt:'Dictamen de trazos, usos y destinos específicos — Dirección de Ordenamiento del Territorio (GDL)', nota:'Requerido específicamente para guarderías y estancias infantiles en Guadalajara, con sus cláusulas respectivas'});
+    }
+  }
+  if (nomUp.indexOf('ESCUELA') >= 0 || nomUp.indexOf('ACADEMIA') >= 0 || nomUp.indexOf('CENTRO DE CAPACITACION') >= 0) {
+    docs.adicionales.push({txt:'Incorporación o Reconocimiento de Validez Oficial de Estudios (RVOE) si aplica', nota:'Según el nivel educativo — SEJ para nivel básico y medio superior; SEP para superior'});
+    if (gdl) {
+      docs.adicionales.push({txt:'Dictamen de trazos, usos y destinos específicos — Dirección de Ordenamiento del Territorio (GDL)', nota:'Requerido para escuelas y academias en Guadalajara (incluye video juegos), con sus cláusulas respectivas'});
+    }
+  }
+  if (gdl && (nomUp.indexOf('VIDEO JUEGO') >= 0 || nomUp.indexOf('VIDEOJUEGO') >= 0 || nomUp.indexOf('MAQUINAS DE JUEGO') >= 0 || nomUp.indexOf('SALA DE JUEGOS') >= 0)) {
+    docs.adicionales.push({txt:'Dictamen de trazos, usos y destinos específicos — Dirección de Ordenamiento del Territorio (GDL)', nota:'Requerido específicamente para video juegos y salas de juegos en Guadalajara, con sus cláusulas respectivas'});
+  }
+  if (nomUp.indexOf('CLINICA') >= 0 || nomUp.indexOf('HOSPITAL') >= 0 || nomUp.indexOf('LABORATORIO') >= 0 || nomUp.indexOf('CONSULTORIO') >= 0) {
+    docs.adicionales.push({txt:'Licencia sanitaria de la Secretaría de Salud Jalisco (SSJ)', nota:'Para establecimientos de atención médica — tramitar en la Jurisdicción Sanitaria No. 4 (Zona Metropolitana GDL)'});
+    docs.adicionales.push({txt:'Cédula profesional del médico responsable (Dirección Responsable)', nota:'El titular técnico debe tener cédula expedida por la SEP'});
+  }
+  if (nomUp.indexOf('FARMACIA') >= 0) {
+    docs.adicionales.push({txt:'Licencia sanitaria COFEPRIS para farmacia', nota:'La farmacia debe contar con Director Técnico (Químico Farmacéutico Biólogo o Farmacéutico)'});
+    docs.adicionales.push({txt:'Cédula profesional del Director Técnico de la farmacia'});
+  }
+  if (nomUp.indexOf('SALON DE BELLEZA') >= 0 || nomUp.indexOf('ESTETICA') >= 0 || nomUp.indexOf('SPA') >= 0 || nomUp.indexOf('MASAJE') >= 0) {
+    docs.adicionales.push({txt:'Aviso de funcionamiento ante la Secretaría de Salud (establecimientos de salud estética)', nota:'Aplica según servicios ofrecidos — consultar Normas Oficiales Mexicanas NOM-082 y NOM-141'});
+  }
+  if (nomUp.indexOf('VETERINARIA') >= 0 || nomUp.indexOf('CLINICA VETERINARIA') >= 0) {
+    docs.adicionales.push({txt:'Cédula profesional del Médico Veterinario responsable'});
+    docs.adicionales.push({txt:'Autorización COFEPRIS si vende medicamentos veterinarios de control especial'});
+  }
+  if (nomUp.indexOf('RESTAURANT') >= 0 || nomUp.indexOf('FONDA') >= 0 || nomUp.indexOf('COCINA') >= 0 || nomUp.indexOf('CAFETERIA') >= 0 || nomUp.indexOf('TAQUERIA') >= 0) {
+    docs.adicionales.push({txt:'Aviso de funcionamiento ante COFEPRIS (establecimiento de alimentos y bebidas)', nota:'Tramitar vía SARE o directamente con COFEPRIS — cofepris.gob.mx'});
+    docs.adicionales.push({txt:'Certificación en manejo higiénico de alimentos (Distintivo H o constancia SADER/SSJ)', nota:'Recomendado para establecimientos con preparación de alimentos — algunos municipios lo exigen'});
+  }
+  if (nomUp.indexOf('ESTACION DE GAS') >= 0 || nomUp.indexOf('GASOLINERA') >= 0 || nomUp.indexOf('GAS L.P.') >= 0) {
+    docs.adicionales.push({txt:'Permiso de la Comisión Reguladora de Energía (CRE)', nota:'Obligatorio para expendio de combustibles y gas — tramitar ante CRE (gob.mx/cre)'});
+    docs.adicionales.push({txt:'Estudio de impacto ambiental (SEMARNAT o SEMADET)', nota:'Para actividades con almacenamiento de combustibles o gases'});
+    docs.adicionales.push({txt:'Autorización de la Secretaría del Trabajo y Previsión Social (STPS) — instalaciones de alto riesgo'});
+  }
+  if (nomUp.indexOf('SALON DE FIESTAS') >= 0 || nomUp.indexOf('SALON DE EVENTOS') >= 0 || nomUp.indexOf('CENTRO DE ESPECTACULOS') >= 0 || nomUp.indexOf('TEATRO') >= 0) {
+    docs.adicionales.push({txt:'Programa Interno de Protección Civil (PIPC) con aforo máximo autorizado', nota:'Incluye planos de evacuación, señalética, extintores y simulacros'});
+    docs.adicionales.push({txt:'Dictamen estructural del inmueble (para aforos superiores a 500 personas)', nota:'Emitido por perito estructural registrado ante el municipio'});
+    if (zpn) {
+      docs.adicionales.push({txt:'Visto bueno de Bomberos Zapopan para eventos con más de 200 personas'});
+    }
+  }
+  if (nomUp.indexOf('TALLER MECANICO') >= 0 || nomUp.indexOf('LAMINADO') >= 0 || nomUp.indexOf('HOJALATERIA') >= 0) {
+    docs.adicionales.push({txt:'Constancia de capacitación en manejo de residuos peligrosos (aceites y solventes)', nota:'Ley General para la Prevención y Gestión Integral de Residuos'});
+  }
+  if (gdl) {
+    // Giros específicos GDL según Formato Múltiple Padrón y Licencias 2024-2027
+    if (nomUp.indexOf('TORTILL') >= 0) {
+      docs.adicionales.push({txt:'Anuencia de vecinos con copia de identificación oficial vigente', nota:'Requisito específico para tortillerías — Padrón y Licencias GDL'});
+    }
+    if (nomUp.indexOf('CERRAJER') >= 0) {
+      docs.adicionales.push({txt:'Constancia de no antecedentes penales del titular (IJCF, no mayor a 90 días)', nota:'Instituto Jalisciense de Ciencias Forenses — requisito específico para cerrajerías en GDL'});
+    }
+    if (nomUp.indexOf('FUMIGACION') >= 0 || nomUp.indexOf('CONTROL DE PLAGAS') >= 0 || nomUp.indexOf('DESINFECCION') >= 0) {
+      docs.adicionales.push({txt:'Licencia sanitaria de servicios de control de plagas urbanas (SSJ)', nota:'Emitida por la Secretaría de Salud Jalisco, a nombre del titular en el domicilio solicitado — requisito para fumigación en GDL'});
+    }
+    if (nomUp.indexOf('GUARDERIA') >= 0 || nomUp.indexOf('ESTANCIA INFANTIL') >= 0) {
+      docs.adicionales.push({txt:'Aviso de funcionamiento de la Secretaría de Salud Jalisco (SSJ)', nota:'A nombre del titular, en el domicilio solicitado — requisito para guarderías y estancias infantiles en GDL'});
+    }
+    if (giro.alcohol && (giro.tipoAlc === 'alta_deposito' || giro.tipoAlc === 'bar' || giro.tipoAlc === 'rest_bar' || giro.tipoAlc === 'discoteca' || giro.tipoAlc === 'cabaret' || giro.tipoAlc === 'terraza_a')) {
+      docs.adicionales.push({txt:'Anuencia de vecinos con copia de identificación oficial vigente del titular', nota:'Giro restringido (vinos y licores, bares, discotecas, salones de eventos) — Padrón y Licencias GDL'});
+    }
+    docs.adicionales.push({txt:'Licencia de Anuncio Exterior (si instala rotulación o anuncio exterior)', nota:'Trámite separado ante Padrón y Licencias GDL — Art. 47, Ley Ingresos GDL 2026. No obligatorio si no hay anuncio'});
+  }
+  if (zpn) {
+    docs.adicionales.push({txt:'Registro en el padrón del Sistema de Administración Tributaria de Zapopan (SAT Municipal)', nota:'Para efectos del pago de derechos de licencia y refrendo anual'});
+  }
+  return docs;
+}
+
+
+function fmt(n) { return '$' + Math.round(n).toLocaleString('es-MX'); }
+
+// ── RENDER RESULTADO ─────────────────────────────────────────────────
+function renderResultado(giro, mun, sup, tramiteLabel) {
+  var tarAlc = giro.alcohol ? TARIFAS_ALCOHOL[mun][giro.tipoAlc] : null;
+  var hayDerecho = tarAlc && tarAlc.tarifa > 0;
+
+  document.getElementById('res-titulo').textContent = giro.nom || giro.id;
+  var subLbl = (MUN_NOMBRES[mun] || mun) + ' - Ley de Ingresos 2026';
+  if (tramiteLabel) subLbl += ' | Tramite: ' + tramiteLabel;
+  document.getElementById('res-subtitulo').textContent = subLbl;
+
+  var alertHtml = '';
+  var ccfHtml = '';
+  if (!giro.alcohol) {
+    var artRef = mun==='GDL' ? 'Art. 6 Fracc. j, Ley de Ingresos GDL 2026' : 'Transitorio b y c, Ley de Ingresos ZPN 2026';
+    ccfHtml = '<details class="ccf-details">'
+      + '<summary>&#9432; Sin derecho de licencia municipal</summary>'
+      + '<div class="ccf-body">'
+      + 'Este giro está sujeto al <strong>Convenio de Coordinación Fiscal</strong> ('+ artRef +'). '
+      + 'El municipio no puede cobrar un derecho de licencia porque el negocio ya tributa al SAT (IVA/ISR). '
+      + '<br><br><strong>Lo que esto significa:</strong> no se paga el derecho de licencia en Tesorería; '
+      + 'el costo real de apertura está en los trámites previos (Uso de Suelo, Protección Civil, dictamenes, etc.).'
+      + '</div></details>';
+  } else if (tarAlc && tarAlc.tarifa === 0) {
+    alertHtml = '<div class="alert-box alert-info">&#9432; <strong>Exento de derechos de licencia municipal</strong> - ' + tarAlc.art + '</div>';
+  }
+  document.getElementById('res-alerta').innerHTML = alertHtml;
+  document.getElementById('res-ccf').innerHTML = ccfHtml;
+
+  var docs = getChecklist(giro, mun, giro.moral, giro.zonaPat, tramiteLabel);
+  var html = '';
+  if (docs.base.length > 0) {
+    html += '<div class="checklist-section"><div class="checklist-title">Documentos basicos del titular</div>';
+    docs.base.forEach(function(d,i) { html += '<div class="doc-item"><div class="doc-num">'+(i+1)+'</div><div><div class="doc-text">'+d.txt+'</div>'+(d.nota?'<div class="doc-note">'+d.nota+'</div>':'')+'</div></div>'; });
+    html += '</div>';
+  }
+  if (docs.previos.length > 0) {
+    html += '<div class="checklist-section"><div class="checklist-title">Tramites previos requeridos</div>';
+    docs.previos.forEach(function(d,i) { html += '<div class="doc-item"><div class="doc-num" style="background:#555">'+(docs.base.length+i+1)+'</div><div><div class="doc-text">'+d.txt+'</div>'+(d.nota?'<div class="doc-note">'+d.nota+'</div>':'')+'</div></div>'; });
+    html += '</div>';
+  }
+  if (docs.adicionales.length > 0) {
+    var seen = {}; var uniq = [];
+    docs.adicionales.forEach(function(d) { if (!seen[d.txt]) { seen[d.txt]=true; uniq.push(d); } });
+    html += '<div class="checklist-section"><div class="checklist-title">Documentos adicionales segun giro</div>';
+    var base = docs.base.length + docs.previos.length;
+    uniq.forEach(function(d,i) { html += '<div class="doc-item"><div class="doc-num" style="background:#1a6fb4">'+(base+i+1)+'</div><div><div class="doc-text">'+d.txt+'</div>'+(d.nota?'<div class="doc-note">'+d.nota+'</div>':'')+'</div></div>'; });
+    html += '</div>';
+  }
+  document.getElementById('res-checklist').innerHTML = html;
+
+  var dHtml = '<div class="section-hdr">Estimacion de costos</div><div class="fee-box">';
+  var total = 0;
+  if (mun === 'GDL') {
+    dHtml += '<div class="fee-row"><div class="fee-label">Solicitud (forma valorada)<div class="fundamento">Art. 74 Fracc. I-1, Ley Ingresos GDL 2026</div></div><div class="fee-val">$57</div></div>';
+    total += 57;
+  }
+  if (hayDerecho && tarAlc) {
+    dHtml += '<div class="fee-row"><div class="fee-label">Derecho de licencia de giro (anual)<div class="fundamento">'+tarAlc.art+'</div></div><div class="fee-val">'+fmt(tarAlc.tarifa)+'</div></div>';
+    total += tarAlc.tarifa;
+    var ambPct = TARIFAS_ALCOHOL[mun].ambiental_pct || 0;
+    var ambiental = Math.round(tarAlc.tarifa * ambPct);
+    if (ambiental > 0) {
+      var pctLabel = mun==='GDL' ? '10% derecho ambiental' : '3% areas naturales protegidas';
+      dHtml += '<div class="fee-row"><div class="fee-label">'+pctLabel+'</div><div class="fee-val">'+fmt(ambiental)+'</div></div>';
+      total += ambiental;
+    }
+  } else if (!giro.alcohol) {
+    dHtml += '<div class="fee-row"><div class="fee-label">Derecho de licencia de giro</div><div class="fee-val"><span class="badge-gratuito">Exento</span></div></div>';
+  }
+  if (giro.pc !== 'minimo') {
+    var pcTarifa = 0;
+    if (mun === 'GDL') {
+      var tabla = PC_GDL.otros;
+      if (giro.id==='escuela'||giro.id==='guarderia') tabla=PC_GDL.escuela;
+      else if (giro.id==='cabaret'||giro.id==='bar'||giro.id==='discoteca') tabla=PC_GDL.nocturno;
+      else if (giro.id==='hotel') tabla=PC_GDL.hotel;
+      else if (giro.id==='estacion') tabla=PC_GDL.gasolinera;
+      else if (giro.id==='estacionam') tabla=PC_GDL.estacionam;
+      if (sup > 0) {
+        for (var j=0; j<tabla.length; j++) { if (sup<=tabla[j].max){pcTarifa=tabla[j].t;break;} }
+        dHtml += '<div class="fee-row"><div class="fee-label">Constancia de Proteccion Civil<div class="fundamento">Art. 17 Fracc. XVII, Ley Ingresos GDL 2026</div></div><div class="fee-val"><span class="badge-pc">'+fmt(pcTarifa)+'</span></div></div>';
+        total += pcTarifa;
+      } else {
+        dHtml += '<div class="fee-row"><div class="fee-label">Constancia de Proteccion Civil</div><div class="fee-val">Indica m&#178; para calcular</div></div>';
+      }
+    } else if (mun === 'ZPN') {
+      if (sup > 0) {
+        var valorBienes = sup * 3000;
+        pcTarifa = valorBienes<=1000 ? PC_ZPN.base : PC_ZPN.base + Math.ceil((valorBienes-1000)*PC_ZPN.millar/1000);
+        dHtml += '<div class="fee-row"><div class="fee-label">Peritaje PC y Bomberos<div class="fundamento">Art. 93 Fracc. XXII, Ley Ingresos ZPN 2026</div></div><div class="fee-val"><span class="badge-pc">'+fmt(pcTarifa)+'</span></div></div>';
+        total += pcTarifa;
+      } else {
+        dHtml += '<div class="fee-row"><div class="fee-label">Peritaje PC y Bomberos<div class="fundamento">Art. 93 Fracc. XXII, Ley Ingresos ZPN 2026</div></div><div class="fee-val">Indica m&#178; para calcular</div></div>';
+      }
+    } else if (mun === 'TLA') {
+      // TLA — Art. XXXIX l) Ley Ingresos TLA 2026: otros servicios no especificados
+      var PC_TLA = [{max:250,t:316},{max:500,t:2726},{max:1000,t:4360},{max:2000,t:8450},{max:Infinity,t:14800}];
+      if (sup > 0) {
+        var pcTla = 0;
+        for (var k=0; k<PC_TLA.length; k++) { if (sup<=PC_TLA[k].max){pcTla=PC_TLA[k].t;break;} }
+        dHtml += '<div class="fee-row"><div class="fee-label">Dictamen de Protección Civil y Bomberos TLA<div class="fundamento">Art. XXXIX Fracc. l), Ley Ingresos TLA 2026 — Otros servicios ('+sup+' m²)</div></div><div class="fee-val"><span class="badge-pc">'+fmt(pcTla)+'</span></div></div>';
+        total += pcTla;
+      } else {
+        dHtml += '<div class="fee-row"><div class="fee-label">Dictamen de Protección Civil y Bomberos TLA<div class="fundamento">Art. XXXIX Fracc. l), Ley Ingresos TLA 2026</div></div><div class="fee-val">Indica m&#178; para calcular</div></div>';
+      }
+    } else if (mun === 'TON') {
+      // TON — Art. 78 Fracc. ñ) Núm. 6, Ley Ingresos TON 2026: otros servicios no especificados
+      var PC_TON = [{max:200,t:2191},{max:400,t:7535},{max:Infinity,t:12881}];
+      if (sup > 0) {
+        var pcTon = 0;
+        for (var k=0; k<PC_TON.length; k++) { if (sup<=PC_TON[k].max){pcTon=PC_TON[k].t;break;} }
+        dHtml += '<div class="fee-row"><div class="fee-label">Constancia de Supervisión PC y Bomberos TON<div class="fundamento">Art. 78 Fracc. ñ) Núm. 6, Ley Ingresos TON 2026 — Otros servicios ('+sup+' m²)</div></div><div class="fee-val"><span class="badge-pc">'+fmt(pcTon)+'</span></div></div>';
+        total += pcTon;
+      } else {
+        dHtml += '<div class="fee-row"><div class="fee-label">Constancia de Supervisión PC y Bomberos TON<div class="fundamento">Art. 78 Fracc. ñ) Núm. 6, Ley Ingresos TON 2026</div></div><div class="fee-val">Indica m&#178; para calcular</div></div>';
+      }
+    } else if (mun === 'TLQ') {
+      // TLQ — Art. XXIV b) Ley Ingresos TLQ 2026: giros de control especial (Art. 45 Reg. Giros TLQ)
+      var PC_TLQ = [{max:400,t:2046},{max:Infinity,t:3429}];
+      if (sup > 0) {
+        var pcTlq = sup <= 400 ? 2046 : 3429;
+        dHtml += '<div class="fee-row"><div class="fee-label">Dictamen de Seguridad PC y Bomberos TLQ<div class="fundamento">Art. XXIV Fracc. b), Ley Ingresos TLQ 2026 — Giros de control especial Art. 45 Reg. Giros ('+sup+' m²)</div></div><div class="fee-val"><span class="badge-pc">'+fmt(pcTlq)+'</span></div></div>';
+        total += pcTlq;
+      } else {
+        dHtml += '<div class="fee-row"><div class="fee-label">Dictamen de Seguridad PC y Bomberos TLQ<div class="fundamento">Art. XXIV Fracc. b), Ley Ingresos TLQ 2026 — aplica a giros de control especial</div></div><div class="fee-val">Indica m&#178; para calcular</div></div>';
+      }
+    } else {
+      dHtml += '<div class="fee-row"><div class="fee-label">Constancia / Dictamen de Protección Civil<div class="fundamento">Confirmar tarifa vigente en Dirección de Protección Civil de ' + (MUN_NOMBRES[mun]||mun) + '</div></div><div class="fee-val" style="font-size:11px;color:var(--text2)">Solicitar en ventanilla</div></div>';
+    }
+  }
+  var dtudeCosto, dtudeArt;
+  if (mun === 'GDL') {
+    dtudeCosto = '$2,016';
+    dtudeArt   = 'Dictamen de Trazos, Usos y Destinos Específicos — Pág. 201, Ley de Ingresos GDL 2026';
+    total += 2016;
+  } else if (mun === 'ZPN') {
+    dtudeCosto = '$1,834 (est. 2026)';
+    dtudeArt   = 'Art. 119 Fracc. I Inc. X, Ley de Ingresos ZPN — Estimado 2026';
+    total += 1834;
+  } else {
+    dtudeCosto = 'Confirmar en ventanilla';
+    dtudeArt   = 'Dictamen de Compatibilidad de Uso de Suelo — Dirección de Ordenamiento Territorial de ' + (MUN_NOMBRES[mun]||mun) + '. Tarifa por confirmar en Ley de Ingresos 2026 del municipio.';
+  }
+  dHtml += '<div class="fee-row"><div class="fee-label">Dictamen de Uso de Suelo (DTUDE o equivalente)<div class="fundamento">'+dtudeArt+'</div></div><div class="fee-val">'+dtudeCosto+'</div></div>';
+  dHtml += '<div class="fee-total-row"><div>Total estimado</div><div class="fee-total-val">'+fmt(total)+'</div></div>';
+  dHtml += '</div>';
+  if (mun==='GDL') {
+    dHtml += '<div style="margin-top:10px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.78rem;color:var(--text);opacity:.85;">'
+      + '&#128218; <strong>Base normativa GDL:</strong> Reglamento para el Funcionamiento de Giros Comerciales, Industriales y de Prestación de Servicios del Municipio de Guadalajara (últ. reforma 2023). '
+      + '<span style="display:block;margin-top:4px;">&#9888; Condicionantes de uso de suelo (Art. 6): si la superficie del giro excede 100 m², puede reclasificarse como CS3, I3 o CS5 — verificar con Padrón y Licencias antes del trámite.</span>'
+      + '</div>';
+  }
+  if (mun==='TLA') {
+    dHtml += '<div style="margin-top:10px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.78rem;color:var(--text);opacity:.85;">'
+      + '&#128218; <strong>Base normativa TLA:</strong> Reglamento para el Funcionamiento de Giros Comerciales, Industriales y de Prestación de Servicios del Municipio de Tlajomulco de Zúñiga (aprobado 2014, últ. reforma 4 jun 2021). '
+      + '<span style="display:block;margin-top:4px;">Ventanilla: <strong>Oficialía Mayor de Padrón y Licencias</strong>. Vigencia: <strong>enero–diciembre del ejercicio fiscal</strong>; refrendo en enero–febrero (Art. 15). SARE: giros de bajo riesgo en <strong>3 días hábiles</strong> con Afirmativa Ficta (Art. 13 Ter).</span>'
+      + '</div>';
+  }
+  if (mun==='TLQ') {
+    dHtml += '<div style="margin-top:10px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.78rem;color:var(--text);opacity:.85;">'
+      + '&#128218; <strong>Base normativa TLQ:</strong> Reglamento para el Funcionamiento de Establecimientos Comerciales, Industriales y de Prestación de Servicios, Municipio de San Pedro Tlaquepaque (aprobado 11 abr 2019, últ. reforma 31 oct 2023). '
+      + '<span style="display:block;margin-top:4px;">Ventanilla: <strong>Dirección de Padrón y Licencias, H. Ayuntamiento de San Pedro Tlaquepaque</strong>.</span>'
+      + '</div>';
+  }
+  if (mun==='TON') {
+    dHtml += '<div style="margin-top:10px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.78rem;color:var(--text);opacity:.85;">'
+      + '&#128218; <strong>Base normativa TON:</strong> Código Municipal de Comercio para el Municipio de Tonalá, Jalisco (Acuerdo 135 — 2025). '
+      + '<span style="display:block;margin-top:4px;">Ventanilla: <strong>Dirección de Padrón y Licencias, Tonalá</strong>. Vigencia: <strong>indefinida</strong> con pago anual de derechos (Arts. 8 y 12). Giros restringidos (alcohol): requieren autorización del Consejo de Giros Restringidos (Art. 5).</span>'
+      + '</div>';
+  }
+  dHtml += '<div style="margin-top:10px;padding:8px 12px;background:var(--bg2);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;font-size:.78rem;color:var(--text);opacity:.82;line-height:1.5">'
+    + '&#8505;&#65039; <strong>Información orientativa.</strong> Los requisitos y costos mostrados se basan en reglamentos y leyes de ingresos vigentes. Confírmalos con la dependencia correspondiente antes de iniciar el trámite.'
+    + '</div>';
+  if (!hayDerecho && !giro.alcohol) {
+    var ventDir = {GDL:'Padrón y Licencias, Guadalajara', ZPN:'Desarrollo Económico, Zapopan', TLQ:'Padrón y Licencias, Tlaquepaque', TLA:'Oficialía Mayor de Padrón y Licencias, Tlajomulco', TON:'Padrón y Licencias, Tonalá'};
+    dHtml += '<div class="alert-box alert-warn" style="margin-top:10px">&#9888; El costo real depende de si tu giro requiere dictamen de Protección Civil. Consulta con la Dirección de ' + (ventDir[mun]||mun) + ' para confirmar los requisitos.</div>';
+  }
+  document.getElementById('res-derechos').innerHTML = dHtml;
+  document.getElementById('result-panel').style.display = 'block';
+  _lastConsulta = { mun: mun, munId: munId,
+    giro: giro.id || giro.nom || giro.nombre || '',
+    tramite: tramiteLabel, sup: sup,
+    moral: giro.moral || false, zonaPat: giro.zonaPat || false };
+  var _sw = document.getElementById('hist-save-wrap');
+  if (_sw) _sw.style.display = 'flex';
+  var _sm = document.getElementById('hist-saved-msg');
+  if (_sm) _sm.style.display = 'none';
+  // Historial — guardar estado actual
+  _lastConsulta = { mun: mun, munId: munId,
+    giro: giro.id||giro.nom||'',
+    tramite: tramiteLabel, sup: sup,
+    moral: giro.moral||false, zonaPat: giro.zonaPat||false };
+  var sw = document.getElementById('hist-save-wrap');
+  if (sw) { sw.style.display = 'flex'; }
+  var sm = document.getElementById('hist-saved-msg');
+  if (sm) sm.style.display = 'none';
+}
+
+// ── CALCULAR GDL ─────────────────────────────────────────────────────
+function calcularGDL() {
+  var giroNom = document.getElementById('sel-giro-gdl').value;
+  var tramite = document.getElementById('sel-tramite-gdl').value;
+  var sup     = parseFloat(document.getElementById('inp-sup').value) || 0;
+  var moral   = document.querySelector('input[name="tpers-gdl"]:checked').value === 'moral';
+  var zonaPat = document.getElementById('chk-zona-pat').checked;
+  var inpG    = document.getElementById('inp-giro-gdl');
+  if (!giroNom) {
+    inpG.style.borderColor='#e53935'; inpG.focus();
+    setTimeout(function(){inpG.style.borderColor='';},2000); return;
+  }
+  var tipoAlc  = ALC_ZPN[giroNom] || null;
+  var pcNivel  = PC_NIVEL_ZPN[giroNom] || 'bajo';
+  var cofepris = COFEPRIS_ZPN.indexOf(giroNom) >= 0;
+  var rpbi     = RPBI_ZPN.indexOf(giroNom) >= 0;
+  var semarnat = SEMARNAT_ZPN.indexOf(giroNom) >= 0;
+  var giro = {
+    id: giroNom, nom: giroNom,
+    alcohol: !!tipoAlc, tipoAlc: tipoAlc,
+    pc: pcNivel, cofepris: cofepris, rpbi: rpbi,
+    semarnat: semarnat, residuos: semarnat,
+    moral: moral, zonaPat: zonaPat
+  };
+  renderResultado(giro, 'GDL', sup, tramite, tramite);
+}
+
+// ── CALCULAR ZPN ─────────────────────────────────────────────────────
+function calcularZPN() {
+  var giroNom = document.getElementById('sel-giro-zpn').value;
+  var tramite = document.getElementById('sel-tramite-zpn').value;
+  var sup     = parseFloat(document.getElementById('inp-sup-zpn').value) || 0;
+  var moral   = document.querySelector('input[name="tpers-zpn"]:checked').value === 'moral';
+  var zonaPat = document.getElementById('chk-zona-pat-zpn').checked;
+  var selG    = document.getElementById('sel-giro-zpn');
+  if (!giroNom) {
+    selG.style.borderColor='#e53935'; selG.focus();
+    setTimeout(function(){selG.style.borderColor='';},2000);
+    return;
+  }
+  var tipoAlc  = ALC_ZPN[giroNom] || null;
+  var pcNivel  = PC_NIVEL_ZPN[giroNom] || 'bajo';
+  var cofepris = COFEPRIS_ZPN.indexOf(giroNom) >= 0;
+  var rpbi     = RPBI_ZPN.indexOf(giroNom) >= 0;
+  var semarnat = SEMARNAT_ZPN.indexOf(giroNom) >= 0;
+  var giro = {
+    id: giroNom, nom: giroNom,
+    alcohol: !!tipoAlc, tipoAlc: tipoAlc,
+    pc: pcNivel, cofepris: cofepris, rpbi: rpbi,
+    semarnat: semarnat, residuos: semarnat,
+    moral: moral, zonaPat: zonaPat
+  };
+  renderResultado(giro, 'ZPN', sup, tramite, tramite);
+}
+
+// ── CALCULAR TLQ / TLA / TON ─────────────────────────────────────────
+function calcularMunGen() {
+  var giroNom = document.getElementById('inp-giro-gen').value.trim();
+  var tramite = document.getElementById('sel-tramite-gen').value;
+  var sup     = parseFloat(document.getElementById('inp-sup-gen').value) || 0;
+  var moral   = document.querySelector('input[name="tpers-gen"]:checked').value === 'moral';
+  var zonaPat = document.getElementById('chk-zona-pat-gen').checked;
+  var inp     = document.getElementById('inp-giro-gen');
+  if (!giroNom) {
+    inp.style.borderColor = '#e53935'; inp.focus();
+    setTimeout(function(){ inp.style.borderColor = ''; }, 2000);
+    return;
+  }
+  // Detectar alcohol y tipo usando el mismo mapeo que ZPN (mismos nombres de giro)
+  var giroUp   = giroNom.toUpperCase();
+  var tipoAlc  = ALC_ZPN[giroUp] || null;
+  var esAlcohol = (tipoAlc !== null) && !!(TARIFAS_ALCOHOL[munNom] && TARIFAS_ALCOHOL[munNom][tipoAlc]);
+  var pcNivel  = PC_NIVEL_ZPN[giroUp] || 'bajo';
+  var cofepris = COFEPRIS_ZPN.indexOf(giroUp) >= 0;
+  var rpbi     = RPBI_ZPN.indexOf(giroUp) >= 0;
+  var semarnat = SEMARNAT_ZPN.indexOf(giroUp) >= 0;
+  var giro = {
+    id: giroNom, nom: giroNom,
+    alcohol: esAlcohol, tipoAlc: esAlcohol ? tipoAlc : null,
+    pc: pcNivel, cofepris: cofepris, rpbi: rpbi,
+    semarnat: semarnat, residuos: semarnat,
+    moral: moral, zonaPat: zonaPat
+  };
+  renderResultado(giro, munNom, sup, tramite);
+}
+
+// ── SELECTOR MUNICIPIO ───────────────────────────────────────────────
+var MUN_NOMBRES = { GDL:'Guadalajara', ZPN:'Zapopan', TLQ:'Tlaquepaque', TLA:'Tlajomulco', TON:'Tonalá' };
+var MUN_GEN = ['TLQ','TLA','TON'];
+
+function selMun(id, nom, el) {
+  munId = id; munNom = nom;
+  document.querySelectorAll('.muni-btn').forEach(function(b){b.classList.remove('active');});
+  el.classList.add('active');
+  document.getElementById('form-gdl').style.display     = (nom==='GDL') ? 'block' : 'none';
+  document.getElementById('form-zpn').style.display     = (nom==='ZPN') ? 'block' : 'none';
+  document.getElementById('form-mun-gen').style.display = (MUN_GEN.indexOf(nom) >= 0) ? 'block' : 'none';
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('btn-nuevo').style.display    = 'none';
+}
+
+// ── GDL SELECTORES ───────────────────────────────────────────────────
+function onCatChange(){}
+
+function onGiroChange() {}
+function onGiroZpnChange() {}
+function onInputChange() {}
+
+// ── NUEVO ANALISIS ───────────────────────────────────────────────────
+function nuevoAnalisis() {
+  // Reset GDL
+  document.getElementById('inp-giro-gdl').value='';
+  document.getElementById('inp-giro-gdl').classList.remove('has-value');
+  var sg = document.getElementById('scian-info-gdl'); if(sg) sg.style.display='none';
+  document.getElementById('sel-giro-gdl').value='';
+  document.getElementById('sel-tramite-gdl').value='ALTA';
+  document.getElementById('inp-sup').value='';
+  var gdlFis = document.querySelector('input[name="tpers-gdl"][value="fisica"]');
+  if(gdlFis) gdlFis.checked=true;
+  document.getElementById('chk-zona-pat').checked=false;
+  // Reset ZPN
+  document.getElementById('inp-giro-zpn').value='';
+  document.getElementById('inp-giro-zpn').classList.remove('has-value');
+  var sz = document.getElementById('scian-info-zpn'); if(sz) sz.style.display='none';
+  document.getElementById('sel-giro-zpn').value='';
+  document.getElementById('sel-tramite-zpn').value='ALTA';
+  document.getElementById('inp-sup-zpn').value='';
+  var zpnFis = document.querySelector('input[name="tpers-zpn"][value="fisica"]');
+  if(zpnFis) zpnFis.checked=true;
+  var colZpn = document.getElementById('sel-colonia-zpn');
+  if(colZpn) colZpn.value='';
+  var plZpn = document.getElementById('sel-plaza-zpn');
+  if(plZpn) plZpn.value='(SIN PLAZA COMERCIAL)';
+  document.getElementById('chk-zona-pat-zpn').checked=false;
+  // Reset GEN (TLQ/TLA/TON)
+  var ig = document.getElementById('inp-giro-gen'); if(ig) ig.value='';
+  var tg = document.getElementById('sel-tramite-gen'); if(tg) tg.value='ALTA';
+  var sg = document.getElementById('inp-sup-gen'); if(sg) sg.value='';
+  var tpg = document.querySelector('input[name="tpers-gen"][value="fisica"]'); if(tpg) tpg.checked=true;
+  var zpg = document.getElementById('chk-zona-pat-gen'); if(zpg) zpg.checked=false;
+  // Reset resultado
+  document.getElementById('result-panel').style.display='none';
+  var _sw2=document.getElementById('hist-save-wrap'); if(_sw2)_sw2.style.display='none';
+  document.getElementById('btn-nuevo').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+  histRenderCards();
+}
+
+// ── DEEP LINK desde M02 (GU_m02_a_m06) ─────────────────────────────
+function leerDeepLink() {
+  var raw = null;
+  try { raw = localStorage.getItem('GU_m02_a_m06'); } catch(e) {}
+  if (!raw) return;
+  var d;
+  try { d = JSON.parse(raw); } catch(e) { localStorage.removeItem('GU_m02_a_m06'); return; }
+  if (!d || (Date.now() - d.ts) > 600000) { localStorage.removeItem('GU_m02_a_m06'); return; }
+
+  // Municipio — usar selMun para activar form correcto
+  var munNomDL = d.munNombre || '';
+  var munMap = { 'Guadalajara': {id:39, nom:'GDL', btnId:'btn-gdl'},
+                 'Zapopan':     {id:120,nom:'ZPN', btnId:'btn-zpn'},
+                 'Tlaquepaque': {id:38, nom:'TLQ', btnId:'btn-tlq'},
+                 'Tlajomulco':  {id:97, nom:'TLA', btnId:'btn-tla'},
+                 'Tonalá':      {id:101,nom:'TON', btnId:'btn-ton'} };
+  var mDef = munMap[munNomDL];
+  if (mDef) {
+    var btnEl = document.getElementById(mDef.btnId);
+    if (btnEl) selMun(mDef.id, mDef.nom, btnEl);
+  }
+
+  // Giro — rellenar autocomplete y calcular
+  var giroNom = d.giroNombre || '';
+  if (giroNom) {
+    setTimeout(function() {
+      if (munNom === 'ZPN') {
+        acSeleccionar(giroNom);
+        setTimeout(function() { calcularZPN(); }, 150);
+      } else if (munNom === 'GDL') {
+        acSeleccionarGDL(giroNom);
+        setTimeout(function() { calcularGDL(); }, 150);
+      } else {
+        var inp = document.getElementById('inp-giro-gen');
+        if (inp) { inp.value = giroNom; inp.classList.add('has-value'); }
+      }
+    }, 200);
+  }
+
+  localStorage.removeItem('GU_m02_a_m06');
+
+  // Banner de confirmación
+  var banner = document.createElement('div');
+  banner.style.cssText = 'background:rgba(26,39,68,.06);border:0.5px solid var(--brand);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text2);margin-bottom:12px';
+  banner.innerHTML = '&#x2705; <strong>Datos recibidos desde M02</strong> — giro y municipio prellenados.';
+  var wrap = document.querySelector('.m06-wrap') || document.querySelector('main') || document.body;
+  if (wrap && wrap.firstChild) wrap.insertBefore(banner, wrap.firstChild);
+}
+
+// ── NAVEGACIÓN → M02 ──────────────────────────────────────────────────
+function irAM02() {
+  try {
+    localStorage.setItem('GU_m06_a_m02', JSON.stringify({
+      ts: Date.now(),
+      munId: munId,
+      munNombre: munNom
+    }));
+  } catch(e) {}
+  window.location.href = 'GestorUrbano_M02_4.html';
+}
+
+// load: ver histRenderCards + leerDeepLink al final del JS
+
+// ── TEMA ─────────────────────────────────────────────────────────────
+function guToggleTheme() {
+  var h = document.documentElement;
+  var isDark = h.getAttribute('data-theme') === 'dark';
+  var next = isDark ? 'light' : 'dark';
+  h.setAttribute('data-theme', next);
+  localStorage.setItem('gu_theme', next);
+  var lbl = document.getElementById('gu-toggle-label');
+  if (lbl) lbl.textContent = next === 'dark' ? 'Modo claro' : 'Modo oscuro';
+}
+(function(){
+  var t = localStorage.getItem('gu_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  var lbl = document.getElementById('gu-toggle-label');
+  if (lbl) lbl.textContent = t === 'dark' ? 'Modo claro' : 'Modo oscuro';
+})();
+
+
+// ── LISTA DE GIROS ZPN ──────────────────────────────────────────────
+
+// ── SINÓNIMOS para autocomplete ────────────────────────────────────────
+// Clave: término popular (uppercase sin acento) → valores: giros del padrón
+var SINONIMOS = {
+  'TAQUERIA':    ['ALIMENTOS PARA CONSUMO INMEDIATO','ALIMENTOS PARA LLEVAR','RESTAURANTE'],
+  'TACOS':       ['ALIMENTOS PARA CONSUMO INMEDIATO','ALIMENTOS PARA LLEVAR'],
+  'TORTAS':      ['ALIMENTOS PARA CONSUMO INMEDIATO','ALIMENTOS PARA LLEVAR'],
+  'LONCHERIA':   ['ALIMENTOS PARA CONSUMO INMEDIATO','ALIMENTOS PARA LLEVAR'],
+  'BIRRIERIA':   ['ALIMENTOS PARA CONSUMO INMEDIATO','RESTAURANTE'],
+  'POZOLERIA':   ['ALIMENTOS PARA CONSUMO INMEDIATO','RESTAURANTE'],
+  'MARISQUERIA': ['MARISCOS EN ESTADO NATURAL','MARISCOS PROCESADOS PARA CONSUMO HUMANO','RESTAURANTE'],
+  'CAFETERIA':   ['ALIMENTOS PARA CONSUMO INMEDIATO','RESTAURANTE'],
+  'FONDA':       ['ALIMENTOS PARA CONSUMO INMEDIATO','RESTAURANTE'],
+  'PELUQUERIA':  ['ESTETICA'],
+  'BARBERIA':    ['ESTETICA'],
+  'SALON DE BELLEZA': ['ESTETICA','CLINICA DE BELLEZA'],
+  'SALON DE UÑAS':    ['ESTETICA'],
+  'BELLEZA':     ['ESTETICA','CLINICA DE BELLEZA','ART. DE BELLEZA'],
+  'CYBER':       ['COMPRA VENTA DE SISTEMA DE COMPUTO Y CONSUMIBLES','RENTA DE SISTEMA DE COMPUTO'],
+  'INTERNET':    ['COMPRA VENTA DE SISTEMA DE COMPUTO Y CONSUMIBLES','RENTA DE SISTEMA DE COMPUTO'],
+  'COMPUTADORAS':['COMPRA VENTA DE SISTEMA DE COMPUTO Y CONSUMIBLES','RENTA DE SISTEMA DE COMPUTO'],
+  'GYM':         ['GIMNASIO','ACADEMIA DE ACTIVIDADES DEPORTIVAS Y DE ESPARCIMIENTO'],
+  'GIMNASIO':    ['GIMNASIO','ACADEMIA DE ACTIVIDADES DEPORTIVAS Y DE ESPARCIMIENTO'],
+  'FITNESS':     ['GIMNASIO','ACADEMIA DE ACTIVIDADES DEPORTIVAS Y DE ESPARCIMIENTO'],
+  'YOGA':        ['ACADEMIA DE ACTIVIDADES DEPORTIVAS Y DE ESPARCIMIENTO'],
+  'CROSSFIT':    ['GIMNASIO','ACADEMIA DE ACTIVIDADES DEPORTIVAS Y DE ESPARCIMIENTO'],
+  'MINISUPER':   ['ABARROTES','MISCELANEA'],
+  'TIENDITA':    ['ABARROTES','MISCELANEA'],
+  'TIENDA':      ['ABARROTES','MISCELANEA'],
+  'MISCELANEA':  ['MISCELANEA','ABARROTES'],
+  'ZAPATOS':     ['ZAPATERIA','ZAPATERIA','COMERCIO A POR MAYOR DE CALZADO'],
+  'ZAPATO':      ['ZAPATERIA'],
+  'FRUTERIA':    ['FRUTAS Y VERDURAS'],
+  'VERDULERIA':  ['FRUTAS Y VERDURAS'],
+  'VERDURAS':    ['FRUTAS Y VERDURAS'],
+  'FRUTAS':      ['FRUTAS Y VERDURAS'],
+  'POLLERIA':    ['CARNICERIA'],
+  'POLLO':       ['CARNICERIA'],
+  'CARNITAS':    ['CARNICERIA','ALIMENTOS PARA CONSUMO INMEDIATO'],
+  'PANADERIA':   ['PANADERIA'],
+  'PAN':         ['PANADERIA'],
+  'TORTILLERIA': ['MASA Y TORTILLAS','MAQUINAS TORTILLADORAS','CENTRO DE DISTRIBUCION DE MASA Y TORTILLA'],
+  'TORTILLAS':   ['MASA Y TORTILLAS','MAQUINAS TORTILLADORAS'],
+  'REFACCIONES': ['REFACCIONARIA','ACCESORIOS AUTOMOTRICES','ACCESORIOS Y AUTOPARTES SEMINUEVAS'],
+  'TALLER':      ['TALLER MECANICO','TALLER DE CALZADO','TALLER DE JOYERIA'],
+  'MECANICO':    ['TALLER MECANICO'],
+  'VULCANIZADORA':['TALLER MECANICO'],
+  'DENTISTA':    ['CONSULTORIO ODONTOLOGICO','LABORATORIO DENTAL'],
+  'ODONTOLOGO':  ['CONSULTORIO ODONTOLOGICO'],
+  'DOCTOR':      ['CONSULTORIO MEDICO','CONSULTORIOS'],
+  'MEDICO':      ['CONSULTORIO MEDICO','CONSULTORIOS'],
+  'CLINICA':     ['CONSULTORIO MEDICO','CONSULTORIOS','CLINICA VETERINARIA'],
+  'ABOGADO':     ['BUFETES JURIDICOS'],
+  'JURIDICO':    ['BUFETES JURIDICOS'],
+  'NOTARIA':     ['BUFETES JURIDICOS'],
+  'CONTADOR':    ['OTROS SERVICIOS DE CONSULTORIA CIENTIFICA Y TECNICA'],
+  'DESPACHO':    ['BUFETES JURIDICOS','OTROS SERVICIOS DE CONSULTORIA CIENTIFICA Y TECNICA'],
+  'CANTINA':     ['CANTINA'],
+  'PULQUERIA':   ['CANTINA'],
+  'VETERINARIO': ['VETERINARIA','CLINICA VETERINARIA'],
+  'VETERINARIA': ['VETERINARIA','CLINICA VETERINARIA'],
+  'MASCOTAS':    ['VETERINARIA','CLINICA VETERINARIA','ESTETICA CANINA','ADIESTRAMIENTO DE CANINOS'],
+  'PERROS':      ['ADIESTRAMIENTO DE CANINOS','VETERINARIA','ESTETICA CANINA'],
+  'SALON DE FIESTAS': ['SALON DE EVENTOS','SALON DE EVENTOS CON MUSICA EN VIVO'],
+  'FIESTA':      ['SALON DE EVENTOS','ART. PARA FIESTA'],
+  'JARDIN DE EVENTOS': ['SALON DE EVENTOS','SALON DE EVENTOS CON MUSICA EN VIVO'],
+  'MUEBLES':     ['MUEBLERIAS'],
+  'MUEBLERIA':   ['MUEBLERIAS'],
+  'LIBRERIA':    ['PAPELERIA'],
+  'LIBROS':      ['PAPELERIA'],
+  'TLAPALERIA':  ['TLAPALERIA','FERRETERIA'],
+  'OPTICA':      ['OPTICA'],
+  'LENTES':      ['OPTICA'],
+  'JOYERIA':     ['JOYERIA','TALLER DE JOYERIA'],
+  'RELOJES':     ['RELOJERIA','JOYERIA'],
+  'FARMACIA':    ['FARMACIA'],
+  'MEDICAMENTOS':['FARMACIA'],
+  'LAVANDERIA':  ['LAVANDERIA'],
+  'TINTORERIA':  ['RECEPCION Y ENTREGA DE ROPA PARA TINTORERIA'],
+  'FOTOGRAFO':   ['ESTUDIOS FOTOGRAFICOS','ACCESORIOS FOTOGRAFICOS'],
+  'FOTOCOPIADO': ['FOTOCOPIADORA'],
+  'COPIAS':      ['FOTOCOPIADORA'],
+  'SEGUROS':     ['AGENTES DE SEGUROS'],
+  'GASOLINERA':  ['ESTACION DE GASOLINA'],
+  'CREMERIA':    ['CREMERIA'],
+  'QUESOS':      ['CREMERIA'],
+  'HELADERIA':   ['CONSERVADOR DE PRODUCTOS HELADOS','PALETERIA'],
+  'PALETAS':     ['PALETERIA'],
+  'NIEVE':       ['PALETERIA'],
+  'DULCERIA':    ['DULCERIA'],
+  'DULCERIA':      ['DULCERIA'],
+  'FLORERIA':    ['FLORERIA'],
+  'FLORES':      ['FLORERIA'],
+  'FUMIGACION':  ['FUMIGACION'],
+  'MUDANZA':     ['MUDANZAS'],
+  'ESTACIONAMIENTO': ['ESTACIONAMIENTO'],
+  'PARKING':     ['ESTACIONAMIENTO'],
+  'LAVADO DE AUTOS': ['LAVADO DE AUTOS'],
+  'AUTOLAVADO':      ['LAVADO DE AUTOS','AUTO BAÑOS'],
+  'CARWASH':         ['LAVADO DE AUTOS','AUTO BAÑOS'],
+  'PIZZA':           ['RESTAURANTE','ALIMENTOS PARA CONSUMO INMEDIATO'],
+  'PIZZERIA':        ['RESTAURANTE','ALIMENTOS PARA CONSUMO INMEDIATO'],
+  'HAMBURGUESA':     ['ALIMENTOS PARA CONSUMO INMEDIATO','RESTAURANTE'],
+  'HAMBURGUESAS':    ['ALIMENTOS PARA CONSUMO INMEDIATO','RESTAURANTE'],
+  'SUSHI':           ['MINI SUSHI BAR','RESTAURANTE'],
+  'DEPOSITO DE GAS': ['ESTACION DE GAS'],
+  'GAS':             ['ESTACION DE GAS','AUTO ABASTO DE COMBUSTIBLE'],
+  'PSICOLOGO':       ['CONSULTORIOS'],
+  'PSICOLOGIA':      ['CONSULTORIOS'],
+  'TERAPEUTA':       ['CONSULTORIOS','CENTRO TERAPEUTICO'],
+  'NUTRIOLOGO':      ['CONSULTORIOS'],
+  'ENFERMERIA':      ['CONSULTORIO MEDICO'],
+  'COSTURA':         ['REPARACION DE ROPA','CLASES DE CORTE Y CONFECCION'],
+  'MODISTA':         ['REPARACION DE ROPA'],
+  'SEGUROS':         ['AGENTES DE SEGUROS'],
+  'MUDANZA':         ['MUDANZAS'],
+  'FUMIGADORA':      ['FUMIGACION'],
+  'PLAGA':           ['FUMIGACION'],
+  'BANCO':           ['INST. BANCARIA Y DE CDTO.','CAJA POPULAR'],
+  'CAJA':            ['CAJA POPULAR'],
+  'PRESTAMISTA':     ['PRESTAMOS','PRESTAMOS PRENDARIOS'],
+  'EMPEÑO':          ['PRESTAMOS PRENDARIOS'],
+  'CASA DE EMPEÑO':  ['PRESTAMOS PRENDARIOS'],
+  'CELULARES':       ['APARATOS ELECTRONICOS','COMPRA VENTA DE SISTEMA DE COMPUTO Y CONSUMIBLES'],
+  'TELEFONO':        ['APARATOS ELECTRONICOS'],
+  'ELECTRONICA':     ['APARATOS ELECTRONICOS','APARATOS ELECTRODOMESTICOS'],
+  'BICICLETA':       ['BICICLETAS','TALLER DE BICICLETAS'],
+  'PAPELERIA':       ['PAPELERIA'],
+  'ESCUELA':         ['ESCUELA','EDUCACION INICIAL','ESTANCIA INFANTIL'],
+  'GUARDERIA':       ['GUARDERIA','ESTANCIA INFANTIL'],
+  'KINDER':          ['ESCUELA PREESCOLAR','ESTANCIA INFANTIL'],
+  'PREESCOLAR':      ['ESCUELA PREESCOLAR'],
+  'PRIMARIA':        ['ESCUELA PRIMARIA'],
+  'SECUNDARIA':      ['ESCUELA SECUNDARIA'],
+  'PREPARATORIA':    ['ESCUELA PREPARATORIA'],
+  'UNIVERSIDAD':     ['ESCUELA DE LICENCIATURA','ESCUELA DE ESTUDIOS SUPERIORES'],
+  'HOTEL':           ['HOTEL'],
+  'MOTEL':           ['MOTEL'],
+  'HOSTAL':          ['HOTEL','CASA DE HUESPEDES'],
+  'AIRBNB':          ['ALQUILER SIN INTERMEDIACION DE VIVIENDAS AMUEBLADAS'],
+  'RENTA':           ['ALQUILER SIN INTERMEDIACION DE VIVIENDAS AMUEBLADAS'],
+  'CERVEZA':         ['VENTA DE BEBIDAS DE BAJA GRADUACION','BEBIDAS SIN CONTENIDO ALCOHOLICO'],
+  'VINOS':           ['VINOS Y LICORES EN VINATERIAS','VINOS GENEROSOS EN B.C.'],
+  'LICORES':         ['VINOS Y LICORES EN VINATERIAS'],
+  'DEPOSITO DE CERVEZA': ['VENTA DE BEBIDAS DE BAJA GRADUACION DEPOSITO']
+};
+
+var GIROS_ZPN_LISTA = [
+  "ABARROTES",
+  "ACADEMIA DE ACTIVIDADES DEPORTIVAS Y DE ESPARCIMIENTO",
+  "ACADEMIA DE ACTIVIDADES TÉCNICAS Y DE CAPACITACIÓN",
+  "ACADEMIA DE NATACION",
+  "ACCESORIOS AUTOMOTRICES",
+  "ACCESORIOS DE VESTIR",
+  "ACCESORIOS FOTOGRAFICOS",
+  "ACCESORIOS PARA SEGURIDAD INDUSTRIAL Y DOMESTICA",
+  "ACCESORIOS RELACIONADOS",
+  "ACCESORIOS RELACIONADOS CON EL GIRO",
+  "ACCESORIOS Y AUTOPARTES SEMINUEVAS",
+  "ACEITES Y LUBRICANTES",
+  "ACOMODADORES DE AUTOS EVENTUAL",
+  "ACTIVIDADES DEPORTIVAS Y DE ESPARCIMIENTO",
+  "ACTIVIDADES EXTRACTIVAS",
+  "ACUARIO",
+  "ADIESTRAMIENTO DE CANINOS",
+  "ADITIVOS",
+  "AFILADURIA",
+  "AGEN. DE AUTOTRANSPORTES",
+  "AGEN. DE PUBLICIDAD",
+  "AGENCIA DE AUTOS NUEVOS",
+  "AGENCIA DE AUTOS SEMINUEVOS",
+  "AGENCIA DE MENSAJERIA Y PAQUETERIA",
+  "AGENCIA DE MOTOCICLETAS",
+  "AGENCIA DE VIAJES",
+  "AGENCIAS NOTICIOSAS",
+  "ALBERGUE",
+  "ALFOMBRAS",
+  "ALIMENTOS",
+  "ALIMENTOS CON VINOS GENEROSOS",
+  "ALIMENTOS PARA CONSUMO INMEDIATO",
+  "ALIMENTOS PARA LLEVAR",
+  "ALIMENTOS PARA USO ANIMAL",
+  "ALMACEN",
+  "ALQUILER DE APARATOS ELECTRICOS Y ELECTRONICOS",
+  "ALQUILER DE ART. DE OFICINA",
+  "ALQUILER DE AUTOMOVILES CON CHOFER",
+  "ALQUILER DE ROPA",
+  "ALQUILER SIN INTERMEDIACION DE OFICINAS Y LOCALES COMERCIALES",
+  "ALQUILER SIN INTERMEDIACION DE VIVIENDAS AMUEBLADAS",
+  "ALQUILER SIN INTERMEDIACION DE VIVIENDAS NO AMUEBLADAS",
+  "ALUMINIO",
+  "ANIMALES",
+  "ANTIGUEDADES",
+  "ANUNCIO CARTELERA DE AZOTEA",
+  "ANUNCIO CARTELERA DE PISO",
+  "ANUNCIO EN BAÑO PUBLICO",
+  "ANUNCIO EN CASETA TELEFONICA",
+  "ANUNCIO EN PARADERO DE TRANSPORTE PUBLICO",
+  "ANUNCIO EN PUESTO DE PERIODICO",
+  "ANUNCIO ESTRUCTURAL",
+  "ANUNCIO ESTRUCTURAL SOBRE PUENTE PEATONAL",
+  "ANUNCIO EVENTUAL EN CARTELES IMPRESOS EN TABLEROS DEL AYUNTAMIENTO",
+  "ANUNCIO EVENTUAL EN VALLA",
+  "ANUNCIO EVENTUAL INFLABLE",
+  "ANUNCIO EVENTUAL MANTA",
+  "ANUNCIO EVENTUAL PENDON",
+  "ANUNCIO SEMIESTRUCTURAL LUMINOSO",
+  "ANUNCIO SEMIESTRUCTURAL OPACO",
+  "ANUNCIO SIN ESTRUCTURA LUMINOSO",
+  "ANUNCIO SIN ESTRUCTURA OPACO",
+  "ANUNCIOS EN PUESTOS DE FLORES",
+  "ANUNCIOS ESPECIALES",
+  "APARATO MUSICAL",
+  "APARATOS ELECTRODOMESTICOS",
+  "APARATOS ELECTRONICOS",
+  "APARATOS ORTOPEDICOS",
+  "APARATOS Y ACCESORIOS MUSICALES",
+  "ARRENDAMIENTO DE MAQUINARIA",
+  "ART. DE BELLEZA",
+  "ART. DE DECORACION",
+  "ART. DE JARDINERIA",
+  "ART. DE LIMPIEZA",
+  "ART. DE PIEL",
+  "ART. NAVIDEÑOS",
+  "ART. PARA FIESTA",
+  "ART. PROMOCIONALES",
+  "ARTESANIAS",
+  "ARTICULOS DEPORTIVOS",
+  "ARTICULOS PARA ALBERCA",
+  "ARTICULOS PARA DISEÑO Y PINTURA",
+  "ARTICULOS PARA EL HOGAR",
+  "ARTICULOS RELIGIOSOS",
+  "ARTICULOS Y ACCESORIOS MILITARES",
+  "ARTIFICIOS PIROTECNICOS",
+  "ARTISTAS, ESCRITORES Y TECNICOS INDEPENDIENTES",
+  "ASESORIA EN INVERSIONES",
+  "ASILO",
+  "ASOCIACIONES Y ORGANIZACIONES CIVILES",
+  "AUTO ABASTO DE COMBUSTIBLE",
+  "AUTO BAÑOS",
+  "AUTOCINEMAS",
+  "BALNEARIO",
+  "BAÑOS PUBLICOS",
+  "BANQUETES",
+  "BAR",
+  "BAR EN CABARET",
+  "BAR EN CENTRO NOCTURNO",
+  "BAR EN CLUB, CENTROS RECREATIVOS",
+  "BAR EN DISCOTEQUE",
+  "BAR EN HOTEL",
+  "BAR EN MOTEL",
+  "BAR EN MOTORHOTEL",
+  "BAR EN RESTAURANTE",
+  "BASCULA",
+  "BAZAR",
+  "BEBIDAS DE ALTA GRADUACIÓN ANEXO ABARROTES",
+  "BEBIDAS SIN CONTENIDO ALCOHOLICO",
+  "BICICLETAS",
+  "BILLAR CATEGORIA A",
+  "BILLAR CATEGORIA B CON VENTA DE BEBIDAS DE BAJA GRADUACION",
+  "BILLAR CATEGORIA C",
+  "BILLETES DE LOTERÍA",
+  "BISUTERIA",
+  "BLANCOS",
+  "BODEGA",
+  "BODEGA (EXCLUSIVA PARA ANEXO)",
+  "BODEGA DE ACOPIO Y RECICLAJE DE RESIDUOS DIVERSOS",
+  "BOLERAMA",
+  "BOLERIA",
+  "BONETERIA Y MERCERÍA",
+  "BOTANAS",
+  "BUFETES JURIDICOS",
+  "CABARET",
+  "CAFE",
+  "CAFETERIA",
+  "CAJA POPULAR",
+  "CAJAS DE CARTON, MATERIAL DE EMPAQUE",
+  "CAJAS DE SEGURIDAD",
+  "CAMARA DE REFRIGERACION",
+  "CAMPISMO",
+  "CAMPOS DE GOLF",
+  "CANCHAS DEPORTIVAS",
+  "CANTINA",
+  "CARBON Y LEÑA",
+  "CARNE EMPACADA",
+  "CARNES FRIAS",
+  "CARNICERIA",
+  "CARNITAS Y CHICHARRÓN",
+  "CARPINTERIA",
+  "CASA DE BOLSA",
+  "CASA DE CAMBIO",
+  "CASA DE HUESPEDES",
+  "CASA HOGAR (ORFANATORIO)",
+  "CEMENTERIO",
+  "CENTRO ARTISTICO Y CULTURAL",
+  "CENTRO DE ACOPIO",
+  "CENTRO DE COPIADO",
+  "CENTRO DE DISTRIBUCION DE MASA Y TORTILLA",
+  "CENTRO DE ESPECTACULOS",
+  "CENTRO NOCTURNO",
+  "CENTRO TERAPEUTICO",
+  "CENTRO TURISTICO",
+  "CENTROS BOTANEROS",
+  "CEREALES Y SEMILLAS",
+  "CERRAJERIA",
+  "CHATARRA Y RECICLADOS",
+  "CLASES DE CORTE Y CONFECCION",
+  "CLASES DE MANUALIDADES",
+  "CLASES DE REGULARIZACION",
+  "CLINICA",
+  "CLINICA DE BELLEZA",
+  "CLINICA VETERINARIA",
+  "CLUB CINEGETICO",
+  "CLUB DEPORTIVO SOCIAL",
+  "CLUB SOCIAL",
+  "COCINA ECONOMICA",
+  "COMECIO AL POR MAYOR DE EVISTAS Y PERIODICOS",
+  "COMECIO AL POR MAYOR DE JUGUETES Y BICICLETAS",
+  "COMERCIA AL POR MAYOR DE ARTICULOS DE PAPELERIA",
+  "COMERCIO A POR MAYOR DE CALZADO",
+  "COMERCIO AL POR MAYOR DE ARTICULOS DE JOYERIA Y RELOJES",
+  "COMERCIO AL POR MAYOR DE ARTICULOS DESECHABLES",
+  "COMERCIO AL POR MAYOR DE BLANCOS",
+  "COMERCIO AL POR MAYOR DE CEMENTO, TABIQUE Y GRAVA",
+  "COMERCIO AL POR MAYOR DE CUEROS Y PIELES",
+  "COMERCIO AL POR MAYOR DE DISCOS Y CASETES",
+  "COMERCIO AL POR MAYOR DE FIBRAS, HILOS Y TELAS",
+  "COMERCIO AL POR MAYOR DE LIBROS",
+  "COMERCIO AL POR MAYOR DE PINTURA",
+  "COMERCIO AL POR MAYOR DE ROPA, ACCESORIOS, BISUTERIA Y ACC.DE VESTIR",
+  "COMERCIO AL POR MAYOR DE VIDRIOS Y ESPEJOS",
+  "COMPRA VENTA",
+  "COMPRA VENTA AL POR MAYOR DE MOBILIARIO, EQUIPO E INSTRUMENTAL MEDICO",
+  "COMPRA VENTA CERRADURAS INTELIGENTES Y CAJAS FUERTES",
+  "COMPRA VENTA DE SISTEMA DE COMPUTO Y CONSUMIBLES",
+  "COMPRA Y VENTA DE LLANTAS",
+  "CONSERVADOR DE PRODUCTOS HELADOS",
+  "CONSERVAS ALIMENTICIAS",
+  "CONSULTORIO MEDICO",
+  "CONSULTORIO ODONTOLOGICO",
+  "CONSULTORIOS",
+  "CONSUMIBLES PARA FILMACIONES",
+  "CORTIJO TAURINO",
+  "CREMERIA",
+  "CRISTALERIA",
+  "CULTIVO DE AGAVES ALCOHOLEROS",
+  "CULTIVO DE JITOMATE O TOMATE ROJO",
+  "CULTIVO DE MAIZ FORRAJERO",
+  "CULTIVO DE MAIZ GRANO",
+  "CULTIVO DE SORGO GRANO",
+  "DEMOSTRACIONES",
+  "DEPILACION CON CERA",
+  "DEPILACIONES",
+  "DEPORTES EXTREMOS",
+  "DEPORTISTAS PROFESIONALES",
+  "DEPORTIVOS Y SIMILARES QUE CUENTAN CON INSTALACIONES PARA PRESENTARLOS",
+  "DESECHABLES",
+  "DESPACHOS DE INVESTIGACION DE SOLVENCIA ECONOMICA",
+  "DETALLADO AUTOMOTRIZ",
+  "DISCOTEQUES",
+  "DISEÑO DE ANUNCIOS A MANO Y POR COMPUTADORA",
+  "DISEÑO DE ANUNCIOS, ROTULOS, LONAS Y TOLDOS LUMINOSOS",
+  "DISEÑO E IMPRESION",
+  "DISTRIBUCION DE PELICULAS Y AUDIOVISUALES",
+  "DULCERIA",
+  "EDICION DE DIRECTORIOS Y DE LISTAS DE CORREO",
+  "EDICION DE LIBROS",
+  "EDICION DE LIBROS INTEGRADA CON LA IMPRESION",
+  "EDICION DE PERIODICOS",
+  "EDICION DE PERIODICOS INTEGRADA CON LA IMPRESION",
+  "EDICION DE REVISTAS Y OTRAS PUBLICACIONES PERIODICAS",
+  "EDUCACION INICIAL",
+  "ELABORACION DE COMPOSTA",
+  "ELABORACIÓN DE PRODUCTOS HELADOS",
+  "ELABORACION DE VINOS Y LICORES",
+  "ELEVADORES",
+  "EMBOBINADO Y REPARACION DE MOTORES ELECTRICOS Y ELECTRONICOS",
+  "EMPAQUES EN GENERAL",
+  "EQUIPO",
+  "EQUIPO DE ILUMINACION",
+  "EQUIPO MEDICO",
+  "ESCALERA ELECTRICA",
+  "ESCUELA",
+  "ESCUELA DE ESTUDIOS SUPERIORES",
+  "ESCUELA DE LICENCIATURA",
+  "ESCUELA PREESCOLAR",
+  "ESCUELA PREPARATORIA",
+  "ESCUELA PRIMARIA",
+  "ESCUELA SECUNDARIA",
+  "ESPACIOS RECREATIVOS",
+  "ESTABLECIMIENTO ESPECIALIZADO EN ADICCIONES",
+  "ESTACION DE GAS",
+  "ESTACION DE GASOLINA",
+  "ESTACIONAMIENTO",
+  "ESTACIONAMIENTO EN CENTRO COMERCIAL",
+  "ESTACIONAMIENTO PUBLICO",
+  "ESTADIOS",
+  "ESTANCIA INFANTIL",
+  "ESTETICA",
+  "ESTETICA CANINA",
+  "ESTIMULACION TEMPRANA",
+  "ESTUDIOS CINEMATOGRAFICOS",
+  "ESTUDIOS FOTOGRAFICOS",
+  "EVENTOS Y ESPECTACULOS",
+  "EXP. DE AGUA PURIFICADA",
+  "EXP. DE POLLO",
+  "EXPENDIO DE BEBIDAS ALCOHOLICAS DE CUALQUIER TIPO",
+  "EXPENDIO DE BEBIDAS DE BAJA GRADUACION EN B.C.",
+  "EXPENDIO EN ENVASE CERRADO DE ALCOHOL PARA USO MEDICO",
+  "FABRICA DE MATERIALES PARA LA CONSTRUCCIÓN",
+  "FABRICAS E INDUSTRIAS",
+  "FARMACIA",
+  "FERRETERIA",
+  "FERTILIZANTES",
+  "FLORERIA",
+  "FLORICULTURA EN INVERNADEROS Y OTRAS ESTRUCTURAS AGRICOLAS PROTEGIDAS",
+  "FONDA",
+  "FOTOCOPIADORA",
+  "FRUTAS Y VERDURAS",
+  "FUENTE DE SODAS",
+  "GALERIA DE ARTE",
+  "GIMNASIO",
+  "GRABACIONES DE AUDIO Y VIDEO",
+  "GRANJA",
+  "GUARDERIA",
+  "HELICICULTURA",
+  "HERRERIA",
+  "HORNO CREMATORIO",
+  "HORNO CREMATORIO PARA MASCOTAS",
+  "HOSPITALES Y CLINICAS",
+  "HOTEL",
+  "HUESARIO",
+  "HUEVO",
+  "IMPRENTA",
+  "IMPRESION",
+  "INCINERADOR DE DESECHOS",
+  "INCUBADORA",
+  "INDUSTRIALES",
+  "INMOBILIARIA",
+  "INMOBILIARIAS Y CORREDORES DE BIENES RAICES",
+  "INST. BANCARIA Y DE CDTO.",
+  "INST. DE EQUIPO DE SONIDO",
+  "INSTALACION DE ACCESORIOS AUTOMOTRICES",
+  "JOYERIA",
+  "JUEGOS DE VIDEO",
+  "JUEGOS MECANICOS Y ELECTROMECANICOS",
+  "JUGUETERIA",
+  "LAB. DE ANALISIS CLINICOS",
+  "LAB. FOTOGRAFICO",
+  "LABORATORIO",
+  "LABORATORIO DE AUDIOVISUALES",
+  "LABORATORIO DENTAL",
+  "LABRADO Y CORTE ARTESANAL DE CANTERA",
+  "LAVADEROS PUBLICOS",
+  "LAVANDERIA",
+  "LECHERIA",
+  "LENCERIA",
+  "LIBRERIAS",
+  "LLANTERA",
+  "LUDOTECA",
+  "MADERERIA",
+  "MANUALIDADES",
+  "MANUFACTURA DOMICILIARIA",
+  "MANUFACTURA MENOR",
+  "MAQUILA",
+  "MAQUINARIA EN GENERAL",
+  "MAQUINAS TORTILLADORAS",
+  "MAQUINAS TRAGAMONEDAS",
+  "MARCOS Y MOLDURAS",
+  "MARISCOS EN ESTADO NATURAL",
+  "MARISCOS PROCESADOS PARA CONSUMO HUMANO",
+  "MASA Y TORTILLAS",
+  "MASAJES TERAPEUTICOS",
+  "MATERIA PRIMA",
+  "MATERIAL DISCOGRAFICO",
+  "MATERIAL ELECTRICO",
+  "MATERIALES DE CONSTRUCCION",
+  "MESA DE BILLAR",
+  "MESA DE JUEGO",
+  "MINI RESTAURANTE BAR",
+  "MINI SUSHI BAR",
+  "MINI-SUPER",
+  "MISCELANEA",
+  "MOLINO DE NIXTAMAL",
+  "MOTEL",
+  "MOTOR HOTEL",
+  "MUEBLERIAS",
+  "MUSEO",
+  "MUSEOS DEL SECTOR PRIVADO",
+  "MUSICA EN VIVO",
+  "MUSICOS Y CANCIONEROS",
+  "NACION",
+  "NEVERIA",
+  "NOTARIAS PUBLICAS",
+  "OBRADOR",
+  "OFICINA ADMINISTRATIVA",
+  "OFICINA CORPORATIVA",
+  "OFICINA DE PROFESIONALES",
+  "OFICINA VIRTUAL",
+  "OPTICA",
+  "OTROS SERVICIOS DE CONSULTORIA CIENTIFICA Y TECNICA",
+  "OTROS SERVICIOS DE LIMPIEZA",
+  "OTROS SERVICIOS RELACIONADOS CON LA CONTABILIDAD",
+  "PAILERIA",
+  "PALENQUE",
+  "PALETERIA",
+  "PAN",
+  "PANADERIA",
+  "PAÑALES",
+  "PANTALLA LUMINOSA",
+  "PAPELERIA",
+  "PARQUE ECOLOGICO",
+  "PASTELERIA Y POSTRES",
+  "PEDICURISTA",
+  "PELETERIA",
+  "PENSION CANINA",
+  "PENSIONES DE AUTOS",
+  "PERFUMERIA",
+  "PETROLEO",
+  "PINTURAS",
+  "PISOS",
+  "PISOS, AZULEJOS Y ACCESORIOS PARA BAÑO",
+  "PISTA DE PATINAJE (HIELO)",
+  "PISTA PARA MINI AUTOS ELECTRICOS",
+  "PISTAS DE ACTIVIDADES DEPORTIVAS Y DE ESPARCIMIENTO",
+  "PLANCHADURÍA",
+  "PLASTICOS",
+  "PODOLOGIA",
+  "PRELICENCIA",
+  "PRESTACION DE SERVICIOS",
+  "PRESTADORES DE SERVICIOS",
+  "PRESTAMOS",
+  "PRESTAMOS PRENDARIOS",
+  "PRODUCCION DE BEBIDAS ALCOHÓLICAS CON VENTA AL MENUDEO",
+  "PRODUCTOS AGROPECUARIOS",
+  "PRODUCTOS DE REPOSTERIA",
+  "PRODUCTOS LACTEOS",
+  "PRODUCTOS NATURISTAS",
+  "PRODUCTOS QUIMICOS",
+  "PRODUCTOS QUIMICOS DE LIMPIEZA",
+  "PRONOSTICOS DEPORTIVOS",
+  "PUERTAS Y VENTANAS",
+  "PULQUERIA",
+  "PURIFICACIÓN Y ENVASADO DE AGUA PARA CONSUMO HUMANO",
+  "RADIODIFUSORA",
+  "RASTRO",
+  "RASTRO DE AVES (GIRO RESTRINGIDO)",
+  "RECEPCION Y ENTREGA DE ROPA PARA TINTORERIA",
+  "REFACCIONARIA",
+  "REGALOS",
+  "RELACIONADOS",
+  "RELLENO SANITARIO TECNIFICADO",
+  "RELOJERIA",
+  "RENTA DE AUTOMOTORES",
+  "RENTA DE CANCHAS",
+  "RENTA DE MOBILIARIO Y ARTICULOS PARA FIESTA",
+  "RENTA DE SISTEMA DE COMPUTO",
+  "REPARACION DE PARTES MECANICAS E HIDRAULICAS",
+  "REPARACION DE ROPA",
+  "REST-BAR CAMP.C/MUS.VIV PIST B",
+  "REST-BAR CAMPESTRE CON MUSICA VIVO",
+  "RESTAURANT- BAR CAMPESTRE,FOLKLORICO CON MUSICA EN VIVO",
+  "RESTAURANTE",
+  "RESTAURANTE BAR",
+  "RESTAURANTE CON VENTA Y CONSUMO DE BEBIDAS DE BAJA GRADUACION",
+  "RESTAURANTE-BAR CAMPESTRE",
+  "RESTAURANTE-BAR FOLCKLORICO",
+  "REVISTAS, LIBROS Y PERIODICOS",
+  "ROCKOLA EVENTUAL",
+  "ROPA",
+  "ROPA DE BEBE",
+  "ROSTICERIA",
+  "ROTULISTAS",
+  "ROTULOS",
+  "SABANAS Y COLCHAS",
+  "SALA DE EXHIBICION",
+  "SALAS CINEMATOGRAFICAS",
+  "SALON CON MUSICA V. Y PISTA BAILE",
+  "SALON DE BAILE",
+  "SALON DE EVENTOS",
+  "SALON DE EVENTOS CON MUSICA EN VIVO",
+  "SALON DE EVENTOS CON PISTA DE BAILE",
+  "SALON DE FIESTAS INFANTILES",
+  "SALON DE JUEGOS (EXCLUSIVO ANEXO)",
+  "SALON DE MASAJES",
+  "SASTRERIA",
+  "SERVI-BAR DE CUATRO A GRAN TURISMO",
+  "SERVI-BAR DE UNA A TRES ESTRELLAS",
+  "SERVICIO DE COMEDOR PARA EMPRESAS",
+  "SERVICIOS AUTOMOTRICES",
+  "SERVICIOS FUNERARIOS",
+  "SILLON PARA MASAJES",
+  "SOLVENTES",
+  "TABAQUERIA",
+  "TALABARTERIA",
+  "TALLER",
+  "TALLER AUTOELECTRICO",
+  "TALLER DE APARATOS ELECTRODOMESTICOS",
+  "TALLER DE APARATOS ELECTRONICOS Y ELECTRICOS",
+  "TALLER DE BICICLETAS",
+  "TALLER DE CALZADO",
+  "TALLER DE CERAMICA",
+  "TALLER DE COSTURA",
+  "TALLER DE JOYERIA",
+  "TALLER DE LAMINADO Y PINTURA",
+  "TALLER DE MOFLES",
+  "TALLER DE MOTOS",
+  "TALLER DE SOLDADURA",
+  "TALLER DE TORNO",
+  "TALLER MECANICO",
+  "TAPICERÍA",
+  "TARJETAS Y ACCESORIOS TELEFONICOS",
+  "TATUAJES Y PERFORACIONES",
+  "TEATRO",
+  "TELAS",
+  "TELEFONOS CELULARES",
+  "TELEFONOS Y FAX PUBLICO",
+  "TELEVISION POR CABLE",
+  "TERMINAL DE AUTOBUSES",
+  "TERRAZA (EXCLUSIVA PARA ANEXO)",
+  "TERRAZA CAMPESTRE",
+  "TERRAZA CAMPESTRE CON MUSICA EN VIVO",
+  "TERRAZA CAMPESTRE CON MUSICA VIVO Y PISTA BAILE",
+  "TERRAZA SIN VENTA Y O CONSUMO DE BEBIDAS ALCOHOLICAS",
+  "TERRAZA TIPO A",
+  "TERRAZA TIPO B",
+  "TIANGUIS DEL AUTOMOVIL",
+  "TIENDA DE AUTOSERVICIO",
+  "TIENDA DE DEPORTES",
+  "TIENDA DEPARTAMENTAL",
+  "TINTORERIA",
+  "TLAPALERIA",
+  "TOSTADERIA",
+  "TOSTADERIA (VENTA)",
+  "TRAILER PARK",
+  "TRANSFORMACION DE ALIMENTOS",
+  "VALET PARKING",
+  "VENTA BEBIDAS DE BAJA GRADUACION EN B.C.",
+  "VENTA DE ALIMENTOS",
+  "VENTA DE ARTICULOS EROTICOS-SEXUALES (SEX SHOP)",
+  "VENTA DE ATAUDES",
+  "VENTA DE BEBIDAS DE BAJA GRADUACION",
+  "VENTA DE BEBIDAS DE BAJA GRADUACION ANEXO A ABARROTES Y MISCELANEAS",
+  "VENTA DE BEBIDAS DE BAJA GRADUACION ANEXO A MINI-SUPER",
+  "VENTA DE BEBIDAS DE BAJA GRADUACION DEPOSITO",
+  "VENTA DE BOLETOS",
+  "VENTA DE CARTUCHOS PARA TIRO DEPORTIVO Y CACERIA",
+  "VENTA DE DISFRACES VESTIMENTA REGIONAL Y VESTIDOS DE NOVIA",
+  "VENTA DE HERRAJES EN GENERAL",
+  "VENTA DE HIELO",
+  "VENTA DE JUEGOS DE VIDEO",
+  "VENTA DE SOMBREROS",
+  "VENTA Y CONSUMO DE BEBIDAS DE BAJA GRADUACION ANEXO A RESTAURANTE",
+  "VENTA Y CONSUMO DE BEBIDAS DE BAJA GRADUACION ANEXO A ALIMENTOS",
+  "VENTA Y CONSUMO DE BEBIDAS DE BAJA GRADUACION ANEXO A CENTRO BOTANERO",
+  "VENTA Y CONSUMO DE BEBIDAS DE BAJA GRADUACION ANEXO A ESTADIOS",
+  "VENTA Y CONSUMO DE BEBIDAS DE BAJA GRADUACION ANEXO BILLARES O BOLICHE",
+  "VENTA Y CONSUMO DE BEBIDAS DE BAJA GRADUACION ANEXO CANCHAS DEPORTIVAS",
+  "VENTA Y CONSUMO DE BEBIDAS DE BAJA GRADUACION CON ALIMENTOS",
+  "VETERINARIA",
+  "VIDEO CLUB",
+  "VIDEO-BAR",
+  "VIDRIERA",
+  "VINOS GENEROSOS EN B.A",
+  "VINOS GENEROSOS EN B.C.",
+  "VINOS Y LICORES EN ABARROTES",
+  "VINOS Y LICORES EN MINI-SUPER",
+  "VINOS Y LICORES EN TIENDAS DE AUTOSERVICIO Y SUPERMERCADOS",
+  "VINOS Y LICORES EN VINATERIAS",
+  "VINOS Y LICORES P/CAFE",
+  "VIVERO",
+  "VIVERO SIN PRODUCCION DE PLANTA",
+  "VTA DE BEBIDAS DE BAJA GRAD. EN TIENDA DE AUTOSERVICIO Y SUPERMERCADOS",
+  "YOGA",
+  "ZAPATERIA",
+  "AGENTES DE SEGUROS",
+  "FUMIGACION",
+  "LAVADO DE AUTOS",
+  "MUDANZAS"
+];
+
+// GDL usa el mismo catálogo de giros
+var GIROS_GDL_LISTA = GIROS_ZPN_LISTA;
+
+var SCIAN_DATA = {
+  "ABARROTES":["461110","Comercio al por menor en tiendas de abarrotes, ultramarinos y misceláneas"],
+  "ACADEMIA DE ACTIVIDADES DEPORTIVAS Y DE ESPARCIMIENTO":["711311","Promotores del sector privado de espectáculos artísticos, culturales, deportivos y similares que cuentan con instalaciones para presentarlos"],
+  "ACADEMIA DE ACTIVIDADES TÉCNICAS Y DE CAPACITACIÓN":["541990","Otros servicios profesionales, científicos y técnicos"],
+  "ACADEMIA DE NATACION":["611698","Otros servicios educativos proporcionados por el sector privado"],
+  "ACCESORIOS AUTOMOTRICES":["462111","Comercio al por menor en supermercados"],
+  "ACCESORIOS DE VESTIR":["463215","Comercio al por menor de bisutería y accesorios de vestir"],
+  "ACCESORIOS FOTOGRAFICOS":["465214","Comercio al por menor de equipo y material fotográfico"],
+  "ACCESORIOS PARA SEGURIDAD INDUSTRIAL Y DOMESTICA":["561620","Servicios de protección y custodia mediante el monitoreo de sistemas de seguridad"],
+  "ACCESORIOS Y AUTOPARTES SEMINUEVAS":["468212","Comercio al por menor de partes y refacciones usadas para automóviles, camionetas y camiones"],
+  "ACEITES Y LUBRICANTES":["468420","Comercio al por menor de aceites y grasas lubricantes, aditivos y similares para vehículos de motor"],
+  "ACUARIO":["112515","Piscicultura y otra acuicultura, excepto camaronicultura"],
+  "AGEN. DE AUTOTRANSPORTES":["484210","Servicios de mudanzas"],
+  "AGEN. DE PUBLICIDAD":["541810","Agencias de publicidad"],
+  "AGENCIA DE MENSAJERIA Y PAQUETERIA":["561910","Servicios de empacado y etiquetado"],
+  "AGENCIA DE MOTOCICLETAS":["468311","Comercio al por menor de motocicletas"],
+  "AGENCIA DE VIAJES":["561510","Agencias de viajes"],
+  "AGENCIAS NOTICIOSAS":["516210","Servicios de distribución de audio y video en tiempo real (streaming), redes sociales, cadenas de radio y televisión y otros proveedores de contenido"],
+  "ALFOMBRAS":["466311","Comercio al por menor de alfombras, cortinas, tapices y similares"],
+  "ALIMENTOS":["311993","Elaboración de alimentos frescos para consumo inmediato"],
+  "ALIMENTOS PARA CONSUMO INMEDIATO":["311993","Elaboración de alimentos frescos para consumo inmediato"],
+  "ALIMENTOS PARA LLEVAR":["311993","Elaboración de alimentos frescos para consumo inmediato"],
+  "ALIMENTOS PARA USO ANIMAL":["311110","Elaboración de alimentos balanceados para animales"],
+  "ALQUILER DE APARATOS ELECTRICOS Y ELECTRONICOS":["532210","Alquiler de aparatos eléctricos y electrónicos para el hogar y personales"],
+  "ALQUILER DE ART. DE OFICINA":["532420","Alquiler de equipo de cómputo y de otras máquinas y mobiliario de oficina"],
+  "ALQUILER DE AUTOMOVILES CON CHOFER":["485320","*Alquiler de automóviles con chofer"],
+  "ALQUILER DE ROPA":["532281","Alquiler de prendas de vestir"],
+  "ALQUILER SIN INTERMEDIACION DE OFICINAS Y LOCALES COMERCIALES":["531114","*Alquiler sin intermediación de oficinas y locales comerciales"],
+  "ALQUILER SIN INTERMEDIACION DE VIVIENDAS AMUEBLADAS":["531111","*Alquiler sin intermediación de viviendas amuebladas"],
+  "ALQUILER SIN INTERMEDIACION DE VIVIENDAS NO AMUEBLADAS":["531112","*Alquiler sin intermediación de viviendas no amuebladas"],
+  "ALUMINIO":["434221","Comercio al por mayor de materiales metálicos para la construcción y la manufactura"],
+  "ANIMALES":["115210","Servicios relacionados con la cría y explotación de animales"],
+  "ANTIGUEDADES":["466313","Comercio al por menor de antigüedades y obras de arte"],
+  "ANUNCIO SEMIESTRUCTURAL LUMINOSO":["541850","Agencias de anuncios publicitarios"],
+  "ANUNCIO SEMIESTRUCTURAL OPACO":["541830","Agencias de compra de medios a petición del cliente"],
+  "ANUNCIO SIN ESTRUCTURA LUMINOSO":["541850","Agencias de anuncios publicitarios"],
+  "ANUNCIO SIN ESTRUCTURA OPACO":["541850","Agencias de anuncios publicitarios"],
+  "APARATO MUSICAL":["339991","Fabricación de instrumentos musicales"],
+  "APARATOS ELECTRODOMESTICOS":["466112","Comercio al por menor de electrodomésticos menores y aparatos de línea blanca"],
+  "APARATOS ELECTRONICOS":["433510","Comercio al por mayor de electrodomésticos menores y aparatos de línea blanca"],
+  "APARATOS ORTOPEDICOS":["464122","Comercio al por menor de artículos ortopédicos"],
+  "APARATOS Y ACCESORIOS MUSICALES":["465216","Comercio al por menor de instrumentos musicales"],
+  "ART. DE BELLEZA":["465111","Comercio al por menor de artículos de perfumería y cosméticos"],
+  "ART. DE DECORACION":["541410","Diseño y decoración de interiores"],
+  "ART. DE JARDINERIA":["466113","Comercio al por menor de muebles para jardín"],
+  "ART. DE LIMPIEZA":["467115","Comercio al por menor de artículos para la limpieza"],
+  "ART. DE PIEL":["463216","Comercio al por menor de ropa de cuero, de piel y de otros artículos de estos materiales"],
+  "ART. PARA FIESTA":["322299","Fabricación de otros productos de cartón y papel"],
+  "ART. PROMOCIONALES":["541870","Distribución de material publicitario"],
+  "ARTESANIAS":["465915","Comercio al por menor en tiendas de artesanías"],
+  "ARTICULOS DEPORTIVOS":["465215","Comercio al por menor de artículos y aparatos deportivos"],
+  "ARTICULOS PARA ALBERCA":["467117","Comercio al por menor de artículos para albercas y otros artículos"],
+  "ARTICULOS PARA DISEÑO Y PINTURA":["435312","Comercio al por mayor de artículos y accesorios para diseño y pintura artística"],
+  "ARTICULOS PARA EL HOGAR":["466111","Comercio al por menor de muebles para el hogar"],
+  "ARTICULOS RELIGIOSOS":["465913","Comercio al por menor de artículos religiosos"],
+  "ARTICULOS Y ACCESORIOS MILITARES":["314999","Fabricación de banderas y otros productos textiles no clasificados en otra parte"],
+  "ARTISTAS, ESCRITORES Y TECNICOS INDEPENDIENTES":["711510","Artistas, escritores y técnicos independientes"],
+  "ASESORIA EN INVERSIONES":["523910","Asesoría en inversiones"],
+  "ASOCIACIONES Y ORGANIZACIONES CIVILES":["813230","Asociaciones y organizaciones civiles"],
+  "BANQUETES":["722320","Servicios de preparación de alimentos para ocasiones especiales"],
+  "BASCULA":["435319","Comercio al por mayor de maquinaria y equipo para otros servicios y para actividades comerciales"],
+  "BAZAR":["466410","Comercio al por menor de artículos usados"],
+  "BEBIDAS SIN CONTENIDO ALCOHOLICO":["461213","Comercio al por menor de bebidas no alcohólicas y hielo"],
+  "BICICLETAS":["465213","Comercio al por menor de bicicletas y triciclos"],
+  "BILLAR CATEGORIA A":["713991","Billares"],
+  "BILLETES DE LOTERÍA":["713291","Venta de billetes de lotería, pronósticos deportivos y otros boletos de sorteo"],
+  "BISUTERIA":["339913","Joyería de metales y piedras no preciosos y de otros materiales"],
+  "BLANCOS":["463112","Comercio al por menor de blancos"],
+  "BODEGA (EXCLUSIVA PARA ANEXO)":["431110","Comercio al por mayor de abarrotes"],
+  "BOLERIA":["812130","Sanitarios públicos y Bolerías"],
+  "BONETERIA Y MERCERÍA":["463113","Comercio al por menor de artículos de mercería y bonetería"],
+  "BOTANAS":["311910","Elaboración de botanas"],
+  "BUFETES JURIDICOS":["541110","Bufetes jurídicos"],
+  "CAFE":["311921","Beneficio del café"],
+  "CAFETERIA":["311923","Elaboración de café instantáneo"],
+  "CAJA POPULAR":["522320","Cajas, cooperativas y sociedades financieras de ahorro y préstamo popular"],
+  "CAJAS DE CARTON, MATERIAL DE EMPAQUE":["434223","Comercio al por mayor de envases en general, papel y cartón para la industria"],
+  "CAMARA DE REFRIGERACION":["333412","Fabricación de equipo de refrigeración industrial y comercial"],
+  "CAMPISMO":["433313","Comercio al por mayor de artículos y aparatos deportivos"],
+  "CARBON Y LEÑA":["468419","Comercio al por menor de otros combustibles"],
+  "CARNE EMPACADA":["461121","Comercio al por menor de carnes rojas"],
+  "CARNES FRIAS":["461150","Comercio al por menor de leche, otros productos lácteos y embutidos"],
+  "CARNICERIA":["431121","Comercio al por mayor de carnes rojas"],
+  "CARNITAS Y CHICHARRÓN":["461190","Comercio al por menor de otros alimentos"],
+  "CASA DE BOLSA":["521110","Banca central"],
+  "CASA DE CAMBIO":["523121","Casas de cambio"],
+  "CASA DE HUESPEDES":["721311","Pensiones y casas de huéspedes"],
+  "CENTRO DE COPIADO":["561431","Servicios de fotocopiado, fax y afines"],
+  "CENTRO DE DISTRIBUCION DE MASA Y TORTILLA":["461190","Comercio al por menor de otros alimentos"],
+  "CENTRO TERAPEUTICO":["621311","Consultorios de quiropráctica del sector privado"],
+  "CEREALES Y SEMILLAS":["461140","Comercio al por menor de semillas y granos alimenticios, especias y chiles secos"],
+  "CERRAJERIA":["811491","Cerrajerías"],
+  "CLASES DE CORTE Y CONFECCION":["611511","Escuelas del sector público dedicadas a la enseñanza de oficios"],
+  "CLASES DE MANUALIDADES":["611512","Escuelas del sector público dedicadas a la enseñanza de oficios"],
+  "CLASES DE REGULARIZACION":["611691","Servicios de profesores particulares"],
+  "COMERCIO AL POR MAYOR DE BLANCOS":["432112","Comercio al por mayor de blancos"],
+  "COMERCIO AL POR MAYOR DE CUEROS Y PIELES":["432113","Comercio al por mayor de cueros y pieles"],
+  "COMERCIO AL POR MAYOR DE DISCOS Y CASETES":["433311","Comercio al por mayor de grabaciones de audio y video en medios físicos"],
+  "COMERCIO AL POR MAYOR DE FIBRAS, HILOS Y TELAS":["432111","Comercio al por mayor de fibras, hilos y telas"],
+  "COMERCIO AL POR MAYOR DE LIBROS":["433420","Comercio al por mayor de libros"],
+  "COMERCIO AL POR MAYOR DE PINTURA":["434226","Comercio al por mayor de pintura"],
+  "COMERCIO AL POR MAYOR DE VIDRIOS Y ESPEJOS":["434227","Comercio al por mayor de vidrios y espejos"],
+  "COMPRA VENTA AL POR MAYOR DE MOBILIARIO, EQUIPO E INSTRUMENTAL MEDICO":["435313","Comercio al por mayor de mobiliario, equipo e instrumental médico y de laboratorio"],
+  "COMPRA VENTA CERRADURAS INTELIGENTES Y CAJAS FUERTES":["467111","Comercio al por menor en ferreterías y tlapalerías"],
+  "COMPRA VENTA DE SISTEMA DE COMPUTO Y CONSUMIBLES":["466211","Comercio al por menor de mobiliario, equipo y accesorios de cómputo"],
+  "COMPRA Y VENTA DE LLANTAS":["468213","Comercio al por menor de llantas y cámaras para automóviles, camionetas y camiones"],
+  "CONSERVAS ALIMENTICIAS":["431193","Comercio al por mayor de conservas alimenticias"],
+  "CONSULTORIOS":["621111","Consultorios de medicina general del sector privado"],
+  "CREMERIA":["431160","Comercio al por mayor de leche y otros productos lácteos"],
+  "CRISTALERIA":["466114","Comercio al por menor de cristalería, loza y utensilios de cocina"],
+  "CULTIVO DE JITOMATE O TOMATE ROJO":["111211","Cultivo de jitomate o tomate rojo"],
+  "DEPILACION CON CERA":["812110","Salones y clínicas de belleza y peluquerías"],
+  "DEPORTISTAS PROFESIONALES":["711211","Deportistas profesionales"],
+  "DESECHABLES":["434240","Comercio al por mayor de artículos desechables"],
+  "DISEÑO DE ANUNCIOS A MANO Y POR COMPUTADORA":["541510","Servicios de diseño de sistemas de cómputo y servicios relacionados"],
+  "DISEÑO DE ANUNCIOS, ROTULOS, LONAS Y TOLDOS LUMINOSOS":["541430","Diseño gráfico"],
+  "DISEÑO E IMPRESION":["541430","Diseño gráfico"],
+  "DISTRIBUCION DE PELICULAS Y AUDIOVISUALES":["512120","Distribución de películas y de otros materiales audiovisuales"],
+  "DULCERIA":["461160","Comercio al por menor de dulces y materias primas para repostería"],
+  "EDICION DE DIRECTORIOS Y DE LISTAS DE CORREO":["513141","Edición de directorios y listas de correo en formato electrónico"],
+  "EDICION DE LIBROS":["513131","Edición de libros en formato electrónico"],
+  "EDICION DE LIBROS INTEGRADA CON LA IMPRESION":["513132","Edición de libros integrada con la impresión"],
+  "EDICION DE PERIODICOS":["513111","Edición de periódicos en formato electrónico"],
+  "EDICION DE REVISTAS Y OTRAS PUBLICACIONES PERIODICAS":["513122","Edición de revistas y otras publicaciones periódicas integradas con la impresión"],
+  "ELEVADORES":["238290","Otras instalaciones y equipamiento en construcciones"],
+  "EMPAQUES EN GENERAL":["467116","Comercio al por menor de materiales para la construcción en tiendas de autoservicio especializadas"],
+  "EQUIPO DE ILUMINACION":["434225","Comercio al por mayor de equipo y material eléctrico"],
+  "EQUIPO MEDICO":["435313","Comercio al por mayor de mobiliario, equipo e instrumental médico y de laboratorio"],
+  "ESCALERA ELECTRICA":["435419","Comercio al por mayor de otra maquinaria y equipo de uso general"],
+  "ESTETICA":["812110","Salones y clínicas de belleza y peluquerías"],
+  "ESTUDIOS FOTOGRAFICOS":["541920","Servicio de fotografía y videograbación"],
+  "EXP. DE AGUA PURIFICADA":["311212","Purificación y embotellado de agua"],
+  "EXP. DE POLLO":["461122","Comercio al por menor de carne de ave"],
+  "EXPENDIO EN ENVASE CERRADO DE ALCOHOL PARA USO MEDICO":["464111","Farmacias sin minisúper"],
+  "FARMACIA":["433110","Comercio al por mayor de productos farmacéuticos"],
+  "FERTILIZANTES":["434111","Comercio al por mayor de fertilizantes, plaguicidas y semillas para siembra"],
+  "FLORERIA":["466312","Comercio al por menor de plantas y flores naturales"],
+  "FLORICULTURA EN INVERNADEROS Y OTRAS ESTRUCTURAS AGRICOLAS PROTEGIDAS":["111422","Floricultura en invernaderos y otras estructuras agrícolas protegidas"],
+  "FONDA":["722511","Restaurantes con servicio de preparación de alimentos a la carta o de comida corrida"],
+  "FOTOCOPIADORA":["561431","Servicios de fotocopiado, fax y afines"],
+  "FRUTAS Y VERDURAS":["461130","Comercio al por menor de frutas y verduras frescas"],
+  "FUENTE DE SODAS":["722518","Restaurantes que preparan otro tipo de alimentos para llevar"],
+  "GALERIA DE ARTE":["466313","Comercio al por menor de antigüedades y obras de arte"],
+  "GRANJA":["115119","Otros servicios relacionados con la agricultura"],
+  "HUEVO":["112312","Explotación de gallinas para la producción de huevo para plato"],
+  "IMPRENTA":["435220","Comercio al por mayor de maquinaria y equipo para la industria manufacturera"],
+  "INCUBADORA":["435313","Comercio al por mayor de mobiliario, equipo e instrumental médico y de laboratorio"],
+  "INMOBILIARIA":["531210","Inmobiliarias y corredores de bienes raíces"],
+  "INMOBILIARIAS Y CORREDORES DE BIENES RAICES":["531319","Otros servicios relacionados con los servicios inmobiliarios"],
+  "INST. BANCARIA Y DE CDTO.":["493111","Almacenes generales de depósito"],
+  "INST. DE EQUIPO DE SONIDO":["436112","Comercio al por mayor de partes y refacciones nuevas para automóviles, camionetas y camiones."],
+  "INSTALACION DE ACCESORIOS AUTOMOTRICES":["468111","Comercio al por menor de automóviles y camionetas nuevos"],
+  "JOYERIA":["339912","Orfebrería y joyería de metales y piedras preciosos"],
+  "JUEGOS MECANICOS Y ELECTROMECANICOS":["713111","Parques de diversiones y temáticos del sector privado"],
+  "JUGUETERIA":["465212","Comercio al por menor de juguetes"],
+  "LAB. FOTOGRAFICO":["812910","Servicios de revelado e impresión de fotografías"],
+  "LABORATORIO":["541380","Servicios de laboratorios de pruebas"],
+  "LABORATORIO DENTAL":["339111","Fabricación de equipo no electrónico para uso médico, dental y para laboratorio"],
+  "LAVADEROS PUBLICOS":["812210","Lavanderías y tintorerías"],
+  "LECHERIA":["112120","Explotación de bovinos para la producción de leche"],
+  "LENCERIA":["463213","Comercio al por menor de lencería"],
+  "LIBRERIAS":["465312","Comercio al por menor de libros"],
+  "MANUALIDADES":["466319","Comercio al por menor de otros artículos para la decoración de interiores"],
+  "MANUFACTURA DOMICILIARIA":["339999","Otras industrias manufactureras"],
+  "MAQUINARIA EN GENERAL":["332710","Maquinado de piezas para maquinaria y equipo en general"],
+  "MAQUINAS TRAGAMONEDAS":["435319","Comercio al por mayor de maquinaria de equipo para otros servicios y para actividades comerciales"],
+  "MARCOS Y MOLDURAS":["2338350","Realización de trabajos de carpintería en el lugar de la construcción"],
+  "MARISCOS EN ESTADO NATURAL":["431123","Comercio al por mayor de pescados y mariscos"],
+  "MARISCOS PROCESADOS PARA CONSUMO HUMANO":["431123","Comercio al por mayor de pescados y mariscos"],
+  "MASA Y TORTILLAS":["311830","Elaboración de tortillas de maíz y molienda de nixtamal"],
+  "MASAJES TERAPEUTICOS":["621398","Otros consultorios del sector privado para el cuidado de la salud"],
+  "MATERIA PRIMA":["311221","Elaboración de féculas y otros almidones y sus derivados"],
+  "MATERIAL DISCOGRAFICO":["465211","Comercio al por menor de grabaciones de audio y video en medios físicos"],
+  "MATERIAL ELECTRICO":["434225","Comercio al por mayor de equipo y material eléctrico"],
+  "MESA DE BILLAR":["713991","Billares"],
+  "MESA DE JUEGO":["339920","Fabricación de artículos deportivos"],
+  "MINI-SUPER":["462111","Comercio al por menor en supermercados"],
+  "MISCELANEA":["461110","Comercio al por menor en tiendas de abarrotes, ultramarinos y misceláneas"],
+  "MUEBLERIAS":["462210","Comercio al por menor en tiendas departamentales"],
+  "MUSEOS DEL SECTOR PRIVADO":["712111","Museos del sector privado"],
+  "MUSICOS Y CANCIONEROS":["711131","Cantantes y grupos musicales del sector privado"],
+  "NEVERIA":["461170","Comercio al por menor de paletas de hielo y helados"],
+  "NOTARIAS PUBLICAS":["541120","Notarías Públicas"],
+  "OFICINA VIRTUAL":["517312","Operadores de servicios de telecomunicaciones inalámbricas"],
+  "OPTICA":["464121","Comercio al por menor de lentes"],
+  "OTROS SERVICIOS DE CONSULTORIA CIENTIFICA Y TECNICA":["541711","Servicios de investigación científica y desarrollo en ciencias naturales y exactas, ingeniería y ciencias de la vida, prestados por el sector privado"],
+  "OTROS SERVICIOS DE LIMPIEZA":["561790","Otros servicios de limpieza"],
+  "PALENQUE":["531115","Alquiles sin intermediación de teatros, estadios, auditorios y similares"],
+  "PALETERIA":["431199","Comercio al por mayor de otros alimentos"],
+  "PANADERIA":["311812","Panificación tradicional"],
+  "PAPELERIA":["433410","Comercio al por mayor de artículos de papelería"],
+  "PASTELERIA Y POSTRES":["431180","Comercio al por mayor de dulces y materias primas para repostería"],
+  "PAÑALES":["422111","Comercio al por menor en supermercados"],
+  "PINTURAS":["467113","Comercio al por menor de pintura"],
+  "PISOS":["467112","Comercio al por menor de pisos y recubrimientos cerámicos"],
+  "PISOS, AZULEJOS Y ACCESORIOS PARA BAÑO":["434211","Comercio al por mayor de cemento, tabique y grava"],
+  "PISTA DE PATINAJE (HIELO)":["713943","Centros de acondicionamiento físico del sector privado"],
+  "PISTAS DE ACTIVIDADES DEPORTIVAS Y DE ESPARCIMIENTO":["713944","Centros de acondicionamiento físico del sector público"],
+  "PLANCHADURÍA":["812210","Lavanderías y tintorerías"],
+  "PLASTICOS":["434240","Comercio al por mayor de artículos desechables"],
+  "PODOLOGIA":["611211","Escuelas de educación técnica superior del sector privado"],
+  "PRESTACION DE SERVICIOS":["523910","Asesoría en inversiones"],
+  "PRESTAMOS":["522320","Cajas, cooperativas y sociedades financieras de ahorro y préstamo popular"],
+  "PRESTAMOS PRENDARIOS":["5232110","Banca múltiple"],
+  "PRODUCTOS AGROPECUARIOS":["115113","Beneficios de productos agrícolas"],
+  "PRODUCTOS DE REPOSTERIA":["461160","Comercio al por menor de dulces y materias primas para repostería"],
+  "PRODUCTOS LACTEOS":["461150","Comercio al por menor de leche, otros productos lácteos y embutidos"],
+  "PRODUCTOS QUIMICOS DE LIMPIEZA":["467115","Comercio al por menor de artículos para la limpieza"],
+  "PRONOSTICOS DEPORTIVOS":["713291","Venta de billetes de lotería, pronósticos deportivos y otros boletos de sorteo"],
+  "REFACCIONARIA":["436112","Comercio al por mayor de partes y refacciones nuevas para automóviles, camionetas y camiones"],
+  "ROSTICERIA":["722517","Restaurantes con servicio de preparación de pizza"],
+  "SALON DE EVENTOS":["512130","Exhibición de películas y otros materiales audiovisuales"],
+  "SALON DE EVENTOS CON MUSICA EN VIVO":["711312","Promotores del sector privado de espectáculos artísticos, culturales, deportivos y similares que no cuentan con instalaciones para presentarlos"],
+  "SALON DE FIESTAS":["512130","Exhibición de películas y otros materiales audiovisuales"],
+  "SEGUROS":["524210","Agentes y corredores de seguros"],
+  "SERVICIOS FUNERARIOS":["812210","Lavanderías y tintorerías"],
+  "SUPERMERCADO":["462111","Comercio al por menor en supermercados"],
+  "TALLER DE CALZADO":["811430","Reparación de calzado y otros artículos de cuero y piel"],
+  "TALLER DE JOYERIA":["339910","Joyería, orfebrería y artículos conexos"],
+  "TALLER MECANICO":["811111","Reparación mecánica en general de automóviles y camiones"],
+  "TORTILLERIA":["311830","Elaboración de tortillas de maíz y molienda de nixtamal"],
+  "VETERINARIA":["541940","Servicios veterinarios"],
+  "VINATERIA":["462112","Comercio al por menor de vinos y licores en vinaterías"],
+  "ZAPATERIA":["466311","Comercio al por menor de alfombras, cortinas, tapices y similares"]
+};
+
+// ── AUTOCOMPLETE — FUNCIÓN GENÉRICA ─────────────────────────────────────────
+function _acBuscar(q) {
+  var q2 = q.toUpperCase().trim();
+  var matches = [];
+  // 1. Sinónimos exactos
+  if (SINONIMOS[q2]) SINONIMOS[q2].forEach(function(s){ if(matches.indexOf(s)<0) matches.push(s); });
+  // 2. Coincidencia parcial en lista principal
+  GIROS_ZPN_LISTA.forEach(function(g) {
+    if(g.indexOf(q2) >= 0 && matches.indexOf(g) < 0) matches.push(g);
+  });
+  return matches.slice(0, 14);
+}
+
+function _acRender(matches, listId, onClickFn) {
+  var list = document.getElementById(listId);
+  if (!list) return;
+  if (!matches.length) { list.style.display = 'none'; return; }
+  list.innerHTML = matches.map(function(m, i) {
+    var safe = m.replace(/'/g, "\'");
+    return '<div class="ac-item" onmousedown="'+onClickFn+'(\''+safe+'\')" data-idx="'+i+'">'+m+'</div>';
+  }).join('');
+  list.style.display = 'block';
+}
+
+function _acKeyNav(e, listId, selectFn) {
+  var list = document.getElementById(listId);
+  var items = list ? list.querySelectorAll('.ac-item') : [];
+  if (!items.length) return;
+  var cur = list.querySelector('.ac-active');
+  var curIdx = cur ? parseInt(cur.getAttribute('data-idx')) : -1;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    var next = Math.min(curIdx+1, items.length-1);
+    items.forEach(function(el){ el.classList.remove('ac-active'); });
+    items[next].classList.add('ac-active');
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    var prev = Math.max(curIdx-1, 0);
+    items.forEach(function(el){ el.classList.remove('ac-active'); });
+    items[prev].classList.add('ac-active');
+  } else if (e.key === 'Enter') {
+    if (cur) { e.preventDefault(); window[selectFn](cur.textContent); }
+  } else if (e.key === 'Escape') {
+    list.style.display = 'none';
+  }
+}
+
+// ── AUTOCOMPLETE ZPN ─────────────────────────────────────────────────────────
+function acFiltrar() {
+  var q = document.getElementById('inp-giro-zpn').value;
+  if (!q.trim()) { document.getElementById('ac-list-zpn').style.display = 'none'; return; }
+  _acRender(_acBuscar(q), 'ac-list-zpn', 'acSeleccionar');
+}
+function acOcultar() { setTimeout(function(){ var l=document.getElementById('ac-list-zpn'); if(l) l.style.display='none'; }, 200); }
+function acKeyDown(e) { _acKeyNav(e, 'ac-list-zpn', 'acSeleccionar'); }
+function acSeleccionar(val) {
+  document.getElementById('inp-giro-zpn').value = val;
+  document.getElementById('inp-giro-zpn').classList.add('has-value');
+  document.getElementById('sel-giro-zpn').value = val;
+  var list = document.getElementById('ac-list-zpn'); if(list) list.style.display='none';
+  var sd = SCIAN_DATA[val];
+  var si = document.getElementById('scian-info-zpn');
+  if (si) {
+    if (sd) {
+      document.getElementById('scian-id-zpn').textContent = sd[0];
+      document.getElementById('scian-nom-zpn').textContent = sd[1];
+      si.style.display = '';
+    } else { si.style.display = 'none'; }
+  }
+}
+
+// ── AUTOCOMPLETE GDL ─────────────────────────────────────────────────────────
+function acFiltrarGDL() {
+  var q = document.getElementById('inp-giro-gdl').value;
+  if (!q.trim()) { document.getElementById('ac-list-gdl').style.display = 'none'; return; }
+  _acRender(_acBuscar(q), 'ac-list-gdl', 'acSeleccionarGDL');
+}
+function acOcultarGDL() { setTimeout(function(){ var l=document.getElementById('ac-list-gdl'); if(l) l.style.display='none'; }, 200); }
+function acKeyDownGDL(e) { _acKeyNav(e, 'ac-list-gdl', 'acSeleccionarGDL'); }
+function acSeleccionarGDL(val) {
+  document.getElementById('inp-giro-gdl').value = val;
+  document.getElementById('inp-giro-gdl').classList.add('has-value');
+  document.getElementById('sel-giro-gdl').value = val;
+  var list = document.getElementById('ac-list-gdl'); if(list) list.style.display='none';
+  var sd = SCIAN_DATA[val];
+  var si = document.getElementById('scian-info-gdl');
+  if (si) {
+    if (sd) {
+      document.getElementById('scian-id-gdl').textContent = sd[0];
+      document.getElementById('scian-nom-gdl').textContent = sd[1];
+      si.style.display = '';
+    } else { si.style.display = 'none'; }
+  }
+}
+
+// ── AUTOCOMPLETE GEN (TLQ / TLA / TON) ───────────────────────────────────────
+function acFiltrarGen() {
+  var q = document.getElementById('inp-giro-gen').value;
+  if (!q.trim()) { document.getElementById('ac-list-gen').style.display = 'none'; return; }
+  _acRender(_acBuscar(q), 'ac-list-gen', 'acSeleccionarGen');
+}
+function acOcultarGen() { setTimeout(function(){ var l=document.getElementById('ac-list-gen'); if(l) l.style.display='none'; }, 200); }
+function acKeyDownGen(e) { _acKeyNav(e, 'ac-list-gen', 'acSeleccionarGen'); }
+function acSeleccionarGen(val) {
+  var inp = document.getElementById('inp-giro-gen');
+  inp.value = val;
+  inp.classList.add('has-value');
+  var list = document.getElementById('ac-list-gen'); if(list) list.style.display='none';
+}
+
+// ── WINDOW ONLOAD ─────────────────────────────────────────────────────────────
+window.addEventListener('load', function() {
+  try {
+    var t = localStorage.getItem('gu_theme');
+    if (t) document.body.setAttribute('data-theme', t);
+  } catch(e) {}
+  // Deep link desde M02
+  leerDeepLink();
+  // Historial
+  try { histRenderCards(); } catch(e) {}
+});
+</script>
+</body>
+</html>

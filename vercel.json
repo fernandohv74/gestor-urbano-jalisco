@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/11 de junio v1/$1"
+    }
+  ]
+}

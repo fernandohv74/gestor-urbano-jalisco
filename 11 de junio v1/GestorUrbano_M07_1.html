@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M07 - Directorio y Glosario - Gestor Urbano Jalisco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand:#1A2744; --brand-light:#2D3A6B; --brand-pale:#E6EAF4;
+  --bg:#F9FAFB; --bg2:#FFFFFF; --bg3:#F0F0EE;
+  --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.14);
+  --text:#0F0F0E; --text2:#666666; --text3:#999999;
+  --sans:'Outfit','Helvetica Neue',sans-serif; --mono:'Geist Mono',monospace;
+  --accent:#1A2744; --text1:#0F0F0E;
+  /* gu-nav vars */
+  --nav-bg:rgba(249,250,251,0.92); --logo-bg:#1A2744; --logo-ico:#FFFFFF;
+  --card-bg:#FFFFFF; --toggle-track:#E0E0DE; --toggle-thumb:#FFFFFF;
+  --border3:rgba(0,0,0,0.22); --r-md:6px; --r-pill:9999px; --ease:cubic-bezier(.16,1,.3,1);
+}
+[data-theme="dark"] {
+  --brand:#6B82C4; --brand-light:#8A9ED4; --brand-pale:#1A2235;
+  --bg:#0B0F1A; --bg2:#111827; --bg3:#1A2235;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+  --text:#E2E8F0; --text2:#94A3B8; --text3:#4B5563;
+  --accent:#6B82C4; --text1:#E2E8F0;
+  /* gu-nav vars dark */
+  --nav-bg:rgba(11,15,26,0.92); --logo-bg:#E2E8F0; --logo-ico:#0B0F1A;
+  --card-bg:#111827; --toggle-track:#3D7BFF; --toggle-thumb:#FFFFFF;
+  --border3:rgba(255,255,255,0.20);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* NAV */
+.gu-nav{background:var(--nav-bg);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:0.5px solid var(--border);padding:13px 32px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;transition:background .3s,border-color .3s;}
+.gu-nav-logo{width:30px;height:30px;background:var(--logo-bg);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.gu-nav-logo svg{width:16px;height:16px;fill:var(--logo-ico);}
+.gu-nav-name{font-size:13px;font-weight:500;letter-spacing:-.2px;color:var(--text);}
+.gu-nav-sep{color:var(--border2);font-size:14px;}
+.gu-nav-mod{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;}
+.gu-nav-back{margin-left:auto;display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--card-bg);border:0.5px solid var(--border2);padding:4px 10px;border-radius:var(--r-md);text-decoration:none;transition:background .3s,border-color .3s,color .3s;}
+.gu-nav-back:hover{border-color:var(--border3);color:var(--text2);}
+.gu-nav-back svg{width:11px;height:11px;fill:currentColor;}
+.gu-toggle{margin-left:auto;display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:var(--r-pill);border:0.5px solid var(--border2);background:var(--card-bg);cursor:pointer;font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.04em;transition:background .3s,border-color .3s,color .3s;user-select:none;}
+.gu-toggle:hover{opacity:.8;}
+.gu-toggle-track{width:28px;height:16px;border-radius:8px;background:var(--toggle-track);position:relative;flex-shrink:0;transition:background .3s;}
+.gu-toggle-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--toggle-thumb);box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .3s var(--ease);}
+[data-theme="dark"] .gu-toggle-thumb{left:14px;}
+@media(max-width:600px){.gu-nav{padding:12px 16px;}.gu-nav-sep,.gu-nav-mod{display:none;}}
+.nav-back{
+  font-size:13px;font-weight:500;color:var(--text2);
+  text-decoration:none;padding:5px 10px;border-radius:6px;
+  transition:background .15s,color .15s;
+}
+.nav-back:hover{background:var(--bg3);color:var(--text);}
+.mod-badge{
+  font-size:11px;font-weight:700;letter-spacing:.8px;
+  background:var(--brand-pale);color:var(--accent);
+  padding:3px 9px;border-radius:20px;text-transform:uppercase;
+}
+.theme-btn{
+  background:none;border:1px solid var(--border);border-radius:8px;
+  padding:5px 10px;cursor:pointer;font-size:15px;color:var(--text2);
+  transition:background .15s;
+}
+.theme-btn:hover{background:var(--bg3);}
+
+/* WRAP */
+.wrap{max-width:860px;margin:0 auto;padding:28px 20px 60px;}
+.page-title{font-size:24px;font-weight:700;color:var(--text1);margin-bottom:4px;}
+.page-sub{font-size:13px;color:var(--text2);margin-bottom:24px;}
+
+/* SEARCH */
+/* ── FUENTES TAB ── */
+.fue-group{margin-bottom:12px;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.fue-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg2);cursor:pointer;font-weight:600;font-size:.9rem;color:var(--text);user-select:none;}
+.fue-header:hover{background:var(--bg3,var(--bg2));}
+.fue-arrow{font-size:.75rem;color:var(--text2);}
+.fue-body{padding:8px 0;}
+.fue-item{display:flex;align-items:center;gap:8px;padding:7px 16px;font-size:.82rem;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.fue-item:last-child{border-bottom:none;}
+.fue-item a{color:var(--accent);text-decoration:none;flex:1;min-width:0;}
+.fue-item a:hover{text-decoration:underline;}
+.fue-item span:not(.fue-tag):not(.fue-mod){flex:1;color:var(--text);}
+.fue-tag{padding:2px 7px;border-radius:4px;font-size:.72rem;font-weight:600;white-space:nowrap;flex-shrink:0;}
+.fue-mun{background:#DBEAFE;color:#1E40AF;}
+[data-theme=dark] .fue-mun{background:#1E3A5F;color:#93C5FD;}
+.fue-est{background:#D1FAE5;color:#065F46;}
+[data-theme=dark] .fue-est{background:#064E3B;color:#6EE7B7;}
+.fue-fed{background:#EDE9FE;color:#5B21B6;}
+[data-theme=dark] .fue-fed{background:#3B1F6E;color:#C4B5FD;}
+.fue-metro{background:#FEF3C7;color:#92400E;}
+[data-theme=dark] .fue-metro{background:#451A03;color:#FDE68A;}
+.fue-mod{font-size:.7rem;color:var(--text2);white-space:nowrap;display:flex;gap:3px;flex-wrap:wrap;}
+.fue-mod{display:inline-flex;}
+.search-wrap{position:relative;margin-bottom:20px;}
+.search-ico{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  font-size:16px;pointer-events:none;
+}
+.search-input{
+  width:100%;padding:12px 14px 12px 42px;
+  font-family:var(--sans);font-size:14px;
+  background:var(--bg2);color:var(--text);
+  border:1px solid var(--border2);border-radius:10px;outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(107,130,196,.12);}
+.search-input::placeholder{color:var(--text3);}
+.search-clear{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--text3);
+  font-size:18px;line-height:1;display:none;
+}
+.search-clear:hover{color:var(--text);}
+
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:20px;
+  background:var(--bg3);border-radius:10px;padding:4px;}
+.tab-btn{
+  flex:1;padding:9px 16px;border:none;border-radius:7px;
+  font-family:var(--sans);font-size:13px;font-weight:600;
+  cursor:pointer;transition:background .15s,color .15s;
+  background:transparent;color:var(--text2);
+}
+.tab-btn.active{background:var(--bg2);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.08);}
+.tab-btn:hover:not(.active){color:var(--text);}
+.tab-count{
+  display:inline-block;font-size:11px;font-weight:700;
+  background:var(--brand-pale);color:var(--accent);
+  padding:1px 7px;border-radius:10px;margin-left:6px;
+}
+
+/* FILTER PILLS */
+.filter-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+.fpill{
+  padding:4px 12px;border:1px solid var(--border2);border-radius:20px;
+  font-size:12px;font-weight:500;cursor:pointer;
+  background:var(--bg2);color:var(--text2);transition:all .15s;
+}
+.fpill:hover,.fpill.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+/* CARDS */
+.cards-grid{display:flex;flex-direction:column;gap:10px;}
+.entry-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:16px 18px;
+  transition:border-color .15s,box-shadow .15s;cursor:pointer;
+}
+.entry-card:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(107,130,196,.08);}
+.entry-card.expanded{border-color:var(--accent);}
+.card-top{display:flex;align-items:flex-start;gap:12px;}
+.card-ico{font-size:22px;flex-shrink:0;margin-top:1px;}
+.card-body{flex:1;min-width:0;}
+.card-name{font-size:14px;font-weight:700;color:var(--text1);margin-bottom:2px;}
+.card-short{font-size:12px;color:var(--text2);line-height:1.4;}
+.card-arrow{font-size:14px;color:var(--text3);flex-shrink:0;transition:transform .2s;}
+.entry-card.expanded .card-arrow{transform:rotate(90deg);}
+.card-detail{
+  display:none;margin-top:14px;padding-top:14px;
+  border-top:1px solid var(--border);
+}
+.entry-card.expanded .card-detail{display:block;}
+
+/* Tags / Chips */
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.tag{
+  font-size:11px;font-weight:600;padding:2px 9px;border-radius:12px;
+  background:var(--brand-pale);color:var(--accent);
+}
+.tag.mun{background:#EFF6FF;color:#1D4ED8;}
+[data-theme="dark"] .tag.mun{background:#1E3A5F;color:#93C5FD;}
+.tag.fed{background:#FEF9C3;color:#854D0E;}
+[data-theme="dark"] .tag.fed{background:#3B2F00;color:#FDE68A;}
+.tag.est{background:#F0FDF4;color:#166534;}
+[data-theme="dark"] .tag.est{background:#0F2E1A;color:#86EFAC;}
+
+/* Detail rows */
+.detail-row{display:flex;gap:8px;margin-bottom:7px;font-size:12px;line-height:1.5;}
+.detail-lbl{font-weight:600;color:var(--text2);white-space:nowrap;min-width:90px;}
+.detail-val{color:var(--text);}
+.detail-val a{color:var(--accent);text-decoration:none;}
+.detail-val a:hover{text-decoration:underline;}
+
+/* Glosario */
+.glo-term{font-size:15px;font-weight:700;color:var(--accent);font-family:var(--mono,'monospace');}
+.glo-def{font-size:13px;color:var(--text);line-height:1.6;margin-top:6px;}
+.glo-example{
+  margin-top:10px;padding:10px 14px;
+  background:var(--bg3);border-radius:8px;
+  font-size:12px;color:var(--text2);line-height:1.5;
+}
+.glo-example strong{color:var(--text);}
+
+/* Empty */
+.empty-msg{text-align:center;padding:40px 20px;color:var(--text3);font-size:14px;}
+.empty-msg span{display:block;font-size:32px;margin-bottom:10px;}
+
+/* Responsive */
+@media(max-width:600px){
+  .wrap{padding:16px 12px 40px;}
+  .detail-row{flex-direction:column;gap:2px;}
+  .detail-lbl{min-width:unset;}
+}
+
+/* Botón imprimir general */
+.btn-print-m07{display:inline-flex;align-items:center;gap:6px;background:#f4f4f4;border:1px solid #ddd;border-radius:8px;padding:7px 14px;font-size:12px;color:#555;cursor:pointer;transition:all .15s;margin-left:auto}
+.btn-print-m07:hover{border-color:#4A7FBD;color:#4A7FBD}
+/* Botón imprimir sección */
+.btn-print-sec{display:inline-flex;align-items:center;gap:5px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn-print-sec:hover{border-color:var(--accent);color:var(--accent);}
+.sec-top-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;}
+.sec-info-banner{flex:1;padding:8px 12px;background:var(--bg2);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;font-size:.78rem;color:var(--text);opacity:.82;line-height:1.5}
+.sec-desc{flex:1;color:var(--text2);font-size:.85rem;line-height:1.6;}
+
+/* @media print */
+@media print {
+  .top-nav, .search-wrap, .tabs, .filter-row, .theme-btn,
+  .btn-print-m07, .btn-print-sec, .search-clear, .empty-msg,
+  .sec-top-bar .btn-print-sec { display:none !important; }
+  @page { size:Letter portrait; margin:1.5cm; }
+  body { background:#fff !important; color:#111 !important; font-size:10pt; }
+  .wrap { padding:0 !important; max-width:100% !important; }
+  /* Impresión general: todas las secciones */
+  #section-dir, #section-glo, #section-fue { display:block !important; }
+  /* Impresión por sección: solo la que tiene print-target */
+  body.printing-section #section-dir:not(.print-target),
+  body.printing-section #section-glo:not(.print-target),
+  body.printing-section #section-fue:not(.print-target) { display:none !important; }
+  body.printing-section .print-target { display:block !important; }
+  .entry-card { break-inside:avoid; border:1px solid #ccc !important; box-shadow:none !important; }
+  .card-head { background:#1A2744 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .tag.mun { background:#EFF6FF !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .tag.est { background:#F0FDF4 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .tag.fed { background:#FFFBEB !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .detail-val a { color:#1A2744 !important; text-decoration:none; }
+  .entry-card.expanded .card-detail { display:block !important; }
+}
+</style>
+</head>
+<body>
+
+<nav class="gu-nav">
+  <div class="gu-nav-logo">
+    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 1L1 5v9h5v-4h4v4h5V5L8 1z"/></svg>
+  </div>
+  <span class="gu-nav-name">Gestor Urbano Jalisco</span>
+  <span class="gu-nav-sep">/</span>
+  <span class="gu-nav-mod">M07 · Directorio y Glosario</span>
+  <a href="index.html" class="gu-nav-back">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    Menú principal
+  </a>
+  <a href="GestorUrbano_M01_3.html" class="gu-nav-back" style="margin-left:4px">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    M01 · Uso de suelo
+  </a>
+  <button class="gu-toggle" onclick="guToggleTheme()" aria-label="Cambiar tema">
+    <div class="gu-toggle-track"><div class="gu-toggle-thumb"></div></div>
+    <span id="gu-toggle-label">Modo oscuro</span>
+  </button>
+</nav>
+
+<div class="wrap">
+
+  <div style="margin-bottom:22px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+    <div>
+      <div class="page-title">Directorio y Glosario Urbano</div>
+      <div class="page-sub">Organismos clave del AMG y términos normativos explicados de forma simple</div>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <span class="search-ico">🔍</span>
+    <input type="text" class="search-input" id="searchInput"
+           placeholder="Buscar organismo, trámite o término..."
+           oninput="onSearch()" autocomplete="off">
+    <button class="search-clear" id="searchClear" onclick="clearSearch()">×</button>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-dir" onclick="switchTab('dir')">
+      🏛️ Directorio<span class="tab-count" id="cnt-dir">21</span>
+    </button>
+    <button class="tab-btn" id="tab-glo" onclick="switchTab('glo')">
+      📖 Glosario<span class="tab-count" id="cnt-glo">44</span>
+    </button>
+    <button class="tab-btn" id="tab-fue" onclick="switchTab('fue')">
+      📚 Fuentes
+    </button>
+  </div>
+
+  <!-- DIRECTORIO SECTION -->
+  <div id="section-dir">
+    <div class="sec-top-bar">
+      <div class="sec-info-banner">ℹ️ Direcciones y datos verificados desde portales oficiales a la fecha de publicación. Confirma horarios de atención y requisitos específicos directamente con cada dependencia antes de acudir.</div>
+      <button class="btn-print-sec" onclick="imprimirSeccion('dir')" title="Imprimir solo el Directorio">🖨️ Imprimir Directorio</button>
+    </div>
+    <div class="filter-row" id="filter-dir">
+      <button class="fpill active" onclick="setFilter(this,'dir','')">Todos</button>
+      <button class="fpill" onclick="setFilter(this,'dir','municipal')">Municipal</button>
+      <button class="fpill" onclick="setFilter(this,'dir','estatal')">Estatal</button>
+      <button class="fpill" onclick="setFilter(this,'dir','federal')">Federal</button>
+      <button class="fpill" onclick="setFilter(this,'dir','metro')">Metropolitano</button>
+    </div>
+    <div class="cards-grid" id="cards-dir"></div>
+    <div class="empty-msg" id="empty-dir" style="display:none"><span>🔍</span>Sin resultados para esa búsqueda.</div>
+  </div>
+
+  <!-- GLOSARIO SECTION -->
+  <div id="section-glo" style="display:none">
+    <div class="sec-top-bar" style="margin-bottom:12px;">
+      <span style="font-size:.82rem;color:var(--text2);">Términos normativos y técnicos del AMG explicados de forma simple.</span>
+      <button class="btn-print-sec" onclick="imprimirSeccion('glo')" title="Imprimir solo el Glosario">🖨️ Imprimir Glosario</button>
+    </div>
+    <div class="filter-row" id="filter-glo">
+      <button class="fpill active" onclick="setFilter(this,'glo','')">Todos</button>
+      <button class="fpill" onclick="setFilter(this,'glo','coeficientes')">Coeficientes</button>
+      <button class="fpill" onclick="setFilter(this,'glo','tramites')">Trámites</button>
+      <button class="fpill" onclick="setFilter(this,'glo','actores')">Actores</button>
+      <button class="fpill" onclick="setFilter(this,'glo','zonificacion')">Zonificación</button>
+      <button class="fpill" onclick="setFilter(this,'glo','organismos')">Organismos</button>
+    </div>
+    <div class="cards-grid" id="cards-glo"></div>
+    <div class="empty-msg" id="empty-glo" style="display:none"><span>🔍</span>Sin resultados para esa búsqueda.</div>
+  </div>
+
+  <!-- FUENTES SECTION -->
+  <div id="section-fue" style="display:none">
+    <div class="sec-top-bar" style="margin-bottom:16px;">
+      <span class="sec-desc">Fuentes normativas, planes, portales y APIs utilizados como base de datos para todos los módulos del Gestor Urbano Jalisco AMG.</span>
+      <button class="btn-print-sec" onclick="imprimirSeccion('fue')" title="Imprimir solo las Fuentes">🖨️ Imprimir Fuentes</button>
+    </div>
+
+    <!-- Reglamentos y Leyes -->
+    <div class="fue-group">
+      <div class="fue-header" onclick="toggleFue(this)">
+        <span>📜 Reglamentos y Leyes</span><span class="fue-arrow">▼</span>
+      </div>
+      <div class="fue-body">
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/reglamentos" target="_blank">Código de Edificación del Municipio de Guadalajara</a><span class="fue-mod">M01 M03 M05 M08</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/reglamentos" target="_blank">Código de Gobierno Municipal de Guadalajara — Art. 260 (Medio Ambiente), Art. 261 (Movilidad)</a><span class="fue-mod">M07</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://retys.zapopan.gob.mx/regulaciones/117/detalle" target="_blank">Código Ambiental para el Municipio de Zapopan</a><span class="fue-mod">M07</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://retys.zapopan.gob.mx/regulaciones/139/detalle" target="_blank">Ley de Catastro Municipal del Estado de Jalisco (aplicación Zapopan)</a><span class="fue-mod">M07 M08</span></div>
+        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://info.jalisco.gob.mx" target="_blank">Reglamento de Zonificación del Estado de Jalisco</a><span class="fue-mod">M01 M03 M04</span></div>
+        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://semadet.jalisco.gob.mx" target="_blank">Ley Estatal del Equilibrio Ecológico y la Protección al Ambiente (LEEPA)</a><span class="fue-mod">M07</span></div>
+        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><span>Ley de Desarrollo Urbano del Estado de Jalisco</span><span class="fue-mod">M01 M03</span></div>
+        <div class="fue-item"><span class="fue-tag fue-fed">Federal</span><span>Ley General de Asentamientos Humanos, Ordenamiento Territorial y Desarrollo Urbano (LGAHOTDU)</span><span class="fue-mod">M01 M02 M03</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/reglamentos" target="_blank">Reglamento de Gestión del Desarrollo Urbano para el Municipio de Guadalajara</a><span class="fue-mod">M01 M02 M03 M05 M10</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/reglamentos" target="_blank">Reglamento de Zonificación Urbana del Municipio de Guadalajara</a><span class="fue-mod">M01 M02 M03 M04</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/reglamentos" target="_blank">Reglamento para la Gestión Integral del Municipio de Guadalajara — última reforma: 10 abr 2025, publicada 30 abr 2025 en Gaceta Municipal — Arts. 50 VIII (escaleras no computan CUS), 50 Ter (rejilla herrería sí computa), XII Bis / XIII Bis (ICOS/ICUS), Arts. 32, 89 Ter, 149 Ter, 157, 159 Bis, 161, 190, 241, 249 Bis, 273, 276, 278, 1332-1336</a><span class="fue-mod">M02 M03 M04 M05</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/reglamentos" target="_blank">Reglamento para el Funcionamiento de Giros Comerciales, Industriales y de Prestación de Servicios — Municipio de Guadalajara (últ. reforma 2023)</a><span class="fue-mod">M02 M06</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLQ</span><span>Reglamento para el Funcionamiento de Establecimientos Comerciales, Industriales y de Prestación de Servicios — Municipio de San Pedro Tlaquepaque (aprobado 11 abr 2019, últ. reforma 31 oct 2023) — Texto completo pendiente de localizar en portal oficial; ficha de mejora regulatoria disponible (JMRA)</span><span class="fue-mod">M06</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><span>Reglamento para el Funcionamiento de Giros Comerciales, Industriales y de Prestación de Servicios del Municipio de Tlajomulco de Zúñiga (aprobado 2014, últ. reforma 4 jun 2021) — Arts. 13 Ter (SARE), 15 (vigencia/refrendo), 29 (requisitos apertura)</span><span class="fue-mod">M06</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TON</span><span>Código Municipal de Comercio para el Municipio de Tonalá, Jalisco (Acuerdo 135 — 2025) — Arts. 5 (Consejo de Giros Restringidos), 8 y 12 (vigencia indefinida / pago anual)</span><span class="fue-mod">M06</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://movilidad.guadalajara.gob.mx" target="_blank">Reglamento de Movilidad, Transporte y Seguridad Vial de Guadalajara — Arts. 73, 74, 76 (Dictamen de Movilidad / Impacto Vial)</a><span class="fue-mod">M04 M05</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://retys.zapopan.gob.mx/regulaciones" target="_blank">Norma Técnica de Accesibilidad Universal para el Municipio de Zapopan (GMZ 13/12/2019)</a><span class="fue-mod">M04 M05</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><a href="https://tlajomulco.gob.mx/reglamentos" target="_blank">Reglamento Municipal de Zonificación de Tlajomulco de Zúñiga (publicado 21/11/2014)</a><span class="fue-mod">M01 M03 M04</span></div>
+      </div>
+    </div>
+
+    <!-- Leyes de Ingresos (Tarifas) -->
+    <div class="fue-group">
+      <div class="fue-header" onclick="toggleFue(this)">
+        <span>💰 Leyes de Ingresos — Tarifas y Derechos 2026</span><span class="fue-arrow">▼</span>
+      </div>
+      <div class="fue-body">
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://catastro.guadalajara.gob.mx/leyes/LeyIngresos2026.pdf" target="_blank">Ley de Ingresos del Municipio de Guadalajara 2026 — Arts. 17 (PC), 44/46/47 (giros/alcohol/anuncios), 64/74 (construcción/forma valorada)</a><span class="fue-mod">M05 M06 M08 M10</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://transparencia.info.jalisco.gob.mx" target="_blank">Ley de Ingresos del Municipio de Zapopan 2026 — Arts. 77 (tarifas SCIAN alcohol), 93 Fracc. XXII (PC/Bomberos), tarifas de construcción y derechos</a><span class="fue-mod">M06 M08 M10</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLQ</span><a href="https://transparencia.info.jalisco.gob.mx" target="_blank">Ley de Ingresos del Municipio de San Pedro Tlaquepaque 2026 — Arts. 51 (alcohol), 52 (giros comunes $277), 63 (construcción), 64 (alineamiento), XXIV (PC/Bomberos)</a><span class="fue-mod">M06 M08</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><a href="https://congresoweb.congresojal.gob.mx/bibliotecavirtual/legislacion/Ingresos/Documentos_PDF-Ingresos/Ley%20de%20Ingresos%20del%20Municipio%20de%20Tlajomulco%20de%20Z%C3%BA%C3%B1iga,%20Jalisco%20para%20el%20ejercicio%20fiscal%202026-160626.pdf" target="_blank">Ley de Ingresos del Municipio de Tlajomulco de Zúñiga 2026 (Decreto 30157/LXIV/26, pub. 16 jun 2026) — Arts. 40 (INJI 1.25%), 78 (alcohol), 82 (construcción: hab $191/m², comercio $214/m², industria $143/m²; demolición 20%, remodelación 50%, prórroga 10%/bimestre), 86 (alineamiento: hab $130/ml, no hab $250/ml; nº oficial $383), 122 Fracc. XII (habitabilidad 10% licencia), XXXIX Fracc. l) (PC/Bomberos giros)</a><span class="fue-mod">M06 M08 M10</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TON</span><a href="https://transparencia.info.jalisco.gob.mx" target="_blank">Ley de Ingresos del Municipio de Tonalá 2026 — Arts. 61 (alcohol), 64 (construcción), 78 Fracc. ñ) (PC/Bomberos giros)</a><span class="fue-mod">M06 M08 M10</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://catastro.guadalajara.gob.mx/tabladevalores/tablasdevaloresguadalajara2026.pdf" target="_blank">Tablas de Valores Catastrales Guadalajara 2026</a><span class="fue-mod">M08</span></div>
+      </div>
+    </div>
+
+    <!-- Planes y Programas -->
+    <div class="fue-group">
+      <div class="fue-header" onclick="toggleFue(this)">
+        <span>🗺️ Planes de Desarrollo Urbano</span><span class="fue-arrow">▼</span>
+      </div>
+      <div class="fue-body">
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/contenido/pmdu" target="_blank">Plan de Desarrollo Urbano de Centro de Población — Guadalajara (PDUCP)</a><span class="fue-mod">M01 M03</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://portal.zapopan.gob.mx/ordenamiento/normatividad.html" target="_blank">Plan de Desarrollo Urbano Zapopan ZPN-01 2023 y sus 12 Planes Parciales (ZPN-01 a ZPN-12) — Normas de edificación calibradas para todos los distritos: MV1-MV4, MB/MD/MC, MR, APD/CPD y zonas especiales TC (ZPN-4/12), MVJ (ZPN-9), GH (ZPN-12), CS-C* PPE</a><span class="fue-mod">M01 M03</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLQ</span><span>Plan Municipal de Desarrollo Urbano Tlaquepaque</span><span class="fue-mod">M01 M03</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><span>Plan Municipal de Desarrollo Urbano Tlajomulco de Zúñiga</span><span class="fue-mod">M01 M03</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TON</span><span>Plan Municipal de Desarrollo Urbano Tonalá</span><span class="fue-mod">M01 M03</span></div>
+        <div class="fue-item"><span class="fue-tag fue-metro">Metropolitano</span><a href="https://www.imeplan.mx/wp-content/uploads/2021/12/POTmet_IIIFB-BajaRes-1.pdf" target="_blank">Plan de Ordenamiento Territorial Metropolitano del AMG — POTmet 2042 (IMEPLAN)</a><span class="fue-mod">M01 M03 M07 M10</span></div>
+      </div>
+    </div>
+
+    <!-- Portales Oficiales -->
+    <div class="fue-group">
+      <div class="fue-header" onclick="toggleFue(this)">
+        <span>🌐 Portales Oficiales Consultados</span><span class="fue-arrow">▼</span>
+      </div>
+      <div class="fue-body">
+        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://visorurbano.com/mapa/" target="_blank">Visor Urbano Jalisco — Consulta de zonificación y uso de suelo</a><span class="fue-mod">M01</span></div>
+        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://geoserver.jalisco.gob.mx" target="_blank">GeoServer Jalisco — WMS/WFS de capas urbanas y catastrales</a><span class="fue-mod">M01</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://mapa.zapopan.gob.mx/arcgis/rest/services/PPDU/PPDU_estrategias/MapServer" target="_blank">ArcGIS REST Services Zapopan — PPDU Estrategias (consulta de zonificación ZPN)</a><span class="fue-mod">M01</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://catastro.guadalajara.gob.mx" target="_blank">Catastro Guadalajara — Valores, avalúos y consultas catastrales</a><span class="fue-mod">M08 M07</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://portal.zapopan.gob.mx/ordenamiento/directorio.html" target="_blank">Ordenamiento del Territorio Zapopan — Directorio y trámites (CISZ)</a><span class="fue-mod">M07</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://portal.zapopan.gob.mx/pylc/directorio.html" target="_blank">Permisos y Licencias de Construcción Zapopan</a><span class="fue-mod">M05 M08</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://portal.zapopan.gob.mx/movilidad/directorio.html" target="_blank">Movilidad y Transporte Zapopan — Directorio oficial</a><span class="fue-mod">M07</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://portal.zapopan.gob.mx/medioambiente/directorio.html" target="_blank">Medio Ambiente Zapopan — Directorio oficial (Unidad El Vergel)</a><span class="fue-mod">M07</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://obraspublicas.guadalajara.gob.mx" target="_blank">Obras Públicas Guadalajara — Portal oficial</a><span class="fue-mod">M07</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://retys.zapopan.gob.mx" target="_blank">RETyS Zapopan — Regulaciones, Trámites y Servicios</a><span class="fue-mod">M06 M07</span></div>
+        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://transparencia.info.jalisco.gob.mx" target="_blank">Portal de Transparencia Jalisco — Directorio de dependencias</a><span class="fue-mod">M07</span></div>
+        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://proteccioncivil.jalisco.gob.mx" target="_blank">Unidad Estatal de Protección Civil y Bomberos Jalisco</a><span class="fue-mod">M07</span></div>
+        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://tonala.gob.mx/portal/coordinacion-del-gabinete-de-seguridad-prevencion-y-servicios-de-emergencia/" target="_blank">Protección Civil y Bomberos Tonalá — Coordinación de Gabinete de Seguridad</a><span class="fue-mod">M07</span></div>
+      </div>
+    </div>
+
+    <!-- APIs -->
+    <div class="fue-group">
+      <div class="fue-header" onclick="toggleFue(this)">
+        <span>⚙️ APIs y Servicios Técnicos</span><span class="fue-arrow">▼</span>
+      </div>
+      <div class="fue-body">
+        <div class="fue-item"><span class="fue-tag fue-fed">API Externa</span><a href="https://developers.google.com/maps/documentation/geocoding" target="_blank">Google Maps Geocoding API — Geocodificación de direcciones para localización de predios</a><span class="fue-mod">M01</span></div>
+        <div class="fue-item"><span class="fue-tag fue-fed">API Externa</span><span>Google Maps JavaScript API — Mapa interactivo con marcadores y capas</span><span class="fue-mod">M01</span></div>
+        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://geoserver.jalisco.gob.mx/geoserver/ows" target="_blank">GeoServer WMS Jalisco — Capas zonificación, uso de suelo, vialidades</a><span class="fue-mod">M01</span></div>
+        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><span>GeoServer WFS Jalisco — Consulta de features por coordenada (getFeatureInfo)</span><span class="fue-mod">M01</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://mapa.zapopan.gob.mx/arcgis/rest/services/PPDU/PPDU_estrategias/MapServer/identify" target="_blank">ArcGIS Identify Zapopan — Consulta de zona PPDU por coordenada</a><span class="fue-mod">M01</span></div>
+        <div class="fue-item"><span class="fue-tag fue-fed">API Externa</span><a href="https://www.anthropic.com" target="_blank">Anthropic API (Claude) — Motor de análisis normativo en Módulo 04 (Asistente IA)</a><span class="fue-mod">M04</span></div>
+      </div>
+    </div>
+
+    <!-- Avisos de Privacidad (para direcciones verificadas) -->
+    <div class="fue-group">
+      <div class="fue-header" onclick="toggleFue(this)">
+        <span>📋 Avisos de Privacidad — Fuente de Domicilios Oficiales</span><span class="fue-arrow">▼</span>
+      </div>
+      <div class="fue-body">
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/sites/default/files/AvisoPrivacidadDireccionMovilidad2025.pdf" target="_blank">Aviso de Privacidad — Dirección de Movilidad y Transporte GDL (marzo 2025)</a><span class="fue-mod">M07</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/sites/default/files/AvisoPrivacidadDireccionMedioAmbiente2025.pdf" target="_blank">Aviso de Privacidad — Dirección de Medio Ambiente GDL (febrero 2025)</a><span class="fue-mod">M07</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://catastro.guadalajara.gob.mx/directorio.php" target="_blank">Directorio Catastro Guadalajara — 5 de Febrero 249, Col. Las Conchas</a><span class="fue-mod">M07</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://portal.zapopan.gob.mx/movilidad/directorio.html" target="_blank">Directorio Movilidad Zapopan — Unidad Administrativa Basílica, Andador 20 de Noviembre s/n</a><span class="fue-mod">M07</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://portal.zapopan.gob.mx/medioambiente/directorio.html" target="_blank">Directorio Medio Ambiente Zapopan — Unidad Administrativa El Vergel, Av. De los Robles 1566</a><span class="fue-mod">M07</span></div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;padding:12px 16px;background:var(--bg2);border-radius:8px;font-size:.8rem;color:var(--text2);line-height:1.6;">
+      <strong>Nota:</strong> Las etiquetas <span style="background:var(--accent);color:#fff;padding:1px 6px;border-radius:4px;font-size:.75rem;">M01</span> indican en qué módulo se utilizó cada fuente.
+      Los domicilios del Directorio (Tab 1) fueron verificados directamente en portales oficiales de cada organismo.
+      Última actualización de fuentes: <strong>junio 2026</strong>.
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+// ── DATOS: DIRECTORIO ─────────────────────────────────────────────────────────
+const DIRECTORIO = [
+  {
+    ico:'💧', nombre:'SIAPA', corto:'Sistema Intermunicipal de Agua Potable y Alcantarillado',
+    tipo:'estatal', municipios:['GDL','ZPN','TLQ','TON'],
+    tramites:'Factibilidad de agua y drenaje, tomas de agua, descargas industriales, constancias de no adeudo',
+    telefono:'(33) 3674-4300', web:'https://www.siapa.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'Av. Dr. R. Michel 2913, Col. Álamo Industrial, Guadalajara',
+    nota:'Organismo intermunicipal estatal. Oficinas centrales en Av. Dr. R. Michel 2913, Guadalajara. Trámite obligatorio previo a licencia de construcción.',
+    categoria:'estatal'
+  },
+  {
+    ico:'🛡️', nombre:'Protección Civil Guadalajara', corto:'Dirección de Protección Civil Municipal — GDL',
+    tipo:'municipal', municipios:['GDL'],
+    tramites:'Dictamen de seguridad, visto bueno PC, inspección de establecimientos, planes de emergencia',
+    telefono:'(33) 3837-6061', web:'https://www.guadalajara.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'Calzada del Campesino 1097, Col. Moderna, Guadalajara (Coordinación Municipal de Gestión Integral de Riesgos)',
+    nota:'Requerido para licencia de funcionamiento categoría B y C en GDL.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🛡️', nombre:'Protección Civil Zapopan', corto:'Dirección de Protección Civil Municipal — ZPN',
+    tipo:'municipal', municipios:['ZPN'],
+    tramites:'Dictamen de seguridad, visto bueno PC, inspección, plan de contingencias',
+    telefono:'(33) 3818-2200', web:'https://www.zapopan.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'Av. Doctor Luis Farah 460, Conjunto Laureles, Zapopan — Trámites: CISZ Av. Laureles 300, Col. El Tepeyac',
+    nota:'Requerido para giros con alta afluencia de público o manejo de sustancias peligrosas.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🛡️', nombre:'Protección Civil Tlaquepaque', corto:'Dirección de Protección Civil Municipal — TLQ',
+    tipo:'municipal', municipios:['TLQ'],
+    tramites:'Dictamen de seguridad, visto bueno PC, inspección de establecimientos',
+    telefono:'(33) 3837-3838', web:'https://www.tlaquepaque.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'San Mateo Evangelista 4174, San Pedro Tlaquepaque',
+    nota:'Necesario para establecimientos con más de 50 personas o manejo de gas LP.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🛡️', nombre:'Protección Civil Tlajomulco', corto:'Dirección de Protección Civil Municipal — TLA',
+    tipo:'municipal', municipios:['TLA'],
+    tramites:'Dictamen de seguridad, visto bueno PC, inspección de establecimientos',
+    telefono:'(33) 3688-5500', web:'https://www.tlajomulco.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'Circuito Metropolitano Sur 440, Tlajomulco de Zúñiga — Ventanilla: Higuera 70 PB, Col. Centro',
+    nota:'Trámite en Palacio Municipal de Tlajomulco de Zúñiga.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🛡️', nombre:'Protección Civil Tonalá', corto:'Dirección de Protección Civil Municipal — TON',
+    tipo:'municipal', municipios:['TON'],
+    tramites:'Dictamen de seguridad, visto bueno PC, inspección de establecimientos',
+    telefono:'(33) 3284-3232', web:'https://www.tonala.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'Paseo Loma Norte 8268, Loma Dorada Delegación C, CP 45402, Tonalá, Jalisco — Tel. (33) 3586-6100',
+    nota:'Ventanilla en Palacio Municipal de Tonalá.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🚒', nombre:'Bomberos GDL', corto:'Heroico Cuerpo de Bomberos de Guadalajara',
+    tipo:'municipal', municipios:['GDL'],
+    tramites:'Revisión de extintores, salidas de emergencia, rutas de evacuación, visto bueno contra incendios',
+    telefono:'(33) 3616-6050', web:'https://www.guadalajara.gob.mx', horario:'24 hrs (emergencias) / Trámites Lun–Vie 9:00–14:00',
+    direccion:'Calzada del Campesino 1097, Col. Moderna, Guadalajara',
+    nota:'El visto bueno de bomberos es prerrequisito para giros con cocina, soldadura o almacenamiento de inflamables.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🚒', nombre:'Bomberos Zapopan', corto:'Heroico Cuerpo de Bomberos de Zapopan',
+    tipo:'municipal', municipios:['ZPN'],
+    tramites:'Revisión de extintores, salidas de emergencia, visto bueno contra incendios',
+    telefono:'(33) 3633-0808', web:'https://www.zapopan.gob.mx', horario:'24 hrs (emergencias) / Trámites Lun–Vie 9:00–14:00',
+    direccion:'Av. Doctor Luis Farah 460, Conjunto Laureles, Zapopan',
+    nota:'Requerido para restaurantes, talleres y bodegas en Zapopan.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🌿', nombre:'SEMADET', corto:'Secretaría de Medio Ambiente y Desarrollo Territorial de Jalisco',
+    tipo:'estatal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
+    tramites:'Cambio de uso de suelo forestal, dictamen ambiental, ANP, manejo de residuos peligrosos, arbolado urbano',
+    telefono:'(33) 3678-9500', web:'https://semadet.jalisco.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Av. Circunvalación Agustín Yáñez 2343, Col. Moderna, Guadalajara',
+    nota:'El dictamen de arbolado urbano de SEMADET es obligatorio cuando la construcción implica derribo de árboles.',
+    categoria:'estatal'
+  },
+  {
+    ico:'🏛️', nombre:'INAH Jalisco', corto:'Instituto Nacional de Antropología e Historia — Delegación Jalisco',
+    tipo:'federal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
+    tramites:'Dictamen de impacto en zonas de monumentos históricos, autorización de intervención en inmuebles catalogados',
+    telefono:'(33) 3616-9197', web:'https://www.inah.gob.mx', horario:'Lun–Vie 9:00–14:00',
+    direccion:'Liceo 168, Sector Hidalgo, Centro Histórico, Guadalajara',
+    nota:'Obligatorio para predios dentro de la Zona de Monumentos Históricos de GDL o ZPN (centro de Zapopan).',
+    categoria:'federal'
+  },
+  {
+    ico:'🎭', nombre:'Secretaría de Cultura Jalisco', corto:'Patrimonio Urbano — Secretaría de Cultura del Estado de Jalisco',
+    tipo:'estatal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
+    tramites:'Dictamen patrimonial estatal, catálogo de inmuebles de valor cultural, autorización de intervención en patrimonio no federal',
+    telefono:'(33) 3030-1000', web:'https://sc.jalisco.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Centro Cultural Patio Los Ángeles, Calle Cuitláhuac 305, Guadalajara',
+    nota:'El área de Patrimonio Urbano atiende en el Centro Cultural Patio Los Ángeles, Calle Cuitláhuac 305, Guadalajara. Necesario para inmuebles de valor patrimonial estatal no catalogados por el INAH.',
+    categoria:'estatal'
+  },
+  {
+    ico:'🏥', nombre:'COEPRIS / SSJ', corto:'Comisión Estatal para la Protección contra Riesgos Sanitarios',
+    tipo:'estatal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
+    tramites:'Aviso de funcionamiento sanitario, licencia sanitaria, inspección de alimentos, farmacias, clínicas, salones de belleza',
+    telefono:'(33) 3678-9700', web:'https://ssj.jalisco.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Av. 8 de Julio 1489 / Calzada Lázaro Cárdenas 3540, Guadalajara',
+    nota:'El Aviso de Funcionamiento ante SSJ/COEPRIS debe tramitarse ANTES que la licencia municipal de funcionamiento para giros de alimentos y salud.',
+    categoria:'estatal'
+  },
+  {
+    ico:'⚡', nombre:'CFE', corto:'Comisión Federal de Electricidad — Zona Occidente',
+    tipo:'federal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
+    tramites:'Factibilidad eléctrica, acometida, ampliación de carga, alumbrado público, dictamen de capacidad',
+    telefono:'800 022 2663', web:'https://www.cfe.mx', horario:'Lun–Vie 9:00–17:00',
+    direccion:'Múltiples oficinas — Zona Centro: Av. 16 de Septiembre 449, GDL | Zapopan: Felipe Ruvalcaba 5550, Paseos del Sol',
+    nota:'La factibilidad CFE es necesaria para proyectos con alta demanda energética (centros comerciales, industria, hospitales).',
+    categoria:'federal'
+  },
+  {
+    ico:'🛣️', nombre:'SIOP', corto:'Secretaría de Infraestructura y Obra Pública de Jalisco',
+    tipo:'estatal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
+    tramites:'Permisos en vías estatales, rupturas de pavimento en carreteras, acceso a vías primarias estatales',
+    telefono:'(33) 3678-8700', web:'https://siop.jalisco.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Av. Prolongación Alcalde 1351, Edificio B PB, Col. Miraflores, Guadalajara',
+    nota:'Necesario cuando el proyecto tiene acceso directo a una carretera o vialidad de jurisdicción estatal.',
+    categoria:'estatal'
+  },
+  {
+    ico:'📋', nombre:'RPPyC Jalisco', corto:'Registro Público de la Propiedad y del Comercio de Jalisco',
+    tipo:'estatal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
+    tramites:'Inscripción de escrituras, gravámenes, condominios, hipotecas, certificado de libertad de gravamen',
+    telefono:'(33) 3678-6900', web:'https://rppyc.jalisco.gob.mx', horario:'Lun–Vie 8:30–15:30',
+    direccion:'Av. Prolongación Alcalde 1855, Guadalajara',
+    nota:'El Certificado de Libertad de Gravamen (vigencia 30 días) es requisito para tramitar licencias en la mayoría de municipios.',
+    categoria:'estatal'
+  },
+  {
+    ico:'🗺️', nombre:'IMEPLAN', corto:'Instituto Metropolitano de Planeación del AMG',
+    tipo:'metro', municipios:['GDL','ZPN','TLQ','TLA','TON'],
+    tramites:'Consulta POTmet 2024, dictamen de impacto metropolitano, proyectos estratégicos, DUIS',
+    telefono:'(33) 3678-9800', web:'https://imeplan.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Av. Abedules 565, Col. Los Pinos, Zapopan',
+    nota:'El POTmet 2024 tiene jerarquía sobre los planes municipales. IMEPLAN emite dictámenes para proyectos de escala metropolitana.',
+    categoria:'metro'
+  },
+  {
+    ico:'🏗️', nombre:'Dirección de Obras GDL', corto:'Dirección de Obras Públicas — Guadalajara',
+    tipo:'municipal', municipios:['GDL'],
+    tramites:'Licencia de construcción, alineamiento y número oficial, dictamen de trazo, rupturas de pavimento, permisos de demolición',
+    telefono:'(33) 3837-6300', web:'https://www.guadalajara.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'Calle Hospital 50-Z, 1er nivel, Col. El Retiro, Guadalajara, CP 44280',
+    nota:'Ventanilla única en Palacio Municipal de Guadalajara, Av. Hidalgo 400. Citas en línea disponibles.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🏗️', nombre:'Dirección de Obras ZPN', corto:'Dirección de Proyectos y Obras Públicas — Zapopan',
+    tipo:'municipal', municipios:['ZPN'],
+    tramites:'Licencia de construcción, alineamiento y número oficial, dictamen de trazo, rupturas de pavimento',
+    telefono:'(33) 3818-2200 ext. 2102', web:'https://www.zapopan.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'Av. Parres Arias s/n, Calle 2 Esq. Periférico, Col. Parque Industrial Belenes, Zapopan',
+    nota:'Ventanilla en Presidencia Municipal de Zapopan, Av. Vallarta 6503.',
+    categoria:'municipal'
+  },
+  {
+    ico:'📐', nombre:'Ordenamiento Territorial GDL', corto:'Dirección de Ordenamiento del Territorio — Guadalajara',
+    tipo:'municipal', municipios:['GDL'],
+    tramites:'Dictamen de uso de suelo, consultas de zonificación, planes parciales, subdivisiones, fusiones, permisos de fraccionamiento',
+    telefono:'(33) 3837-6400', web:'https://www.guadalajara.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'Calle Hospital 50-Z, 2do nivel, Col. El Retiro, Guadalajara, CP 44280',
+    nota:'Emite el dictamen oficial de uso de suelo (vigencia 1 año). Este es el documento base para cualquier licencia en GDL.',
+    categoria:'municipal'
+  },
+  {
+    ico:'📐', nombre:'Ordenamiento Territorial ZPN', corto:'Dirección de Ordenamiento del Territorio — Zapopan',
+    tipo:'municipal', municipios:['ZPN'],
+    tramites:'Dictamen de uso de suelo, planes parciales, consultas de zonificación, subdivisiones, fusiones',
+    telefono:'(33) 3818-2200 ext. 2200', web:'https://www.zapopan.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'CISZ Edificio Tercer Nivel, Av. Prolongación Laureles 300 esq. Blvd. Panamericano, Col. El Tepeyac, Zapopan, CP 45150',
+    nota:'Emite dictamen de uso de suelo con base en el PDU ZPN-01 2023 y sus 12 planes parciales.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🗃️', nombre:'Catastro GDL', corto:'Dirección de Catastro Municipal — Guadalajara',
+    tipo:'municipal', municipios:['GDL'],
+    tramites:'Clave catastral, valor catastral, avalúo, boleta predial, actualización de medidas',
+    telefono:'(33) 3837-6500', web:'https://www.guadalajara.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'5 de Febrero 249, Col. Las Conchas, CP 44460, Guadalajara',
+    nota:'La boleta predial al corriente es requisito base para cualquier trámite de licencia.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🚦', nombre:'Movilidad GDL', corto:'Dirección de Movilidad y Transporte — Guadalajara',
+    tipo:'municipal', municipios:['GDL'],
+    tramites:'Dictamen de impacto al tránsito (EIV), integración vial, autorización de estacionamientos públicos, cierres viales por obra, protección de banqueta',
+    telefono:'(33) 3268-2976', web:'https://www.guadalajara.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'Ghilardi s/n esq. Miraflores, Col. Mezquitan Country, CP 44260, Guadalajara',
+    nota:'Cualquier proyecto que genere impacto vial significativo (centros comerciales, hospitales, edificios de más de cierta magnitud) requiere Estudio de Impacto Vial (EIV) aprobado por esta dirección.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🚦', nombre:'Movilidad ZPN', corto:'Dirección de Movilidad y Transporte — Zapopan',
+    tipo:'municipal', municipios:['ZPN'],
+    tramites:'Dictamen de impacto vial, gráfico de integración vial, autorización de estacionamientos, permisos de cierre vial por obra, accesos desde vía pública',
+    telefono:'(33) 3818-2200 ext. 3509', web:'https://portal.zapopan.gob.mx/movilidad/', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Unidad Administrativa Basílica, Andador 20 de Noviembre s/n, Centro Histórico Zapopan, CP 45100',
+    nota:'Emite el gráfico de integración vial que define cómo el acceso vehicular del proyecto se conecta a la red vial. Requerido para fraccionamientos y desarrollos con más de cierto número de cajones.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🌿', nombre:'Medio Ambiente GDL', corto:'Dirección General de Medio Ambiente y Ecología — Guadalajara',
+    tipo:'municipal', municipios:['GDL'],
+    tramites:'Dictamen de arbolado (tala/poda), inspecciones ambientales, control de residuos, autorizaciones de impacto ambiental municipal, puntos limpios',
+    telefono:'(33) 3837-6600', web:'https://www.guadalajara.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Av. Hidalgo 426, Centro Histórico, CP 44100, Guadalajara — Tel. (33) 3837-4400 ext. 4111',
+    nota:'Interviene obligatoriamente cuando un proyecto requiere tala o poda de árboles en la vía pública o en el propio predio. El dictamen de arbolado puede condicionar o modificar el proyecto.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🌿', nombre:'Medio Ambiente ZPN', corto:'Dirección de Medio Ambiente — Zapopan',
+    tipo:'municipal', municipios:['ZPN'],
+    tramites:'Dictamen ambiental, autorización de poda o tala de árboles, gestión integral de residuos, cambio climático y resiliencia, protección ambiental',
+    telefono:'(33) 3818-2200 ext. 3205', web:'https://portal.zapopan.gob.mx/medioambiente/', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Unidad Administrativa El Vergel, Av. De los Robles 1566, Col. Jardines del Vergel, Zapopan, CP 45180',
+    nota:'Toda tala o poda de árbol en Zapopan requiere dictamen previo de esta dirección. Para proyectos con árboles catalogados puede exigirse reubicación o reposición 1:3.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🗃️', nombre:'Catastro ZPN', corto:'Dirección de Catastro Municipal — Zapopan',
+    tipo:'municipal', municipios:['ZPN'],
+    tramites:'Clave catastral, valor catastral, avalúo, boleta predial, traslado de dominio',
+    telefono:'(33) 3818-2200 ext. 2300', web:'https://www.zapopan.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'CISZ Edificio Segundo Nivel, Av. Prolongación Laureles 300, Col. El Tepeyac, Zapopan',
+    nota:'El valor catastral de Zapopan se actualiza anualmente con base en la Ley de Ingresos municipal.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🏗️', nombre:'Obras Públicas TLQ', corto:'Secretaría de Obras Públicas — H. Ayuntamiento de San Pedro Tlaquepaque',
+    tipo:'municipal', municipios:['TLQ'],
+    tramites:'Licencia de construcción, alineamiento y número oficial, habitabilidad, demolición, refrendo de licencia, rupturas de pavimento',
+    telefono:'(33) 3837-0100 Ext. 2403', web:'https://www.tlaquepaque.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Juárez 28, Col. Centro, San Pedro Tlaquepaque',
+    nota:'Emite licencias de construcción conforme a la Ley de Ingresos TLQ 2026 (Art. 63–64). Tarifas por uso (unifamiliar, comercio, industrial). Vigencia de licencia: 24 meses. Refrendo: 10% por bimestre (Art. 63 Fracc. IV).',
+    categoria:'municipal'
+  },
+  {
+    ico:'🏗️', nombre:'Obras Públicas TLA', corto:'Dirección de Obras Públicas — Municipio de Tlajomulco de Zúñiga',
+    tipo:'municipal', municipios:['TLA'],
+    tramites:'Licencia de construcción, alineamiento y número oficial, habitabilidad, demolición, remodelación, rupturas de pavimento',
+    telefono:'(33) 3283-4400 Ext. 3221', web:'https://vecs.tlajomulco.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Higuera 70 PB, Col. Centro, Tlajomulco de Zúñiga',
+    nota:'Emite licencias de construcción conforme a la Ley de Ingresos TLA 2026. Remodelación: 50% del costo de licencia. Demolición: 20%. Trámites en línea: vecs.tlajomulco.gob.mx.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🏗️', nombre:'Obras Públicas TON', corto:'Dirección de Obras Públicas — Municipio de Tonalá',
+    tipo:'municipal', municipios:['TON'],
+    tramites:'Licencia de construcción, alineamiento y número oficial, habitabilidad, demolición, remodelación, rupturas de pavimento',
+    telefono:'(33) 3284-3600', web:'https://www.tonala.gob.mx', email:'dir.controledificacion@tonala.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Pino Suárez 32, Col. Centro, Tonalá (Dir. Control de la Edificación)',
+    nota:'Emite licencias de construcción conforme a la Ley de Ingresos TON 2026. Remodelación y demolición: 50% del costo de licencia. Tarifas referenciadas a densidad media de Tonalá.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🗃️', nombre:'Padrón y Licencias TLQ', corto:'Dirección de Padrón y Licencias — San Pedro Tlaquepaque',
+    tipo:'municipal', municipios:['TLQ'],
+    tramites:'Alta en padrón de contribuyentes, licencia de funcionamiento, giros comerciales e industriales, cambios de giro, baja de padrón',
+    telefono:'(33) 10-57-62-23 / (33) 10-57-62-24 · Conmutador (33) 10-57-60-00 Ext. 6223 y 6224', web:'https://www.tlaquepaque.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Av. Niños Héroes No. 360, Col. Álamo, San Pedro Tlaquepaque',
+    nota:'Ventanilla para licencias de funcionamiento de giros comerciales en TLQ. Requiere uso de suelo compatible, visto bueno de PC (cuando aplica) y constancia sanitaria (SSJ/COEPRIS para giros de alimentos).',
+    categoria:'municipal'
+  },
+  {
+    ico:'🗃️', nombre:'Padrón y Licencias TLA', corto:'Dirección de Desarrollo Urbano y Padrón — Tlajomulco de Zúñiga',
+    tipo:'municipal', municipios:['TLA'],
+    tramites:'Alta en padrón de contribuyentes, licencia de funcionamiento, giros comerciales e industriales, cambios de giro, baja de padrón',
+    telefono:'(33) 3283-4400', web:'https://vecs.tlajomulco.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Higuera 70 PB, Col. Centro, Tlajomulco de Zúñiga',
+    nota:'Ventanilla para licencias de funcionamiento de giros comerciales en TLA. Trámite en coordinación con Protección Civil (Higuera 70 PB, Col. Centro) para giros con dictamen de seguridad.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🗃️', nombre:'Padrón y Licencias TON', corto:'Dirección de Padrón y Licencias — Municipio de Tonalá',
+    tipo:'municipal', municipios:['TON'],
+    tramites:'Alta en padrón de contribuyentes, licencia de funcionamiento, giros comerciales e industriales, cambios de giro, baja de padrón',
+    telefono:'35-86-60-00 Ext. 1314', web:'https://tramites.tonala.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Morelos No. 20, Tonalá',
+    nota:'Ventanilla para licencias de funcionamiento de giros comerciales en TON. Tonalá es municipio de vocación artesanal y manufactura; muchos giros combinan taller y local de exhibición.',
+    categoria:'municipal'
+  },
+];
+
+// ── DATOS: GLOSARIO ────────────────────────────────────────────────────────────
+const GLOSARIO = [
+  {
+    ico:'📊', termino:'COS', nombre:'Coeficiente de Ocupación del Suelo',
+    categoria:'coeficientes',
+    def:'Proporción máxima del área del terreno que puede cubrirse con construcción en planta baja. Un COS de 0.70 significa que puedes construir en el 70% del terreno; el 30% restante debe quedar libre.',
+    ejemplo:'Terreno de 300 m² con COS 0.60 → máximo 180 m² de construcción en planta baja. Los 120 m² restantes deben ser área libre, jardín o cajones descubiertos.'
+  },
+  {
+    ico:'📊', termino:'CUS', nombre:'Coeficiente de Utilización del Suelo',
+    categoria:'coeficientes',
+    def:'Número de veces la superficie del terreno que puede construirse en total, sumando todos los niveles. Determina la superficie máxima total edificable del proyecto.',
+    ejemplo:'Terreno de 300 m² con CUS 2.40 → máximo 720 m² totales de construcción (puede ser 180 m² × 4 niveles, por ejemplo, combinado con el COS).'
+  },
+  {
+    ico:'📊', termino:'iCOS', nombre:'Índice de Ocupación del Suelo (niveles superiores)',
+    categoria:'coeficientes',
+    def:'Restricción de huella de construcción aplicable a partir del segundo nivel o planta alta. Generalmente es menor que el COS para obligar a retrocesos en altura.',
+    ejemplo:'En GDL, zonas H3-V pueden tener COS 0.70 en PB e iCOS 0.50 desde el segundo nivel, creando una "escalera" de retrocesos.'
+  },
+  {
+    ico:'📊', termino:'iCUS', nombre:'Índice de Utilización del Suelo (superficies superiores)',
+    categoria:'coeficientes',
+    def:'Límite de superficie por nivel individual en plantas altas. Complementa al CUS para regular cómo se distribuye la construcción verticalmente.',
+    ejemplo:'Usado principalmente en Zapopan para controlar la masa volumétrica de torres habitacionales.'
+  },
+  {
+    ico:'👷', termino:'DRO', nombre:'Director Responsable de Obra',
+    categoria:'actores',
+    def:'Profesionista acreditado ante el municipio (arquitecto o ingeniero) que firma y asume responsabilidad técnica y legal de un proyecto de construcción. Sin DRO no se autoriza ninguna licencia de obra en el AMG.',
+    ejemplo:'Para construir un edificio de 6 departamentos necesitas contratar un DRO registrado en el padrón municipal de GDL o ZPN. El DRO firma planos, memorias y es responsable ante el municipio.'
+  },
+  {
+    ico:'👷', termino:'Perito Corresponsable', nombre:'Perito Corresponsable de Obra',
+    categoria:'actores',
+    def:'Especialista adicional que co-firma el proyecto en áreas específicas cuando la obra supera ciertos umbrales. Tipos: estructural, instalaciones, diseño urbano.',
+    ejemplo:'Una bodega industrial de 2,500 m² en ZPN requiere Perito Corresponsable en Estructuras además del DRO, porque supera el umbral de superficie.'
+  },
+  {
+    ico:'📄', termino:'Licencia de construcción', nombre:'Licencia de Construcción',
+    categoria:'tramites',
+    def:'Autorización municipal que permite ejecutar una obra (nueva construcción, ampliación, remodelación, demolición). Es obligatoria antes de iniciar cualquier trabajo de obra en el AMG.',
+    ejemplo:'Antes de levantar una barda, ampliar una cocina o construir un cuarto adicional necesitas licencia de construcción del municipio donde se ubica el predio.'
+  },
+  {
+    ico:'📄', termino:'Licencia de funcionamiento', nombre:'Licencia de Funcionamiento',
+    categoria:'tramites',
+    def:'Autorización municipal para operar un negocio o establecimiento comercial. Es diferente a la licencia de construcción. Se tramita en la Dirección de Padrón o Gobierno Municipal.',
+    ejemplo:'Un restaurante necesita licencia de funcionamiento (para operar el negocio) Y puede necesitar licencia de construcción (si se va a remodelar el local).'
+  },
+  {
+    ico:'📄', termino:'Alineamiento', nombre:'Alineamiento y Número Oficial',
+    categoria:'tramites',
+    def:'Documento oficial donde el municipio certifica la línea de propiedad del predio respecto a la vía pública y asigna o confirma el número oficial de la dirección. Es el primer trámite antes de cualquier licencia de construcción.',
+    ejemplo:'El alineamiento te dice si la calle tiene ampliación vial planeada que afecta tu terreno, y cuántos metros de restricción frontal debes respetar desde la banqueta.'
+  },
+  {
+    ico:'📄', termino:'Dictamen de uso de suelo', nombre:'Dictamen de Uso de Suelo',
+    categoria:'tramites',
+    def:'Documento oficial emitido por la Dirección de Ordenamiento Territorial que certifica la zonificación del predio y los usos permitidos, condicionados y prohibidos. Vigencia típica: 1 año.',
+    ejemplo:'Para tramitar una licencia de funcionamiento en GDL, el municipio puede pedirte el dictamen de uso de suelo que confirma que tu giro es compatible con la zona.'
+  },
+  {
+    ico:'📄', termino:'Visto bueno', nombre:'Visto Bueno (VoBo)',
+    categoria:'tramites',
+    def:'Autorización o aprobación emitida por una dependencia como paso previo dentro de un trámite mayor. No es una licencia en sí misma, sino un requisito de aprobación intermedio.',
+    ejemplo:'Para obtener la licencia de funcionamiento de una tienda de abarrotes necesitas el visto bueno de Protección Civil (que el local cumple normas de seguridad) y el de uso de suelo.'
+  },
+  {
+    ico:'📄', termino:'Subdivisión', nombre:'Subdivisión de Predio',
+    categoria:'tramites',
+    def:'Trámite para dividir un terreno en dos o más fracciones, cada una con clave catastral independiente. Requiere que las fracciones resultantes cumplan superficie mínima y frente mínimo de la zona.',
+    ejemplo:'Un terreno de 800 m² en zona H2 (sup. mínima 120 m², frente mínimo 8 ml) puede subdividirse en máximo 6 fracciones si todas cumplen las medidas mínimas.'
+  },
+  {
+    ico:'📄', termino:'Fusión', nombre:'Fusión de Predios',
+    categoria:'tramites',
+    def:'Trámite inverso a la subdivisión: dos o más predios contiguos se unen en uno solo con una sola clave catastral. Común antes de desarrollos inmobiliarios para tener mayor superficie continua.',
+    ejemplo:'Dos terrenos de 300 m² cada uno se fusionan en un solo predio de 600 m², lo que permite aprovechar mejor el potencial constructivo de la zona.'
+  },
+  {
+    ico:'🏘️', termino:'Régimen de condominio', nombre:'Régimen de Condominio',
+    categoria:'tramites',
+    def:'Figura jurídica que permite que un inmueble tenga múltiples propietarios, cada uno con una unidad privativa (departamento, local, oficina) y derechos sobre las áreas comunes. Debe constituirse ante notario e inscribirse en el RPPyC.',
+    ejemplo:'Un edificio de 12 departamentos se constituye en régimen de condominio para poder vender cada departamento a un propietario diferente con escritura individual.'
+  },
+  {
+    ico:'🗺️', termino:'PPDU', nombre:'Plan Parcial de Desarrollo Urbano',
+    categoria:'zonificacion',
+    def:'Documento normativo que regula el uso del suelo, densidades, alturas y restricciones en un área específica de la ciudad. Cada municipio tiene varios PPDUs que cubren su territorio.',
+    ejemplo:'Zapopan tiene 12 PPDUs (ZPN-01 a ZPN-12). El predio de Andares está en ZPN-05 "Vallarta-Patria". Ese plan define exactamente qué puede construirse ahí.'
+  },
+  {
+    ico:'🗺️', termino:'POTmet', nombre:'Programa de Ordenamiento Territorial Metropolitano 2024',
+    categoria:'zonificacion',
+    def:'Instrumento de planeación de escala metropolitana que establece la visión de crecimiento del AMG al 2042. Tiene jerarquía superior a los planes municipales. Emitido por IMEPLAN.',
+    ejemplo:'Si el POTmet clasifica un área como "zona de contención" y el municipio la tiene como "zona de crecimiento", prevalece el POTmet.'
+  },
+  {
+    ico:'🌳', termino:'ANP', nombre:'Área Natural Protegida',
+    categoria:'zonificacion',
+    def:'Zona con protección legal federal o estatal por sus valores ambientales. Dentro de una ANP las construcciones están muy restringidas o prohibidas. En el AMG incluye el Bosque de La Primavera y el Cerro del Tepopote.',
+    ejemplo:'El Bosque de La Primavera es ANP federal. Cualquier proyecto dentro o colindante requiere manifestación de impacto ambiental federal (MIA) ante SEMARNAT.'
+  },
+  {
+    ico:'🗺️', termino:'Zonificación', nombre:'Zonificación',
+    categoria:'zonificacion',
+    def:'Sistema de clasificación del territorio en zonas con diferentes usos permitidos (habitacional, comercial, industrial, mixto, verde). Cada zona tiene su clave (H1, MC, MV2, EV-V, etc.) y sus propias restricciones.',
+    ejemplo:'Una zona H2-V significa Habitacional con densidad 2, Vertical. Permite casas y edificios de departamentos pero no comercio de alto impacto.'
+  },
+  {
+    ico:'📏', termino:'Restricción frontal', nombre:'Restricción Frontal (Retiro)',
+    categoria:'zonificacion',
+    def:'Distancia mínima que debe dejarse libre entre la línea de propiedad (banqueta) y la construcción. Varía por zona y municipio. No puede construirse ni techarse en esa franja.',
+    ejemplo:'Una zona MV1-H en ZPN puede tener restricción frontal de 3 ml. Si tu terreno empieza en la banqueta, los primeros 3 metros deben quedar como área libre o jardín frontal.'
+  },
+  {
+    ico:'📏', termino:'Restricciones laterales y posteriores', nombre:'Restricciones Laterales y Posteriores',
+    categoria:'zonificacion',
+    def:'Franjas libres obligatorias en los lados y el fondo del terreno. Garantizan ventilación, iluminación y separación entre edificios. Se expresan en metros lineales.',
+    ejemplo:'Restricción lateral de 1.5 ml significa que ninguna construcción puede estar a menos de 1.5 m de la colindancia lateral con el vecino.'
+  },
+  {
+    ico:'📏', termino:'Altura máxima', nombre:'Altura Máxima de Edificación',
+    categoria:'zonificacion',
+    def:'Límite vertical de construcción permitido en la zona, expresado en metros o número de niveles (incluyendo sótanos en algunas zonas). Puede modificarse con compensaciones o en zonas con Plan Especial.',
+    ejemplo:'Una zona H3-V con altura máxima 12 ml permite aproximadamente 4 niveles. Si quieres más altura necesitas un dictamen especial o compensación de CUS.'
+  },
+  {
+    ico:'🚗', termino:'Cajones de estacionamiento', nombre:'Cajones de Estacionamiento',
+    categoria:'zonificacion',
+    def:'Número mínimo de lugares de estacionamiento que exige el reglamento según el uso del suelo y la superficie. Se calculan por cada cierto número de m² o unidades del proyecto.',
+    ejemplo:'En GDL, oficinas requieren 1 cajón por cada 30 m² de construcción. Un edificio de oficinas de 600 m² necesita mínimo 20 cajones.'
+  },
+  {
+    ico:'🌿', termino:'SEMADET', nombre:'Secretaría de Medio Ambiente y Desarrollo Territorial',
+    categoria:'organismos',
+    def:'Dependencia estatal de Jalisco responsable de la política ambiental, áreas naturales protegidas, arbolado urbano y residuos. Sus dictámenes son obligatorios en proyectos con impacto ambiental.',
+    ejemplo:'Si tu proyecto de construcción requiere derribar un árbol en la vía pública, necesitas dictamen de arbolado urbano de SEMADET antes de que el municipio te otorgue la licencia.'
+  },
+  {
+    ico:'🏥', termino:'COEPRIS', nombre:'Comisión Estatal para la Protección contra Riesgos Sanitarios',
+    categoria:'organismos',
+    def:'Organismo estatal de Jalisco (dependiente de la SSJ) que regula y autoriza establecimientos de alimentos, bebidas, farmacias, clínicas, laboratorios y servicios de salud.',
+    ejemplo:'Una cafetería debe tramitar el Aviso de Funcionamiento ante COEPRIS/SSJ ANTES de solicitar la licencia municipal. Sin el aviso sanitario, el municipio no entrega la licencia.'
+  },
+  {
+    ico:'💧', termino:'SIAPA', nombre:'Sistema Intermunicipal de Agua Potable y Alcantarillado',
+    categoria:'organismos',
+    def:'Organismo público que presta los servicios de agua potable y alcantarillado en GDL, Zapopan, Tlaquepaque y Tonalá. Emite la factibilidad de servicios (agua y drenaje) necesaria para licencias de construcción.',
+    ejemplo:'Antes de tramitar una licencia de construcción en GDL necesitas la constancia de factibilidad SIAPA, que confirma que hay capacidad de agua y drenaje para tu proyecto.'
+  },
+  {
+    ico:'📋', termino:'Giro tipo A/B/C/D', nombre:'Categorías de Giro Comercial',
+    categoria:'tramites',
+    def:'Clasificación municipal del impacto de un establecimiento comercial. A = bajo impacto (papelería, estética). B = impacto medio (restaurante, gimnasio). C = alto impacto (bar, gasolinera). D = giro especial con requisitos adicionales.',
+    ejemplo:'Un taller mecánico en GDL es giro tipo C. Requiere visto bueno de PC, SEMADET y uso de suelo compatible. Una librería es tipo A y tiene trámite simplificado.'
+  },
+  {
+    ico:'🌊', termino:'Impacto Hidrológico Cero', nombre:'Impacto Hidrológico Cero (IHC)',
+    categoria:'tramites',
+    def:'Obligación normativa de no aumentar el escurrimiento pluvial respecto al estado natural del predio. Proyectos grandes deben incluir sistemas de captación, pozos de infiltración o superficies permeables para compensar la impermeabilización.',
+    ejemplo:'Una bodega de 5,000 m² que cubre casi todo el terreno debe instalar cisternas de retención pluvial o pozos de infiltración para cumplir con IHC.'
+  },
+  {
+    ico:'🗺️', termino:'Perímetro A / Perímetro B', nombre:'Perímetros de Contención Urbana',
+    categoria:'zonificacion',
+    def:'Delimitaciones del POTmet que clasifican áreas según su grado de consolidación urbana. Perímetro A = zona urbana consolidada (inversión prioritaria en infraestructura). Perímetro B = zona de crecimiento controlado. Fuera de perímetros = restricción de crecimiento.',
+    ejemplo:'Un fraccionamiento nuevo en Tlajomulco dentro del Perímetro B tiene requisitos de urbanización distintos a uno fuera del perímetro, donde prácticamente no se permiten nuevos desarrollos.'
+  },
+  {
+    ico:'📄', termino:'Manifestación de Impacto Ambiental', nombre:'MIA — Manifestación de Impacto Ambiental',
+    categoria:'tramites',
+    def:'Estudio técnico que evalúa los efectos ambientales de un proyecto. La MIA federal la resuelve SEMARNAT; la estatal la tramita SEMADET Jalisco. Requerida para proyectos en ANP, zonas de barrancas o con impacto significativo.',
+    ejemplo:'Un hotel de 200 habitaciones en zona colindante con barranca requiere MIA estatal ante SEMADET antes de cualquier licencia municipal.'
+  },
+  {
+    ico:'🌳', termino:'Dictamen forestal / arbolado', nombre:'Dictamen de Arbolado Urbano',
+    categoria:'tramites',
+    def:'Autorización de SEMADET para derribar, trasplantar o podar árboles en la vía pública o dentro del predio cuando la construcción los afecta. Incluye compensación con reforestación.',
+    ejemplo:'Si hay un árbol en la banqueta frente a tu predio y la construcción lo afecta, necesitas dictamen forestal de SEMADET. Sin él el municipio no expide la licencia.'
+  },
+
+  // ── ORGANISMOS FEDERALES ────────────────────────────────────────────────────
+  {
+    ico:'🏛️', termino:'INAH', nombre:'Instituto Nacional de Antropología e Historia',
+    categoria:'organismos',
+    def:'Organismo federal que protege el patrimonio arqueológico, histórico y artístico de México. Cualquier intervención en inmuebles catalogados o dentro de zonas de monumentos históricos requiere su autorización previa.',
+    ejemplo:'El Centro Histórico de Guadalajara y el entorno de la Basílica de Zapopan son zonas de monumentos históricos del INAH. Remodelar una fachada en esas zonas sin dictamen del INAH es ilegal.'
+  },
+  {
+    ico:'🎭', termino:'Secretaría de Cultura Jalisco', nombre:'Secretaría de Cultura del Estado de Jalisco',
+    categoria:'organismos',
+    def:'Dependencia estatal que complementa la labor del INAH en la protección del patrimonio cultural de Jalisco. Emite dictámenes para inmuebles de valor patrimonial estatal (no federales) y gestiona el catálogo de patrimonio del estado.',
+    ejemplo:'Un inmueble declarado patrimonio del estado de Jalisco pero no federal requiere autorización de la Secretaría de Cultura Jalisco, no del INAH, para cualquier modificación.'
+  },
+  {
+    ico:'💧', termino:'CONAGUA', nombre:'Comisión Nacional del Agua',
+    categoria:'organismos',
+    def:'Organismo federal que administra las aguas nacionales (ríos, acuíferos, cuerpos de agua). Otorga concesiones para extracción de agua subterránea y permisos de descarga a cuerpos de agua nacionales. Interviene en proyectos con pozos o descargas a cauces.',
+    ejemplo:'Un desarrollo habitacional con pozo propio necesita concesión de CONAGUA para extracción de agua subterránea. Un proyecto con descarga pluvial a un arroyo o río requiere permiso de descarga ante CONAGUA.'
+  },
+  {
+    ico:'⚡', termino:'CFE', nombre:'Comisión Federal de Electricidad',
+    categoria:'organismos',
+    def:'Empresa productiva del Estado que suministra energía eléctrica en México. Para proyectos de construcción emite la factibilidad de suministro eléctrico que confirma si hay capacidad en la red para atender la nueva demanda.',
+    ejemplo:'Un centro comercial o edificio de oficinas necesita tramitar la factibilidad CFE antes de iniciar obra. Sin ella el municipio no autoriza la licencia de construcción en proyectos de alta demanda.'
+  },
+  // ── ORGANISMOS ESTATALES ──────────────────────────────────────────────────
+  {
+    ico:'🌿', termino:'Medio Ambiente / Arbolado Urbano', nombre:'SEMADET — Dirección de Arbolado Urbano',
+    categoria:'organismos',
+    def:'Área de SEMADET encargada de la protección, inventario y gestión del arbolado en la vía pública y espacios públicos del estado. Toda poda, derribo o trasplante de árbol en banqueta o área pública requiere su dictamen.',
+    ejemplo:'Si tu proyecto requiere retirar un árbol de la banqueta, debes solicitar el dictamen de arbolado urbano a SEMADET con: fotos, croquis de ubicación, diámetro del tronco y motivo. El trámite puede incluir compensación con reforestación en otra zona.'
+  },
+  // ── ORGANISMOS MUNICIPALES ────────────────────────────────────────────────
+  {
+    ico:'🛡️', termino:'Protección Civil Municipal', nombre:'Dirección de Protección Civil Municipal',
+    categoria:'organismos',
+    def:'Dependencia municipal que verifica que los establecimientos y construcciones cumplan con normas de seguridad civil: extintores, salidas de emergencia, rutas de evacuación, señalética y capacidad máxima. Emite el visto bueno de PC.',
+    ejemplo:'Para obtener licencia de funcionamiento de un gimnasio, restaurante o tienda con afluencia mayor a 30 personas, necesitas el visto bueno de Protección Civil que certifica que el local es seguro para el público.'
+  },
+  {
+    ico:'📐', termino:'Ordenamiento del Territorio', nombre:'Dirección de Ordenamiento del Territorio',
+    categoria:'organismos',
+    def:'Dirección municipal responsable de aplicar los planes parciales y el reglamento de zonificación. Emite el dictamen oficial de uso de suelo, autoriza subdivisiones, fusiones y consultas de compatibilidad de giro.',
+    ejemplo:'Antes de comprar un terreno para un proyecto comercial, puedes solicitar una consulta de compatibilidad de uso de suelo a la Dirección de Ordenamiento del Territorio del municipio correspondiente.'
+  },
+  {
+    ico:'📋', termino:'Dirección de Padrón y Licencias', nombre:'Dirección de Padrón y Licencias Municipales',
+    categoria:'organismos',
+    def:'Dirección municipal encargada de registrar y autorizar los establecimientos comerciales, industriales y de servicios. Es la ventanilla donde se tramita la licencia de funcionamiento y el alta en el padrón de contribuyentes municipal.',
+    ejemplo:'Al abrir un negocio, el primer trámite municipal es darte de alta en Padrón y Licencias. Ellos revisan que tengas el uso de suelo compatible, los vistos buenos requeridos (PC, Salud, etc.) y te expiden la licencia de funcionamiento.'
+  },
+  {
+    ico:'🏗️', termino:'Dirección de Obras Públicas', nombre:'Dirección de Obras Públicas Municipales',
+    categoria:'organismos',
+    def:'Dirección municipal que autoriza, supervisa y recibe las obras de construcción privadas y públicas dentro del municipio. Gestiona licencias de construcción, rupturas de pavimento, alineamiento y número oficial.',
+    ejemplo:'Cuando terminas tu construcción, Obras Públicas te realiza la inspección final y, si todo cumple con lo autorizado, emite la constancia de habitabilidad que permite que el inmueble sea ocupado.'
+  },
+  {
+    ico:'🚗', termino:'Dirección de Movilidad', nombre:'Dirección de Movilidad y Transporte Municipal',
+    categoria:'organismos',
+    def:'Dependencia municipal que regula el tráfico, el estacionamiento, las vialidades y los accesos desde la vía pública. Interviene en proyectos que generan impacto vial significativo (centros comerciales, hospitales, fraccionamientos).',
+    ejemplo:'Un supermercado o centro comercial grande debe presentar un Estudio de Impacto Vial (EIV) ante la Dirección de Movilidad. Si el estudio detecta problemas, pueden exigir semáforos, carriles de aceleración o limitaciones de acceso.'
+  },
+  // ── ZONIFICACIÓN ─────────────────────────────────────────────────────────
+  {
+    ico:'📐', termino:'Regla de los 56°', nombre:'Ángulo de Inclinación — Regla de los 56°',
+    categoria:'zonificacion',
+    def:'Regla urbanística de Guadalajara que limita la altura de un edificio en función del ancho de la calle. Desde un punto en la acera opuesta, la fachada del edificio no puede superar un ángulo de 56° sobre la horizontal. Esto garantiza iluminación solar y ventilación en la vía pública. La fórmula es: Altura máxima = distancia desde el centro de la calle × tan(56°) ≈ × 1.48.',
+    ejemplo:'Calle de 12 m de ancho → 6 m desde el centro hasta la fachada → Altura máxima ≈ 6 × 1.48 = 8.88 m (aproximadamente 3 niveles). Si la calle tiene 20 m, la altura máxima sube a ≈ 14.8 m (unos 5 niveles). En predios con frente a avenidas anchas, esta regla permite mayor altura.'
+  },
+  {
+    ico:'🗺️', termino:'Uso de suelo', nombre:'Uso de Suelo',
+    categoria:'zonificacion',
+    def:'Clasificación normativa que determina para qué puede utilizarse un terreno o inmueble: habitacional, comercial, industrial, mixto, equipamiento, áreas verdes, etc. Está definido en el Plan Parcial de Desarrollo Urbano de cada municipio y no puede modificarse sin autorización.',
+    ejemplo:'Un terreno con uso de suelo "Habitacional Unifamiliar" solo puede tener casas. Si quieres poner un negocio, primero debes verificar si el uso comercial es compatible (permitido o condicionado) o si necesitas tramitar un cambio de uso de suelo ante el municipio.'
+  },
+  // ── TRÁMITES ─────────────────────────────────────────────────────────────
+  {
+    ico:'🏠', termino:'Habitabilidad', nombre:'Constancia de Habitabilidad',
+    categoria:'tramites',
+    def:'Documento emitido por la Dirección de Obras Públicas al concluir una construcción, que certifica que la obra se ejecutó conforme a los planos autorizados y que el inmueble cumple las condiciones mínimas para ser ocupado. Existen dos tipos: Parcial y Total.',
+    ejemplo:'Sin constancia de habitabilidad no puedes escriturar ni obtener servicios de agua o luz en el inmueble nuevo. El municipio la emite tras una inspección final de la obra.'
+  },
+  {
+    ico:'🏠', termino:'Habitabilidad Parcial', nombre:'Constancia de Habitabilidad Parcial',
+    categoria:'tramites',
+    def:'Se emite cuando una fase o parte del proyecto ya está terminada y puede ocuparse, aunque el resto de la obra aún no concluye. Permite habitar o usar una porción del inmueble (por ejemplo, las primeras plantas de un edificio) mientras continúa la construcción de las restantes.',
+    ejemplo:'Un edificio de 10 pisos puede obtener habitabilidad parcial para los pisos 1 al 4 cuando éstos están terminados y cumplen requisitos, aunque los pisos 5 al 10 todavía estén en obra. Así los primeros inquilinos pueden ingresar antes de que concluya todo el proyecto.'
+  },
+  {
+    ico:'🏠', termino:'Habitabilidad Total', nombre:'Constancia de Habitabilidad Total',
+    categoria:'tramites',
+    def:'Se emite cuando la totalidad de la obra ha concluido conforme a lo autorizado en la licencia de construcción. Es el cierre definitivo del expediente de obra y es requisito para el proceso de escrituración e inscripción en el Registro Público de la Propiedad.',
+    ejemplo:'Al terminar completamente un fraccionamiento de 50 casas, el desarrollador solicita la habitabilidad total que certifica que todas las casas, áreas comunes, vialidades internas y servicios están terminados y aprobados por el municipio.'
+  },
+  {
+    ico:'💧', termino:'Factibilidad SIAPA', nombre:'Factibilidad de Servicios — SIAPA',
+    categoria:'tramites',
+    def:'Documento emitido por SIAPA que certifica que existe capacidad suficiente en la red de agua potable y alcantarillado para atender el proyecto. Es requisito previo a la licencia de construcción. Se solicita con los datos del predio y el número de unidades o superficie a construir.',
+    ejemplo:'Para construir un edificio de 20 departamentos en GDL, el DRO debe presentar la factibilidad SIAPA al municipio junto con el expediente de licencia. Si la red no tiene capacidad, SIAPA puede condicionarla a ampliaciones de infraestructura a cargo del desarrollador.'
+  },
+  {
+    ico:'♻️', termino:'Punto Limpio', nombre:'Punto Limpio — Centro Municipal de Acopio',
+    categoria:'tramites',
+    def:'Instalación municipal gratuita donde los ciudadanos depositan residuos de difícil disposición que no se recolectan en la basura domiciliaria ordinaria. Acepta residuos electrónicos (RAEE), pilas y baterías, aceites usados, medicamentos caducados, cartón, escombro en pequeñas cantidades y otros materiales reciclables clasificados. Operados por los municipios del AMG como parte de la Gestión Integral de Residuos Sólidos Urbanos (GIRSU).',
+    ejemplo:'En Zapopan puedes llevar tu viejo refrigerador, pilas gastadas y medicamentos vencidos al Punto Limpio de la Unidad Administrativa El Vergel (Av. De los Robles 1566). En GDL los Puntos Limpios están en distintas colonias y son gratuitos para uso doméstico. Para residuos de obra (escombro), el volumen permitido es limitado; excedentes requieren empresa transportista autorizada por SEMADET.'
+  },
+  {
+    ico:'⚡', termino:'Factibilidad CFE', nombre:'Factibilidad de Suministro Eléctrico — CFE',
+    categoria:'tramites',
+    def:'Documento de CFE que confirma que la red eléctrica tiene capacidad para atender la demanda del proyecto. Se calcula en KVA (kilovoltamperes) según el uso del inmueble. Para proyectos de alta demanda es requisito previo a la licencia de construcción.',
+    ejemplo:'Un hospital privado de 5,000 m² estima una demanda de 800 KVA. CFE revisa la red del área y emite la factibilidad confirmando que puede suministrar esa carga. Si no hay capacidad, puede requerir que el desarrollador costee una subestación eléctrica.'
+  },
+
+  // ── NUEVOS TÉRMINOS: LICENCIAS DE GIRO Y CONSTRUCCIÓN ────────────────────
+  {
+    ico:'📋', termino:'CLG', nombre:'Certificado de Libertad de Gravamen',
+    categoria:'tramites',
+    def:'Documento expedido por el Registro Público de la Propiedad y del Comercio (RPPyC) de Jalisco que certifica que un inmueble no tiene hipotecas, embargos, adeudos o cualquier otro gravamen registrado. Tiene vigencia de 30 días y es requisito obligatorio para tramitar licencias de construcción y de funcionamiento en la mayoría de municipios del AMG.',
+    ejemplo:'Antes de solicitar la licencia de construcción de un edificio de departamentos en ZPN, el trámite incluye presentar el CLG vigente del predio. Si el terreno tiene hipoteca, el RPPyC lo indicará en el certificado y el municipio puede condicionar la licencia hasta resolver el gravamen.'
+  },
+  {
+    ico:'📊', termino:'CUSMAX', nombre:'Coeficiente de Utilización del Suelo Máximo',
+    categoria:'coeficientes',
+    def:'Límite absoluto de superficie construible total en un predio, expresado como múltiplo de la superficie del terreno. A diferencia del CUS regular, el CUSMAX no puede incrementarse con transferencias de potencial, compensaciones ni acuerdos especiales. Es el techo definitivo de edificación que ningún proyecto puede superar independientemente de los estímulos que aplique.',
+    ejemplo:'En un plan parcial de Zapopan, una zona puede tener CUS 3.0 (base) y CUSMAX 4.5. Con transferencia de potencial puedes llegar hasta 4.5 pero nunca más. Un predio de 500 m² puede tener máximo 2,250 m² de construcción total aunque el propietario compre todos los derechos de desarrollo disponibles.'
+  },
+  {
+    ico:'📊', termino:'IDE', nombre:'Índice de Edificación',
+    categoria:'coeficientes',
+    def:'Número máximo de unidades habitacionales o de uso (departamentos, locales, oficinas) que se pueden construir en un predio, determinado por el Plan Parcial de la zona. Controla la densidad en términos de unidades, complementando al CUS (que controla metros cuadrados totales). Se calcula dividiendo la superficie del terreno entre la superficie mínima de lote por unidad que establece la zona.\n\n<strong>Fórmula:</strong> IDE = Superficie del terreno ÷ Superficie mínima de lote por unidad\n\nEjemplo de cálculo: terreno de 600 m² en zona donde la superficie mínima por unidad es 75 m² → IDE = 600 ÷ 75 = <strong>8 unidades máximo</strong>.\n\nEl número final de unidades permitidas resulta del valor más restrictivo entre el IDE y lo que permiten el COS y el CUS juntos. No se puede superar el IDE aunque el CUS todavía lo permita.',
+    ejemplo:'En una zona H3-V de Zapopan con superficie mínima por unidad de 60 m², un terreno de 480 m² tiene IDE = 8. Aunque el CUS permita construir 1,440 m² totales (suficientes para 10 departamentos de 144 m² c/u), el IDE limita a 8 unidades. La restricción más estricta prevalece siempre.'
+  },
+  {
+    ico:'📄', termino:'EIV', nombre:'Estudio de Impacto Vial',
+    categoria:'tramites',
+    def:'Análisis técnico que cuantifica los viajes vehiculares y peatonales que generará un proyecto, y evalúa si la red vial existente puede absorberlos sin afectar la circulación. Es requisito para desarrollos que superan ciertos umbrales de superficie o aforo (centros comerciales, hospitales, fraccionamientos, hoteles). Lo revisa y aprueba la Dirección de Movilidad del municipio.',
+    ejemplo:'Un supermercado de 3,500 m² en GDL genera entre 800 y 1,200 viajes por hora pico. El EIV debe demostrar que la intersección más cercana no se saturará. Si se detecta problema, el desarrollador puede tener que financiar un semáforo, un carril de aceleración o ajustar el acceso del estacionamiento.'
+  },
+  {
+    ico:'🏷️', termino:'SCIAN', nombre:'Sistema de Clasificación Industrial de América del Norte',
+    categoria:'tramites',
+    def:'Nomenclatura estándar compartida por México, EUA y Canadá que clasifica todas las actividades económicas en códigos numéricos de 6 dígitos. En el AMG, los municipios usan el SCIAN para identificar el giro de un negocio y determinar sus requisitos de licencia, uso de suelo compatible, aforo y tarifas de derechos. Es la base de los catálogos de giros comerciales en M02 y M06.',
+    ejemplo:'Una "Taquería con servicio a mesa" tiene código SCIAN 722511 (Restaurantes con servicio completo). Con ese código el municipio determina: uso de suelo compatible (CS o MC), categoría de giro (B o C), dictámenes requeridos (PC, SSJ) y tarifa de la licencia de funcionamiento.'
+  },
+  {
+    ico:'🏥', termino:'Aviso de Funcionamiento Sanitario', nombre:'Aviso de Funcionamiento — COEPRIS / SSJ',
+    categoria:'tramites',
+    def:'Notificación obligatoria ante la Comisión Estatal para la Protección contra Riesgos Sanitarios (COEPRIS / Servicios de Salud Jalisco) para establecimientos que manejan alimentos, bebidas, cosméticos, medicamentos o prestan servicios de salud. Debe tramitarse antes de solicitar la licencia municipal de funcionamiento. Se gestiona en línea a través del portal COFEPRIS o en las ventanillas de la SSJ.',
+    ejemplo:'Una cafetería no puede obtener su licencia de funcionamiento municipal sin presentar primero el Aviso de Funcionamiento Sanitario. El municipio lo verifica como requisito del expediente. El aviso debe renovarse cada dos años y exhibirse en el establecimiento.'
+  },
+  {
+    ico:'🔄', termino:'Cambio de uso de suelo', nombre:'Cambio de Uso de Suelo',
+    categoria:'tramites',
+    def:'Trámite formal ante la Dirección de Ordenamiento Territorial para modificar el uso autorizado de un predio en el Plan Parcial. No todos los cambios son posibles: el municipio analiza compatibilidad con la zona, impacto vial, servicios existentes y voto de los vecinos. En algunos casos requiere aprobación del Cabildo y publicación en el Periódico Oficial del Estado.',
+    ejemplo:'Un terreno con uso de suelo habitacional H2 que quiere convertirse en comercio de barrio MC puede solicitar cambio de uso de suelo. El municipio evalúa la solicitud y puede aprobarla, negarla o condicionarla (por ejemplo, sin venta de alcohol, sin estacionamiento de alto flujo). El proceso puede tardar de 3 a 12 meses.'
+  },
+  {
+    ico:'🔨', termino:'Ruptura de pavimento', nombre:'Permiso de Ruptura de Pavimento',
+    categoria:'tramites',
+    def:'Autorización municipal para cortar o romper la banqueta, guarnición o calzada para ejecutar trabajos de instalación de tomas de agua, drenaje, gas, fibra óptica u otros. Al terminar, el responsable debe reintegrar el pavimento en las mismas condiciones originales. Se solicita en la Dirección de Obras Públicas junto con una garantía económica.',
+    ejemplo:'Para conectar la toma de agua de un nuevo edificio a la red municipal, el plomero o constructor debe tramitar un permiso de ruptura de pavimento indicando la calle, la longitud de la zanja y la fecha estimada de trabajo. Si no se repone correctamente, el municipio ejecuta la garantía y recupera el costo.'
+  },
+  {
+    ico:'🗂️', termino:'Clave catastral', nombre:'Clave Catastral del Predio',
+    categoria:'tramites',
+    def:'Código alfanumérico único que identifica a cada predio dentro del padrón catastral municipal. Es el número de identidad del terreno y es obligatorio en todos los trámites de construcción, licencias de funcionamiento, traslados de dominio y pagos de predial. Se obtiene en la Dirección de Catastro municipal.',
+    ejemplo:'Una clave catastral típica en GDL tiene el formato: 0039-0001-0001 (manzana-lote-fracción). Con esa clave puedes verificar en Catastro la superficie del predio, el valor catastral, los propietarios registrados y si hay adeudos de predial. Sin clave catastral no avanza ningún trámite.'
+  },
+  {
+    ico:'📢', termino:'Licencia de anuncio', nombre:'Licencia de Anuncio Publicitario',
+    categoria:'tramites',
+    def:'Autorización municipal para instalar cualquier elemento de publicidad exterior visible desde la vía pública: rótulos en fachada, lonas, espectaculares, tótems y letras volumen. Es independiente de la licencia de funcionamiento. La solicitud incluye dimensiones, materiales, iluminación y ubicación. Cada municipio tiene su propio reglamento de imagen urbana.',
+    ejemplo:'Un local comercial que quiere poner un letrero iluminado en fachada de 3 × 1 m y una lona en la ventana necesita licencia de anuncio aparte de su licencia de funcionamiento. En zonas de centro histórico (GDL, Zapopan) los materiales, colores y tamaños están muy regulados por el reglamento de imagen urbana.'
+  },
+  {
+    ico:'📝', termino:'Manifestación de obra', nombre:'Manifestación de Obra (Obra Menor)',
+    categoria:'tramites',
+    def:'Trámite simplificado, alternativo a la licencia de construcción completa, para obras de bajo impacto que no modifican la estructura del inmueble: pintura de fachada, impermeabilización, cambio de recubrimientos, instalación de tinacos, albañilería menor. La gestión es más rápida y de menor costo. El alcance varía por municipio.',
+    ejemplo:'Cambiar el piso de una habitación, instalar un baño adicional sin modificar muros de carga, o impermeabilizar una azotea son trabajos que en GDL y ZPN pueden tramitarse como manifestación de obra. Si la obra se extiende o afecta estructura, el municipio puede exigir convertirla en licencia de construcción regular con firma de DRO.'
+  },
+  {
+    ico:'🏷️', termino:'Padrón de contribuyentes municipal', nombre:'Alta en Padrón de Contribuyentes Municipal',
+    categoria:'tramites',
+    def:'Registro obligatorio de todo negocio ante la Dirección de Padrón y Licencias del municipio donde opera. Es el paso previo a la licencia de funcionamiento. El alta incluye datos del propietario, giro SCIAN, domicilio, superficie del local, régimen fiscal y los vistos buenos requeridos. Una vez dado de alta, el negocio queda sujeto a inspecciones periódicas.',
+    ejemplo:'Antes de que el municipio te entregue la licencia de funcionamiento de tu negocio, debes llenar la cédula de empadronamiento con los datos del establecimiento, presentar INE, RFC, comprobante de domicilio del local, comprobante del uso de suelo y los vistos buenos (PC, SSJ si aplica). Ese expediente queda en el padrón municipal permanentemente.'
+  },
+  {
+    ico:'🔄', termino:'Refrendo / Prórroga de licencia de construcción', nombre:'Refrendo de Licencia de Construcción',
+    categoria:'tramites',
+    def:'Trámite de renovación de una licencia de construcción cuando la obra no se terminó dentro del plazo autorizado original (normalmente 24 meses). El refrendo extiende la vigencia por un periodo adicional mediante el pago de un porcentaje sobre el costo original de la licencia. Cada municipio define sus propios plazos y tarifas en su Ley de Ingresos anual.',
+    ejemplo:'Una obra con licencia vigente hasta diciembre de 2024 que no se terminó puede tramitar el refrendo en enero de 2025 antes de que la licencia expire. Sin refrendo, la licencia caduca y hay que tramitar una nueva, con el costo y tiempo que eso implica.'
+  },
+  {
+    ico:'🔄', termino:'Refrendo de licencia de funcionamiento', nombre:'Refrendo de Licencia de Funcionamiento',
+    categoria:'tramites',
+    def:'Renovación anual de la licencia de funcionamiento de un negocio. La mayoría de los municipios del AMG requieren que la licencia se refrende cada año en el primer trimestre (enero–marzo) mediante el pago de la tarifa de refrendo establecida en la Ley de Ingresos. Si no se refrenda, el negocio opera con licencia vencida y puede ser sujeto a clausura.',
+    ejemplo:'Un restaurante con licencia de funcionamiento expedida en marzo de 2023 debe tramitar el refrendo en enero–marzo de 2024 pagando la tarifa correspondiente. En GDL y ZPN el refrendo incluye la actualización de datos del padrón y la verificación de que siguen vigentes los vistos buenos de PC y SSJ.'
+  },
+  {
+    ico:'🍺', termino:'Licencia de alcoholes', nombre:'Licencia para Venta o Consumo de Bebidas Alcohólicas',
+    categoria:'tramites',
+    def:'Autorización municipal específica para establecimientos que venden, sirven o permiten el consumo de bebidas con contenido alcohólico. Es adicional e independiente de la licencia de funcionamiento general. Se clasifica según el tipo de expendio: abarrotes, restaurante con bar, cantina, cervecera, etc. Cada categoría tiene restricciones de horario, distancia a escuelas e iglesias, y tarifa de derechos diferenciada.',
+    ejemplo:'Un restaurante que quiere ofrecer cerveza y vino de mesa necesita solicitar licencia de alcoholes en la categoría restaurante-bar además de su licencia de funcionamiento general. En GDL la tarifa es proporcional a la categoría y superficie. Si el local está a menos de 200 metros de una escuela primaria, la licencia puede ser negada en ese municipio.'
+  },
+  {
+    ico:'⚡', termino:'SARE', nombre:'Sistema de Apertura Rápida de Empresas',
+    categoria:'tramites',
+    def:'Mecanismo simplificado de apertura de negocios de bajo riesgo que reduce el tiempo de obtención de la licencia de funcionamiento a 3 días hábiles. Se basa en una lista oficial de giros preaprobados (giros de impacto mínimo: estéticas, papelerías, tortillerías, tiendas de abarrotes sin alcohol, etc.). En Tlajomulco de Zúñiga está regulado en el Art. 13 Ter del Reglamento de Giros 2021 y aplica la Afirmativa Ficta si el municipio no resuelve en el plazo establecido.',
+    ejemplo:'Una papelería que quiere abrir en Tlajomulco ingresa al SARE: presenta documentación básica (INE, RFC, comprobante domicilio, uso de suelo) y en máximo 3 días hábiles recibe su licencia sin dictamen previo de PC ni SSJ. Si el municipio no responde en ese plazo, la Afirmativa Ficta le otorga la licencia automáticamente.'
+  },
+  {
+    ico:'✅', termino:'Afirmativa Ficta', nombre:'Afirmativa Ficta (Silencio Administrativo Positivo)',
+    categoria:'tramites',
+    def:'Principio jurídico por el cual, si una autoridad no responde una solicitud dentro del plazo legalmente establecido, la respuesta se considera aprobada de manera automática. En Tlajomulco de Zúñiga aplica a giros SARE de bajo riesgo: si la Oficialía Mayor de Padrón y Licencias no emite resolución en 3 días hábiles, la licencia de funcionamiento se tiene por otorgada (Art. 13 Ter, Reglamento de Giros TLA 2021). El solicitante debe conservar el acuse de recibo como comprobante.',
+    ejemplo:'Una pequeña tienda de artesanías ingresa su solicitud SARE el lunes. Si para el jueves al mediodía no ha recibido respuesta municipal, la Afirmativa Ficta opera y puede iniciar operaciones exhibiendo su acuse de recibo. No aplica para giros de alto riesgo, alcoholes, ni municipios sin SARE implementado.'
+  },
+  {
+    ico:'🤝', termino:'Carta de anuencia de vecinos', nombre:'Carta de Anuencia de Vecinos Colindantes',
+    categoria:'tramites',
+    def:'Documento firmado por los propietarios o arrendatarios de los predios colindantes directos en el que manifiestan no tener objeción para que se instale el negocio o se realice la obra. En Tlajomulco de Zúñiga es requisito opcional para giros de bajo riesgo, pero se vuelve obligatoria en caso de controversia con algún vecino. El solicitante tiene 5 días hábiles para obtenerla mediante el Consejo Social de Participación Ciudadana (Art. 29 Fracc. I Item 9, Reg. Giros TLA 2021).',
+    ejemplo:'Una papelería que va a abrir junto a una casa habitación recibe objeción del vecino de la derecha. El municipio de Tlajomulco exige la carta de anuencia de ese vecino. El solicitante tiene 5 días hábiles para gestionarla con apoyo del Consejo Social de Participación Ciudadana. Si el vecino se niega sin causa justificada, el municipio puede mediar o conceder la licencia según el caso.'
+  },
+  {
+    ico:'🏛️', termino:'Consejo de Giros Restringidos TON', nombre:'Consejo Municipal para Giros de Control Especial — Tomalá',
+    categoria:'organismos',
+    def:'Órgano colegiado del Municipio de Tonalá que evalúa y dictamina las solicitudes de establecimientos considerados de control especial según el Acuerdo 135 (2025): cantinas, centros nocturnos, establecimientos con baile, venta de alcohol, entre otros. El consejo revisa la solicitud, realiza visita de inspección, recibe opinión de vecinos y emite dictamen en un plazo definido. Su aprobación es requisito previo para tramitar la licencia de funcionamiento en esa categoría.',
+    ejemplo:'Una cervecería artesanal que quiere abrir en Tonalá (giro con venta de alcohol para consumo en el lugar) debe primero presentar su solicitud ante el Consejo de Giros Restringidos. El consejo verifica la distancia a escuelas, el impacto en la colonia, y recaba opinión de los vecinos antes de emitir su dictamen. Sin ese dictamen favorable, el trámite de licencia no procede en Padrón y Licencias del municipio.'
+  }
+];
+
+// == ESTADO ===================================================================
+var tabActual = 'dir';
+var filterDir = '';
+var filterGlo = '';
+var q = '';
+
+// == RENDER ===================================================================
+function renderDir(data) {
+  var cont = document.getElementById('cards-dir');
+  if (!data || !data.length) { cont.innerHTML = ''; document.getElementById('empty-dir').style.display = ''; return; }
+  document.getElementById('empty-dir').style.display = 'none';
+  cont.innerHTML = data.map(function(d) {
+    var tipoCls = d.tipo === 'municipal' ? 'mun' : d.tipo === 'estatal' ? 'est' : d.tipo === 'federal' ? 'fed' : 'metro';
+    var tipoLbl = d.tipo.charAt(0).toUpperCase() + d.tipo.slice(1);
+    var tags = '<div class="tags"><span class="tag '+tipoCls+'">'+tipoLbl+'</span>';
+    (d.municipios||[]).forEach(function(m){ tags += '<span class="tag">'+m+'</span>'; });
+    tags += '</div>';
+    return '<div class="entry-card" onclick="toggleCard(this)">'
+      +'<div class="card-top"><div class="card-ico">'+d.ico+'</div>'
+      +'<div class="card-body"><div class="card-name">'+d.nombre+'</div>'
+      +'<div class="card-short">'+d.corto+'</div></div>'
+      +'<div class="card-arrow">&#8250;</div></div>'
+      +'<div class="card-detail">'+tags
+      +(d.tramites  ? '<div class="detail-row"><div class="detail-lbl">Trámites</div><div class="detail-val">'+d.tramites+'</div></div>' : '')
+      +(d.telefono  ? '<div class="detail-row"><div class="detail-lbl">Teléfono</div><div class="detail-val">'+d.telefono+'</div></div>' : '')
+      +(d.horario   ? '<div class="detail-row"><div class="detail-lbl">Horario</div><div class="detail-val">'+d.horario+'</div></div>' : '')
+      +(d.direccion ? '<div class="detail-row"><div class="detail-lbl">Dirección</div><div class="detail-val">'+d.direccion+'</div></div>' : '')
+      +(d.web       ? '<div class="detail-row"><div class="detail-lbl">Web</div><div class="detail-val"><a href="'+d.web+'" target="_blank">'+d.web+'</a></div></div>' : '')
+      +(d.nota      ? '<div class="detail-row"><div class="detail-lbl">Nota</div><div class="detail-val">'+d.nota+'</div></div>' : '')
+      +'</div></div>';
+  }).join('');
+}
+
+function renderGlo(data) {
+  var cont = document.getElementById('cards-glo');
+  if (!data || !data.length) { cont.innerHTML = ''; document.getElementById('empty-glo').style.display = ''; return; }
+  document.getElementById('empty-glo').style.display = 'none';
+  cont.innerHTML = data.map(function(g) {
+    return '<div class="entry-card" onclick="toggleCard(this)">'
+      +'<div class="card-top"><div class="card-ico">'+g.ico+'</div>'
+      +'<div class="card-body"><div class="card-name"><span class="glo-term">'+g.termino+'</span></div>'
+      +'<div class="card-short">'+g.nombre+'</div></div>'
+      +'<div class="card-arrow">&#8250;</div></div>'
+      +'<div class="card-detail"><div class="glo-def">'+g.def+'</div>'
+      +(g.ejemplo ? '<div class="glo-example"><strong>Ejemplo:</strong> '+g.ejemplo+'</div>' : '')
+      +'</div></div>';
+  }).join('');
+}
+
+function toggleCard(el) { el.classList.toggle('expanded'); }
+
+// == TABS =====================================================================
+function switchTab(tab) {
+  tabActual = tab;
+  ['dir','glo','fue'].forEach(function(t) {
+    document.getElementById('section-'+t).style.display = (t === tab) ? '' : 'none';
+    document.getElementById('tab-'+t).classList.toggle('active', t === tab);
+  });
+  applyFilters();
+}
+
+// == FILTROS Y BUSQUEDA =======================================================
+function setFilter(btn, section, val) {
+  if (section === 'dir') filterDir = val; else filterGlo = val;
+  btn.parentElement.querySelectorAll('.fpill').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function onSearch() {
+  q = document.getElementById('searchInput').value.toLowerCase().trim();
+  document.getElementById('searchClear').style.display = q ? '' : 'none';
+  applyFilters();
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = ''; q = '';
+  document.getElementById('searchClear').style.display = 'none';
+  applyFilters();
+}
+
+function applyFilters() {
+  if (tabActual === 'dir') {
+    var r = DIRECTORIO.filter(function(d) {
+      var t = (d.nombre+' '+d.corto+' '+(d.tramites||'')+' '+(d.nota||'')).toLowerCase();
+      return (!q || t.indexOf(q) >= 0) && (!filterDir || d.categoria === filterDir);
+    });
+    renderDir(r);
+  } else if (tabActual === 'glo') {
+    var r2 = GLOSARIO.filter(function(g) {
+      var t = (g.termino+' '+g.nombre+' '+(g.def||'')+' '+(g.ejemplo||'')).toLowerCase();
+      return (!q || t.indexOf(q) >= 0) && (!filterGlo || g.categoria === filterGlo);
+    });
+    renderGlo(r2);
+  }
+}
+
+// == FUENTES ==================================================================
+function toggleFue(el) {
+  var body = el.nextElementSibling;
+  if (!body) return;
+  var open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : '';
+  var arrow = el.querySelector('.fue-arrow');
+  if (arrow) arrow.textContent = open ? '▶' : '▼';
+}
+
+// == IMPRESION POR SECCION ====================================================
+function imprimirSeccion(sec) {
+  ['dir','glo','fue'].forEach(function(s) {
+    var el = document.getElementById('section-'+s);
+    if (el) el.classList.remove('print-target');
+  });
+  var target = document.getElementById('section-'+sec);
+  if (target) { target.classList.add('print-target'); target.style.display = ''; }
+  document.body.classList.add('printing-section');
+  window.print();
+  window.addEventListener('afterprint', function handler() {
+    document.body.classList.remove('printing-section');
+    ['dir','glo','fue'].forEach(function(s) {
+      var el = document.getElementById('section-'+s);
+      if (el) { el.classList.remove('print-target'); el.style.display = (s === tabActual) ? '' : 'none'; }
+    });
+    window.removeEventListener('afterprint', handler);
+  });
+}
+
+// == TEMA =====================================================================
+function guToggleTheme() {
+  var h = document.documentElement;
+  var isDark = h.getAttribute('data-theme') === 'dark';
+  var next = isDark ? 'light' : 'dark';
+  h.setAttribute('data-theme', next);
+  try { localStorage.setItem('gu_theme', next); } catch(e) {}
+  var lbl = document.getElementById('gu-toggle-label');
+  if (lbl) lbl.textContent = next === 'dark' ? 'Modo claro' : 'Modo oscuro';
+}
+
+// == INICIO ===================================================================
+window.onload = function() {
+  try {
+    var s = localStorage.getItem('gu_theme');
+    if (s) document.documentElement.setAttribute('data-theme', s);
+    var lbl = document.getElementById('gu-toggle-label');
+    if (lbl) lbl.textContent = (s === 'dark') ? 'Modo claro' : 'Modo oscuro';
+  } catch(e) {}
+  switchTab('dir');
+};
+</script>
+</body>
+</html>

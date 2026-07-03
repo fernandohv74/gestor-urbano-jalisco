@@ -1,0 +1,2729 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestor Urbano Jalisco — Potencial Constructivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="gu-design-system.css">
+<script>
+(function(){
+  var t=localStorage.getItem('gu_theme');
+  if(t) document.documentElement.setAttribute('data-theme',t);
+})();
+
+function guToggleTheme(){
+  var h=document.documentElement;
+  var isDark=h.getAttribute('data-theme')==='dark';
+  var next=isDark?'light':'dark';
+  h.setAttribute('data-theme',next);
+  localStorage.setItem('gu_theme',next);
+  var lbl=document.getElementById('gu-toggle-label');
+  if(lbl) lbl.textContent=next==='dark'?'Modo claro':'Modo oscuro';
+}
+</script>
+<style>
+/* ── M03 layout específico ── */
+.m03-wrap{display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 48px)}
+@media(max-width:860px){.m03-wrap{grid-template-columns:1fr}}
+.m03-side{background:var(--panel-bg);border-right:0.5px solid var(--border);padding:16px;overflow-y:auto;max-height:calc(100vh - 48px);position:sticky;top:48px;display:flex;flex-direction:column;gap:14px;transition:background var(--t),border-color var(--t)}
+.m03-side .gu-rcard{flex-shrink:0;overflow:visible}
+
+/* Historial compacto M03 */
+.gu-hist-item{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:var(--r-md);cursor:pointer;border:0.5px solid var(--border);background:var(--bg3);margin-bottom:4px;transition:all var(--t-fast);font-size:11px;min-width:0;overflow:hidden}
+.gu-hist-item:hover{border-color:var(--brand)}
+.gu-hist-zona{font-family:var(--mono);font-size:10px;color:var(--brand);background:var(--brand-pale);padding:1px 6px;border-radius:var(--r-sm);flex-shrink:0;white-space:nowrap}
+.gu-hist-dir{color:var(--text2);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.gu-hist-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;flex-shrink:0;padding:0 2px}
+.gu-hist-del:hover{color:var(--sem-r-txt)}
+@media(max-width:860px){.m03-side{position:relative;top:0;max-height:none}}
+.m03-main{padding:20px 24px;background:var(--bg);overflow-y:auto;transition:background var(--t)}
+
+/* Municipio bar compacta */
+.muni-bar{display:flex;gap:5px;flex-wrap:wrap}
+.muni-btn{flex:1;min-width:44px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);color:var(--text2);padding:6px 4px;font-family:var(--sans);font-size:11px;font-weight:500;cursor:pointer;transition:all var(--t-fast);text-align:center}
+.muni-btn:hover:not(.disabled){border-color:var(--brand);color:var(--text)}
+.muni-btn.active{background:var(--brand-pale);border-color:var(--brand);color:var(--brand)}
+.muni-btn.disabled{opacity:.4;cursor:not-allowed}
+
+/* Btn agregar */
+.btn-ag{width:100%;background:var(--brand);color:#fff;border:none;border-radius:var(--r-md);padding:10px;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:opacity var(--t-fast)}
+.btn-ag:hover{opacity:.88}
+.btn-ag:disabled{opacity:.4;cursor:not-allowed}
+
+/* Grid de predios */
+.preds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.placeholder-pc{grid-column:1/-1;text-align:center;color:var(--text3);font-size:14px;padding:60px 20px;border:0.5px dashed var(--border2);border-radius:var(--r-lg)}
+
+/* Tarjeta de predio */
+.pc{background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:background var(--t),border-color var(--t)}
+.pc-hdr{padding:12px 14px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--bg3);transition:background var(--t),border-color var(--t)}
+.pc-num{width:22px;height:22px;background:var(--brand-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--brand);flex-shrink:0}
+.pc-del{margin-left:auto;background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;line-height:1;transition:color var(--t-fast)}
+.pc-del:hover{color:var(--sem-r-txt)}
+
+/* Input superficie */
+.sup-inp{background:#fff;border:1.5px solid #BA7517;border-radius:7px;padding:5px 10px;color:#633806;font-family:var(--mono);font-size:20px;font-weight:500;outline:none;width:110px;text-align:right;transition:border-color var(--t-fast)}
+.sup-inp:focus{border-color:#854F0B}
+[data-theme="dark"] .sup-inp{background:#1a0d00;color:#FAC775;border-color:#BA7517}
+.sup-blk{display:grid;grid-template-columns:1fr auto;border-radius:12px;overflow:hidden;border:1.5px solid #BA7517;margin:0 12px 8px}
+.sup-blk-left{padding:10px 14px;background:#FAEEDA}
+[data-theme="dark"] .sup-blk-left{background:#1a0d00}
+.sup-blk-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:500;color:#854F0B;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+[data-theme="dark"] .sup-blk-tag{color:#FAC775}
+.sup-blk-q{font-size:13px;font-weight:500;color:#412402;margin-bottom:7px}
+[data-theme="dark"] .sup-blk-q{color:#FAEEDA}
+.sup-blk-row{display:flex;align-items:center;gap:8px}
+.sup-blk-m2{font-size:14px;color:#854F0B;font-weight:500}
+[data-theme="dark"] .sup-blk-m2{color:#FAC775}
+.sup-blk-min{font-size:10px;color:#BA7517;margin-top:5px}
+.sup-blk-right{background:#FAC775;padding:12px 14px;border-left:1.5px solid #BA7517;display:flex;flex-direction:column;justify-content:center;gap:5px;min-width:120px}
+[data-theme="dark"] .sup-blk-right{background:#412402}
+.sup-blk-rlbl{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#633806}
+[data-theme="dark"] .sup-blk-rlbl{color:#FAC775}
+.sup-blk-rval{font-size:14px;font-family:var(--mono);font-weight:500;color:#412402}
+[data-theme="dark"] .sup-blk-rval{color:#FAEEDA}
+.sup-blk-rsep{height:0.5px;background:#BA7517;opacity:.4}
+
+/* Coeficientes */
+.coefs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:10px 0}
+.coef{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);padding:8px 10px;text-align:center;transition:background var(--t),border-color var(--t)}
+.coef-l{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:3px;transition:color var(--t)}
+.coef-v{font-family:var(--mono);font-size:15px;font-weight:500;color:var(--text);transition:color var(--t)}
+
+/* Escenarios */
+.escs{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.esc{border-radius:var(--r-md);padding:10px 12px;border:0.5px solid;transition:background var(--t),border-color var(--t)}
+.esc-base{background:var(--bg3);border-color:var(--border)}
+.esc-opt{background:var(--brand-pale);border-color:var(--brand-light)}
+.esc-max{background:var(--sem-am-bg);border-color:var(--sem-am-brd)}
+.esc-badge{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:5px}
+.esc-base .esc-badge{color:var(--text3)}
+.esc-opt .esc-badge{color:var(--brand)}
+.esc-max .esc-badge{color:var(--sem-am-txt)}
+.esc-m2{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--text);line-height:1;transition:color var(--t)}
+.esc-tag{font-size:10px;color:var(--text2);margin-top:3px;transition:color var(--t)}
+.esc-desp{font-size:10px;color:var(--text3);margin-top:2px;font-style:italic;transition:color var(--t)}
+.best{outline:2px solid var(--brand);outline-offset:2px}
+
+/* Niveles tabla */
+.niv-tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
+.niv-tbl th{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding:4px 6px;border-bottom:0.5px solid var(--border);text-align:left}
+.niv-tbl td{padding:4px 6px;border-bottom:0.5px solid var(--border);color:var(--text2);font-size:11px;transition:color var(--t)}
+.niv-tbl tr:last-child td{border-bottom:none}
+.niv-btn{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-sm);padding:2px 7px;font-family:var(--mono);font-size:10px;color:var(--text2);cursor:pointer;transition:all var(--t-fast)}
+.niv-btn:hover,.niv-btn.active{background:var(--brand-pale);border-color:var(--brand);color:var(--brand)}
+
+/* Desplante */
+.despl-row{display:flex;gap:8px;margin-top:8px}
+.despl-item{flex:1;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);padding:8px;text-align:center;transition:background var(--t),border-color var(--t)}
+.despl-l{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:3px;transition:color var(--t)}
+.despl-u{font-size:9px;color:var(--text3);transition:color var(--t)}
+.despl-v{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--text);transition:color var(--t)}
+
+/* IDE */
+.ide-blk{margin-top:10px;background:var(--bg3);border-radius:var(--r-md);padding:10px 12px;border:0.5px solid var(--border);transition:background var(--t),border-color var(--t)}
+.ide-ttl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px;transition:color var(--t)}
+.ide-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ide-box{background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-md);padding:8px;transition:background var(--t),border-color var(--t)}
+.ide-n{font-family:var(--mono);font-size:16px;font-weight:500;color:var(--text);transition:color var(--t)}
+.ide-l{font-size:10px;color:var(--text2);margin-top:2px;transition:color var(--t)}
+.ide-nota{font-size:10px;color:var(--text3);margin-top:6px;line-height:1.5;transition:color var(--t)}
+.ide-def{font-size:10px;color:var(--text3);border-top:0.5px solid var(--border);padding-top:6px;margin-top:6px;line-height:1.5;transition:color var(--t),border-color var(--t)}
+
+/* ICUS */
+.icus-blk{margin-top:10px;background:var(--sem-am-bg);border:0.5px solid var(--sem-am-brd);border-radius:var(--r-md);padding:12px;transition:background var(--t),border-color var(--t)}
+.no-icus{margin-top:10px;background:var(--sem-v-bg);border:0.5px solid var(--sem-v-brd);border-radius:var(--r-md);padding:10px 12px;font-size:12px;color:var(--sem-v-txt)}
+.icus-ttl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--sem-am-txt);margin-bottom:8px}
+.icus-row{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);padding:3px 0;border-bottom:0.5px solid var(--border);transition:color var(--t),border-color var(--t)}
+.icus-row:last-of-type{border-bottom:none}
+.icus-formula{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:6px;padding-top:6px;border-top:0.5px solid var(--border);line-height:1.6;transition:color var(--t),border-color var(--t)}
+.icus-total{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--sem-am-txt);margin-top:8px}
+.icus-nota{font-size:10px;color:var(--text3);margin-top:4px;font-style:italic;transition:color var(--t)}
+
+/* Comparativa */
+.comp-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}
+.comp-tbl th{background:var(--bg3);padding:8px 10px;text-align:left;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);border-bottom:0.5px solid var(--border)}
+.comp-tbl td{padding:8px 10px;border-bottom:0.5px solid var(--border);color:var(--text2);transition:color var(--t),border-color var(--t)}
+.comp-tbl tr:last-child td{border-bottom:none}
+.comp-sep{height:1px;background:var(--border2);margin:16px 0}
+
+/* ── Botón imprimir ── */
+.btn-print-m03{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);padding:7px 14px;font-family:var(--sans);font-size:12px;color:var(--text2);cursor:pointer;transition:all var(--t-fast);margin-bottom:16px}
+.btn-print-m03:hover{border-color:var(--brand);color:var(--brand)}
+
+/* ── @media print ── */
+@media print {
+  .gu-nav, .m03-side, .btn-print-m03, .pc-del, .muni-bar, .placeholder-pc { display:none !important; }
+  @page { size:Letter portrait; margin:1.2cm; }
+  body { background:#fff !important; color:#111 !important; font-size:10pt; }
+  .m03-wrap { display:block !important; }
+  .m03-main { padding:0 !important; background:#fff !important; overflow:visible !important; }
+  .preds-grid { grid-template-columns:1fr !important; gap:12px !important; }
+  .pc { break-inside:avoid; border:1px solid #ccc !important; }
+  .pc-hdr { background:#f5f5f5 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .esc-opt { background:#e8f0ff !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .esc-max { background:#fff8e1 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .sup-blk-left { background:#FAEEDA !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .sup-blk-right { background:#FAC775 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .icus-blk { background:#fff8e1 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .no-icus { background:#e8f5e9 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .coef, .esc, .despl-item, .ide-blk, .ide-box { background:#f9f9f9 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .comp-tbl th { background:#f0f0f0 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  #compSection { display:block !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAVEGACIÓN ── -->
+<nav class="gu-nav">
+  <div class="gu-nav-logo">
+    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 1L1 5v9h5v-4h4v4h5V5L8 1z"/></svg>
+  </div>
+  <span class="gu-nav-name">Gestor Urbano Jalisco</span>
+  <span class="gu-nav-sep">/</span>
+  <span class="gu-nav-mod">M03 · Potencial constructivo</span>
+  <a href="index.html" class="gu-nav-back">
+    <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    Menú principal
+  </a>
+  <a href="GestorUrbano_M01_3.html" class="gu-nav-back" style="margin-left:4px">
+    <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    M01 · Uso de suelo
+  </a>
+  <a href="GestorUrbano_M05_2.html" class="gu-nav-back" style="margin-left:4px">
+    <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    M05 · Licencia construcción
+  </a>
+  <a href="GestorUrbano_M04_3.html" class="gu-nav-back" style="margin-left:4px">
+    <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    M04 · Asistente IA
+  </a>
+  <button class="gu-toggle" onclick="guToggleTheme()" aria-label="Cambiar tema" style="margin-left:8px">
+    <div class="gu-toggle-track"><div class="gu-toggle-thumb"></div></div>
+    <span id="gu-toggle-label">Modo oscuro</span>
+  </button>
+</nav>
+
+<!-- ── LAYOUT M03 ── -->
+<div class="m03-wrap">
+
+  <!-- ══ SIDEBAR ══ -->
+  <div class="m03-side">
+
+    <!-- Municipio -->
+    <div class="gu-rcard">
+      <div class="gu-rcard-hdr">Municipio</div>
+      <div class="gu-rcard-body">
+        <div class="muni-bar">
+          <button class="muni-btn active" onclick="selMun('guadalajara',this)">GDL</button>
+          <button class="muni-btn" onclick="selMun('zapopan',this)">ZPN</button>
+          <button class="muni-btn" onclick="selMun('tlajomulco',this)">TLA</button>
+          <button class="muni-btn" onclick="selMun('tlaquepaque',this)">TLQ</button>
+          <button class="muni-btn" onclick="selMun('tonala',this)">TON</button>
+        </div>
+        <div id="muniNota" style="font-size:11px;color:var(--sem-am-txt);padding:6px 0 0;min-height:4px"></div>
+      </div>
+    </div>
+
+    <!-- Búsqueda -->
+    <div class="gu-rcard">
+      <div class="gu-rcard-hdr">
+        Agregar predio
+        <span style="font-size:10px;color:var(--text3);font-weight:400;margin-left:6px">(máx. 2)</span>
+      </div>
+      <div class="gu-rcard-body">
+        <div class="gu-tabs" style="margin-bottom:10px">
+          <button class="gu-tab active" id="tDir" onclick="cambiarTab('Dir')">Dirección</button>
+          <button class="gu-tab" id="tCat" onclick="cambiarTab('Cat')">Predial</button>
+          <button class="gu-tab" id="tCoord" onclick="cambiarTab('Coord')">Coords</button>
+        </div>
+
+        <!-- Tab Dirección -->
+        <div id="pDir">
+          <div class="gu-field-group" style="margin-bottom:5px">
+            <div class="gu-input-icon">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M7 1a5 5 0 100 10A5 5 0 007 1zM0 7a7 7 0 1112.452 4.391l3.328 3.329a1 1 0 11-1.414 1.414l-3.329-3.328A7 7 0 010 7z"/></svg>
+              <input id="inCalle" class="gu-input" type="text" placeholder="Dirección · Ej: Av. Vallarta 1200" onkeydown="if(event.key==='Enter')agregarPredio()">
+            </div>
+          </div>
+          <div class="gu-field-group" style="margin-bottom:5px">
+            <input id="inColonia" class="gu-input" type="text" placeholder="Colonia (opcional)" onkeydown="if(event.key==='Enter')agregarPredio()">
+          </div>
+          <div class="gu-field-group" style="margin-bottom:8px">
+            <input id="inCP" class="gu-input" type="text" placeholder="CP (opcional)" style="font-family:var(--mono)" onkeydown="if(event.key==='Enter')agregarPredio()">
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn-ag" onclick="agregarPredio()" id="btnAgregar" style="flex:1">+ Agregar</button>
+            <button onclick="limpiarBusqueda()" title="Limpiar" style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);color:var(--text3);padding:0 12px;font-size:15px;cursor:pointer;transition:all var(--t-fast);flex-shrink:0" onmouseover="this.style.borderColor='var(--sem-r-brd)';this.style.color='var(--sem-r-txt)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">✕</button>
+          </div>
+        </div>
+
+        <!-- Tab Predial -->
+        <div id="pCat" style="display:none">
+          <div class="gu-field-group" style="margin-bottom:8px">
+            <div class="gu-input-icon">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 1h10a1 1 0 011 1v12a1 1 0 01-1 1H3a1 1 0 01-1-1V2a1 1 0 011-1zm1 2v2h8V3H4zm0 4v1h8V7H4zm0 3v1h5v-1H4z"/></svg>
+              <input id="inCat" class="gu-input" type="text" placeholder="Ej: D65J2671002" onkeydown="if(event.key==='Enter')buscarCatM03()">
+            </div>
+          </div>
+          <div class="gu-nota" style="margin-bottom:8px;font-size:10.5px">Clave catastral de tu recibo del predial.</div>
+          <button class="btn-ag" onclick="buscarCatM03()">Buscar por clave catastral</button>
+        </div>
+
+        <!-- Tab Coordenadas -->
+        <div id="pCoord" style="display:none">
+          <div class="gu-coord-row" style="margin-bottom:8px">
+            <input id="inLat" class="gu-input" type="number" placeholder="Latitud" step="0.000001">
+            <input id="inLng" class="gu-input" type="number" placeholder="Longitud" step="0.000001">
+          </div>
+          <div class="gu-nota" style="margin-bottom:8px;font-size:10.5px">En Google Maps: mantén presionado → copia las coordenadas.</div>
+          <button class="btn-ag" onclick="buscarCoordsM03()">Buscar por coordenadas</button>
+        </div>
+
+        <div id="statusBox" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <!-- Historial -->
+    <div class="gu-rcard" id="histCard" style="display:none">
+      <div class="gu-rcard-hdr">Consultas recientes</div>
+      <div class="gu-rcard-body" id="histLista"></div>
+    </div>
+
+    <!-- Instrucciones -->
+    <div class="gu-rcard">
+      <div class="gu-rcard-hdr">¿Cómo usar?</div>
+      <div class="gu-rcard-body">
+        <div style="font-size:11px;color:var(--text2);line-height:2">
+          <strong style="color:var(--brand)">1.</strong> Selecciona municipio<br>
+          <strong style="color:var(--brand)">2.</strong> Busca por dirección, predial o coordenadas<br>
+          <strong style="color:var(--brand)">3.</strong> Ajusta la superficie real del predio<br>
+          <strong style="color:var(--brand)">4.</strong> Hasta 2 predios simultáneos<br>
+          <strong style="color:var(--brand)">5.</strong> Comparativa automática al tener 2+
+        </div>
+        <div style="height:0.5px;background:var(--border);margin:10px 0"></div>
+        <div style="font-size:10px;color:var(--text3);line-height:1.8">
+          <strong style="color:var(--text2)">Tarifa ICUS 2026:</strong><br>
+          GDL: $1,516/m² excedente<br>
+          ZPN: $1,595/m² + $15,349 ECPD fijo<br>
+          TLA · TLQ · TON: sin ICUS equivalente<br>
+          <em>Art. 37 Ley Ingresos GDL · Art. 62 ZPN</em><br><br>
+          <em>Estimaciones orientativas. Verificar con la Dirección de Ordenamiento del Territorio.</em><br>
+          <span style="color:var(--sem-am-txt)">Tarifas ICUS vigentes al año 2026. Verificar actualización anual.</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /sidebar -->
+
+  <!-- ══ MAIN ══ -->
+  <div class="m03-main">
+    <div id="resultados" style="scroll-margin-top:20px"></div>
+    <button class="btn-print-m03" onclick="window.print()" id="btnImprimir" style="display:none">🖨️ Imprimir / Guardar PDF</button>
+    <div id="predsGrid" class="preds-grid">
+      <div class="placeholder-pc">Agrega un predio para comenzar →</div>
+    </div>
+    <div id="compSection" style="display:none"></div>
+  </div>
+
+</div><!-- /m03-wrap -->
+
+
+<script>
+const MAPS_KEY   = 'AIzaSyAc6-2m7WvZf-u8AK7Co74PdJqp0ceer0o';
+const T_GDL      = 1516;
+const T_ZPN      = 1595;   // Art. 62 Ley de Ingresos Zapopan 2026
+const T_ECPD     = 15349;  // XXXIII Derechos — Revisión ECPD Zapopan 2026
+
+const GS='https://visorgeoserver.guadalajara.gob.mx/geoserver';
+const HDRS={'Referer':'https://visorurbano.guadalajara.gob.mx/mapa'};
+
+// ══════════════════════════════════════════════════
+// API VISOR JALISCO — WFS (Zapopan, Tlajomulco, Tlaquepaque, Tonalá)
+// Endpoint: api-visorurbano.jalisco.gob.mx
+// Proyección: EPSG:32614 (UTM Zone 14N) — requiere conversión
+// ══════════════════════════════════════════════════
+const VUJ = 'https://api-visorurbano.jalisco.gob.mx/geoserver/ows';
+const VUJ_MUNICIPIOS = { zapopan:120, tlajomulco:97, tlaquepaque:98, tonala:101, guadalajara:39 };
+
+// Conversión WGS84 (lat/lng) → UTM Zona 13N (EPSG:32613)
+// El AMG (~103°W) está en Zona 13N — meridiano central -105°
+// Confirmado: api-visorurbano.jalisco.gob.mx usa EPSG:32613
+function wgs84ToUtm14N(lat, lng){
+  const a=6378137, f=1/298.257223563;
+  const k0=0.9996, E0=500000, N0=0;
+  const lon0=-105*Math.PI/180; // Zona 13N — meridiano central correcto para AMG
+  const e2=2*f-f*f, e_=Math.sqrt(e2/(1-e2));
+  const phi=lat*Math.PI/180, lam=lng*Math.PI/180;
+  const N=a/Math.sqrt(1-e2*Math.sin(phi)**2);
+  const T=Math.tan(phi)**2, C=e_**2*Math.cos(phi)**2;
+  const A=Math.cos(phi)*(lam-lon0);
+  const e4=e2**2, e6=e2**3;
+  const M=a*((1-e2/4-3*e4/64-5*e6/256)*phi
+    -(3*e2/8+3*e4/32+45*e6/1024)*Math.sin(2*phi)
+    +(15*e4/256+45*e6/1024)*Math.sin(4*phi)
+    -(35*e6/3072)*Math.sin(6*phi));
+  const x=k0*N*(A+(1-T+C)*A**3/6+(5-18*T+T**2+72*C-58*e_**2)*A**5/120)+E0;
+  const y=k0*(M+N*Math.tan(phi)*(A**2/2+(5-T+9*C+4*C**2)*A**4/24+(61-58*T+T**2+600*C-330*e_**2)*A**6/720))+N0;
+  return { x: Math.round(x*100)/100, y: Math.round(y*100)/100 };
+}
+
+// ══════════════════════════════════════════════════
+// BD LOCAL — Respaldo cuando el API VUJ está caído
+// Actualizar ejecutando el script de descarga en la
+// consola del Visor Jalisco y pegando el resultado.
+// ══════════════════════════════════════════════════════════════════════════
+// VUJ_BD_LOCAL[120] — Zapopan PDU ZPN-01 "Zapopan Centro" 2023
+// Fuente: Sección 5.2.4 Matrices de Control de la Urbanización y Edificación
+// Valores extraídos de tablas originales del documento técnico (179 páginas).
+// CONFIRMADO DESDE PDF (diciembre 2023):
+//   MV1 COS 0.40 CUS 0.80  Sup 600m²  Frente 20ml  Lat 2.5ml  Post 3ml
+//   MV2 COS 0.60 CUS 1.20  Sup 300m²  Frente 10ml  Post 3ml
+//   MV3 COS 0.70 CUS 1.40  Sup 140m²  Frente  8ml  Post 3ml
+//   MV4 COS 0.80 CUS 1.60  Sup  90m²  Frente  6ml  Rest.Front 2ml  Post 3ml
+//   MB/MD/MC COS 0.80 CUS 2.40/2.80opt/4.00MAX  Sup 320m²  Frente 16ml
+//   MR  COS 0.80 CUS 2.40(CS-R) Sup 1500m² Frente 30ml  HABITACIONAL PROHIBIDO
+//   APD/CPD COS 0.60 CUS 2.40/2.80opt  MAX 4.40-8.00 segun superficie  Frente 32ml
+// ══════════════════════════════════════════════════════════════════════════
+
+
+const VUJ_BD_LOCAL = {
+  120: [
+    // MV1 — MIXTO VECINAL DENSIDAD MÍNIMA (tabla pág.251 §5.2.4.3.1.1)
+    {
+      clave: 'MV1',
+      descripcion_zona: 'Mixto Vecinal Densidad Mínima — habitacional unifamiliar y plurifamiliar horizontal de muy baja densidad',
+      coeficiente_ocupacion_suelo: '0.40',
+      coeficiente_utilizacion_suelo: '0.80',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS',
+      modo_edificacion: 'Abierto',
+      superficie_minima: '600', frente_minimo: '20',
+      restriccion_frontal: '5', restricciones_laterales: '2.5', restriccion_posterior: '3',
+      indice_edificacion: '600', porcentaje_jardinado_restriccion_frontal: '60',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: 'PDU ZPN-01 2023 §5.2.4.3.1.1. COS 0.40, CUS 0.80. Sup.mín 600m² H-Unifamiliar / 800m² H-Pluri-H (solo subdivisión). IDE 600m²(U) / 400m²(H). EV-V: COS 0.10 CUS 0.10 lat 5ml post 5ml. Rest.frontal 60% jardinado. Modo Abierto.',
+      uso_permitido: 'H1-U · H1-H · EV-V · EI-V(condicionado)',
+      coefs_por_uso: {
+        'H1-U': {cos:'0.40',cus:'0.80',sup:'600',frente:'20',rest_f:'5',rest_l:'2.5',rest_p:'3',jar:'60',modo:'Abierto',nota:'Habitacional unifamiliar — modo abierto'},
+        'H1-H': {cos:'0.40',cus:'0.80',sup:'800',frente:'20',rest_f:'5',rest_l:'2.5',rest_p:'3',jar:'60',modo:'Abierto',nota:'Plurifamiliar horizontal — solo subdivisión'},
+        'EV-V': {cos:'0.10',cus:'0.10',sup:'—',frente:'—',rest_f:'5',rest_l:'5',rest_p:'5',jar:'—',modo:'Abierto',nota:'Espacios verdes — COS 0.10 sin construcción cerrada'},
+        'EI-V': {cos:'0.40',cus:'0.80',sup:'—',frente:'—',rest_f:'5',rest_l:'2.5',rest_p:'3',jar:'60',modo:'Abierto',nota:'Equipamiento vecinal — condicionado'},
+      },
+      municipio_id: 120,
+    },
+    // MV2 — MIXTO VECINAL DENSIDAD BAJA (tabla pág.260 §5.2.4.3.1.5)
+    {
+      clave: 'MV2',
+      descripcion_zona: 'Mixto Vecinal Densidad Baja — habitacional unifamiliar, plurifamiliar horizontal y comercio vecinal',
+      coeficiente_ocupacion_suelo: '0.60',
+      coeficiente_utilizacion_suelo: '1.20',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS (U/H) · Máx.4 niveles (H2-V condicionado)',
+      modo_edificacion: 'Semicerrado',
+      superficie_minima: '300', frente_minimo: '10',
+      restriccion_frontal: '5', restricciones_laterales: 'Ver plano', restriccion_posterior: '3',
+      indice_edificacion: '300', porcentaje_jardinado_restriccion_frontal: '50',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: 'PDU ZPN-01 2023 §5.2.4.3.1.5. CUS 1.20 U/H; CUS 1.80 H2-V (condicionado, máx.4 niv., requiere ECPD+contribución especial). IDE 300m²(U)/250m²(H)/300m²(CS-V). CS-V: COS 0.60 CUS 1.20 resultante. Sup.mín 400m²(TH) / 800m²(H2-V) solo subdivisión. Lat 5ml para EV-V.',
+      uso_permitido: 'H2-U · H2-H · H2-V(condicionado) · EV-V · EI-V · CS-V · TH(condicionado) · MFD(condicionado)',
+      coefs_por_uso: {
+        'H2-U': {cos:'0.60',cus:'1.20',sup:'250',frente:'10',rest_f:'Ver plano',rest_l:'Ver plano',rest_p:'3',jar:'40',modo:'Semicerrado',nota:'Unifamiliar — superficie 250m² solo subdivisión'},
+        'H2-H': {cos:'0.60',cus:'1.20',sup:'500',frente:'10',rest_f:'Ver plano',rest_l:'Ver plano',rest_p:'3',jar:'40',modo:'Semicerrado',nota:'Plurifamiliar horizontal — máx. 3 niveles'},
+        'H2-V': {cos:'0.60',cus:'1.80',sup:'800',frente:'10',rest_f:'5',rest_l:'Ver plano',rest_p:'5',jar:'20',modo:'Abierto',nota:'⚠️ Condicionado — máx. 4 niveles, requiere ECPD + contribución especial'},
+        'EV-V': {cos:'0.10',cus:'0.10',sup:'—',frente:'—',rest_f:'5',rest_l:'5',rest_p:'5',jar:'—',modo:'Abierto',nota:'Espacios verdes — COS 0.10 sin construcción cerrada'},
+        'EI-V': {cos:'0.60',cus:'1.20',sup:'—',frente:'—',rest_f:'5',rest_l:'Ver plano',rest_p:'5',jar:'50',modo:'Abierto',nota:'Equipamiento vecinal'},
+        'CS-V': {cos:'0.60',cus:'1.20',sup:'300',frente:'10',rest_f:'Ver plano',rest_l:'Ver plano',rest_p:'3',jar:'40',modo:'Variable',nota:'Comercio vecinal — máx. 200 m² por local'},
+        'TH':   {cos:'0.60',cus:'1.20',sup:'400',frente:'16',rest_f:'5',rest_l:'Ver plano',rest_p:'3',jar:'20',modo:'Cerrado',nota:'⚠️ Condicionado — Turístico Hotelero máx. 3 niveles'},
+        'MFD':  {cos:'0.60',cus:'1.20',sup:'—',frente:'—',rest_f:'Ver plano',rest_l:'Ver plano',rest_p:'3',jar:'40',modo:'Semicerrado',nota:'⚠️ Condicionado — manufactura domiciliaria, máx. 80m², 5 empleados'},
+      },
+      municipio_id: 120,
+    },
+    // MV3 — MIXTO VECINAL DENSIDAD MEDIA (tabla pág.271 §5.2.4.3.1.11)
+    {
+      clave: 'MV3',
+      descripcion_zona: 'Mixto Vecinal Densidad Media — habitacional plurifamiliar densidad media, comercio vecinal compatible',
+      coeficiente_ocupacion_suelo: '0.70',
+      coeficiente_utilizacion_suelo: '1.40',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS (U/H) · Máx.4 niveles (H3-V condicionado)',
+      modo_edificacion: 'Semicerrado (hab) · Variable (CS)',
+      superficie_minima: '140', frente_minimo: '8',
+      restriccion_frontal: '3', restricciones_laterales: 'Ver plano', restriccion_posterior: '3',
+      indice_edificacion: '140', porcentaje_jardinado_restriccion_frontal: '40',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: 'PDU ZPN-01 2023 §5.2.4.3.1.11. CUS 1.40 U/H; CUS 2.10 H3-V (condicionado, máx.4 niv., requiere ECPD). IDE 140m²(U)/130m²(H)/140m²(CS-V). CS-V: COS 0.70 CUS 1.40. Sup.mín 200m²(TH)/480m²(H3-V) solo subdivisión. Lat 5ml EV-V.',
+      uso_permitido: 'H3-U · H3-H · H3-V(condicionado) · EV-V · EI-V · CS-V · TH(condicionado) · MFD(condicionado)',
+      coefs_por_uso: {
+        'H3-U': {cos:'0.70',cus:'1.40',sup:'140',frente:'8',rest_f:'3',rest_l:'Ver plano',rest_p:'3',jar:'40',modo:'Semicerrado',nota:'Unifamiliar densidad media'},
+        'H3-H': {cos:'0.70',cus:'1.40',sup:'260',frente:'8',rest_f:'3',rest_l:'Ver plano',rest_p:'3',jar:'40',modo:'Semicerrado',nota:'Plurifamiliar horizontal'},
+        'H3-V': {cos:'0.70',cus:'2.10',sup:'480',frente:'12',rest_f:'5',rest_l:'Ver plano',rest_p:'5',jar:'20',modo:'Abierto',nota:'⚠️ Condicionado — máx. 4 niveles, requiere ECPD'},
+        'EV-V': {cos:'0.10',cus:'0.10',sup:'—',frente:'—',rest_f:'5',rest_l:'5',rest_p:'5',jar:'—',modo:'Abierto',nota:'Espacios verdes — sin construcción cerrada'},
+        'EI-V': {cos:'0.70',cus:'1.40',sup:'—',frente:'—',rest_f:'3',rest_l:'Ver plano',rest_p:'5',jar:'40',modo:'Abierto',nota:'Equipamiento vecinal'},
+        'CS-V': {cos:'0.70',cus:'1.40',sup:'140',frente:'8',rest_f:'3',rest_l:'Ver plano',rest_p:'3',jar:'40',modo:'Variable',nota:'Comercio vecinal — máx. 200 m² por local'},
+        'TH':   {cos:'0.70',cus:'2.10',sup:'200',frente:'16',rest_f:'5',rest_l:'Ver plano',rest_p:'3',jar:'30',modo:'Semicerrado',nota:'⚠️ Condicionado — Turístico Hotelero máx. 4 niveles'},
+        'MFD':  {cos:'0.70',cus:'1.40',sup:'—',frente:'—',rest_f:'Ver plano',rest_l:'Ver plano',rest_p:'3',jar:'40',modo:'Semicerrado',nota:'⚠️ Condicionado — manufactura domiciliaria, máx. 80m²'},
+      },
+      municipio_id: 120,
+    },
+    // MV4 — MIXTO VECINAL DENSIDAD ALTA (tabla pág.283 §5.2.4.3.1.17)
+    {
+      clave: 'MV4',
+      descripcion_zona: 'Mixto Vecinal Densidad Alta — habitacional plurifamiliar alta densidad, comercio vecinal compatible',
+      coeficiente_ocupacion_suelo: '0.80',
+      coeficiente_utilizacion_suelo: '1.60',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS (U/H) · Máx.4 niveles (H4-V condicionado)',
+      modo_edificacion: 'Cerrado/Semicerrado (hab) · Variable (CS)',
+      superficie_minima: '90', frente_minimo: '6',
+      restriccion_frontal: '2', restricciones_laterales: 'Ver plano', restriccion_posterior: '3',
+      indice_edificacion: '90', porcentaje_jardinado_restriccion_frontal: '30',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: 'PDU ZPN-01 2023 §5.2.4.3.1.17. CUS 1.60 U/H; CUS 2.40 H4-V (condicionado, máx.4 niv., requiere ECPD). Rest.Frontal 2ml (la más reducida de MV). IDE 90m²(U)/60m²(H)/90m²(CS-V). En APD con proyecto unifamiliar/pluri-H: aplican normas MV4 (NG10 nota[1]).',
+      uso_permitido: 'H4-U · H4-H · H4-V(condicionado) · EV-V · EI-V · CS-V · TH(condicionado) · MFD(condicionado)',
+      coefs_por_uso: {
+        'H4-U': {cos:'0.80',cus:'1.60',sup:'90',frente:'6',rest_f:'2',rest_l:'Ver plano',rest_p:'3',jar:'30',modo:'Cerrado/Semicerrado',nota:'Unifamiliar densidad alta'},
+        'H4-H': {cos:'0.80',cus:'1.60',sup:'120',frente:'8',rest_f:'2',rest_l:'Ver plano',rest_p:'3',jar:'30',modo:'Cerrado/Semicerrado',nota:'Plurifamiliar horizontal'},
+        'H4-V': {cos:'0.80',cus:'2.40',sup:'200',frente:'12',rest_f:'5',rest_l:'Ver plano',rest_p:'5',jar:'20',modo:'Abierto',nota:'⚠️ Condicionado — requiere ECPD. Ver NG5 para altura.'},
+        'EV-V': {cos:'0.10',cus:'0.10',sup:'—',frente:'—',rest_f:'5',rest_l:'5',rest_p:'5',jar:'—',modo:'Abierto',nota:'Espacios verdes — sin construcción cerrada'},
+        'EI-V': {cos:'0.80',cus:'1.60',sup:'90',frente:'8',rest_f:'2',rest_l:'Ver plano',rest_p:'3',jar:'30',modo:'Abierto',nota:'Equipamiento vecinal'},
+        'CS-V': {cos:'0.80',cus:'1.60',sup:'90',frente:'6',rest_f:'2',rest_l:'Ver plano',rest_p:'3',jar:'30',modo:'Variable',nota:'Comercio vecinal — máx. 200 m² por local'},
+        'TH':   {cos:'0.70',cus:'2.10',sup:'200',frente:'16',rest_f:'5',rest_l:'Ver plano',rest_p:'3',jar:'30',modo:'Semicerrado',nota:'⚠️ Condicionado — Turístico Hotelero máx. 4 niveles'},
+        'MFD':  {cos:'0.80',cus:'1.60',sup:'—',frente:'—',rest_f:'Ver plano',rest_l:'Ver plano',rest_p:'3',jar:'30',modo:'Semicerrado',nota:'⚠️ Condicionado — manufactura domiciliaria, máx. 80m²'},
+      },
+      municipio_id: 120,
+    },
+    // MB — MIXTO BARRIAL
+    // ✅ CORREGIDO v102: COS 0.80 / CUS 2.40 — fuente: tabla PDF §5.2.4.3.2 (tabla única MB/MD/MC)
+    // Jerarquía: ArcGIS Zapopan → BD local PDU → VUJ (último recurso)
+    {
+      clave: 'MB', cus_opt: '2.80', cus_max: '4.00',
+      descripcion_zona: 'Mixto Barrial — habitacional con comercio/servicios de escala barrial. Áreas de renovación urbana / Mixto barrial intensidad media.',
+      coeficiente_ocupacion_suelo: '0.80',
+      coeficiente_utilizacion_suelo: '2.40',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Ver Norma General 5',
+      modo_edificacion: 'Variable',
+      superficie_minima: '320', frente_minimo: '16',
+      restriccion_frontal: '5', restricciones_laterales: 'Ver particularidades de zona [7]', restriccion_posterior: 'Ver Norma General 5',
+      indice_edificacion: '80', porcentaje_jardinado_restriccion_frontal: '20',
+      cajones_estacionamiento: 'Ver Norma General No. 22 [2]',
+      observaciones: 'PDU ZPN-01 2023 §5.2.4.3.2. COS 0.80 | CUS Base 2.40 | CUS Optativo 2.80 [1] | CUS MAX 4.00. Altura: Ver Norma General 5. Restricción frontal 5ml. Frente jardinado 20%. Restricciones laterales/frontales sujetas a particularidades de la zona [7]. [1] CUS Optativo aplica cuando el proyecto incluye mezcla de uso habitacional con otros usos permitidos en el mismo predio. 🗺️ Ver imagen normas: mapa.zapopan.gob.mx/mapa_urbano/imagenes/MB.png',
+      uso_permitido: 'Habitacional Plurifamiliar V · Comercio Barrial · Servicios Barriales · Equipamiento',
+      municipio_id: 120,
+    },
+    // MD — MIXTO DISTRITAL (tabla pág.298 §5.2.4.3.2) | REEMPLAZA MD-1 DEL VUJ
+    {
+      clave: 'MD', cus_opt: '2.80', cus_max: '4.00',
+      descripcion_zona: 'Mixto Distrital — habitacional con comercio/servicios de escala distrital. Corredores urbanos distrital.',
+      coeficiente_ocupacion_suelo: '0.80',
+      coeficiente_utilizacion_suelo: '2.40',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante CUS÷COS (sin límite de metros — ver NG5)',
+      modo_edificacion: 'Variable',
+      superficie_minima: '320', frente_minimo: '16',
+      restriccion_frontal: '5', restricciones_laterales: 'Ver plano', restriccion_posterior: 'Ver NG5',
+      indice_edificacion: '80', porcentaje_jardinado_restriccion_frontal: '20',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ CLAVE ACTUALIZADA: PDU ZPN-01 2023 usa "MD" (el VUJ desactualizado tenía "MD-1"). §5.2.4.3.2. ⚠️ Altura: NO hay límite de metros fijo — es resultante de CUS÷COS. Ejemplo MD (CUS 2.40 ÷ COS 0.80 = 3 niv. base; CUS opt. 2.80÷0.80 = 3.5 niv.; CUS MAX 4.00÷0.80 = 5 niv.). NG5: restricción posterior se amplía al 20% de profundidad del lote si ≥6 niveles. COS 0.80, CUS Base 2.40, CUS Optativo 2.80, C.U.S.MAX.4.00. Misma matriz que MB y MC. En APD/CPD con C.U.S.MAX. mayor: COS baja a 0.60 y MAX hasta 8.00. 🗺️ Ver imagen normas: mapa.zapopan.gob.mx/mapa_urbano',
+      uso_permitido: 'Habitacional Plurifamiliar V · Comercio Distrital · Servicios · Oficinas',
+      municipio_id: 120,
+    },
+    // MD-1 — alias retrocompat VUJ desactualizado
+    {
+      clave: 'MD-1', cus_opt: '2.80', cus_max: '4.00', // alias retrocompat VUJ — mismos valores que MD
+      descripcion_zona: 'Mixto Distrital (clave anterior VUJ) — equivalente a MD en PDU ZPN-01 2023',
+      coeficiente_ocupacion_suelo: '0.80',
+      coeficiente_utilizacion_suelo: '2.40',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante CUS÷COS (sin límite de metros — ver NG5)',
+      modo_edificacion: 'Variable',
+      superficie_minima: '320', frente_minimo: '16',
+      restriccion_frontal: '5', restricciones_laterales: 'Ver plano', restriccion_posterior: 'Ver NG5',
+      indice_edificacion: '80', porcentaje_jardinado_restriccion_frontal: '20',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ Clave "MD-1" en desuso — PDU ZPN-01 2023 unifica en "MD". COS 0.80, CUS 2.40/2.80opt/4.00MAX. Misma norma que MD.',
+      uso_permitido: 'Habitacional Plurifamiliar V · Comercio Distrital · Servicios',
+      municipio_id: 120,
+    },
+    // MC — MIXTO CENTRAL (tabla pág.298 §5.2.4.3.2)
+    // ✅ CORREGIDO v101: COS 0.80 / CUS 2.40 — confirmado tabla oficial PDF PDU ZPN-01 2023
+    // Error anterior: se usaban valores de MB (COS 0.70 / CUS 2.10) por copia incorrecta
+    {
+      clave: 'MC', cus_opt: '2.80', cus_max: '4.00',
+      descripcion_zona: 'Mixto Central — habitacional con comercio/servicios de escala central. Mayor intensidad de uso.',
+      coeficiente_ocupacion_suelo: '0.80',
+      coeficiente_utilizacion_suelo: '2.40',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante CUS÷COS (sin límite de metros — ver NG5)',
+      modo_edificacion: 'Variable',
+      superficie_minima: '320', frente_minimo: '16',
+      restriccion_frontal: '5', restricciones_laterales: 'Ver plano', restriccion_posterior: 'Ver NG5',
+      indice_edificacion: '80', porcentaje_jardinado_restriccion_frontal: '20',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: 'PDU ZPN-01 2023 §5.2.4.3.2. ✅ COS 0.80 / CUS 2.40 base — misma matriz que MB y MD (tabla única §5.2.4.3.2). ⚠️ Altura: NO hay límite de metros fijo — es resultante de CUS÷COS. Ejemplo MC (CUS 2.40 ÷ COS 0.80 = 3 niv. base; CUS opt. 2.80÷0.80 = 3.5 niv.; CUS MAX 4.00÷0.80 = 5 niv.). NG5: restricción posterior se amplía al 20% de profundidad del lote si ≥6 niveles. CUS Optativo 2.80 aplica cuando el proyecto mezcla habitacional con otros usos en el mismo predio [1]; si es solo habitacional plurifamiliar vertical, aplica CUS Base 2.40. Sup.mín 320m² y frente 16ml solo para subdivisión/condominio/reserva urbana [5]. APD/CPD (MC-APD): COS baja a 0.60, MAX hasta 8.00. En PPE: altura sujeta a Dictamen Imagen Urbana (NG14). 🗺️ Ver imagen normas: mapa.zapopan.gob.mx/mapa_urbano',
+      uso_permitido: 'Habitacional Plurifamiliar V · Comercio Central · Servicios · Hotelería · Oficinas',
+      municipio_id: 120,
+    },
+    // MR — MIXTO REGIONAL (tabla pág.307 §5.2.4.3.5)
+    {
+      clave: 'MR', // sin cus_opt/cus_max — USO HABITACIONAL PROHIBIDO, CUS Optativo no aplica
+      descripcion_zona: 'Mixto Regional — comercio/industria/servicios regionales. USO HABITACIONAL PROHIBIDO.',
+      coeficiente_ocupacion_suelo: '0.80',
+      coeficiente_utilizacion_suelo: '2.40',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS (CS-R). CUS industrial: m³/m² — ver observaciones',
+      modo_edificacion: 'Variable',
+      superficie_minima: '1500', frente_minimo: '30',
+      restriccion_frontal: '5', restricciones_laterales: 'Ver plano',
+      restriccion_posterior: '3 ml (12 ml si colinda MV-hab o equipamiento)',
+      indice_edificacion: '0', porcentaje_jardinado_restriccion_frontal: '20',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ USO HABITACIONAL PROHIBIDO (NG1 frac.IV PDU). PDU §5.2.4.3.5. COS 0.80 (CS-R e ind.) / 0.50 (Parque Industrial). ⚠️ CUS VOLUMÉTRICO para usos industriales (m³ edificados ÷ m² de terreno, NO igual al CUS superficial): CS-R→2.40 superficial | MFM→7.00 m³/m² | SI→8.00 m³/m² | IJ→6.00 m³/m² | I1→8.00 m³/m² | I2/I3→10.50 m³/m². El simulador muestra CUS 2.40 (CS-R); para usos industriales el cálculo volumétrico es distinto — consultar la tabla completa §5.2.4.3.5. Nota[9]: superficie libre post-COS mínimo 30% verde. Rest.Post 12ml si colinda MV-habitacional o equipamiento. Sup.mín 1500m² y frente 30ml solo subdivisión.',
+      uso_permitido: 'CS-R · MFM · SI · IJ · I1/I2/I3 — NO habitacional',
+      municipio_id: 120,
+    },
+    // APD — ÁREAS/CORREDORES CON POTENCIAL DE DESARROLLO + C.U.S.MAX.
+    // (tabla pág.310 §5.2.4.3.7 — CON aprovechamiento C.U.S.MAX.)
+    {
+      clave: 'APD', cus_opt: '2.80', // CUS Optativo confirmado PDF §5.2.4.3.7 ZPN-2/ZPN-3 [1]
+      descripcion_zona: 'Área/Corredor con Potencial de Desarrollo CON C.U.S.MAX. — MD/MC/MR en APD o CPD activando el coeficiente máximo optativo',
+      coeficiente_ocupacion_suelo: '0.60',
+      coeficiente_utilizacion_suelo: '2.40',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Ver Norma General 5',
+      modo_edificacion: 'Abierto',
+      superficie_minima: '500', frente_minimo: '32',
+      restriccion_frontal: '5', restricciones_laterales: 'Ver plano', restriccion_posterior: 'Ver NG5',
+      indice_edificacion: '80', porcentaje_jardinado_restriccion_frontal: '40',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: 'PDU ZPN-01 2023 §5.2.4.3.7 tabla pág.310. COS 0.60 (baja vs MB/MD/MC). CUS Base 2.40 | Optativo 2.80 (mezcla, mín.50%COS no-hab). C.U.S.MAX por superficie: 500-1000m²→4.40 | 1001-2500m²→5.60 | 2501-5000m²→6.80 | >5000m²→8.00. Frente 32ml solo subdivisión. IDE 80m² (no aplica MR). Requiere ECPD (NG17)+contribución especial. Lotes <500m² excluidos. Si solo unifamiliar/pluri-H: aplica MV4.',
+      uso_permitido: 'Según zona base MD/MC/MR con C.U.S.MAX. optativo',
+      municipio_id: 120,
+    },
+    // CPD — alias de APD
+    {
+      clave: 'CPD', cus_opt: '2.80', // CUS Optativo confirmado PDF §5.2.4.3.7 — alias de APD
+      descripcion_zona: 'Corredor Urbano con Potencial de Desarrollo CON C.U.S.MAX. — equivalente a APD en corredores',
+      coeficiente_ocupacion_suelo: '0.60',
+      coeficiente_utilizacion_suelo: '2.40',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Ver Norma General 5',
+      modo_edificacion: 'Abierto',
+      superficie_minima: '500', frente_minimo: '32',
+      restriccion_frontal: '5', restricciones_laterales: 'Ver plano', restriccion_posterior: 'Ver NG5',
+      indice_edificacion: '80', porcentaje_jardinado_restriccion_frontal: '40',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: 'PDU ZPN-01 2023. Igual que APD. C.U.S.MAX: 500-1000m²→4.40 | 1001-2500m²→5.60 | 2501-5000m²→6.80 | >5000m²→8.00. MR-CPD: IDE no aplica. Condominios habitacionales excluidos del C.U.S.MAX.',
+      uso_permitido: 'Según zona base del corredor MD/MC/MR',
+      municipio_id: 120,
+    },
+    // MC-APD — alias para la clave que devuelve el VUJ en corredores MC
+    {
+      clave: 'MC-APD', cus_opt: '2.80', // CUS Optativo confirmado PDF §5.2.4.3.7 ZPN-2/ZPN-3 [1]
+      descripcion_zona: 'Mixto Central en Área/Corredor con Potencial de Desarrollo — aplica normas APD con C.U.S.MAX.',
+      coeficiente_ocupacion_suelo: '0.60',
+      coeficiente_utilizacion_suelo: '2.40',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Ver Norma General 5',
+      modo_edificacion: 'Abierto',
+      superficie_minima: '500', frente_minimo: '32',
+      restriccion_frontal: '5', restricciones_laterales: 'Ver plano', restriccion_posterior: 'Ver NG5',
+      indice_edificacion: '80', porcentaje_jardinado_restriccion_frontal: '40',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: 'PDU ZPN-01 2023 §5.2.4.3.7. Zona MC en corredor APD/CPD. COS 0.60, C.U.S.MAX: 500-1000m²→4.40 | 1001-2500m²→5.60 | 2501-5000m²→6.80 | >5000m²→8.00. Requiere ECPD (NG17).',
+      uso_permitido: 'Habitacional Plurifamiliar V · Comercio Central · Servicios · Hotelería · Oficinas + C.U.S.MAX.',
+      municipio_id: 120,
+    },
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // SUBZONAS ESPECIALES — ZPN-02 a ZPN-12 Zapopan
+    // Fuente: PDFs oficiales PDU ZPN-02 a ZPN-12 2023 (portal.zapopan.gob.mx)
+    // Extraídas: 26 mayo 2026 — v60
+    // HALLAZGO: MB/MD/MC base son idénticos en todos los distritos ZPN-01 a ZPN-12.
+    // Lo que varía por distrito son las subzonas especiales (APR, ADC, PPE).
+    // ══════════════════════════════════════════════════════════════════════════
+
+    // MV1-ADC — Densidad Mínima en Área de Desarrollo Controlado (ZPN-02, ZPN-04)
+    {
+      clave: 'MV1-ADC',
+      descripcion_zona: 'Mixto Vecinal Densidad Mínima en Área de Desarrollo Controlado',
+      coeficiente_ocupacion_suelo: '0.40',
+      coeficiente_utilizacion_suelo: '0.80',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS',
+      modo_edificacion: 'Abierto',
+      superficie_minima: '600', frente_minimo: '20',
+      restriccion_frontal: '5', restricciones_laterales: '2.5', restriccion_posterior: '3',
+      indice_edificacion: '600', porcentaje_jardinado_restriccion_frontal: '60',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: 'PDU ZPN-02/04 2023. Mismos valores que MV1 estándar. Sujeto a Norma General 23 (Áreas de Desarrollo Controlado). Usos restringidos: solo H1-U, H1-H, EV-V. NO comercio ni servicios.',
+      uso_permitido: 'H1-U · H1-H · EV-V',
+      municipio_id: 120,
+    },
+
+    // MV1-PPE — Densidad Mínima en Área de Protección al Patrimonio Edificado (ZPN-02)
+    {
+      clave: 'MV1-PPE',
+      descripcion_zona: 'Mixto Vecinal Densidad Mínima en Área de Protección al Patrimonio Edificado',
+      coeficiente_ocupacion_suelo: '0.40',
+      coeficiente_utilizacion_suelo: '0.80',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS — sujeta a Dictamen DOT (NG14)',
+      modo_edificacion: 'Abierto',
+      superficie_minima: '600', frente_minimo: '20',
+      restriccion_frontal: '5', restricciones_laterales: '2.5', restriccion_posterior: '3',
+      indice_edificacion: '600', porcentaje_jardinado_restriccion_frontal: '60',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ PPE: Altura sujeta a Dictamen de Imagen Urbana (NG14). PDU ZPN-02 2023. Usos: H1-U, H1-H, EV-V únicamente.',
+      uso_permitido: 'H1-U · H1-H · EV-V',
+      municipio_id: 120,
+    },
+
+    // MV2-PPE — Densidad Baja en Área de Protección al Patrimonio Edificado (ZPN-02)
+    {
+      clave: 'MV2-PPE',
+      descripcion_zona: 'Mixto Vecinal Densidad Baja en Área de Protección al Patrimonio Edificado',
+      coeficiente_ocupacion_suelo: '0.60',
+      coeficiente_utilizacion_suelo: '1.20',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Máximo 3 niveles (PPE)',
+      modo_edificacion: 'Semicerrado',
+      superficie_minima: '300', frente_minimo: '10',
+      restriccion_frontal: '5', restricciones_laterales: '5', restriccion_posterior: '3',
+      indice_edificacion: '300', porcentaje_jardinado_restriccion_frontal: '50',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ PPE: Altura MÁXIMA 3 niveles. PDU ZPN-02 2023. Restricciones laterales 5ml (más restrictivo que MV2 estándar). NO H2-V. Usos: H2-U, H2-H, EV-V, EI-V.',
+      uso_permitido: 'H2-U · H2-H · EV-V · EI-V',
+      municipio_id: 120,
+    },
+
+    // MV3-APR — Densidad Media en Área con Potencial de Reciclamiento (ZPN-11, ZPN-12)
+    {
+      clave: 'MV3-APR',
+      descripcion_zona: 'Mixto Vecinal Densidad Media en Área con Potencial de Reciclamiento',
+      coeficiente_ocupacion_suelo: '0.70',
+      coeficiente_utilizacion_suelo: '1.40',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS · H3-V: máx.4 niv. (ECPD)',
+      modo_edificacion: 'Semicerrado / Variable',
+      superficie_minima: '140', frente_minimo: '8',
+      restriccion_frontal: '3', restricciones_laterales: 'Ver plano', restriccion_posterior: '3',
+      indice_edificacion: '140', porcentaje_jardinado_restriccion_frontal: '40',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: 'PDU ZPN-11/12 2023 APR. COS 0.70 CUS 1.40 base. H3-V condicionado: CUS 2.10 máx.4 niv. requiere ECPD + contribución especial. MB condicionado COS 0.80 CUS 2.40. MFM/SI/I1 condicionados. Restricción frontal 3ml. NG9.',
+      uso_permitido: 'H3-U · H3-H · H3-V(condicionado) · EV-V · EI-V · CS-V · MB(condicionado) · MFD · MFM/SI/I1(condicionados)',
+      municipio_id: 120,
+    },
+
+    // MV3-PPE — Densidad Media en Área de Protección al Patrimonio Edificado (ZPN-12)
+    {
+      clave: 'MV3-PPE',
+      descripcion_zona: 'Mixto Vecinal Densidad Media en Área de Protección al Patrimonio Edificado',
+      coeficiente_ocupacion_suelo: '0.70',
+      coeficiente_utilizacion_suelo: '1.40',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS · TH: máx.4 niv.',
+      modo_edificacion: 'Semicerrado',
+      superficie_minima: '140', frente_minimo: '8',
+      restriccion_frontal: '3', restricciones_laterales: '5', restriccion_posterior: '3',
+      indice_edificacion: '140', porcentaje_jardinado_restriccion_frontal: '40',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ PPE: Sin H3-V. PDU ZPN-12 2023 PPE. TH condicionado máx.4 niv. Restricciones laterales 5ml. CS-V condicionado. MFD condicionado. NG14.',
+      uso_permitido: 'H3-U · H3-H · EV-V · EI-V · TH(condicionado) · CS-V(condicionado) · MFD(condicionado)',
+      municipio_id: 120,
+    },
+
+    // MV4-APR — Densidad Alta en Área con Potencial de Reciclamiento (ZPN-02, ZPN-09)
+    // ✅ RF=3ml CONFIRMADO PDF ZPN-2/ZPN-3 — APR aumenta restricción frontal de 2ml a 3ml vs MV4 base
+    {
+      clave: 'MV4-APR',
+      descripcion_zona: 'Mixto Vecinal Densidad Alta en Área con Potencial de Reciclamiento',
+      coeficiente_ocupacion_suelo: '0.80',
+      coeficiente_utilizacion_suelo: '1.60',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS · H4-V: ver NG5 (ECPD)',
+      modo_edificacion: 'Cerrado / Semicerrado / Variable',
+      superficie_minima: '90', frente_minimo: '6',
+      restriccion_frontal: '3', restricciones_laterales: 'Ver plano', restriccion_posterior: '3',
+      indice_edificacion: '90', porcentaje_jardinado_restriccion_frontal: '30',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: 'PDU ZPN-02/09 2023 APR. COS 0.80. CUS 1.60 H4-U/H; CUS 2.40 H4-V condicionado (NG5 ECPD); CUS 2.40 CS-V; CUS 1.60 MB condicionado. MFM/SI/I1 condicionados (CUS volumétrico). H4-V: rest.posterior 5ml, rest.lateral 5ml, modo abierto. NG9.',
+      uso_permitido: 'H4-U · H4-H · H4-V(condicionado) · EV-V · EI-V · CS-V · MB(condicionado) · MFD · MFM/SI/I1(condicionados)',
+      municipio_id: 120,
+    },
+
+    // MV4-ADC — Densidad Alta en Área de Desarrollo Controlado (ZPN-02)
+    {
+      clave: 'MV4-ADC',
+      descripcion_zona: 'Mixto Vecinal Densidad Alta en Área de Desarrollo Controlado',
+      coeficiente_ocupacion_suelo: '0.80',
+      coeficiente_utilizacion_suelo: '1.60',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS · TH: máx.4 niv.',
+      modo_edificacion: 'Cerrado / Semicerrado',
+      superficie_minima: '90', frente_minimo: '6',
+      restriccion_frontal: '2', restricciones_laterales: 'Ver plano', restriccion_posterior: '3',
+      indice_edificacion: '90', porcentaje_jardinado_restriccion_frontal: '30',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: 'PDU ZPN-02 2023 ADC. NG23 (Desarrollo Controlado). COS 0.80 CUS 1.60. Restricción frontal 2ml. TH condicionado máx.4 niv. CS-V condicionado. MFD condicionado. Sin H4-V, sin MB, sin industria.',
+      uso_permitido: 'H4-U · H4-H · EV-V · EI-V · TH(condicionado) · CS-V(condicionado) · MFD(condicionado)',
+      municipio_id: 120,
+    },
+
+    // MV4-PPE — Densidad Alta en Área de Protección al Patrimonio Edificado (ZPN-10, ZPN-12)
+    {
+      clave: 'MV4-PPE',
+      descripcion_zona: 'Mixto Vecinal Densidad Alta en Área de Protección al Patrimonio Edificado',
+      coeficiente_ocupacion_suelo: '0.80',
+      coeficiente_utilizacion_suelo: '1.60',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Máximo 4 niveles (PPE — NG14)',
+      modo_edificacion: 'Cerrado / Semicerrado',
+      superficie_minima: '90', frente_minimo: '6',
+      restriccion_frontal: '3', restricciones_laterales: 'Ver plano', restriccion_posterior: '3',
+      indice_edificacion: '90', porcentaje_jardinado_restriccion_frontal: '30',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ PPE: Altura MÁXIMA 4 niveles (NG14). PDU ZPN-10/12 2023. Sin H4-V. CS-V condicionado. TH condicionado. MFD condicionado.',
+      uso_permitido: 'H4-U · H4-H · EV-V · EI-V · CS-V(condicionado) · TH(condicionado) · MFD(condicionado)',
+      municipio_id: 120,
+      coefs_por_uso: {
+        'H4-U': {cos:'0.80',cus:'1.60',alt:'Resultante CUS÷COS',modo:'Cerrado / Semicerrado',sup:'90', fre:'6',rf:'3',rl:'3',rp:'3',jar:'30',ide:'90'},
+        'H4-H': {cos:'0.80',cus:'1.60',alt:'Resultante CUS÷COS',modo:'Cerrado / Semicerrado',sup:'120',fre:'8',rf:'2',rl:'5',rp:'5',jar:'30',ide:'60'},
+        'EV-V': {cos:'0.10',cus:'0.10',alt:'Máximo 4 niveles',   modo:'Abierto',             sup:'200',fre:'—',rf:'—',rl:'5',rp:'5',jar:'—', ide:'—'},
+        'EI-V': {cos:'0.80',cus:'1.60',alt:'Resultante CUS÷COS',modo:'Variable',              sup:'90', fre:'6',rf:'—',rl:'—',rp:'—',jar:'—', ide:'90'},
+        'CS-V': {cos:'0.80',cus:'1.60',alt:'Variable',           modo:'Variable',              sup:'90', fre:'6',rf:'—',rl:'—',rp:'3',jar:'30',ide:'90'},
+        'TH':   {cos:'0.80',cus:'1.60',alt:'Resultante CUS÷COS',modo:'Variable',              sup:'200',fre:'8',rf:'—',rl:'5',rp:'5',jar:'—', ide:'—'},
+        'MFD':  {cos:'0.80',cus:'1.60',alt:'Variable',           modo:'Variable',              sup:'90', fre:'6',rf:'—',rl:'—',rp:'3',jar:'30',ide:'90'},
+      },
+    },
+
+    // MB-PPE / MD-PPE / MC-PPE — Zonas Mixtas con PPE (COS baja a 0.70, máx.4 niv.)
+    // Confirmado: ZPN-02, ZPN-03, ZPN-04 — misma matriz en todos los distritos
+    {
+      clave: 'MB-PPE',
+      descripcion_zona: 'Mixto Barrial en Área de Protección al Patrimonio Edificado',
+      coeficiente_ocupacion_suelo: '0.70',
+      coeficiente_utilizacion_suelo: '2.10',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Máximo 4 niveles (PPE — NG14)',
+      modo_edificacion: 'Variable',
+      superficie_minima: '320', frente_minimo: '16',
+      restriccion_frontal: 'Ver plano', restricciones_laterales: 'Ver plano', restriccion_posterior: 'Ver NG5',
+      indice_edificacion: '80', porcentaje_jardinado_restriccion_frontal: '20',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ PPE: Altura MÁXIMA 4 niveles — Dictamen de Imagen Urbana (NG14). PDU ZPN-02/03/04 2023 §5.2.4.3.3. COS 0.70 CUS 2.10. Aplica para MB* en todos los distritos con PPE. Confirmar en plano E-3 del distrito correspondiente.',
+      uso_permitido: 'Habitacional Plurifamiliar V · Comercio Barrial · Servicios · Equipamiento',
+      municipio_id: 120,
+    },
+    {
+      clave: 'MD-PPE',
+      descripcion_zona: 'Mixto Distrital en Área de Protección al Patrimonio Edificado',
+      coeficiente_ocupacion_suelo: '0.70',
+      coeficiente_utilizacion_suelo: '2.10',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Máximo 4 niveles (PPE — NG14)',
+      modo_edificacion: 'Variable',
+      superficie_minima: '320', frente_minimo: '16',
+      restriccion_frontal: 'Ver plano', restricciones_laterales: 'Ver plano', restriccion_posterior: 'Ver NG5',
+      indice_edificacion: '80', porcentaje_jardinado_restriccion_frontal: '20',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ PPE: Altura MÁXIMA 4 niveles (NG14). PDU ZPN-02/03/04 2023 §5.2.4.3.3. COS 0.70 CUS 2.10. Aplica para MD* en todos los distritos con PPE.',
+      uso_permitido: 'Habitacional Plurifamiliar V · Comercio Distrital · Servicios · Oficinas',
+      municipio_id: 120,
+    },
+    {
+      clave: 'MC-PPE',
+      descripcion_zona: 'Mixto Central en Área de Protección al Patrimonio Edificado',
+      coeficiente_ocupacion_suelo: '0.70',
+      coeficiente_utilizacion_suelo: '2.10',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Máximo 4 niveles (PPE — NG14)',
+      modo_edificacion: 'Variable',
+      superficie_minima: '320', frente_minimo: '16',
+      restriccion_frontal: 'Ver plano', restricciones_laterales: 'Ver plano', restriccion_posterior: 'Ver NG5',
+      indice_edificacion: '80', porcentaje_jardinado_restriccion_frontal: '20',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ PPE: Altura MÁXIMA 4 niveles (NG14). PDU ZPN-02/03/04 2023 §5.2.4.3.3. COS 0.70 CUS 2.10. Aplica para MC* en todos los distritos con PPE.',
+      uso_permitido: 'Habitacional Plurifamiliar V · Comercio Central · Servicios · Hotelería · Oficinas',
+      municipio_id: 120,
+    },
+
+    // MR-PPE — Mixto Regional con PPE (COS 0.70 para CS-R, diferente al MR estándar 0.80)
+    // Confirmado: ZPN-02, ZPN-04
+    {
+      clave: 'MR-PPE',
+      descripcion_zona: 'Mixto Regional en Área de Protección al Patrimonio Edificado',
+      coeficiente_ocupacion_suelo: '0.70',
+      coeficiente_utilizacion_suelo: '2.10',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS — sujeta a NG14',
+      modo_edificacion: 'Variable',
+      superficie_minima: '1500', frente_minimo: '30',
+      restriccion_frontal: '5', restricciones_laterales: 'Ver plano',
+      restriccion_posterior: '3 ml (12 ml si colinda MV-hab o equipamiento)',
+      indice_edificacion: '0', porcentaje_jardinado_restriccion_frontal: '20',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ USO HABITACIONAL PROHIBIDO. ⚠️ COS DIFERENTE a MR estándar: CS-R→COS 0.70 CUS 2.10 | IJ→COS 0.50 | SI→COS 0.70 CUS 6.00m³ | MFM→CUS 7.00m³. PDU ZPN-02/04 2023 §5.2.4.3.5 PPE. Altura sujeta a NG14. Nota [9]: superficie libre ≥30% verde.',
+      uso_permitido: 'CS-R · MFM · SI · IJ · I1 — NO habitacional',
+      municipio_id: 120,
+    },
+
+    // MD-APR — Mixto Distrital en Área con Potencial de Reciclamiento
+    {
+      clave: 'MD-APR',
+      descripcion_zona: 'Mixto Distrital en Área con Potencial de Reciclamiento',
+      coeficiente_ocupacion_suelo: '0.80',
+      coeficiente_utilizacion_suelo: '2.40',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante CUS÷COS (NG5)',
+      modo_edificacion: 'Variable',
+      superficie_minima: '320', frente_minimo: '16',
+      restriccion_frontal: '5', restricciones_laterales: 'Ver plano', restriccion_posterior: 'Ver NG5',
+      indice_edificacion: '80', porcentaje_jardinado_restriccion_frontal: '20',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: 'PDU ZPN-xx 2023. Mismos valores que MD estándar. Sujeto a Norma General 9 (APR). CUS 2.40/2.80opt/4.00MAX. Puede requerir ECPD para CUS optativo.',
+      uso_permitido: 'Habitacional Plurifamiliar V · Comercio Distrital · Servicios · Oficinas',
+      municipio_id: 120,
+    },
+
+    // TC — TURÍSTICO CAMPESTRE (ZPN-4 La Tuzania · ZPN-12 El Nixticuil)
+    // Fuente: PDU ZPN-04/12 2023 — Normas de Edificación pág. Resumen Zonas
+    {
+      clave: 'TC',
+      descripcion_zona: 'Turístico Campestre — uso exclusivamente turístico en zonas periféricas de baja densidad',
+      coeficiente_ocupacion_suelo: '0.25',
+      coeficiente_utilizacion_suelo: '0.50',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS',
+      modo_edificacion: 'Abierto',
+      superficie_minima: '1600', frente_minimo: '40',
+      restriccion_frontal: '10', restricciones_laterales: 'Ver norma', restriccion_posterior: 'Ver norma',
+      indice_edificacion: '1600', porcentaje_jardinado_restriccion_frontal: '80',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: 'PDU ZPN-04/12 2023. COS 0.25 — el más restrictivo de zonas edificables. CUS 0.50. Lote mín 1,600m², frente 40ml, ajard frontal 80%. Solo uso turístico campestre. Sin habitacional permanente, sin comercio ni industria.',
+      uso_permitido: 'Turístico Campestre — hotelería, cabañas, recreación',
+      municipio_id: 120,
+    },
+
+    // MVJ — MIXTO VECINAL JARDÍN (ZPN-9 Base Aérea El Bajío — zona exclusiva)
+    // Fuente: PDU ZPN-09 2023 — zona creada para áreas residenciales colindantes con Base Aérea Militar No. 5
+    {
+      clave: 'MVJ',
+      descripcion_zona: 'Mixto Vecinal Jardín — habitacional de muy baja densidad con alto porcentaje verde. Zona exclusiva ZPN-9.',
+      coeficiente_ocupacion_suelo: '0.20',
+      coeficiente_utilizacion_suelo: '0.40',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS — ⚠️ sujeta a restricción RI-AV por Base Aérea',
+      modo_edificacion: 'Abierto',
+      superficie_minima: '2500', frente_minimo: '50',
+      restriccion_frontal: '5', restricciones_laterales: '10', restriccion_posterior: '10',
+      indice_edificacion: '2500', porcentaje_jardinado_restriccion_frontal: '80',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ ZONA EXCLUSIVA ZPN-9 Base Aérea El Bajío. La más restrictiva del PDU Zapopan: COS=0.20, lote mín 2,500m², frente 50ml, RL 10ml, RP 10ml, ajard 80%. ⚠️ Restricciones RI-AV: altura máxima real puede ser menor al resultante COS/CUS según distancia a pistas 08-26 y 09-27. Solo uso habitacional jardín (HJ). Sin comercio ni industria.',
+      uso_permitido: 'HJ (Habitacional Jardín) · EV-V · EI-V (condicionados)',
+      municipio_id: 120,
+    },
+
+    // GH — GRANJAS Y HUERTOS (ZPN-12 El Nixticuil — zona exclusiva)
+    // Fuente: PDU ZPN-12 2023 — zona agroproductiva, lote más grande del PDU Zapopan
+    {
+      clave: 'GH',
+      descripcion_zona: 'Granjas y Huertos — uso agroproductivo de muy baja densidad. Zona exclusiva ZPN-12.',
+      coeficiente_ocupacion_suelo: '0.20',
+      coeficiente_utilizacion_suelo: '0.40',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS',
+      modo_edificacion: 'Abierto',
+      superficie_minima: '4000', frente_minimo: '40',
+      restriccion_frontal: '5', restricciones_laterales: '10', restriccion_posterior: '10',
+      indice_edificacion: '4000', porcentaje_jardinado_restriccion_frontal: '10',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ ZONA EXCLUSIVA ZPN-12 El Nixticuil. Lote mínimo más grande del PDU Zapopan: 4,000m². COS=0.20 CUS=0.40. Frente 40ml, RL 10ml, RP 10ml. Ajardinado 10% (orientado a producción agrícola, no jardinería decorativa). Solo usos agrícolas y pecuarios. Sin comercio, sin industria, sin habitacional permanente.',
+      uso_permitido: 'Granjas · Huertos · Usos agrícolas y pecuarios',
+      municipio_id: 120,
+    },
+
+    // CS-C* — COMERCIOS Y SERVICIOS CENTRAL CON PPE (varios ZPN con patrimonio edificado)
+    // Fuente: PDU Zapopan 2023 §5.2.4.3.4 — COS 0.40 vs 0.80 estándar
+    {
+      clave: 'CS-C*',
+      descripcion_zona: 'Comercios y Servicios Central en Área de Protección al Patrimonio Edificado',
+      coeficiente_ocupacion_suelo: '0.40',
+      coeficiente_utilizacion_suelo: '3.10',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS — sujeta a Dictamen de Imagen Urbana (NG14)',
+      modo_edificacion: 'Variable',
+      superficie_minima: '800', frente_minimo: '20',
+      restriccion_frontal: '5', restricciones_laterales: 'Ver plano', restriccion_posterior: '3',
+      indice_edificacion: '80', porcentaje_jardinado_restriccion_frontal: '20',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ PPE: COS 0.40 (reducido a la mitad vs CS-C estándar 0.80). CUS 3.10. Altura sujeta a Dictamen de Imagen Urbana (NG14). PDU Zapopan 2023. Lote mín 800m², frente 20ml. Aplica en zonas CS-C colindantes con patrimonio edificado.',
+      uso_permitido: 'Comercio Central · Servicios · Hotelería (con restricciones PPE)',
+      municipio_id: 120,
+    },
+  ],
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // VUJ_BD_LOCAL[98] — San Pedro Tlaquepaque
+  // Fuente: Plan de Desarrollo Urbano Municipal Tlaquepaque — Gaceta Municipal 2021 (1,674 págs)
+  // Sesión 06 jun 2026 — extraídas H3-U, H4-U, H4-H, H4-V, MB, MD, MC, MR
+  // HALLAZGO: TLQ NO remite al REZ para zonas mixtas — tiene CUS 3.20 propio (vs REZ 2.40)
+  // Confirmado: solo estas 8 zonas tienen normas propias; el resto usa la API VUJ directamente.
+  // TLA (munId 97) y TON (munId 101) remiten al REZ — BD local agregada con valores REZ estándar.
+  // ══════════════════════════════════════════════════════════════════════════
+  98: [
+    { clave:'H3-U', descripcion_zona:'Habitacional Unifamiliar Densidad Media — Tlaquepaque', coeficiente_ocupacion_suelo:'0.70', coeficiente_utilizacion_suelo:'1.40', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Semicerrado', superficie_minima:'120', frente_minimo:'8', restriccion_frontal:'3', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'120', porcentaje_jardinado_restriccion_frontal:'40', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'PDU San Pedro Tlaquepaque 2021. COS 0.70 CUS 1.40. Superficie mínima 120m². RF 3ml.', uso_permitido:'H3-U · EV-V · EI-V', municipio_id:98 },
+    { clave:'H4-U', descripcion_zona:'Habitacional Unifamiliar Densidad Alta — Tlaquepaque', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'1.60', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Cerrado/Semicerrado', superficie_minima:'90', frente_minimo:'6', restriccion_frontal:'2', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'90', porcentaje_jardinado_restriccion_frontal:'30', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'PDU San Pedro Tlaquepaque 2021. COS 0.80 CUS 1.60. Superficie mínima 90m². RF 2ml.', uso_permitido:'H4-U · EV-V · EI-V', municipio_id:98 },
+    { clave:'H4-H', descripcion_zona:'Habitacional Plurifamiliar Horizontal Densidad Alta — Tlaquepaque', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'1.60', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Cerrado/Semicerrado', superficie_minima:'120', frente_minimo:'8', restriccion_frontal:'2', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'90', porcentaje_jardinado_restriccion_frontal:'30', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'PDU San Pedro Tlaquepaque 2021. COS 0.80 CUS 1.60.', uso_permitido:'H4-H · EV-V · EI-V', municipio_id:98 },
+    { clave:'H4-V', descripcion_zona:'Habitacional Plurifamiliar Vertical Densidad Alta — Tlaquepaque', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'2.40', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Abierto', superficie_minima:'200', frente_minimo:'12', restriccion_frontal:'5', restricciones_laterales:'Ver plano', restriccion_posterior:'5', indice_edificacion:'90', porcentaje_jardinado_restriccion_frontal:'20', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'PDU San Pedro Tlaquepaque 2021. COS 0.80 CUS 2.40. RF 5ml. Modo abierto.', uso_permitido:'H4-V · EV-V · EI-V', municipio_id:98 },
+    { clave:'MB', descripcion_zona:'Mixto Barrial — Tlaquepaque', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'3.20', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'200', frente_minimo:'10', restriccion_frontal:'3', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'80', porcentaje_jardinado_restriccion_frontal:'20', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'⚠️ PDU San Pedro Tlaquepaque 2021. CUS 3.20 — PROPIO DE TLQ (≠ REZ 2.40 ≠ ZPN 2.40). COS 0.80.', uso_permitido:'Habitacional · Comercio Barrial · Servicios Barriales · Equipamiento', municipio_id:98 },
+    { clave:'MD', descripcion_zona:'Mixto Distrital — Tlaquepaque', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'3.20', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'200', frente_minimo:'10', restriccion_frontal:'3', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'80', porcentaje_jardinado_restriccion_frontal:'20', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'⚠️ PDU San Pedro Tlaquepaque 2021. CUS 3.20 — PROPIO DE TLQ. COS 0.80.', uso_permitido:'Habitacional · Comercio Distrital · Servicios · Oficinas', municipio_id:98 },
+    { clave:'MC', descripcion_zona:'Mixto Central — Tlaquepaque', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'3.20', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'200', frente_minimo:'10', restriccion_frontal:'3', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'80', porcentaje_jardinado_restriccion_frontal:'20', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'⚠️ PDU San Pedro Tlaquepaque 2021. CUS 3.20 — PROPIO DE TLQ. COS 0.80.', uso_permitido:'Habitacional · Comercio Central · Servicios · Hotelería · Oficinas', municipio_id:98 },
+    { clave:'MR', descripcion_zona:'Mixto Regional — Tlaquepaque. USO HABITACIONAL PROHIBIDO.', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'3.20', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'500', frente_minimo:'20', restriccion_frontal:'5', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'0', porcentaje_jardinado_restriccion_frontal:'20', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'⚠️ PDU San Pedro Tlaquepaque 2021. USO HABITACIONAL PROHIBIDO. CUS 3.20 — PROPIO DE TLQ. COS 0.80.', uso_permitido:'CS-R · I1/I2/I3 · SI — NO habitacional', municipio_id:98 },
+  ],
+  // VUJ_BD_LOCAL[97] — Tlajomulco de Zúñiga
+  // Fuente: Reglamento de Zonificación del Municipio de Tlajomulco de Zúñiga
+  //         Aprobado y publicado 21 Nov 2014 · Cuadro Resumen pág. 115
+  //         Columnas: COS | CUS | RestF | RestL | RestP — valores OFICIALES municipales
+  //         RestL=S/P = según proyecto · RestL=N/A = sin restricción lateral definida
+  //         CUS=0 en industriales = el reglamento no define CUS para esas zonas (rige COS)
+  97: [
+    { clave:'H1-U', descripcion_zona:'Habitacional Jardín Unifamiliar — Tlajomulco', coeficiente_ocupacion_suelo:'0.40', coeficiente_utilizacion_suelo:'0.80', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Abierto', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'5', restricciones_laterales:'2.5', restriccion_posterior:'3', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115', uso_permitido:'H1-U', municipio_id:97 },
+    { clave:'H1-H', descripcion_zona:'Habitacional Jardín Plurifamiliar Horizontal — Tlajomulco', coeficiente_ocupacion_suelo:'0.40', coeficiente_utilizacion_suelo:'0.80', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Abierto', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'5', restricciones_laterales:'2.5', restriccion_posterior:'3', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115', uso_permitido:'H1-H', municipio_id:97 },
+    { clave:'H1-V', descripcion_zona:'Habitacional Jardín Plurifamiliar Vertical — Tlajomulco', coeficiente_ocupacion_suelo:'0.40', coeficiente_utilizacion_suelo:'1.60', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Abierto', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'5', restricciones_laterales:'2.5', restriccion_posterior:'3', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115', uso_permitido:'H1-V', municipio_id:97 },
+    { clave:'H2-U', descripcion_zona:'Habitacional Unifamiliar Densidad Baja — Tlajomulco', coeficiente_ocupacion_suelo:'0.60', coeficiente_utilizacion_suelo:'1.20', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Semicerrado', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'5', restricciones_laterales:'S/P', restriccion_posterior:'3', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · RestL=S según proyecto', uso_permitido:'H2-U', municipio_id:97 },
+    { clave:'H2-H', descripcion_zona:'Habitacional Plurifamiliar Horizontal Densidad Baja — Tlajomulco', coeficiente_ocupacion_suelo:'0.60', coeficiente_utilizacion_suelo:'1.20', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Semicerrado', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'5', restricciones_laterales:'S/P', restriccion_posterior:'3', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · RestL=S según proyecto', uso_permitido:'H2-H', municipio_id:97 },
+    { clave:'H2-V', descripcion_zona:'Habitacional Plurifamiliar Vertical Densidad Baja — Tlajomulco', coeficiente_ocupacion_suelo:'0.60', coeficiente_utilizacion_suelo:'2.40', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Abierto', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'5', restricciones_laterales:'S/P', restriccion_posterior:'3', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · RestL=S según proyecto', uso_permitido:'H2-V', municipio_id:97 },
+    { clave:'H3-U', descripcion_zona:'Habitacional Unifamiliar Densidad Media — Tlajomulco', coeficiente_ocupacion_suelo:'0.70', coeficiente_utilizacion_suelo:'1.40', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Semicerrado', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'3', restricciones_laterales:'S/P', restriccion_posterior:'3', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · RestL=S según proyecto', uso_permitido:'H3-U', municipio_id:97 },
+    { clave:'H3-H', descripcion_zona:'Habitacional Plurifamiliar Horizontal Densidad Media — Tlajomulco', coeficiente_ocupacion_suelo:'0.70', coeficiente_utilizacion_suelo:'1.40', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Semicerrado', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'3', restricciones_laterales:'S/P', restriccion_posterior:'3', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · RestL=S según proyecto', uso_permitido:'H3-H', municipio_id:97 },
+    { clave:'H3-V', descripcion_zona:'Habitacional Plurifamiliar Vertical Densidad Media — Tlajomulco', coeficiente_ocupacion_suelo:'0.70', coeficiente_utilizacion_suelo:'2.80', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Abierto', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'3', restricciones_laterales:'S/P', restriccion_posterior:'3', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · RestL=S según proyecto', uso_permitido:'H3-V', municipio_id:97 },
+    { clave:'H4-U', descripcion_zona:'Habitacional Unifamiliar Densidad Alta — Tlajomulco', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'1.60', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Cerrado', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'2', restricciones_laterales:'S/P', restriccion_posterior:'3', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · RestL=S según proyecto', uso_permitido:'H4-U', municipio_id:97 },
+    { clave:'H4-H', descripcion_zona:'Habitacional Plurifamiliar Horizontal Densidad Alta — Tlajomulco', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'1.60', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Cerrado', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'2', restricciones_laterales:'S/P', restriccion_posterior:'3', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · RestL=S según proyecto', uso_permitido:'H4-H', municipio_id:97 },
+    { clave:'H4-V', descripcion_zona:'Habitacional Plurifamiliar Vertical Densidad Alta — Tlajomulco', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'3.20', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Abierto', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'2', restricciones_laterales:'S/P', restriccion_posterior:'3', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · RestL=S según proyecto', uso_permitido:'H4-V', municipio_id:97 },
+    { clave:'CS-V', descripcion_zona:'Comercio y Servicios Vecinal — Tlajomulco', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'2.40', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'5', restricciones_laterales:'N/A', restriccion_posterior:'3', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · RestL=— sin restricción lateral', uso_permitido:'Comercio y Servicios Vecinal', municipio_id:97 },
+    { clave:'CS-B', descripcion_zona:'Comercio y Servicios Barrial — Tlajomulco', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'3.20', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'5', restricciones_laterales:'N/A', restriccion_posterior:'3', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · RestL=— sin restricción lateral', uso_permitido:'Comercio y Servicios Barrial', municipio_id:97 },
+    { clave:'CS-D', descripcion_zona:'Comercio y Servicios Distrital — Tlajomulco', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'5.60', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'5', restricciones_laterales:'N/A', restriccion_posterior:'3', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · RestL=— sin restricción lateral', uso_permitido:'Comercio y Servicios Distrital', municipio_id:97 },
+    { clave:'CS-C', descripcion_zona:'Comercio y Servicios Central — Tlajomulco', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'5.60', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'5', restricciones_laterales:'N/A', restriccion_posterior:'3', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · RestL=— sin restricción lateral', uso_permitido:'Comercio y Servicios Central', municipio_id:97 },
+    { clave:'CS-R', descripcion_zona:'Comercio y Servicios Regional — Tlajomulco', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'5.60', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'5', restricciones_laterales:'N/A', restriccion_posterior:'0', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · RestL=— · RestP=0 sin restricción posterior', uso_permitido:'Comercio y Servicios Regional', municipio_id:97 },
+    { clave:'I-1', descripcion_zona:'Industrial Bajo Impacto — Tlajomulco', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'0', icos:'0', icus:'0', altura_maxima_edificacion:'Ver Reglamento TLA', modo_edificacion:'Abierto', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'5', restricciones_laterales:'N/A', restriccion_posterior:'H**', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · CUS=— no aplica · RestP=H** alineamiento con habitacional vecino', uso_permitido:'Industrial Bajo Impacto', municipio_id:97 },
+    { clave:'I-2', descripcion_zona:'Industrial Mediano Impacto — Tlajomulco', coeficiente_ocupacion_suelo:'0.70', coeficiente_utilizacion_suelo:'0', icos:'0', icus:'0', altura_maxima_edificacion:'Ver Reglamento TLA', modo_edificacion:'Abierto', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'5', restricciones_laterales:'N/A', restriccion_posterior:'H**', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · CUS=— no aplica · RestP=H** alineamiento con habitacional vecino', uso_permitido:'Industrial Mediano Impacto', municipio_id:97 },
+    { clave:'I-3', descripcion_zona:'Industrial Alto Impacto — Tlajomulco', coeficiente_ocupacion_suelo:'0.70', coeficiente_utilizacion_suelo:'0', icos:'0', icus:'0', altura_maxima_edificacion:'Ver Reglamento TLA', modo_edificacion:'Abierto', superficie_minima:'Ver Reglamento TLA', frente_minimo:'Ver Reglamento TLA', restriccion_frontal:'5', restricciones_laterales:'N/A', restriccion_posterior:'H**', indice_edificacion:'Ver Reglamento TLA', porcentaje_jardinado_restriccion_frontal:'Ver Reglamento TLA', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Reglamento Zonificación TLA 2014 · pág.115 · CUS=— no aplica · RestP=H** alineamiento con habitacional vecino', uso_permitido:'Industrial Alto Impacto', municipio_id:97 },
+  ],
+  // VUJ_BD_LOCAL[101] — Tonalá
+  // Fuente: Reglamento Estatal de Zonificación (REZ) Jalisco — Cuadros 45/46
+  // Sesión jun 2026 — TON remite al REZ para todo (PDU TON-07 "Loma Dorada" confirmado)
+  // Se usan valores REZ estándar como fallback cuando el API VUJ no responde.
+  101: [
+    { clave:'H1-U', descripcion_zona:'Habitacional Jardín / Densidad Mínima — Tonalá (REZ)', coeficiente_ocupacion_suelo:'0.30', coeficiente_utilizacion_suelo:'0.60', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Abierto', superficie_minima:'2000', frente_minimo:'20', restriccion_frontal:'5', restricciones_laterales:'2.5', restriccion_posterior:'3', indice_edificacion:'30', porcentaje_jardinado_restriccion_frontal:'70', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Valores REZ estándar Jalisco. Confirmar con Dirección de Obras TON.', uso_permitido:'Habitacional jardín · EV-V', municipio_id:101 },
+    { clave:'H2-U', descripcion_zona:'Habitacional Unifamiliar Densidad Baja — Tonalá (REZ)', coeficiente_ocupacion_suelo:'0.50', coeficiente_utilizacion_suelo:'1.00', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Abierto/Semicerrado', superficie_minima:'400', frente_minimo:'15', restriccion_frontal:'5', restricciones_laterales:'2', restriccion_posterior:'3', indice_edificacion:'50', porcentaje_jardinado_restriccion_frontal:'60', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Valores REZ estándar Jalisco. Confirmar con Dirección de Obras TON.', uso_permitido:'H2-U · EV-V · EI-V', municipio_id:101 },
+    { clave:'H3-U', descripcion_zona:'Habitacional Unifamiliar Densidad Media — Tonalá (REZ)', coeficiente_ocupacion_suelo:'0.70', coeficiente_utilizacion_suelo:'1.40', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Semicerrado', superficie_minima:'120', frente_minimo:'8', restriccion_frontal:'3', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'120', porcentaje_jardinado_restriccion_frontal:'40', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Valores REZ estándar Jalisco. Confirmar con Dirección de Obras TON.', uso_permitido:'H3-U · EV-V · EI-V', municipio_id:101 },
+    { clave:'H4-U', descripcion_zona:'Habitacional Unifamiliar Densidad Alta — Tonalá (REZ)', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'1.60', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Cerrado/Semicerrado', superficie_minima:'90', frente_minimo:'6', restriccion_frontal:'2', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'90', porcentaje_jardinado_restriccion_frontal:'30', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Valores REZ estándar Jalisco. PDU TON-07 identifica múltiples polígonos H4.', uso_permitido:'H4-U · EV-V · EI-V', municipio_id:101 },
+    { clave:'H4',   descripcion_zona:'Habitacional Densidad Alta — Tonalá (REZ)', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'1.60', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Cerrado/Semicerrado', superficie_minima:'90', frente_minimo:'6', restriccion_frontal:'2', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'90', porcentaje_jardinado_restriccion_frontal:'30', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Valores REZ estándar Jalisco. Clave genérica H4 usada en PDU TON-07 "Loma Dorada".', uso_permitido:'H4 · EV-V · EI-V', municipio_id:101 },
+    { clave:'H4-H', descripcion_zona:'Habitacional Plurifamiliar Horizontal Densidad Alta — Tonalá (REZ)', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'1.60', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Cerrado/Semicerrado', superficie_minima:'120', frente_minimo:'8', restriccion_frontal:'2', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'90', porcentaje_jardinado_restriccion_frontal:'30', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Valores REZ estándar Jalisco. Confirmar con Dirección de Obras TON.', uso_permitido:'H4-H · EV-V · EI-V', municipio_id:101 },
+    { clave:'H4-V', descripcion_zona:'Habitacional Plurifamiliar Vertical Densidad Alta — Tonalá (REZ)', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'2.40', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Abierto', superficie_minima:'200', frente_minimo:'12', restriccion_frontal:'5', restricciones_laterales:'Ver plano', restriccion_posterior:'5', indice_edificacion:'90', porcentaje_jardinado_restriccion_frontal:'20', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Valores REZ estándar Jalisco. Confirmar con Dirección de Obras TON.', uso_permitido:'H4-V · EV-V · EI-V', municipio_id:101 },
+    { clave:'MB', descripcion_zona:'Mixto Barrial — Tonalá (REZ)', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'2.40', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'200', frente_minimo:'10', restriccion_frontal:'3', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'80', porcentaje_jardinado_restriccion_frontal:'20', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Valores REZ estándar Jalisco. PDU TON-07 identifica zonas MB. CUS 2.40.', uso_permitido:'Habitacional · Comercio Barrial · Servicios Barriales · Equipamiento', municipio_id:101 },
+    { clave:'MD', descripcion_zona:'Mixto Distrital — Tonalá (REZ)', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'2.40', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'200', frente_minimo:'10', restriccion_frontal:'3', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'80', porcentaje_jardinado_restriccion_frontal:'20', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Valores REZ estándar Jalisco. CUS 2.40. Confirmar con Dirección de Obras TON.', uso_permitido:'Habitacional · Comercio Distrital · Servicios · Oficinas', municipio_id:101 },
+    { clave:'MC', descripcion_zona:'Mixto Central — Tonalá (REZ)', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'3.20', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'200', frente_minimo:'10', restriccion_frontal:'3', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'80', porcentaje_jardinado_restriccion_frontal:'20', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Valores REZ estándar Jalisco. PDU TON-07 identifica zonas MC. CUS 3.20.', uso_permitido:'Habitacional · Comercio Central · Servicios · Hotelería', municipio_id:101 },
+    { clave:'MR', descripcion_zona:'Mixto Regional — Tonalá (REZ)', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'3.20', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'500', frente_minimo:'20', restriccion_frontal:'5', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'0', porcentaje_jardinado_restriccion_frontal:'20', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'Valores REZ estándar Jalisco. USO HABITACIONAL RESTRINGIDO. Confirmar con Dirección de Obras TON.', uso_permitido:'CS · I1/I2 · SI — habitacional restringido', municipio_id:101 },
+  ],
+};
+const VUJ_BD_FECHA = '2023-PDU-ZPN01a12-Zapopan-v60 | 2021-PDU-TLQ-v1 | 2014-RegZon-TLA-REAL | 2026-PDU-TON-REZ';
+
+// Consulta WFS al Visor Jalisco con timeout y fallback a BD local
+async function vujWfs(typename, cqlFilter, count=1){
+  const url=`${VUJ}?service=WFS&request=GetFeature&version=2.0.0`
+    +`&typename=${typename}&count=${count}&outputFormat=application/json`
+    +(cqlFilter?`&cql_filter=${encodeURIComponent(cqlFilter)}`:'');
+
+  // Timeout de 8 segundos
+  const controller = new AbortController();
+  const timeout = setTimeout(()=>controller.abort(), 8000);
+
+  try{
+    const r=await fetch(url, {signal: controller.signal});
+    clearTimeout(timeout);
+    const d=await r.json();
+    return d.features||[];
+  }catch(e){
+    clearTimeout(timeout);
+    // Si falla por timeout o conexión → intentar BD local
+    if(typename==='VUJ:normacontroledificacion' && cqlFilter){
+      return vujBDLocalNormas(cqlFilter);
+    }
+    return [];
+  }
+}
+
+// Búsqueda en BD local — PDU ZPN-01 2023
+// Estrategia: exacto → prefijo (MD-4 → MD) → substring
+
+
+function vujBDLocalNormas(cqlFilter){
+  const munMatch   = cqlFilter.match(/municipio_id=(\d+)/);
+  const claveMatch = cqlFilter.match(/clave LIKE '%(.+?)%'/);
+  if(!munMatch||!claveMatch) return [];
+  const munId  = parseInt(munMatch[1]);
+  const filtro = claveMatch[1].toUpperCase().trim();
+  const normas = VUJ_BD_LOCAL[munId]||[];
+  if(!normas.length) return [];
+
+  // Normalizar: quitar paréntesis, espacios, asterisco final
+  const norm = c => c.toUpperCase().replace(/\s*\(.*?\)/g,'').replace(/\*$/,'').trim();
+  const fN = norm(filtro);
+
+  // 1. Exacto
+  let e = normas.find(n => norm(n.clave||'') === fN);
+  // 2. Prefijo: filtro "MD-4" → BD "MD"
+  if(!e) e = normas.find(n => { const cn=norm(n.clave||''); return fN.startsWith(cn) || cn.startsWith(fN); });
+  // 3. Substring
+  if(!e) e = normas.find(n => { const cn=norm(n.clave||'').toLowerCase(); const f=fN.toLowerCase(); return cn.includes(f)||f.includes(cn); });
+  if(!e) return [];
+
+  const p = Object.assign({}, e);
+  if(norm(e.clave||'') !== fN)
+    p.observaciones = (p.observaciones||'') + ` [BD LOCAL: "${filtro}" → "${e.clave}" PDU ZPN-01 2023]`;
+  return [{properties: p}];
+}
+
+async function wms(lat,lng,ws,layer,count=5,delta=0.003){
+  const bbox=`${lng-delta},${lat-delta},${lng+delta},${lat+delta}`;
+  const url=`${GS}/${ws}/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&LAYERS=${layer}&QUERY_LAYERS=${layer}&INFO_FORMAT=application/json&FEATURE_COUNT=${count}&SRS=EPSG:4326&WIDTH=101&HEIGHT=101&BBOX=${bbox}&X=50&Y=50`;
+  try{const r=await fetch(url,{headers:HDRS});const d=await r.json();return d.features||[];}
+  catch(e){return [];}
+}
+
+// Consulta de zonificación con BBOX adaptativo:
+// Primero intenta con BBOX pequeño (~30m) para capturar solo el polígono exacto.
+// Si no devuelve nada, amplía a 0.003 (~300m) como respaldo.
+async function wmsZonificacion(lat,lng){
+  // Intento 1: BBOX de ~30 metros — solo el polígono que contiene el punto exacto
+  const d1 = await wms(lat,lng,'vu2','ZonificacionSecundaria',3,0.0003);
+  if(d1.length) return d1;
+
+  // Intento 2: BBOX de ~80 metros
+  const d2 = await wms(lat,lng,'vu2','ZonificacionSecundaria',3,0.0008);
+  if(d2.length) return d2;
+
+  // Intento 3: BBOX de ~300 metros (respaldo)
+  return await wms(lat,lng,'vu2','ZonificacionSecundaria',5,0.003);
+}
+
+// ══════════════════════════════════════════════════
+// PATRIMONIO VUJ — Detección por proximidad y colonia
+// El API Visor Jalisco no expone capas patrimoniales.
+// El geoportal INAH no está accesible desde el browser.
+// Estrategia: radio generoso + colonia como trigger.
+// ══════════════════════════════════════════════════
+
+
+function detectarPatrimonioVUJ(lat, lng, municipio, colonia){
+  const dist = (lat1,lng1,lat2,lng2) =>
+    Math.sqrt((lat1-lat2)**2+(lng1-lng2)**2)*111000;
+
+  // Verificar si la colonia indica zona central
+  const colLower = (colonia||'').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const esCentro = colLower.includes('centro') ||
+                   colLower.includes('downtown') ||
+                   colLower.includes('historico');
+
+  const zonas = {
+    zapopan: [{
+      nombre: 'Zona de Monumentos Históricos — Centro de Zapopan',
+      lat: 20.7213, lng: -103.3923,
+      radio: 1200, // ~12 manzanas alrededor de la Basílica
+      clasificacion: 'Zona de Monumentos Históricos — Decreto Federal INAH',
+      nota: 'El entorno de la Basílica de Zapopan está sujeto a decreto federal de zona de monumentos. Consultar INAH Centro Jalisco antes de cualquier obra.',
+      colonias: ['centro zapopan','centro de zapopan','zapopan centro','villa de zapopan'],
+    }],
+    tlaquepaque: [{
+      nombre: 'Zona Patrimonial — Centro Artesanal de Tlaquepaque',
+      lat: 20.6418, lng: -103.3124,
+      radio: 700,
+      clasificacion: 'Zona de valor patrimonial — PDU San Pedro Tlaquepaque',
+      nota: 'El Centro de Tlaquepaque tiene valor patrimonial reconocido. Verificar con la Dirección de Obras y Ordenamiento Territorial del municipio.',
+      colonias: ['centro','tlaquepaque centro','centro tlaquepaque'],
+    }],
+    tonala: [{
+      nombre: 'Zona Patrimonial — Centro Artesanal de Tonalá',
+      lat: 20.6242, lng: -103.2347,
+      radio: 700,
+      clasificacion: 'Zona de valor patrimonial — PDU Tonalá',
+      nota: 'El Centro de Tonalá tiene valor patrimonial reconocido. Verificar con la Dirección de Obras y Ordenamiento Territorial del municipio.',
+      colonias: ['centro','tonala centro','centro tonala','centro de tonala'],
+    }],
+    tlajomulco: [],
+  };
+
+  const zonasMun = zonas[municipio]||[];
+  for(const z of zonasMun){
+    const d = dist(lat, lng, z.lat, z.lng);
+    // Activar si está dentro del radio O si la colonia es centro
+    const porRadio   = d <= z.radio;
+    const porColonia = esCentro ||
+      z.colonias.some(c => colLower.includes(c));
+
+    if(porRadio || porColonia){
+      return {
+        clasificacion: z.clasificacion,
+        zona: z.nombre,
+        nota: z.nota,
+        distancia: Math.round(d),
+        fuente: 'proximidad-vuj',
+        esAproximado: true,
+        trigger: porColonia && !porRadio ? 'colonia' : 'radio',
+      };
+    }
+  }
+  return null;
+}
+
+// ══════════════════════════════════════════════════
+// CONSULTA ARCGIS ZAPOPAN — fuente oficial directa
+// mapa.zapopan.gob.mx — capa Utilización de Suelo
+// Devuelve clave exacta del polígono (MV3, MV3-PPE, MV4, MB, etc.)
+// ══════════════════════════════════════════════════
+// Construye el objeto resultado directamente desde la BD local (sin VUJ)
+function construirResultadoBDLocal(b, clave, lat, lng, fuente){
+  const parseNum = v => { if(!v||v==='*') return 0; return parseFloat(String(v).replace(',','.'))||0; };
+  const parseCus = v => { if(!v||v==='*') return 0; const m = String(v).replace(',','.').match(/^[\s]*([\d.]+)/); return m ? parseFloat(m[1])||0 : 0; };
+  const splitUsos = s => s ? s.split(/[·\|]/).map(u=>u.trim().replace(/\(condicionado\)/i,'').trim()).filter(Boolean) : [];
+  const usosStr  = b.uso_permitido||'';
+  const perStr   = usosStr.replace(/[^·|\w\-\s,]/g,'');
+  const condStr  = b.uso_condicionado||'';
+  return {
+    clave,
+    uso:   clave,
+    _clave_bd: clave,
+    ppp:   b.descripcion_zona||'',
+    zona:  `BD local / ${clave}`,
+    cos:   parseNum(b.coeficiente_ocupacion_suelo),
+    cus:   parseCus(b.coeficiente_utilizacion_suelo),
+    cus_opt: parseNum(b.cus_opt)||0,
+    cus_max: b.cus_max||'',
+    icos:  parseNum(b.icos)||0,
+    icus:  parseNum(b.icus)||0,
+    alt_max: b.altura_maxima_edificacion||'',
+    modo:  b.modo_edificacion||'',
+    mod_viv: b.modo_edificacion||'',
+    sup_min: b.superficie_minima||'',
+    fre_min: b.frente_minimo||'',
+    rest_f1: b.restriccion_frontal||'',
+    rest_l1: b.restricciones_laterales||'',
+    rest_p1: b.restriccion_posterior||'',
+    jar:   b.porcentaje_jardinado_restriccion_frontal||'',
+    pdc:   'No aplica',
+    dis1:  '—', dis2:'', sub1:'—', sub2:'',
+    uso_per: b.uso_permitido||'',
+    uso_con: b.uso_condicionado||'',
+    _coefs_por_uso: b.coefs_por_uso||{},
+    _observaciones: b.observaciones||'',
+    _fuente_normas: fuente,
+    lat, lng,
+  };
+}
+
+async function consultarArcGISZapopan(lat, lng){
+  try{
+    const base = 'https://mapa.zapopan.gob.mx/arcgis/rest/services/PPDU/PPDU_estrategias/MapServer/identify';
+    const params = new URLSearchParams({
+      geometry: JSON.stringify({x: lng, y: lat}),
+      geometryType: 'esriGeometryPoint',
+      layers: 'all',
+      tolerance: '2',
+      mapExtent: `${lng-0.001},${lat-0.001},${lng+0.001},${lat+0.001}`,
+      imageDisplay: '800,600,96',
+      returnGeometry: 'false',
+      f: 'json'
+    });
+    const r = await fetch(`${base}?${params}`, {signal: AbortSignal.timeout(6000)});
+    if(!r.ok) return null;
+    const data = await r.json();
+    const resultados = data.results||[];
+    // Buscar la capa de Utilización de Suelo
+    const uso = resultados.find(r =>
+      (r.layerName||'').toLowerCase().includes('utiliz') ||
+      (r.layerName||'').toLowerCase().includes('zonif') ||
+      (r.attributes && r.attributes.CLAVE)
+    );
+    if(!uso) return null;
+    const clave = uso.attributes?.CLAVE || uso.attributes?.clave ||
+                  uso.attributes?.USO   || uso.attributes?.uso   || null;
+    if(!clave) return null;
+    // Normalizar asterisco: "MV2*H" → "MV2-H", "MV4*PPE" → "MV4-PPE"
+    return clave.trim().toUpperCase().replace(/\*/g, '-');
+  }catch(e){
+    return null; // Silencioso — cae en fallback VUJ
+  }
+}
+
+// ══════════════════════════════════════════════════
+// CONSULTA VISOR JALISCO — normaliza datos al mismo
+// formato que Guadalajara para renderizar igual
+// ══════════════════════════════════════════════════
+async function consultarVisorJalisco(lat, lng, munId){
+  let claveArcGIS = null; // declarar al nivel de función
+
+  // ══════════════════════════════════════════════════════════════════
+  // ZAPOPAN: flujo ArcGIS → BD local → VUJ (último recurso)
+  // ══════════════════════════════════════════════════════════════════
+  if(munId === 120){
+    // 1. ArcGIS Zapopan — clave exacta del polígono
+    const claveArcGIS = await consultarArcGISZapopan(lat, lng);
+    if(claveArcGIS){
+      // 2a. BD local con clave ArcGIS exacta
+      const bdRes = vujBDLocalNormas(`municipio_id=120 AND clave LIKE '%${claveArcGIS}%'`);
+      if(bdRes.length) return construirResultadoBDLocal(bdRes[0].properties, claveArcGIS, lat, lng, 'arcgis+bd-local');
+      // 2b. BD local con clave base (MV3-PPE → MV3)
+      // MV2-H → claveBase = 'MV2', busca en BD como MV2
+      const claveBase = claveArcGIS.split('-')[0];
+      const bdRes2 = vujBDLocalNormas(`municipio_id=120 AND clave LIKE '%${claveBase}%'`);
+      if(bdRes2.length) return construirResultadoBDLocal(bdRes2[0].properties, claveArcGIS, lat, lng, 'arcgis+bd-local-approx');
+    }
+    // ArcGIS falló (CORS) — intentar BD local sin clave exacta usando VUJ para obtener clave
+    // El VUJ se usa, luego se cruza con BD local
+  }
+
+  // ── OTROS MUNICIPIOS (y Zapopan sin ArcGIS/BD) — usa VUJ ──────────
+  // Convertir coordenadas a UTM Zone 14N
+  const utm = wgs84ToUtm14N(lat, lng);
+
+  // 1. Obtener zonificación usando polígono real del predio (mismo método que VUJ oficial)
+  // Paso A: obtener polígono catastral del predio
+  // Paso B: INTERSECTS con ese polígono → devuelve exactamente las mismas zonas que el VUJ
+  let _todasZonas = [];
+  if(!_zonaVUJForzada){
+    const _predios = await vujWfs('VUJ:predios',
+      `CONTAINS(geom,POINT(${utm.x} ${utm.y}))`, 1);
+    if(_predios.length && _predios[0].geometry){
+      const _coords = _predios[0].geometry.coordinates[0];
+      const _wkt = 'POLYGON((' + _coords.map(c=>c[0]+' '+c[1]).join(',') + '))';
+      _todasZonas = await vujWfs('VUJ:zonificaciondesarrollourbano32613',
+        `INTERSECTS(geom,${_wkt})`, 10);
+    }
+    // Fallback si no hay polígono catastral
+    if(!_todasZonas.length){
+      _todasZonas = await vujWfs('VUJ:zonificaciondesarrollourbano32613',
+        `CONTAINS(geom,POINT(${utm.x} ${utm.y}))`, 10);
+    }
+  } else {
+    _todasZonas = zonasVUJ;
+  }
+  if(!_zonaVUJForzada && !_todasZonas.length) throw new Error('No se encontró zonificación para esta ubicación.');
+
+  // Filtrar vialidades/verde/infraestructura + deduplicar por clave base
+  // Solo excluir infraestructura vial/de paso que nunca es zonificación de un predio
+  // EV- NO se excluye — puede ser la zonificación real (parque, área verde)
+  const _CLAVES_EXCLUIR = /^(EI-Bp|RI-FR|VC$|VA$|VL$|RI-VL)/i;
+  const _filtradas = _zonaVUJForzada ? _todasZonas : _todasZonas.filter(z => {
+    const cs = (z.properties?.clave_de_clasificacion_de_zona_secundaria||'').trim();
+    const cp = (z.properties?.clave_de_clasificacion_de_zona_primaria||'').trim();
+    return !_CLAVES_EXCLUIR.test(cs||cp||'');
+  });
+  // Deduplicar por ÁREA+CLAVE — eliminar duplicados exactos (mismo AU-RN/H4-U)
+  // pero mantener combinaciones distintas (AU-RN/H4-U vs CA/EV-V son diferentes)
+  const _combinacionesVistas = new Set();
+  const _zonasRelevantes = _filtradas.filter(z => {
+    const area = (z.properties?.clave_de_clasificacion_de_area_primaria||'').trim();
+    const cs   = (z.properties?.clave_de_clasificacion_de_zona_secundaria||'').trim();
+    const cp   = (z.properties?.clave_de_clasificacion_de_zona_primaria||'').trim();
+    const key  = (area||'') + '/' + (cs||cp||'');
+    if(_combinacionesVistas.has(key)) return false;
+    _combinacionesVistas.add(key);
+    return true;
+  });
+
+
+  // Si el usuario hizo clic en un badge, reordenar sin re-consultar
+  if(_zonaVUJForzada){
+    const forzadaIdx = zonasVUJ.indexOf(_zonaVUJForzada);
+    if(forzadaIdx > 0) zonasVUJ = [_zonaVUJForzada, ...zonasVUJ.filter((_,i)=>i!==forzadaIdx)];
+    else if(forzadaIdx < 0) zonasVUJ = [_zonaVUJForzada, ...zonasVUJ];
+  } else {
+    zonasVUJ = _zonasRelevantes.length ? _zonasRelevantes : _todasZonas.slice(0,1);
+  }
+
+  // Usar la primera zona activa
+  const _zonaActiva = zonasVUJ[0] || _todasZonas[0];
+  const z = _zonaActiva.properties;
+  const claveZonif = z.clave_de_zonificacion||'';
+  // Extraer clave base — priorizar campos directos antes de parsear claveZonif
+  // "AU-RN / MC / (132)" → el número final queda en la última parte, MC en la penúltima
+  const _claveSecundaria = (z.clave_de_clasificacion_de_zona_secundaria||'').trim();
+  const _clavePrimaria   = (z.clave_de_clasificacion_de_zona_primaria||'').trim();
+  let claveBase;
+  if(_claveSecundaria){
+    // Campo directo disponible — usar directamente (ej: "MC", "H4-U")
+    claveBase = _claveSecundaria;
+  } else if(_clavePrimaria){
+    claveBase = _clavePrimaria;
+  } else {
+    // Fallback: parsear claveZonif — eliminar segmento numérico "(132)" y tomar última clave
+    // "AU-RN / MC / (132)" → partes sin paréntesis: ["AU-RN","MC",""] → último no vacío
+    const partes = claveZonif.split('/').map(p => p.replace(/\(\d+\*?\)/g,'').trim()).filter(Boolean);
+    claveBase = partes[partes.length-1] || '';
+  }
+
+  // 2. Obtener normas de control
+  const normas = await vujWfs(
+    'VUJ:normacontroledificacion',
+    `municipio_id=${munId} AND clave LIKE '%${claveBase}%'`,
+    1
+  );
+  const n = normas[0]?.properties || {};
+
+  // 3. Normalizar al formato de Guadalajara
+  // El VUJ usa coma decimal europea: "1,6" = 1.6, "0,80" = 0.80
+  const parseNum = v => {
+    if(!v || v==='*' || v==='**') return 0;
+    // Reemplazar coma decimal europea → punto, luego extraer primer número
+    const clean = String(v).replace(',','.').replace(/[^\d.]/g,'');
+    return parseFloat(clean)||0;
+  };
+  // Para CUS que puede tener "2.4 base, 2.8 máximo" — tomar el primer número
+  const parseCus = v => {
+    if(!v || v==='*' || v==='**') return 0;
+    const s = String(v).replace(',','.');
+    const m = s.match(/^[\s]*([\d.]+)/);
+    return m ? parseFloat(m[1])||0 : 0;
+  };
+
+  // Para municipios distintos a Zapopan (munId≠120), los coeficientes vienen
+  // directamente de la capa de zonificación (z.*) — la tabla normacontroledificacion
+  // WFS puede tener valores distintos a la ficha técnica oficial del VUJ.
+  // Para Zapopan se usan las normas WFS + BD local PDU ZPN-01.
+  let cos, cus, icos=0, icus=0;
+  if(munId !== 120){
+    // Tlaquepaque, Tlajomulco, Tonalá: coefs desde la ficha de zonificación
+    cos  = parseNum(z.coeficiente_de_ocupacion_del_suelo || n.coeficiente_ocupacion_suelo);
+    cus  = parseCus(z.coeficiente_de_utilizacion_del_suelo || n.coeficiente_utilizacion_suelo);
+  } else {
+    // Zapopan: coefs desde tabla normacontroledificacion WFS
+    cos  = parseNum(n.coeficiente_ocupacion_suelo);
+    cus  = parseCus(n.coeficiente_utilizacion_suelo);
+  }
+  icos = parseNum(n.icos)||0;
+  icus = parseNum(n.icus)||0;
+
+  // ── ENRIQUECIMIENTO CON BD LOCAL ──────────────────────────────────────────
+  // El VUJ devuelve COS/CUS como "*" para zonas mixtas (MB, MD, MC, MR, APD).
+  // Para zonas habitacionales devuelve la clave VUJ (H1-H, H2-H, etc.)
+  // La BD local está indexada por zona PDU (MV1, MV2...) — necesitamos mapear.
+  const VUJ_A_PDU = {
+    'H1-U':'MV1','H1-H':'MV1',
+    'H2-U':'MV2','H2-H':'MV2','H2-V':'MV2',
+    'H3-U':'MV3','H3-H':'MV3','H3-V':'MV3',
+    'H4-U':'MV3',                             // Unifamiliar densidad media — confirmado Borrego 19c
+    'H4-H':'MV4','H4-V':'MV4',               // Plurifamiliar H/V densidad alta — confirmado Privada Santa María
+    'H5-U':'MV4','H5-H':'MV4','H5-V':'MV4',
+  };
+
+  // Si ArcGIS Zapopan devolvió la clave exacta del polígono, usarla directamente
+  let claveBD = claveArcGIS || VUJ_A_PDU[claveBase] || claveBase;
+  const fuenteClave = claveArcGIS ? 'arcgis-zapopan' : 'vuj-traducido';
+
+  // Override geográfico para Zapopan sin ArcGIS:
+  // El VUJ usa "MD" para zonas que el PDU clasifica como MV4 en el Centro de Zapopan.
+  // Confirmado por Mapa Urbano oficial: Pedro Moreno 435/516 = MV4-PPE
+  // Basílica de Zapopan: 20.7213, -103.3923
+  if(!claveArcGIS && munId === 120){
+    const distBasilica = Math.sqrt((lat-20.7213)**2+(lng-(-103.3923))**2)*111000;
+    const enPPE = distBasilica <= 1200;
+    if(enPPE){
+      // En zona PPE: MD y variantes → MV4-PPE (confirmado Mapa Urbano)
+      if(claveBD === 'MD' || claveBD === 'MD-1' || claveBD === 'MD-PPE' ||
+         claveBase.startsWith('MD')){
+        claveBD = 'MV4-PPE';
+      }
+      // Otras zonas MV sin PPE → agregar PPE
+      else if(!claveBD.includes('-PPE') && !claveBD.includes('-APR') &&
+              (claveBD.startsWith('MV') || claveBD.startsWith('MB') || claveBD.startsWith('MC'))){
+        claveBD = claveBD + '-PPE';
+      }
+    }
+  }
+
+  let bdLocal = null;
+  const fakeFilter = `municipio_id=${munId} AND clave LIKE '%${claveBD}%'`;
+  const bdRes = vujBDLocalNormas(fakeFilter);
+  if(bdRes.length) bdLocal = bdRes[0].properties;
+  const b = bdLocal || {};
+
+  // Para Zapopan: BD local siempre tiene prioridad sobre VUJ
+  // El VUJ puede devolver valores desactualizados (ej: COS 0.6 en lugar de 0.8 para MB)
+  if(munId === 120 && bdLocal){
+    cos = parseNum(b.coeficiente_ocupacion_suelo)||cos;
+    cus = parseCus(b.coeficiente_utilizacion_suelo)||cus;
+  } else {
+    if(!cos) cos = parseNum(b.coeficiente_ocupacion_suelo)||0;
+    if(!cus) cus = parseCus(b.coeficiente_utilizacion_suelo)||0;
+  }
+
+  const descZona = z.descripcion_de_clasificacion_de_zona_secundaria||
+                   z.descripcion_de_clasificacion_de_zona_primaria||'';
+  const grupoZona = z.grupo_zona||'';
+
+  // Extraer CUS optativo/máximo de la BD local (ej: "2.10" base, "2.45" máximo)
+  // El campo coeficiente_utilizacion_suelo puede ser "2.10" — el máximo va en observaciones
+  // Parseamos el segundo número si existe: "2.10 base, 2.45 máximo *" → 2.45
+  const parseCusOpt = v => {
+    if(!v) return 0;
+    const s = String(v).replace(',','.');
+    // Captura CUS optativo/máximo buscando patrones explícitos.
+    // NO usa '/' como separador — evita falso positivo con "ZPN-10/12" → 12.
+    // Solo acepta números con punto decimal (2.80, 4.00) o tras flecha (→8.00).
+    const m = s.match(/(?:optativo|opt)[^\d]*([\d]+\.[\d]+)/i) ||
+              s.match(/([\d]+\.[\d]+)\s*(?:opt\b|optativo)/i) ||
+              s.match(/([\d]+\.[\d]+)\s*m[áa]ximo/i) ||
+              s.match(/m[áa]x(?:imo)?\s+([\d]+\.[\d]+)/i) ||
+              s.match(/→\s*([\d]+\.[\d]+)/);
+    if(!m) return 0;
+    const val = parseFloat(m[1])||0;
+    // Rango válido: 1.0–8.0 (máximo real en PDU Zapopan es 8.00 para APD/CPD >5000m²)
+    return (val >= 1.0 && val <= 8.0) ? val : 0;
+  };
+  const cusOpt = parseCusOpt(b.coeficiente_utilizacion_suelo) || parseCusOpt(b.observaciones||'');
+
+  // Fuente de cada campo: API o BD local
+  const fuenteNormas = claveArcGIS ? 'arcgis-zapopan+bd-local' : (bdLocal ? 'vuj+bd-local' : 'vuj');
+  const notaBD = bdLocal
+    ? `⚠️ Las normas de esta zona varían por polígono. Esta zona requiere consulta directa a los Planes Parciales del municipio o a la Dirección de Ordenamiento del Territorio de Zapopan. Valores mostrados son de referencia general (${claveArcGIS||claveBase} → BD local PDU ZPN-01 2023). `
+    : '';
+
+  // Nombres de distritos Zapopan (PDU 2023)
+  const ZPN_NOMBRES = {
+    '01':'ZPN-01 "Zapopan Centro"',   '1':'ZPN-01 "Zapopan Centro"',
+    '02':'ZPN-02 "Arroyo Hondo"',     '2':'ZPN-02 "Arroyo Hondo"',
+    '03':'ZPN-03 "Los Robles"',       '3':'ZPN-03 "Los Robles"',
+    '04':'ZPN-04 "La Tuzanía"',       '4':'ZPN-04 "La Tuzanía"',
+    '05':'ZPN-05 "Vallarta-Patria"',  '5':'ZPN-05 "Vallarta-Patria"',
+    '06':'ZPN-06 "Atemajac"',         '6':'ZPN-06 "Atemajac"',
+    '07':'ZPN-07 "El Collí"',         '7':'ZPN-07 "El Collí"',
+    '08':'ZPN-08 "Santa Ana Tepetitlán"', '8':'ZPN-08 "Santa Ana Tepetitlán"',
+    '09':'ZPN-09 "Base Aérea - El Bajío"','9':'ZPN-09 "Base Aérea - El Bajío"',
+    '10':'ZPN-10 "Cópala"',
+    '11':'ZPN-11 "Tesistán"',
+    '12':'ZPN-12 "El Nixticuil"',
+  };
+  const distNum = String(z.distrito||'').replace(/^D/i,'').trim();
+  // Nombres de distritos por municipio
+  const TLQ_NOMBRES = {
+    '1':'TLQ-1 "Centro Urbano"',
+    '2':'TLQ-2 "Oriente"',
+    '3':'TLQ-3 "San Martín"',
+    '4':'TLQ-4 "Toluquilla"',
+    '5':'TLQ-5 "Concentra"',
+  };
+  const distNombre = munId === 120
+    ? (ZPN_NOMBRES[distNum] || (distNum ? `ZPN-${distNum.padStart(2,'0')}` : ''))
+    : munId === 98
+    ? (TLQ_NOMBRES[distNum] || (distNum ? `TLQ-${distNum}` : ''))
+    : (distNum ? `D${distNum}` : '');
+
+  return {
+    dis1:  z.distrito||'—',
+    dis2:  distNombre,
+    sub1:  z.sub_distrito||'—',
+    sub2:  '',
+    uso:   claveZonif,   // Clave completa: "AU-RN / MC / (132)"
+    clave: claveZonif,
+    zona:  claveZonif,
+    ppp:   b.descripcion_zona || descZona,
+    cos:   cos||'*',
+    cus:   cus||'*',
+    cus_opt: parseNum(b.cus_opt)||cusOpt||0,
+    cos_max: String(cos||'*'),
+    cus_max: b.cus_max||String(cus||'*'),
+    icos:  String(icos),
+    icus:  String(icus),
+    alt_max: n.altura_maxima_edificacion || b.altura_maxima_edificacion || 'Resultante',
+    retranq: n.modo_edificacion || b.modo_edificacion || '—',
+    sup_min: n.superficie_minima || b.superficie_minima || '',
+    fre_min: n.frente_minimo    || b.frente_minimo    || '',
+    rest_f1: n.restriccion_frontal    || b.restriccion_frontal    || 'Ver Plano de Alineamiento',
+    rest_l1: n.restricciones_laterales|| b.restricciones_laterales|| '—',
+    rest_p1: n.restriccion_posterior  || b.restriccion_posterior  || '—',
+    c_otros: n.observaciones || b.observaciones || '',
+    // Parsear uso_permitido → arrays separados de permitidos y condicionados
+    // Formato en BD: 'H2-H · H2-U · EV-V · EI-V(condicionado) · CS-V · TH(condicionado)'
+    // Split por ' · ', los que tienen '(condicionado)' van a uso_con
+    ...(()=>{
+      const raw = b.uso_permitido || '';
+      // Si no hay BD local o el campo es texto libre, tomar usos directamente del VUJ
+      const vujPer = z.usos_compatibles  || z.usos_permitidos  || '';
+      const vujCon = z.usos_condicionados || z.uso_condicionado || '';
+      // Los usos también pueden venir en n.observaciones como HTML:
+      // "<b>Usos compatibles</b>: TH1 TH2 TH3<br> <b>Usos condicionados</b>:CS-V MFD"
+      const parseObsUsos = obs => {
+        if(!obs) return {per:'', con:''};
+        const strip = s => s.replace(/<[^>]+>/g,'').trim();
+        const mPer = obs.match(/Usos compatibles[^:]*:(.*?)(?:<br|$)/i);
+        const mCon = obs.match(/Usos condicionados[^:]*:(.*?)(?:<br|$)/i);
+        return {
+          per: mPer ? strip(mPer[1]) : '',
+          con: mCon ? strip(mCon[1]) : ''
+        };
+      };
+      const obsUsos = parseObsUsos(n.observaciones||'');
+      const perStr = vujPer || obsUsos.per;
+      const conStr = vujCon || obsUsos.con;
+      // Parsear string de usos del VUJ: "TH1 TH2 TH3 H1-U H2-U EV-V EV-B" → array
+      const parseVUJ = s => s ? s.trim().split(/\s+/).filter(Boolean) : [];
+      if(!raw || raw.includes('Habitacional Plurifamiliar') || raw.includes('Según zona')) {
+        // Sin BD local: usar usos del VUJ directamente
+        if(perStr || conStr) {
+          return { uso_per: parseVUJ(perStr).join('|'), uso_con: parseVUJ(conStr).join('|') };
+        }
+        return { uso_per: raw, uso_con: '' };
+      }
+      const items = raw.split(/\s*·\s*/);
+      const perm = [], cond = [];
+      items.forEach(it => {
+        const isCond = it.includes('(condicionado') || it.includes('(condicionados');
+        const clave = it.replace(/\(condicionado.*?\)/i,'').replace(/\(condicionados.*?\)/i,'').trim();
+        clave.split('/').forEach(c => {
+          const k = c.trim();
+          if(k) (isCond ? cond : perm).push(k);
+        });
+      });
+      // Si BD local tiene usos pero VUJ tiene más → complementar
+      const permFinal = perm.length ? perm : parseVUJ(vujPer);
+      const condFinal = cond.length ? cond : parseVUJ(vujCon);
+      return { uso_per: permFinal.join('|'), uso_con: condFinal.join('|') };
+    })(),
+    tdd:    'STD',
+    pdc:    'No aplica',
+    mod_viv: n.modo_edificacion || b.modo_edificacion || '—',
+    fre_aj:  n.porcentaje_jardinado_restriccion_frontal || b.porcentaje_jardinado_restriccion_frontal || '',
+    ide:     n.indice_edificacion || b.indice_edificacion || '',
+    fuente:  fuenteNormas,
+    municipio_id: munId,
+    _cajones_texto: n.cajones_estacionamiento || b.cajones_estacionamiento || '',
+    _observaciones: notaBD + (n.observaciones || b.observaciones || ''),
+    _bd_local_usada: !!bdLocal,
+    _clave_bd: bdLocal ? (b.clave||claveBase) : '',
+    _coefs_por_uso: b.coefs_por_uso || null,
+  };
+}
+// Coordenadas por rangos de número, confirmadas en GeoServer.
+// Solo se usa si Google Maps falla — no afecta consultas normales.
+// ══════════════════════════════════════════════════
+
+
+let munActual  = 'guadalajara';
+let predios    = [];
+let buscando   = false;
+let zonasVUJ   = [];          // requerida por consultarVisorJalisco
+let _zonaVUJForzada = null;   // requerida por consultarVisorJalisco
+let historial  = JSON.parse(localStorage.getItem('gu_m03_hist')||'[]');
+
+const fm  = n=>(n===null||n===undefined||isNaN(n))?'—':Number(n).toLocaleString('es-MX',{minimumFractionDigits:0,maximumFractionDigits:2});
+const fmP = n=>(n===null||n===undefined||isNaN(n))?'—':'$'+Number(n).toLocaleString('es-MX',{minimumFractionDigits:0,maximumFractionDigits:0});
+const pN  = v=>(!v||v==='*')?0:parseFloat(String(v).replace(',','.'))||0;
+const pC  = v=>{if(!v||v==='*') return 0;const m=String(v).replace(',','.').match(/^\s*([\d.]+)/);return m?parseFloat(m[1])||0:0;};
+
+function selMun(id,btn){
+  munActual=id;
+  document.querySelectorAll('.muni-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('muniNota').textContent='';
+}
+// ── Auto-detección de municipio por coordenadas (igual que M01) ──────────
+function detectarMunicipioPorCoords(lat, lng){
+  const b={
+    guadalajara:{swLat:20.603,swLng:-103.407,neLat:20.752,neLng:-103.263},
+    zapopan:    {swLat:20.620,swLng:-103.500,neLat:20.820,neLng:-103.280},
+    tlaquepaque:{swLat:20.570,swLng:-103.350,neLat:20.650,neLng:-103.240},
+    tlajomulco: {swLat:20.440,swLng:-103.520,neLat:20.600,neLng:-103.280},
+    tonala:     {swLat:20.580,swLng:-103.270,neLat:20.680,neLng:-103.160},
+  };
+  for(const [mun,bb] of Object.entries(b)){
+    if(lat>=bb.swLat&&lat<=bb.neLat&&lng>=bb.swLng&&lng<=bb.neLng) return mun;
+  }
+  return null;
+}
+function actualizarMunBtn(mun){
+  munActual=mun;
+  document.querySelectorAll('.muni-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.querySelector(`[onclick*="selMun('${mun}'"]`);
+  if(btn) btn.classList.add('active');
+  document.getElementById('muniNota').textContent='';
+}
+function muniND(n){document.getElementById('muniNota').textContent='⚠️ '+n+' — próximamente.';}
+function setStatus(tipo,msg){
+  const b=document.getElementById('statusBox');
+  if(!tipo){b.innerHTML='';return;}
+  b.innerHTML=`<div class="${tipo==='loading'?'gu-loading':'gu-error'}">${tipo==='loading'?'<div class="gu-spinner"></div>':''} ${msg}</div>`;
+}
+function cambiarTab(t){
+  ['Dir','Cat','Coord'].forEach(x=>{
+    document.getElementById('p'+x).style.display=x===t?'block':'none';
+    document.getElementById('t'+x).classList.toggle('active',x===t);
+  });
+}
+function limpiarBusqueda(){
+  ['inCalle','inColonia','inCP','inCat'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const lat=document.getElementById('inLat');const lng=document.getElementById('inLng');
+  if(lat)lat.value='';if(lng)lng.value='';
+  setStatus('','');
+}
+
+// ── Historial ──────────────────────────────────────────────────────────────
+function guardarHist(dir, zona, municipio){
+  const item={dir,zona,municipio,ts:Date.now()};
+  historial=historial.filter(h=>h.dir!==dir).slice(0,9);
+  historial.unshift(item);
+  localStorage.setItem('gu_m03_hist',JSON.stringify(historial));
+  renderHist();
+}
+function renderHist(){
+  const card=document.getElementById('histCard');
+  const lista=document.getElementById('histLista');
+  if(!historial.length){card.style.display='none';return;}
+  card.style.display='block';
+  lista.innerHTML=historial.map((h,i)=>`
+    <div class="gu-hist-item" onclick="recargarHist(${i})">
+      <div>
+        <div class="gu-hist-dir">${h.dir}</div>
+        <div class="gu-hist-zona">${typeof h.zona==='object'&&h.zona?(h.zona._clave_bd||h.zona.uso||'—'):(h.zona||'—')} · ${(h.municipio||'').substring(0,3).toUpperCase()}</div>
+      </div>
+      <button class="gu-hist-del" onclick="event.stopPropagation();eliminarHist(${i})">✕</button>
+    </div>`).join('');
+}
+function recargarHist(idx){
+  const h=historial[idx];
+  if(!h) return;
+  // Cambiar municipio usando selMun() para que actualice munActual y botones correctamente
+  if(h.municipio && h.municipio!==munActual){
+    const btn=document.querySelector(`[onclick*="selMun('${h.municipio}'"]`);
+    selMun(h.municipio, btn||document.querySelector('.muni-btn'));
+  }
+  document.getElementById('inCalle').value=h.dir||'';
+  cambiarTab('Dir');
+  agregarPredio();
+}
+function eliminarHist(idx){
+  historial.splice(idx,1);
+  localStorage.setItem('gu_m03_hist',JSON.stringify(historial));
+  renderHist();
+}
+
+// ── Cálculo de escenarios ──────────────────────────────────────────────────
+function calcEsc(zona,sup){
+  const cos=pN(zona.cos);
+  const cus=pC(zona.cus)||pN(zona.cus);
+  const icos=pN(zona.icos);
+  const icus=pN(zona.icus);
+  const cusOpt=pN(zona.cus_opt);
+  const cusMax=pN(zona.cus_max);
+  const mun=zona._municipio||munActual;
+  const tarifa=mun==='zapopan'?T_ZPN:T_GDL;
+  const ide=pN(zona.ide);
+
+  const dBase=Math.round(cos*sup*100)/100;
+  const dMax=Math.round((cos+icos)*sup*100)/100;
+  const mBase=Math.round(cus*sup*100)/100;
+  const mICUS=Math.round(icus*sup*100)/100;
+  const mTotal1=mBase+mICUS;
+  const pagoBase=Math.round(mICUS*tarifa);
+
+  const tieneOpt=cusOpt>cus&&cusOpt>0;
+  const mOpt=tieneOpt?Math.round(cusOpt*sup*100)/100:0;
+  const excOpt=tieneOpt?Math.round((cusOpt-cus)*sup*100)/100:0;
+  const pagoOpt=Math.round(excOpt*tarifa);
+
+  const tieneMax=cusMax>cus&&cusMax>0;
+  const mMax=tieneMax?Math.round(cusMax*sup*100)/100:mTotal1;
+  const excMax=tieneMax?Math.round((cusMax-cus)*sup*100)/100:mICUS;
+  const pagoMax=Math.round(excMax*tarifa)+(mun==='zapopan'&&tieneMax?T_ECPD:0);
+
+  const depBase=ide>0?Math.floor(mBase/ide):0;
+  const depOpt=ide>0?Math.floor(mOpt/ide):0;
+  const depMax=ide>0?Math.floor(mMax/ide):0;
+
+  // Usos condicionados con CUS mayor al base (coefs_por_uso)
+  const usosCond=[];
+  const coefsPorUso = zona._coefs_por_uso;
+  if(coefsPorUso && typeof coefsPorUso === 'object' && Object.keys(coefsPorUso).length>0){
+    for(const [uso,coef] of Object.entries(coefsPorUso)){
+      const cusCond=parseFloat(coef.cus)||0;
+      if(cusCond>cus && coef.nota && coef.nota.toLowerCase().includes('condicionado')){
+        const mCond=Math.round(cusCond*sup*100)/100;
+        const excCond=Math.round((cusCond-cus)*sup*100)/100;
+        const pagoCond=Math.round(excCond*tarifa);
+        usosCond.push({uso,cos:parseFloat(coef.cos)||cos,cus:cusCond,
+          mCond,excCond,pagoCond,nota:coef.nota,
+          sup_min:coef.sup||'',rest_f:coef.rest_f||'',rest_p:coef.rest_p||''});
+      }
+    }
+  }
+
+  const niveles=[];
+  if(cos>0&&mBase>0){
+    let acum=0,niv=0;
+    while(acum<mBase-0.5&&niv<=25){
+      const este=Math.min(dBase,mBase-acum);
+      acum+=este;
+      niveles.push({nom:niv===0?'PB — Planta baja':`N${niv} — Nivel ${niv}`,este:Math.round(este),acum:Math.round(acum),pct:Math.round((acum/mBase)*100)});
+      niv++;
+    }
+  }
+
+  // Restricciones de la zona
+  const rest_f=parseFloat(zona.rest_f1)||0;
+  const rest_p=parseFloat(zona.rest_p1)||0;
+  const rest_l=parseFloat(zona.rest_l1)||0;
+
+  // Niveles escenario CUS+iCUS
+  const nivelIcus=[];
+  if(cos>0&&icus>0&&mTotal1>mBase){
+    let acum=0,niv=0;
+    while(acum<mTotal1-0.5&&niv<=35){
+      const este=Math.min(dBase,mTotal1-acum);
+      acum+=este;
+      nivelIcus.push({nom:niv===0?'PB — Planta baja':`N${niv} — Nivel ${niv}`,este:Math.round(este),acum:Math.round(acum),pct:Math.round((acum/mTotal1)*100),esIcus:acum>mBase});
+      niv++;
+    }
+  }
+
+  // C: Altura estimada en niveles (CUS ÷ COS)
+  const altBase = cos>0 ? Math.round((cus/cos)*10)/10 : 0;
+  const altOpt  = cos>0&&cusOpt>0 ? Math.round((cusOpt/cos)*10)/10 : 0;
+  const altMax  = cos>0&&cusMax>0 ? Math.round((cusMax/cos)*10)/10
+                : cos>0&&icus>0   ? Math.round(((cus+icus)/cos)*10)/10 : altBase;
+  return {cos,cus,icos,icus,cusOpt,cusMax,sup,dBase,dMax,mBase,mICUS,mTotal1,pagoBase,
+          tieneOpt,mOpt,excOpt,pagoOpt,tieneMax,mMax,excMax,pagoMax,
+          tarifa,ide,depBase,depOpt,depMax,niveles,nivelIcus,rest_f,rest_p,rest_l,mun,usosCond,altBase,altOpt,altMax};
+}
+
+// ── Render predio ──────────────────────────────────────────────────────────
+function renderPredio(p,idx){
+  const sup = parseFloat(p.sup)||0;
+  p.sup = sup; // asegurar que sup es número
+  const e=calcEsc(p.zona,sup);
+  const mun=p.municipio||munActual;
+  const clave=p.zona._clave_bd||p.zona.uso||'—';
+
+  function icusBlk(excM2,pago,formula,nota){
+    if(excM2<=0&&pago<=0) return `<div class="no-icus">Sin iCUS — sin contribución adicional al municipio</div>`;
+    return `<div class="icus-blk">
+      <div class="icus-ttl">💰 Contribución ICUS al municipio</div>
+      <div class="icus-row">
+        <span class="icus-formula">${formula}</span>
+        <span class="icus-total">${fmP(pago)}</span>
+      </div>
+      ${nota?`<div class="icus-nota">${nota}</div>`:''}
+    </div>`;
+  }
+
+  const escBase=`<div class="esc esc-base">
+    <div class="esc-tag">
+      <span>Base — CUS ${e.cus}</span>
+      ${e.icus>0?`<span class="esc-badge" style="background:var(--bg3);color:var(--text3)">+iCUS ${e.icus}</span>`:''}
+    </div>
+    <div class="esc-m2">${fm(e.mBase)}<span>m² construibles</span></div>
+    <div class="esc-desp">Desplante: ${fm(e.dBase)} m² · Altura estimada: <strong>${e.altBase} niveles</strong> (CUS ${e.cus} ÷ COS ${e.cos})</div>
+    ${e.icus>0?`<div style="font-size:11px;color:var(--text2);margin-top:4px">Con iCUS: +${fm(e.mICUS)} m² → <strong>${fm(e.mTotal1)} m² total</strong></div>`:''}
+    ${icusBlk(e.mICUS,e.pagoBase,`${fm(e.mICUS)} m² × $${fm(e.tarifa)}/m²`,e.icus>0?`Pago al municipio por ${fm(e.mICUS)} m² de iCUS`:'')}
+  </div>`;
+
+  const escOpt=e.tieneOpt?`<div class="esc esc-opt">
+    <div class="esc-tag" style="flex-direction:column;align-items:flex-start;gap:2px">
+      <span style="font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3)">Escenario 2 — Optativo</span>
+      <span style="font-size:12px;font-weight:500;color:var(--brand-light)">CUS ${e.cusOpt} — Con mezcla de usos</span>
+    </div>
+    <div class="esc-m2" style="color:var(--brand-light);margin-top:6px">${fm(e.mOpt)}<span>m² construibles</span></div>
+    <div class="esc-desp" style="margin-bottom:4px">Altura estimada: <strong style="color:var(--brand-light)">${e.altOpt} niveles</strong> (CUS ${e.cusOpt} ÷ COS ${e.cos})</div>
+    <div class="esc-desp" style="margin-bottom:10px">${fm(e.excOpt)} m² más que el escenario base — si combinas vivienda con comercio o servicios en el mismo predio</div>
+    ${mun==='zapopan'?`
+    <div style="background:rgba(0,0,0,.2);border-radius:7px;padding:9px 11px;font-size:11px;line-height:2">
+      <div style="font-size:9px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Cómo se calcula</div>
+      <div style="display:flex;justify-content:space-between;color:var(--text2)">
+        <span>Total construible</span>
+        <span style="font-family:var(--mono)">CUS ${e.cusOpt} × ${fm(sup)} m² = ${fm(e.mOpt)} m²</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;color:var(--text2)">
+        <span>Excedente sobre base (${fm(e.excOpt)} m²)</span>
+        <span style="font-family:var(--mono)">(${e.cusOpt} − ${e.cus}) × ${fm(sup)} m²</span>
+      </div>
+      <div style="border-top:1px solid var(--border);margin:5px 0"></div>
+      <div style="display:flex;justify-content:space-between;color:var(--text2)">
+        <span>ICUS — pago por los ${fm(e.excOpt)} m² extra</span>
+        <span style="font-family:var(--mono)">${fm(e.excOpt)} m² × $${fm(e.tarifa)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-weight:500;font-size:13px;color:var(--sem-am-txt);margin-top:2px">
+        <span>Total a pagar al municipio</span>
+        <span style="font-family:var(--mono)">${fmP(e.pagoOpt)}</span>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--text3);margin-top:6px">PDU ZPN-01 2023 · Art. 62 Ley de Ingresos Zapopan 2026 · $${fm(e.tarifa)}/m² · <span style="color:var(--sem-am-txt)">⚠️ Tarifa vigente 2026 — verificar actualización anual</span></div>`:`
+    <div style="font-size:11px;color:var(--text2);margin-top:4px">Requiere mezcla habitacional + comercial en el mismo predio</div>
+    ${icusBlk(e.excOpt,e.pagoOpt,`${fm(e.excOpt)} m² × $${fm(e.tarifa)}/m²`,`Pago por los ${fm(e.excOpt)} m² extras vs CUS base`)}`}
+  </div>`:'';
+
+  const lblMax=mun==='zapopan'&&e.tieneMax?`CUS MAX ${e.cusMax}`:(e.icus>0?`CUS+iCUS ${e.cus}+${e.icus}`:`CUS ${e.cus}`);
+  const notaMax=e.tieneMax?(mun==='zapopan'?'Requiere Estudio de Capacidades para Potencial de Desarrollo (ECPD)':'Con Transferencia de Derechos de Desarrollo (RTD/ICUS)'):( e.icus>0?'iCUS incluido en el potencial máximo':'No hay incremento disponible en esta zona');
+  const formulaMax=e.tieneMax?(mun==='zapopan'?`${fm(e.excMax)} m² × $${fm(e.tarifa)}/m² + ECPD $${fm(T_ECPD)}`:`${fm(e.excMax)} m² × $${fm(e.tarifa)}/m²`):`${fm(e.excMax)} m² × $${fm(e.tarifa)}/m²`;
+
+  // Escenario 3: ZPN solo si tieneMax. GDL solo si tiene icus o cusMax.
+  const mostrarMax = mun==='zapopan' ? e.tieneMax : (e.tieneMax || e.icus>0);
+  const escMax= !mostrarMax ? '' : `<div class="esc esc-max">
+    <div class="esc-tag" style="flex-direction:column;align-items:flex-start;gap:2px">
+      <span style="font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3)">Escenario 3 — Máximo</span>
+      <span style="font-size:12px;font-weight:500;color:#4ade80">${lblMax}${mun==='zapopan'&&e.tieneMax?' — Con Estudio de Capacidades (ECPD)':''}</span>
+    </div>
+    <div class="esc-m2" style="color:#4ade80;margin-top:6px">${fm(e.mMax)}<span>m² construibles</span></div>
+    <div class="esc-desp" style="margin-bottom:10px">${mun==='zapopan'&&e.tieneMax?fm(e.mMax-e.mBase)+' m² más que el escenario base — requiere contratar un Estudio de Capacidades para Potencial de Desarrollo':fm(e.mTotal1-e.mBase)+' m² adicionales por iCUS — pago ICUS al municipio'}</div>
+    <div class="esc-desp">Desplante máx: ${fm(e.dMax)} m² · Altura estimada: <strong style="color:#4ade80">${e.altMax} niveles</strong> (CUS ${e.tieneMax?e.cusMax:(e.cus+(e.icus||0))} ÷ COS ${e.cos})</div>
+    ${mun==='zapopan'&&e.tieneMax?`
+    <div style="background:rgba(0,0,0,.2);border-radius:7px;padding:9px 11px;font-size:11px;line-height:2;margin-top:8px">
+      <div style="font-size:9px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Cómo se calcula</div>
+      <div style="display:flex;justify-content:space-between;color:var(--text2)">
+        <span>Total construible</span>
+        <span style="font-family:var(--mono)">CUS ${e.cusMax} × ${fm(sup)} m² = ${fm(e.mMax)} m²</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;color:var(--text2)">
+        <span>Excedente sobre base (${fm(e.excMax)} m²)</span>
+        <span style="font-family:var(--mono)">(${e.cusMax} − ${e.cus}) × ${fm(sup)} m²</span>
+      </div>
+      <div style="border-top:1px solid var(--border);margin:5px 0"></div>
+      <div style="display:flex;justify-content:space-between;color:var(--text2)">
+        <span>ICUS — pago por los ${fm(e.excMax)} m² extra</span>
+        <span style="font-family:var(--mono)">${fm(e.excMax)} m² × $${fm(e.tarifa)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;color:var(--text2)">
+        <span>+ ECPD — revisión Estudio de Capacidades</span>
+        <span style="font-family:var(--mono)">$${fm(T_ECPD)} fijo</span>
+      </div>
+      <div style="border-top:1px solid var(--border);margin:5px 0"></div>
+      <div style="display:flex;justify-content:space-between;font-weight:500;font-size:13px;color:var(--sem-am-txt);margin-top:2px">
+        <span>Total a pagar al municipio</span>
+        <span style="font-family:var(--mono)">${fmP(e.pagoMax)}</span>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--text3);margin-top:6px">PDU ZPN-01 2023 · Art. 62 Ley de Ingresos Zapopan 2026 · $${fm(e.tarifa)}/m² + $${fm(T_ECPD)} ECPD fijo · <span style="color:var(--sem-am-txt)">⚠️ Tarifa vigente 2026 — verificar actualización anual</span></div>`:`${icusBlk(e.excMax,e.pagoMax,formulaMax,notaMax)}`}
+  </div>`;
+
+  // B: IDE override desde el predio
+  if(p.ide_override) p.zona._ide_override = p.ide_override;
+  const ideActual = p.ide_override||pN(p.zona.ide)||e.ide;
+
+  const ideTxt = mun==='zapopan'
+    ? `En Zapopan el IDE define la superficie mínima por vivienda en zonas MB, MD y MC (PDU ZPN-01 2023). Esta zona tiene un IDE de <strong>${fm(e.ide)} m²</strong> por depa — cada unidad habitacional debe tener al menos esa superficie.`
+    : `En Guadalajara el IDE aplica solo en zonas de alta densidad (Chapalita, Bosques Victoria, corredores CS4). Esta zona tiene un IDE de <strong>${fm(e.ide)} m²</strong> por depa según el Plan Parcial de Desarrollo Urbano.`;
+
+  const ideBlk=e.ide>0?`<div class="ide-blk">
+    <div class="ide-ttl">🏠 Departamentos estimados por IDE</div>
+    <div class="ide-def"><strong>IDE = Índice de Edificación</strong> — ${ideTxt}</div>
+    <div class="ide-grid">
+      <div class="ide-box">
+        <div class="ide-n" style="color:var(--text2)">${e.depBase}</div>
+        <div class="ide-l">depas base</div>
+      </div>
+      ${e.tieneOpt?`<div class="ide-box"><div class="ide-n" style="color:var(--brand-light)">${e.depOpt}</div><div class="ide-l">depas optativo</div></div>`:''}
+      <div class="ide-box">
+        <div class="ide-n" style="color:var(--uso-p-txt)">${e.depMax}</div>
+        <div class="ide-l">depas máximo</div>
+      </div>
+    </div>
+    <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 8px;background:rgba(0,0,0,.15);border-radius:6px">
+      <span style="font-size:11px;color:var(--text3)">Simular con IDE distinto:</span>
+      <input type="number" min="20" max="500" value="${ideActual||''}" placeholder="${pN(p.zona.ide)||80}"
+        style="width:70px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 6px;color:var(--text);font-size:12px;font-family:var(--mono)"
+        onchange="cambiarIDE(${idx},this.value)">
+      <span style="font-size:11px;color:var(--text3)">m²/depa</span>
+      ${p.ide_override&&p.ide_override!==pN(p.zona.ide)?`<span style="font-size:10px;color:var(--brand-light)">← modificado (norma: ${pN(p.zona.ide)} m²)</span>`:''}
+    </div>
+    <div class="ide-nota">⚠️ Estimación. El número real depende del diseño arquitectónico, circulaciones y reglamento de construcción.
+      ${e.depMax<=1&&e.ide>0?`<br><strong style="color:var(--sem-am-txt)">Con la superficie actual solo cabe ${e.depMax===0?'ningún depa — la superficie es menor al IDE':'1 departamento'}. Aumenta la superficie para ver más opciones.</strong>`:''}
+    </div>
+  </div>`:'';
+
+  // ── Bloque nivel por nivel con toggle CUS / CUS+iCUS ──
+  const _hasRest=(e.rest_f>0||e.rest_p>0||e.rest_l>0);
+  const _restInfo=_hasRest?`<div style="font-size:10px;color:var(--sem-am-txt);background:#1a0d00;border:0.5px solid #92400E;border-radius:6px;padding:6px 10px;margin-bottom:8px;line-height:1.7">⚠️ <strong>Restricciones de construcción aplicables:</strong>${e.rest_f>0?` &nbsp;Frontal: <strong>${e.rest_f} m</strong>`:''}${e.rest_p>0?` &nbsp;Posterior: <strong>${e.rest_p} m</strong>`:''}${e.rest_l>0?` &nbsp;Lateral: <strong>${e.rest_l} m</strong>`:''}<br><span style="color:var(--text3);font-size:9px">El COS (${e.cos}) determina el área de desplante máxima. Las restricciones limitan la posición pero el m² total construible no cambia — verificar con plano de alineamiento oficial.</span></div>`:'';
+  const _hasIcus=e.icus>0&&e.nivelIcus&&e.nivelIcus.length>0;
+  const _tabsHtml=_hasIcus?`<div style="display:flex;gap:6px;margin-bottom:8px"><button id="ntab_base_${idx}" onclick="switchNivTab(${idx},'base')" style="flex:1;padding:5px 8px;border-radius:5px;border:1px solid var(--brand);background:var(--brand-pale);color:var(--brand);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)">📐 CUS ${e.cus}</button><button id="ntab_icus_${idx}" onclick="switchNivTab(${idx},'icus')" style="flex:1;padding:5px 8px;border-radius:5px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--sans)">📐 CUS+iCUS ${Math.round((e.cus+e.icus)*100)/100}</button></div>`:'';
+  const _tblBase=`<table class="niv-tbl" id="niv_base_${idx}"><tr style="background:var(--bg3)"><td><strong>Nivel</strong></td><td style="text-align:right"><strong>m² nivel</strong></td><td style="text-align:right"><strong>m² acum.</strong></td><td style="text-align:right"><strong>% CUS ${e.cus}</strong></td></tr>${e.niveles.map(n=>`<tr><td style="color:var(--text2)">${n.nom}</td><td style="text-align:right">${fm(n.este)}</td><td style="text-align:right">${fm(n.acum)}</td><td style="text-align:right;color:${n.pct>=100?'var(--sem-am-txt)':n.pct>=80?'var(--brand-light)':'var(--uso-p-txt)'}">${n.pct}%</td></tr>`).join('')}</table>`;
+  const _tblIcus=_hasIcus?`<table class="niv-tbl" id="niv_icus_${idx}" style="display:none"><tr style="background:var(--bg3)"><td><strong>Nivel</strong></td><td style="text-align:right"><strong>m² nivel</strong></td><td style="text-align:right"><strong>m² acum.</strong></td><td style="text-align:right"><strong>% CUS+iCUS ${Math.round((e.cus+e.icus)*100)/100}</strong></td></tr>${e.nivelIcus.map(n=>`<tr style="${n.esIcus?'background:rgba(37,99,235,.08)':''}"><td style="color:${n.esIcus?'var(--brand-light)':'var(--text2)'}">${n.nom}${n.esIcus?' 🔵':''}</td><td style="text-align:right">${fm(n.este)}</td><td style="text-align:right">${fm(n.acum)}</td><td style="text-align:right;color:${n.pct>=100?'var(--sem-am-txt)':n.pct>=80?'var(--brand-light)':'var(--uso-p-txt)'}">${n.pct}%</td></tr>`).join('')}</table>`:'';
+  const nivBlk=e.niveles.length?`
+    <button class="niv-btn" onclick="toggleNiv(${idx})" id="nbtn_${idx}">▶ Ver tabla nivel por nivel${_hasIcus?` — CUS ${e.cus} | CUS+iCUS ${Math.round((e.cus+e.icus)*100)/100}`:` — CUS ${e.cus}`}</button>
+    <div id="niv_${idx}" style="display:none;padding-top:8px">${_restInfo}${_tabsHtml}${_tblBase}${_tblIcus}</div>`:'';
+
+  // ── Bloque informativo CUS: qué computa y qué no (GDL y ZPN) ─────────────
+  const cusCriteriosBlk = (mun==='guadalajara'||mun==='zapopan') ? `
+    <button class="niv-btn" style="margin-top:4px" onclick="(function(btn){var d=btn.nextElementSibling;var open=d.style.display!=='block';d.style.display=open?'block':'none';btn.textContent=(open?'▼':'▶')+' Criterios CUS — qué computa y qué no (${mun==='guadalajara'?'GDL':'ZPN'})';})(this)">▶ Criterios CUS — qué computa y qué no (${mun==='guadalajara'?'GDL':'ZPN'})</button>
+    <div style="display:none;padding:10px 12px;background:var(--bg3);border:0.5px solid var(--border);border-top:none;border-radius:0 0 8px 8px;font-size:11px;line-height:1.6">
+      ${mun==='guadalajara'?`
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:8px">GDL · Art. 50 VIII + Art. 50 Ter · Reforma 10 abril 2025</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <tr style="background:var(--bg2)">
+          <th style="padding:5px 8px;text-align:left;color:var(--text3);font-weight:500;border-bottom:0.5px solid var(--border)">Elemento</th>
+          <th style="padding:5px 8px;text-align:center;color:var(--text3);font-weight:500;border-bottom:0.5px solid var(--border)">¿Computa CUS/COS?</th>
+          <th style="padding:5px 8px;text-align:left;color:var(--text3);font-weight:500;border-bottom:0.5px solid var(--border)">Art.</th>
+        </tr>
+        <tr>
+          <td style="padding:5px 8px;color:var(--text2);border-top:0.5px solid var(--border)">Escaleras — cualquier material o sistema constructivo</td>
+          <td style="padding:5px 8px;text-align:center;color:#4ade80;border-top:0.5px solid var(--border)">❌ NO computa</td>
+          <td style="padding:5px 8px;color:var(--text3);border-top:0.5px solid var(--border)">50 VIII</td>
+        </tr>
+        <tr style="background:rgba(0,0,0,.08)">
+          <td style="padding:5px 8px;color:var(--text2);border-top:0.5px solid var(--border)">Entrepisos / cubiertas de rejilla de herrería</td>
+          <td style="padding:5px 8px;text-align:center;color:var(--sem-am-txt);border-top:0.5px solid var(--border)">✅ SÍ computa</td>
+          <td style="padding:5px 8px;color:var(--text3);border-top:0.5px solid var(--border)">50 Ter</td>
+        </tr>
+        <tr>
+          <td style="padding:5px 8px;color:var(--text2);border-top:0.5px solid var(--border)">Pérgolas sin cubierta</td>
+          <td style="padding:5px 8px;text-align:center;color:var(--text2);border-top:0.5px solid var(--border)">50% CUS/COS</td>
+          <td style="padding:5px 8px;color:var(--text3);border-top:0.5px solid var(--border)">50 VIII</td>
+        </tr>
+        <tr style="background:rgba(0,0,0,.08)">
+          <td style="padding:5px 8px;color:var(--text2);border-top:0.5px solid var(--border)">Pérgolas con cristal o acrílico</td>
+          <td style="padding:5px 8px;text-align:center;color:var(--sem-am-txt);border-top:0.5px solid var(--border)">100% CUS/COS</td>
+          <td style="padding:5px 8px;color:var(--text3);border-top:0.5px solid var(--border)">50 VIII</td>
+        </tr>
+        <tr>
+          <td style="padding:5px 8px;color:var(--text2);border-top:0.5px solid var(--border)">Sótanos no habitables</td>
+          <td style="padding:5px 8px;text-align:center;color:#4ade80;border-top:0.5px solid var(--border)">❌ NO computa</td>
+          <td style="padding:5px 8px;color:var(--text3);border-top:0.5px solid var(--border)">50 VIII</td>
+        </tr>
+      </table>
+      <div style="margin-top:8px;font-size:10px;color:var(--text3);padding:5px 8px;background:rgba(0,0,0,.15);border-radius:5px">
+        📄 Reglamento para la Gestión Integral del Municipio de Guadalajara — Reforma publicada 10 abril 2025 · transparencia.guadalajara.gob.mx
+      </div>`:`
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:8px">ZPN · Reglamento de Construcción Zapopan</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <tr style="background:var(--bg2)">
+          <th style="padding:5px 8px;text-align:left;color:var(--text3);font-weight:500;border-bottom:0.5px solid var(--border)">Elemento</th>
+          <th style="padding:5px 8px;text-align:center;color:var(--text3);font-weight:500;border-bottom:0.5px solid var(--border)">¿Computa CUS/COS?</th>
+          <th style="padding:5px 8px;text-align:left;color:var(--text3);font-weight:500;border-bottom:0.5px solid var(--border)">Art.</th>
+        </tr>
+        <tr>
+          <td style="padding:5px 8px;color:var(--text2);border-top:0.5px solid var(--border)">Sótanos no habitables</td>
+          <td style="padding:5px 8px;text-align:center;color:#4ade80;border-top:0.5px solid var(--border)">❌ NO computa</td>
+          <td style="padding:5px 8px;color:var(--text3);border-top:0.5px solid var(--border)">103</td>
+        </tr>
+        <tr style="background:rgba(0,0,0,.08)">
+          <td style="padding:5px 8px;color:var(--text2);border-top:0.5px solid var(--border)">Escaleras de herrería — restricción frontal</td>
+          <td style="padding:5px 8px;text-align:center;color:var(--text3);border-top:0.5px solid var(--border)">No invaden restricción frontal*</td>
+          <td style="padding:5px 8px;color:var(--text3);border-top:0.5px solid var(--border)">—</td>
+        </tr>
+        <tr>
+          <td style="padding:5px 8px;color:var(--text2);border-top:0.5px solid var(--border)">Escaleras metálicas / rejilla Irving como entrepiso</td>
+          <td style="padding:5px 8px;text-align:center;color:var(--text3);border-top:0.5px solid var(--border)">⚠️ Sin artículo explícito</td>
+          <td style="padding:5px 8px;color:var(--text3);border-top:0.5px solid var(--border)">—</td>
+        </tr>
+      </table>
+      <div style="margin-top:8px;font-size:10px;color:var(--sem-am-txt);padding:6px 8px;background:#1a0d00;border-left:2px solid var(--sem-am-txt);border-radius:0 5px 5px 0;line-height:1.6">
+        ⚠️ El Reglamento de Construcción de Zapopan no regula explícitamente si escaleras metálicas o rejilla de herrería computan para CUS. Verificar criterio con la Dirección de Obras Públicas de Zapopan antes de incluirlos o excluirlos del cálculo.
+      </div>
+      <div style="margin-top:6px;font-size:10px;color:var(--text3);padding:5px 8px;background:rgba(0,0,0,.15);border-radius:5px">
+        📄 Reglamento de Construcción del Municipio de Zapopan · Art. 103 · *Las escaleras de herrería no invaden la restricción frontal pero su cómputo en CUS no está especificado.
+      </div>`}
+    </div>` : '';
+
+  // ── Ajuste por elementos especiales Art. 50 VIII (GDL únicamente) ──────────
+  const supEsc = parseFloat(p.sup_escalera)||0;
+  const supRej = parseFloat(p.sup_rejilla)||0;
+  const cusAjusteBlk = mun==='guadalajara'&&sup>0 ? `
+    <button class="niv-btn" style="margin-top:4px" onclick="(function(btn){var d=btn.nextElementSibling;var open=d.style.display!=='block';d.style.display=open?'block':'none';btn.textContent=(open?'▼':'▶')+' Ajuste por elementos especiales — Escalera / Rejilla (Art. 50 VIII)';})(this)">▶ Ajuste por elementos especiales — Escalera / Rejilla (Art. 50 VIII)</button>
+    <div style="display:none;padding:10px 12px;background:var(--bg3);border:0.5px solid var(--border);border-top:none;border-radius:0 0 8px 8px;font-size:11px;line-height:1.6">
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:10px">GDL · Art. 50 VIII · Reforma 10 abr 2025 — ajusta los m² de tu proyecto</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <div style="font-size:11px;color:#4ade80;font-weight:600;margin-bottom:4px">❌ Escalera exterior (no computa CUS)</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="number" min="0" max="9999" step="1" value="${supEsc||''}" placeholder="0"
+              style="width:80px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:4px 6px;color:var(--text);font-size:13px;font-family:var(--mono)"
+              oninput="cambiarEscElem(${idx},'sup_escalera',this.value)">
+            <span style="color:var(--text3)">m²</span>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px">Se agrega sobre el límite CUS sin cargo normativo</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--sem-am-txt);font-weight:600;margin-bottom:4px">✅ Rejilla / entrepiso herrería (sí computa CUS)</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="number" min="0" max="9999" step="1" value="${supRej||''}" placeholder="0"
+              style="width:80px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:4px 6px;color:var(--text);font-size:13px;font-family:var(--mono)"
+              oninput="cambiarEscElem(${idx},'sup_rejilla',this.value)">
+            <span style="color:var(--text3)">m²</span>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px">Descuenta de tu presupuesto CUS disponible</div>
+        </div>
+      </div>
+      ${supEsc>0||supRej>0?`<div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:7px;padding:9px 11px;margin-top:2px">
+        <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">Resultado ajustado</div>
+        <div style="display:flex;justify-content:space-between;color:var(--text2);padding:3px 0;border-bottom:0.5px solid var(--border)">
+          <span>CUS base (${e.cus} × ${fm(sup)} m²)</span><span style="font-family:var(--mono)">${fm(e.mBase)} m²</span>
+        </div>
+        ${supEsc>0?`<div style="display:flex;justify-content:space-between;color:#4ade80;padding:3px 0;border-bottom:0.5px solid var(--border)"><span>+ Escalera exterior (no computa · Art. 50 VIII)</span><span style="font-family:var(--mono)">+${fm(supEsc)} m²</span></div>`:''}
+        ${supRej>0?`<div style="display:flex;justify-content:space-between;color:var(--sem-am-txt);padding:3px 0;border-bottom:0.5px solid var(--border)"><span>Rejilla / entrepiso (sí computa · Art. 50 Ter)</span><span style="font-family:var(--mono)">${fm(supRej)} m² de ${fm(e.mBase)} m² usados</span></div>`:''}
+        <div style="display:flex;justify-content:space-between;font-weight:600;font-size:13px;color:var(--uso-p-txt);padding:5px 0 0">
+          <span>Total m² físicos sin ICUS adicional</span><span style="font-family:var(--mono)">${fm(e.mBase+supEsc)} m²</span>
+        </div>
+        ${supEsc>0?`<div style="font-size:10px;color:var(--text3);margin-top:5px;font-style:italic">Los ${fm(supEsc)} m² de escalera no cuentan como CUS · puedes construirlos sobre tu límite base sin pagar ICUS adicional · Art. 50 VIII reforma abr 2025</div>`:''}
+      </div>`:`<div style="font-size:10px;color:var(--text3);font-style:italic">Ingresa m² de escalera o rejilla para calcular el ajuste.</div>`}
+    </div>` : '';
+
+  // Banner de referencia cuando la API falló y se usó BD local como fallback.
+  // Solo bloquear la tarjeta si COS=0 && CUS=0 (sin datos reales).
+  // Con datos válidos: mostrar banner de advertencia + contenido normal.
+  const _cosVal = parseFloat(p.zona.cos)||0;
+  const _cusVal = parseFloat(p.zona.cus)||0;
+  const _esFallbackSinDatos = p.zona._bd_local_usada && !p._desde_m01 && (_cosVal===0 && _cusVal===0);
+  const _bannerReferencia = (p.zona._bd_local_usada && !p._desde_m01 && !_esFallbackSinDatos)
+    ? `<div style="margin:10px 12px 0;background:#1a0d00;border:1px solid var(--sem-am-txt);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--sem-am-txt);line-height:1.6">
+        \u26A0\uFE0F <strong>Datos de referencia</strong> — la API no obtuvo la zona exacta. Los coeficientes son del tipo de zona más cercano (BD local PDU). Para la zona precisa, búscala en <a href="GestorUrbano_M01_3.html" target="_blank" style="color:var(--brand-light);text-decoration:underline">Módulo 01</a> y usa el botón "Ir a M03".
+      </div>`
+    : '';
+  if(_esFallbackSinDatos){
+    return `<div class="pc" id="pc_${idx}">
+      <div class="pc-hdr">
+        <span class="pc-num">${idx+1}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.dir}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:1px">${mun.charAt(0).toUpperCase()+mun.slice(1)}</div>
+        </div>
+        <button class="pc-del" onclick="eliminarPredio(${idx})" title="Eliminar predio">\u{1F5D1}\uFE0F Borrar</button>
+      </div>
+      <div style="margin:12px;background:#1a1000;border:1px solid var(--sem-am-txt);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--sem-am-txt);line-height:1.7">
+        \u26A0\uFE0F <strong>No se encontró la zona exacta para esta dirección.</strong><br>
+        No se muestran valores para evitar cálculos incorrectos.<br><br>
+        <strong>Para obtener el resultado correcto:</strong><br>
+        1. <a href="GestorUrbano_M01_3.html" style="color:var(--brand-light);text-decoration:underline" target="_blank">Abre el Módulo 01</a> y busca esta misma dirección.<br>
+        2. Si el pin cae en la calle, arrástralo al interior del predio.<br>
+        3. Usa el botón <strong>Calcular potencial constructivo en M03</strong>.
+      </div>
+    </div>`;
+  }
+
+  return `<div class="pc" id="pc_${idx}">
+    <div class="pc-hdr">
+      <span class="pc-num">${idx+1}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.dir}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:1px">${clave} · ${mun.charAt(0).toUpperCase()+mun.slice(1)}</div>
+      </div>
+      <button class="pc-del" onclick="eliminarPredio(${idx})" title="Eliminar predio">🗑️ Borrar</button>
+    </div>
+    ${p.zona.descripcion_zona ? `<div style="padding:6px 12px 0;font-size:11px;color:var(--text2);line-height:1.5">${p.zona.descripcion_zona}</div>` : ''}
+    ${_bannerReferencia}
+    <div class="coefs">
+      <div class="coef"><div class="coef-l">COS</div><div class="coef-v">${e.cos||'—'}</div></div>
+      <div class="coef"><div class="coef-l">CUS base</div><div class="coef-v">${e.cus||'—'}</div></div>
+      <div class="coef"><div class="coef-l">iCOS</div><div class="coef-v">${e.icos||'0'}</div></div>
+      <div class="coef"><div class="coef-l">iCUS</div><div class="coef-v">${e.icus||'0'}</div></div>
+    </div>
+    <div class="sup-blk" id="sup-blk-${idx}">
+      <div class="sup-blk-left">
+        <div class="sup-blk-tag">⚠️ Dato requerido para calcular potencial — sin él solo se muestran coeficientes en 0</div>
+        <div class="sup-blk-q">📐 ¿Cuántos m² tiene tu predio?</div>
+        <div class="sup-blk-row">
+          <input type="number" min="0" step="1" placeholder="0" value="${p.supIngresada||''}" class="sup-inp" id="sup-inp-${idx}" onchange="cambiarSup(${idx},this.value)" onkeydown="if(event.key==='Enter'){cambiarSup(${idx},this.value);this.blur();}">
+          <span class="sup-blk-m2">m²</span>
+        </div>
+        ${p.zona.superficie_minima?`<div class="sup-blk-min">Lote mín. norma: ${p.zona.superficie_minima} m²</div>`:''}
+      </div>
+      <div class="sup-blk-right">
+        <div class="sup-blk-rlbl">M² construibles</div>
+        <div class="sup-blk-rval" id="sup-base-${idx}">${sup>0?fm(e.mBase)+' m²':'—'}</div>
+        <div class="sup-blk-rsep"></div>
+        <div class="sup-blk-rlbl">Desplante máx</div>
+        <div class="sup-blk-rval" id="sup-desp-${idx}">${sup>0?fm(e.dBase)+' m²':'—'}</div>
+      </div>
+    </div>
+    <div class="despl-row">
+      <div class="despl-item">
+        <div class="despl-l">Desplante COS</div>
+        <div class="despl-v">${fm(e.dBase)} <span class="despl-u">m²</span></div>
+        <div style="font-size:9px;color:var(--text3)">COS ${e.cos} × ${fm(e.sup)} m²</div>
+      </div>
+      ${e.icos>0?`<div class="despl-item" style="border-left:1px solid var(--border)">
+        <div class="despl-l">Desplante máx iCOS</div>
+        <div class="despl-v" style="color:var(--brand-light)">${fm(e.dMax)} <span class="despl-u">m²</span></div>
+        <div style="font-size:9px;color:var(--text3)">(COS+iCOS) × ${fm(e.sup)} m²</div>
+      </div>`:''}
+      <div class="despl-item" style="border-left:1px solid var(--border)">
+        <div class="despl-l">Sup. ingresada</div>
+        <div class="despl-v">${fm(e.sup)} <span class="despl-u">m²</span></div>
+        <div style="font-size:9px;color:var(--text3)">${p.zona.superficie_minima?`norma: ${p.zona.superficie_minima} m²`:''}</div>
+      </div>
+    </div>
+    <div class="escs">${escBase}${escOpt}${escMax}${e.usosCond&&e.usosCond.length?e.usosCond.map(uc=>`
+    <div class="esc" style="background:#0a1520;border:1px solid #1e4060">
+      <div class="esc-tag" style="flex-direction:column;align-items:flex-start;gap:2px">
+        <span style="font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3)">Uso condicionado</span>
+        <span style="font-size:12px;font-weight:500;color:#60a5fa">${uc.uso} — CUS ${uc.cus}</span>
+      </div>
+      <div class="esc-m2" style="color:#60a5fa;margin-top:6px">${fm(uc.mCond)}<span>m² construibles</span></div>
+      <div class="esc-desp" style="margin-bottom:10px">${fm(uc.excCond)} m² más que el escenario base — requiere autorización especial del municipio</div>
+      <div style="background:rgba(0,0,0,.25);border-radius:7px;padding:9px 11px;font-size:11px;line-height:2">
+        <div style="font-size:9px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Cómo se calcula</div>
+        <div style="display:flex;justify-content:space-between;color:var(--text2)">
+          <span>Total construible</span>
+          <span style="font-family:var(--mono)">CUS ${uc.cus} × ${fm(sup)} m² = ${fm(uc.mCond)} m²</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;color:var(--text2)">
+          <span>Excedente sobre base (${fm(uc.excCond)} m²)</span>
+          <span style="font-family:var(--mono)">(${uc.cus} − ${e.cus}) × ${fm(sup)} m²</span>
+        </div>
+        <div style="border-top:1px solid var(--border);margin:5px 0"></div>
+        <div style="display:flex;justify-content:space-between;color:var(--text2)">
+          <span>ICUS — pago por los ${fm(uc.excCond)} m² extra</span>
+          <span style="font-family:var(--mono)">${fm(uc.excCond)} m² × $${fm(e.tarifa)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-weight:500;font-size:13px;color:var(--sem-am-txt);margin-top:2px">
+          <span>Total a pagar al municipio</span>
+          <span style="font-family:var(--mono)">${fmP(uc.pagoCond)}</span>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-top:6px;padding:6px 8px;background:rgba(255,200,0,.08);border-radius:5px;border-left:2px solid var(--sem-am-txt)">
+        ⚠️ ${uc.nota}${uc.sup_min?` · Lote mínimo: ${uc.sup_min} m²`:''}
+      </div>
+    </div>`).join(''):''}
+    </div>
+    ${e.cos>0 ? `
+    <div style="margin:0 12px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;overflow:hidden">
+      <div style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text2);border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.5px">
+        🏠 Vista aérea del predio — Distribución normativa
+      </div>
+      <div style="padding:12px;display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;overflow:hidden">
+        <div style="flex-shrink:0;line-height:0">${generarSVGPredi(e.cos,e.rest_f,e.rest_l,e.rest_p,null,p.zona.rest_f1,p.zona.rest_l1,p.zona.rest_p1)}</div><div style="flex:1;min-width:130px;font-size:11px;color:var(--text2);line-height:1.8">${generarLeyendaPredi(e.cos,e.rest_f,e.rest_l,e.rest_p,null,p.zona.rest_f1,p.zona.rest_l1,p.zona.rest_p1)}</div>
+        </div>
+    </div>` : ''}
+    ${ideBlk}
+    ${nivBlk}
+    ${cusAjusteBlk}
+    ${cusCriteriosBlk}
+  </div>`;
+}
+
+function toggleNiv(idx){
+  const t=document.getElementById('niv_'+idx);
+  const b=document.getElementById('nbtn_'+idx);
+  if(!t) return;
+  const show=t.style.display==='none'||t.style.display==='';
+  t.style.display=show?'block':'none';
+  const e=calcEsc(predios[idx].zona,predios[idx].sup);
+  const hasIcus=e.icus>0&&e.nivelIcus&&e.nivelIcus.length>0;
+  const lbl=hasIcus?`CUS ${e.cus} | CUS+iCUS ${Math.round((e.cus+e.icus)*100)/100}`:`CUS ${e.cus}`;
+  if(b) b.textContent=(show?'▼ ':'▶ ')+`Ver tabla nivel por nivel — ${lbl}`;
+}
+function switchNivTab(idx,tab){
+  const base=document.getElementById('niv_base_'+idx);
+  const icus=document.getElementById('niv_icus_'+idx);
+  const btnBase=document.getElementById('ntab_base_'+idx);
+  const btnIcus=document.getElementById('ntab_icus_'+idx);
+  const stA='flex:1;padding:5px 8px;border-radius:5px;border:1px solid var(--brand);background:var(--brand-pale);color:var(--brand);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)';
+  const stI='flex:1;padding:5px 8px;border-radius:5px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--sans)';
+  if(tab==='base'){
+    if(base) base.style.display='table'; if(icus) icus.style.display='none';
+    if(btnBase) btnBase.style.cssText=stA; if(btnIcus) btnIcus.style.cssText=stI;
+  } else {
+    if(base) base.style.display='none'; if(icus) icus.style.display='table';
+    if(btnBase) btnBase.style.cssText=stI; if(btnIcus) btnIcus.style.cssText=stA;
+  }
+}
+
+function cambiarSup(idx,val){
+  if(!predios[idx]) return;
+  const n=parseFloat(val)||0;
+  predios[idx].sup=n;
+  predios[idx].supIngresada=val;
+  // Actualizar resumen rápido
+  const e=calcEsc(predios[idx].zona,n);
+  const base=document.getElementById('sup-base-'+idx);
+  const desp=document.getElementById('sup-desp-'+idx);
+  if(base) base.textContent=n>0?fm(e.mBase)+' m²':'—';
+  if(desp) desp.textContent=n>0?fm(e.dBase)+' m²':'—';
+  // Re-render completo con debounce para no destruir el input mientras se teclea
+  clearTimeout(cambiarSup._t);
+  cambiarSup._t=setTimeout(()=>{
+    const inp=document.getElementById('sup-inp-'+idx);
+    const cursor=inp?inp.selectionStart:null;
+    renderTodo();
+    // Restaurar foco si el input estaba activo
+    const inp2=document.getElementById('sup-inp-'+idx);
+    if(inp2&&document.activeElement===document.body){
+      inp2.focus();
+      try{inp2.setSelectionRange(cursor,cursor);}catch(e){}
+    }
+  },350);
+}
+
+function cambiarIDE(idx,val){
+  if(!predios[idx]) return;
+  predios[idx].ide_override=parseFloat(val)||0;
+  renderTodo();
+}
+function cambiarEscElem(idx,field,val){
+  if(!predios[idx]) return;
+  predios[idx][field]=parseFloat(val)||0;
+  clearTimeout(cambiarEscElem._t);
+  cambiarEscElem._t=setTimeout(function(){ renderTodo(); },400);
+}
+function eliminarPredio(idx){
+  predios.splice(idx,1);
+  renderTodo();
+}
+
+function renderTodo(){
+  const grid=document.getElementById('predsGrid');
+  const btnImp=document.getElementById('btnImprimir');
+  if(!predios.length){
+    grid.innerHTML='<div class="placeholder-pc">Agrega un predio para comenzar →</div>';
+    document.getElementById('compSection').style.display='none';
+    if(btnImp) btnImp.style.display='none';
+    return;
+  }
+  let html=predios.map((p,i)=>renderPredio(p,i)).join('');
+  // "+ Agregar otro predio" eliminado — el panel lateral ya tiene el formulario de agregar
+  grid.innerHTML=html;
+  if(btnImp) btnImp.style.display='inline-flex';
+  predios.length>=2?renderComparativa():(document.getElementById('compSection').style.display='none');
+}
+
+function renderComparativa(){
+  const sec=document.getElementById('compSection');
+  sec.style.display='block';
+  const esc=predios.map(p=>calcEsc(p.zona,p.sup));
+  const maxM=Math.max(...esc.map(e=>e.mMax));
+  const heads=predios.map((p,i)=>`<th>Predio ${i+1}<br><span style="font-size:10px;font-weight:400">${p.dir.substring(0,16)}${p.dir.length>16?'…':''}</span></th>`).join('');
+  const rows=[
+    ['','Zona / Municipio',        esc.map((e,i)=>`${predios[i].zona._clave_bd||predios[i].zona.uso||'—'}`)],
+    ['','Superficie ingresada',    esc.map(e=>fm(e.sup)+' m²')],
+    ['','COS / CUS base',          esc.map(e=>`${e.cos} / ${e.cus}`)],
+    ['sep','DESPLANTE',''],
+    ['','Desplante base (COS)',     esc.map(e=>fm(e.dBase)+' m²')],
+    ['','Desplante máx (COS+iCOS)',esc.map(e=>fm(e.dMax)+' m²')],
+    ['sep','EDIFICABILIDAD',''],
+    ['','m² construibles base',    esc.map(e=>fm(e.mBase)+' m²')],
+    ['','m² construibles optativo',esc.map(e=>e.tieneOpt?fm(e.mOpt)+' m²':'—')],
+    ['','m² construibles máximo',  esc.map(e=>fm(e.mMax)+' m²')],
+    ['sep','CONTRIBUCIÓN ICUS',''],
+    ['','ICUS escenario base',      esc.map(e=>fmP(e.pagoBase))],
+    ['','ICUS escenario optativo',  esc.map(e=>e.tieneOpt?fmP(e.pagoOpt):'—')],
+    ['','ICUS escenario máximo',    esc.map(e=>fmP(e.pagoMax))],
+    ['sep','DEPARTAMENTOS (IDE)',''],
+    ['','Depas base',               esc.map(e=>e.ide>0?e.depBase+' depas':'—')],
+    ['','Depas máximo',             esc.map(e=>e.ide>0?e.depMax+' depas':'—')],
+  ];
+  const filas=rows.map(r=>{
+    if(r[0]==='sep') return `<tr class="comp-sep"><td colspan="${predios.length+1}">${r[1]}</td></tr>`;
+    const celdas=r[2].map((v,ci)=>{
+      const best=(r[1]==='m² construibles máximo')&&(esc[ci].mMax===maxM)&&maxM>0;
+      return `<td${best?' class="best"':''}>${v}</td>`;
+    }).join('');
+    return `<tr><td style="color:var(--text2)">${r[1]}</td>${celdas}</tr>`;
+  }).join('');
+  sec.innerHTML=`<div class="gu-rcard"><div class="gu-rcard-hdr" style="display:flex;align-items:center;justify-content:space-between">
+    <span>📊 Tabla comparativa · Mayor potencial máximo en verde</span>
+    <button onclick="descargarComparativa()" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);padding:5px 12px;font-size:11px;cursor:pointer;transition:all .15s;font-family:var(--sans)"
+      onmouseover="this.style.borderColor='var(--brand);this.style.color='var(--brand-light)'"
+      onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">
+      📥 Descargar Excel
+    </button>
+  </div><div style="overflow-x:auto"><table class="comp-tbl"><thead><tr><th>Parámetro</th>${heads}</tr></thead><tbody>${filas}</tbody></table></div><div style="padding:8px 12px;font-size:10px;color:var(--text3)">GDL $1,516/m² · ZPN $1,595/m² + $15,349 ECPD fijo · Estimaciones orientativas · Verificar con la dirección municipal</div></div>`;
+}
+
+function descargarComparativa(){
+  if(!predios.length) return;
+  const esc=predios.map(p=>calcEsc(p.zona,p.sup));
+  const fecha=new Date().toLocaleDateString('es-MX').replace(/\//g,'-');
+  const nPredios=predios.length;
+
+  // ── Colores corporativos ──
+  const AZUL_OSC  = '1F4E79';
+  const AZUL_MED  = '2E75B6';
+  const AZUL_CLAR = 'D6E4F0';
+  const VERDE     = '1A4731';
+  const VERDE_CLA = 'D1FAE5';
+  const AMARILLO  = '7B5C00';
+  const AMAR_CLA  = 'FEF9C3';
+  const GRIS      = 'F0F4F8';
+  const SEP_BG    = 'E2EAF4';
+
+  const xe = v => String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  // Función para celda con estilo
+  const cH  = (v,bold=true,bg=AZUL_OSC,fg='FFFFFF',sz=11) =>
+    `<Cell ss:StyleID="h"><Data ss:Type="String">${xe(v)}</Data></Cell>`;
+  const cSep= (v,cols) =>
+    `<Cell ss:StyleID="sep" ss:MergeAcross="${cols-1}"><Data ss:Type="String">${xe(v)}</Data></Cell>`;
+  const cL  = v => `<Cell ss:StyleID="lbl"><Data ss:Type="String">${xe(v)}</Data></Cell>`;
+  const cN  = v => isNaN(v)||v===''||v==='—'
+    ? `<Cell ss:StyleID="val"><Data ss:Type="String">${xe(v)}</Data></Cell>`
+    : `<Cell ss:StyleID="val"><Data ss:Type="Number">${v}</Data></Cell>`;
+  const cNb = v => isNaN(v)||v===''||v==='—'
+    ? `<Cell ss:StyleID="valb"><Data ss:Type="String">${xe(v)}</Data></Cell>`
+    : `<Cell ss:StyleID="valb"><Data ss:Type="Number">${v}</Data></Cell>`;
+  const cP  = v => isNaN(v)||v===''||v==='—'
+    ? `<Cell ss:StyleID="peso"><Data ss:Type="String">${xe(v)}</Data></Cell>`
+    : `<Cell ss:StyleID="peso"><Data ss:Type="Number">${v}</Data></Cell>`;
+  const cPb = v => isNaN(v)||v===''||v==='—'
+    ? `<Cell ss:StyleID="pesob"><Data ss:Type="String">${xe(v)}</Data></Cell>`
+    : `<Cell ss:StyleID="pesob"><Data ss:Type="Number">${v}</Data></Cell>`;
+  const cG  = v => `<Cell ss:StyleID="verde"><Data ss:Type="String">${xe(v)}</Data></Cell>`;
+  const cGb = v => isNaN(v)||v===''||v==='—'
+    ? `<Cell ss:StyleID="verdeb"><Data ss:Type="String">${xe(v)}</Data></Cell>`
+    : `<Cell ss:StyleID="verdeb"><Data ss:Type="Number">${v}</Data></Cell>`;
+  const cInfo= v => `<Cell ss:StyleID="info"><Data ss:Type="String">${xe(v)}</Data></Cell>`;
+
+  const row = cells => `<Row>${cells}</Row>\n`;
+
+  // Anchos de columna
+  const colWidths = [220, ...Array(nPredios).fill(180)];
+
+  // Estilos
+  const styles = `<Styles>
+    <Style ss:ID="titulo">
+      <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+      <Font ss:Bold="1" ss:Size="14" ss:Color="#FFFFFF"/>
+      <Interior ss:Color="#${AZUL_OSC}" ss:Pattern="Solid"/>
+      <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#FFFFFF"/></Borders>
+    </Style>
+    <Style ss:ID="h">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+      <Font ss:Bold="1" ss:Size="10" ss:Color="#FFFFFF"/>
+      <Interior ss:Color="#${AZUL_OSC}" ss:Pattern="Solid"/>
+      <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#FFFFFF"/>
+      <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#FFFFFF"/></Borders>
+    </Style>
+    <Style ss:ID="sep">
+      <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+      <Font ss:Bold="1" ss:Size="9" ss:Color="#${AZUL_MED}"/>
+      <Interior ss:Color="#${SEP_BG}" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="lbl">
+      <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+      <Font ss:Size="10" ss:Color="#374151"/>
+      <Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+      <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/></Borders>
+    </Style>
+    <Style ss:ID="val">
+      <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+      <Font ss:Size="10"/>
+      <NumberFormat ss:Format="#,##0.##"/>
+      <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/></Borders>
+    </Style>
+    <Style ss:ID="valb">
+      <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+      <Font ss:Bold="1" ss:Size="11"/>
+      <NumberFormat ss:Format="#,##0.##"/>
+      <Interior ss:Color="#${AZUL_CLAR}" ss:Pattern="Solid"/>
+      <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#93C5FD"/></Borders>
+    </Style>
+    <Style ss:ID="peso">
+      <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+      <Font ss:Size="10" ss:Color="#92400E"/>
+      <NumberFormat ss:Format='"$"#,##0'/>
+      <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/></Borders>
+    </Style>
+    <Style ss:ID="pesob">
+      <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+      <Font ss:Bold="1" ss:Size="11" ss:Color="#92400E"/>
+      <NumberFormat ss:Format='"$"#,##0'/>
+      <Interior ss:Color="#${AMAR_CLA}" ss:Pattern="Solid"/>
+      <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#FCD34D"/></Borders>
+    </Style>
+    <Style ss:ID="verde">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Font ss:Bold="1" ss:Size="10" ss:Color="#FFFFFF"/>
+      <Interior ss:Color="#${VERDE}" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="verdeb">
+      <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+      <Font ss:Bold="1" ss:Size="12" ss:Color="#065F46"/>
+      <NumberFormat ss:Format="#,##0.##"/>
+      <Interior ss:Color="#${VERDE_CLA}" ss:Pattern="Solid"/>
+      <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#059669"/></Borders>
+    </Style>
+    <Style ss:ID="info">
+      <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+      <Font ss:Size="9" ss:Color="#6B7280" ss:Italic="1"/>
+      <Interior ss:Color="#F9FAFB" ss:Pattern="Solid"/>
+    </Style>
+  </Styles>`;
+
+  // Columnas
+  const cols = colWidths.map(w=>`<Column ss:Width="${w}"/>`).join('');
+
+  // Encabezado de título
+  const titleRow = `<Row ss:Height="28">
+    <Cell ss:StyleID="titulo" ss:MergeAcross="${nPredios}">
+      <Data ss:Type="String">Gestor Urbano Jalisco AMG — Comparativa de Potencial Constructivo · ${fecha}</Data>
+    </Cell>
+  </Row>`;
+
+  // Fila de cabeceras
+  const headRow = row(
+    cH('Parámetro') +
+    predios.map((p,i)=>cH(`Predio ${i+1}\n${p.dir.substring(0,30)}`)).join('')
+  );
+
+  // Filas de datos
+  const maxMMax = Math.max(...esc.map(e=>e.mMax));
+
+  const dataRows = [
+    // General
+    row(cL('Zona / Municipio') + esc.map((e,i)=>cN(`${predios[i].zona._clave_bd||predios[i].zona.uso||'—'} · ${(predios[i].municipio||'').substring(0,3).toUpperCase()}`)).join('')),
+    row(cL('Superficie ingresada') + esc.map(e=>cN(e.sup)).join('') ),
+    row(cL('COS / CUS base') + esc.map(e=>cN(`${e.cos} / ${e.cus}`)).join('')),
+    // Sep Desplante
+    row(cSep('DESPLANTE', nPredios+1)),
+    row(cL('Desplante base — COS × Sup (m²)') + esc.map(e=>cN(e.dBase)).join('')),
+    row(cL('Desplante máximo — (COS+iCOS) × Sup (m²)') + esc.map(e=>cN(e.dMax)).join('')),
+    // Sep Edificabilidad
+    row(cSep('EDIFICABILIDAD', nPredios+1)),
+    row(cL('m² construibles — Escenario BASE') + esc.map(e=>cNb(e.mBase)).join('')),
+    row(cL('m² construibles — Escenario OPTATIVO') + esc.map(e=>e.tieneOpt?cNb(e.mOpt):cN('—')).join('')),
+    row(cL('m² construibles — Escenario MÁXIMO ★') + esc.map(e=>e.mMax===maxMMax?cGb(e.mMax):cNb(e.mMax)).join('')),
+    // Sep ICUS
+    row(cSep('CONTRIBUCIÓN ICUS AL MUNICIPIO', nPredios+1)),
+    row(cL('ICUS escenario base ($)') + esc.map(e=>cP(e.pagoBase)).join('')),
+    row(cL('ICUS escenario optativo ($)') + esc.map(e=>e.tieneOpt?cP(e.pagoOpt):cN('—')).join('')),
+    row(cL('ICUS escenario máximo ($)') + esc.map(e=>cPb(e.pagoMax)).join('')),
+    row(cL('Tarifa ICUS aplicada ($/m²)') + esc.map(e=>cN(e.tarifa)).join('')),
+    // Sep Depas
+    row(cSep('DEPARTAMENTOS ESTIMADOS POR IDE', nPredios+1)),
+    row(cL('IDE — m² mínimo por departamento') + esc.map(e=>cN(e.ide>0?e.ide:'No aplica')).join('')),
+    row(cL('Departamentos escenario base') + esc.map(e=>e.ide>0?cN(e.depBase):cN('—')).join('')),
+    row(cL('Departamentos escenario optativo') + esc.map(e=>e.ide>0&&e.tieneOpt?cN(e.depOpt):cN('—')).join('')),
+    row(cL('Departamentos escenario máximo') + esc.map(e=>e.ide>0?cNb(e.depMax):cN('—')).join('')),
+    // Nota
+    `<Row ss:Height="6"></Row>`,
+    row(cInfo(`Generado por Gestor Urbano Jalisco AMG · ${fecha} · Tarifa GDL $1,516/m² · ZPN $1,595/m² + $15,349 ECPD · Estimaciones orientativas. Verificar con la dirección municipal.`)),
+  ].join('');
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:x="urn:schemas-microsoft-com:office:excel">
+  <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+    <Title>Comparativa Potencial Constructivo</Title>
+    <Author>Gestor Urbano Jalisco AMG</Author>
+    <Created>${new Date().toISOString()}</Created>
+  </DocumentProperties>
+  <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+    <WindowHeight>10000</WindowHeight><WindowWidth>20000</WindowWidth>
+    <ProtectStructure>False</ProtectStructure>
+  </ExcelWorkbook>
+  ${styles}
+  <Worksheet ss:Name="Comparativa">
+    <Table>${cols}${titleRow}${headRow}${dataRows}</Table>
+    <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+      <FreezePanes/><FrozenNoSplit/>
+      <SplitHorizontal>2</SplitHorizontal><TopRowBottomPane>2</TopRowBottomPane>
+      <SplitVertical>1</SplitVertical><LeftColumnRightPane>1</LeftColumnRightPane>
+    </WorksheetOptions>
+  </Worksheet>
+</Workbook>`;
+
+  const blob = new Blob([xml], {type:'application/vnd.ms-excel;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `GestorUrbano_Comparativa_${fecha}.xls`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── Geocodificación y consulta de zona ─────────────────────────────────────
+// ── Vista aérea del predio ─────────────────────────────────────────────────
+function generarSVGPredi(cos, rf, rl, rp, color){
+  const W=240, H=200, PAD=36;
+  const escala = Math.min(H/20, W/14);
+  const pxF = Math.min(rf*escala, H*0.35);
+  const pxP = Math.min(rp*escala, H*0.35);
+  const pxL = Math.min(rl*escala, W*0.30);
+  const cx=PAD+pxL, cy=PAD+pxF, cw=W-pxL*2, ch=H-pxF-pxP;
+  const cConst=color||'#1D4ED8';
+  const pct=v=>v>0&&v<=1?Math.round(v*100):Math.round(v);
+  return '<svg width="'+(W+PAD*2)+'" height="'+(H+PAD*2)+'" viewBox="0 0 '+(W+PAD*2)+' '+(H+PAD*2)+'" xmlns="http://www.w3.org/2000/svg" style="display:block">'
+    +'<rect x="'+PAD+'" y="'+PAD+'" width="'+W+'" height="'+H+'" fill="#1E293B" stroke="#334155" stroke-width="1.5" rx="2"/>'
+    +(pxF>0?'<rect x="'+PAD+'" y="'+PAD+'" width="'+W+'" height="'+pxF+'" fill="#0F172A" opacity="0.7"/><line x1="'+PAD+'" y1="'+(PAD+pxF)+'" x2="'+(PAD+W)+'" y2="'+(PAD+pxF)+'" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4,3"/><text x="'+(PAD+W/2)+'" y="'+(PAD+pxF/2+4)+'" text-anchor="middle" fill="#F59E0B" font-size="9" font-family="monospace">RF '+rf+'m</text>':'')
+    +(pxP>0?'<rect x="'+PAD+'" y="'+(PAD+H-pxP)+'" width="'+W+'" height="'+pxP+'" fill="#0F172A" opacity="0.7"/><line x1="'+PAD+'" y1="'+(PAD+H-pxP)+'" x2="'+(PAD+W)+'" y2="'+(PAD+H-pxP)+'" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4,3"/><text x="'+(PAD+W/2)+'" y="'+(PAD+H-pxP/2+4)+'" text-anchor="middle" fill="#F59E0B" font-size="9" font-family="monospace">RP '+rp+'m</text>':'')
+    +(pxL>0?'<rect x="'+PAD+'" y="'+PAD+'" width="'+pxL+'" height="'+H+'" fill="#0F172A" opacity="0.7"/><line x1="'+(PAD+pxL)+'" y1="'+PAD+'" x2="'+(PAD+pxL)+'" y2="'+(PAD+H)+'" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4,3"/><rect x="'+(PAD+W-pxL)+'" y="'+PAD+'" width="'+pxL+'" height="'+H+'" fill="#0F172A" opacity="0.7"/><line x1="'+(PAD+W-pxL)+'" y1="'+PAD+'" x2="'+(PAD+W-pxL)+'" y2="'+(PAD+H)+'" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4,3"/>':'')
+    +'<rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+ch+'" fill="'+cConst+'" opacity="0.85" rx="2"/>'
+    +'<text x="'+(cx+cw/2)+'" y="'+(cy+ch/2-8)+'" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold" font-family="monospace">COS '+cos+'</text>'
+    +'<text x="'+(cx+cw/2)+'" y="'+(cy+ch/2+8)+'" text-anchor="middle" fill="#93C5FD" font-size="10" font-family="monospace">'+pct(cos)+'% del terreno</text>'
+    +'<text x="'+(PAD+W/2)+'" y="'+(PAD-8)+'" text-anchor="middle" fill="#64748B" font-size="9" font-family="sans-serif" letter-spacing="2">CALLE / FRENTE</text>'
+    +'</svg>';
+}
+
+function generarLeyendaPredi(cos, rf, rl, rp, clave){
+  const pct=v=>v>0&&v<=1?Math.round(v*100):Math.round(v);
+  const colorBox=clave?'#F59E0B':'#1D4ED8';
+  let html='<div style="margin-bottom:8px">'
+    +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><div style="width:12px;height:12px;background:'+colorBox+';border-radius:2px;flex-shrink:0"></div><span><strong>Área construible'+(clave?' ('+clave+')':'')+'</strong> — '+pct(cos)+'% del terreno</span></div>'
+    +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><div style="width:12px;height:12px;background:#0F172A;border:1px solid #F59E0B;border-radius:2px;flex-shrink:0"></div><span><strong>Restricciones</strong> — sin construcción cerrada</span></div>'
+    +'<div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:2px;background:#F59E0B;border-radius:1px;flex-shrink:0"></div><span style="color:#F59E0B"><strong>Línea de restricción</strong></span></div>'
+    +'</div>'
+    +'<div style="background:var(--bg3);border-radius:6px;padding:8px 10px;font-size:11px;line-height:1.7">'
+    +(rf>0?'<div>↑ Frontal: <strong>'+rf+' ml</strong></div>':'')
+    +(rp>0?'<div>↓ Posterior: <strong>'+rp+' ml</strong></div>':'')
+    +(rl>0?'<div>↔ Lateral: <strong>'+rl+' ml</strong> c/lado</div>':'')
+    +'<div style="margin-top:4px;padding-top:4px;border-top:1px solid var(--border)">COS <strong>'+cos+'</strong> = desplante máx '+pct(cos)+'% del terreno</div>'
+    +'</div>'
+    +'<div style="margin-top:8px;font-size:10px;color:var(--text3);line-height:1.5">⚠️ Diagrama esquemático. Las medidas reales dependen de la forma del predio.</div>';
+  return html;
+}
+
+// ── Precarga desde M01 (GU_m01_a_m03) ─────────────────────────────────────
+async function cargarDesdeM01(){
+  let datos;
+  try{
+    const raw=localStorage.getItem('GU_m01_a_m03');
+    if(!raw) return;
+    datos=JSON.parse(raw);
+    if(!datos||!datos.zona||(Date.now()-datos.ts)>600000){localStorage.removeItem('GU_m01_a_m03');return;}
+  }catch(e){localStorage.removeItem('GU_m01_a_m03');return;}
+
+  localStorage.removeItem('GU_m01_a_m03');
+
+  const munKey=datos.municipio||'guadalajara';
+  munActual=munKey;
+  document.querySelectorAll('.muni-btn').forEach(b=>b.classList.remove('active'));
+  const btnMun=document.querySelector('[onclick*="selMun(\''+munKey+'\'"]');
+  if(btnMun) btnMun.classList.add('active');
+
+  const nota=document.getElementById('muniNota');
+  if(nota) nota.innerHTML='✅ Cargado desde M01 — <strong>'+(datos.dir||'')+'</strong>';
+
+  _zonaVUJForzada=datos.zona._clave_bd||datos.zona.uso||null;
+
+  const supSugerida=datos.sup>0?datos.sup:
+    (datos.zona.sup_real_predio>0?datos.zona.sup_real_predio:
+    parseFloat(datos.zona.superficie_minima)||0);
+
+  predios.push({
+    dir:      datos.dir||(datos.lat&&datos.lng?datos.lat.toFixed(5)+', '+datos.lng.toFixed(5):''),
+    zona:     datos.zona,
+    sup:      supSugerida,
+    lat:      datos.lat||0,
+    lng:      datos.lng||0,
+    municipio:munKey,
+    _desde_m01:true
+  });
+
+  guardarHist(datos.dir||'',_zonaVUJForzada||'—',munKey);
+  renderTodo();
+  _zonaVUJForzada = null; // reset para que búsquedas nuevas no fallen
+  setTimeout(()=>{const r=document.getElementById('resultados');if(r)r.scrollIntoView({behavior:'smooth',block:'start'});},300);
+}
+
+
+async function geocodificarM03(dir,colonia,cp){
+  const bMap={guadalajara:'20.603,-103.407|20.752,-103.263',zapopan:'20.580,-103.500|20.820,-103.280',tlaquepaque:'20.570,-103.350|20.670,-103.240',tlajomulco:'20.440,-103.520|20.620,-103.280',tonala:'20.580,-103.270|20.680,-103.160'};
+  // Nombre oficial para afinar geocodificación — evita ambigüedades (ej: "Zaragoza 90" sin municipio)
+  const munNombre={guadalajara:'Guadalajara',zapopan:'Zapopan',tlaquepaque:'San Pedro Tlaquepaque',tlajomulco:'Tlajomulco de Zúñiga',tonala:'Tonalá'};
+  const dirLow=(dir+' '+colonia).toLowerCase();
+  // Solo agregar municipio si no está ya en la dirección escrita por el usuario
+  const munYaEscrito=Object.values(munNombre).some(n=>dirLow.includes(n.toLowerCase().split(' ')[0]));
+  const sufijo=munYaEscrito?'Jalisco':(munNombre[munActual]||'')+', Jalisco';
+  const q=[dir,colonia,cp,sufijo].filter(Boolean).join(', ');
+  const r=await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(q)}&bounds=${bMap[munActual]||''}&region=mx&language=es&key=${MAPS_KEY}`);
+  const d=await r.json();
+  if(!d.results?.length) throw new Error('No se encontró la dirección. Agrega la colonia o el CP para afinar la búsqueda.');
+  const loc=d.results[0].geometry.location;
+  return {lat:loc.lat,lng:loc.lng,dir:d.results[0].formatted_address};
+}
+
+// ── AGREGAR PREDIO — Tab Dirección ────────────────────────────────────────
+async function agregarPredio(){
+  if(buscando) return;
+  if(predios.length>=2){ setStatus('error','Máximo 2 predios simultáneos.'); return; }
+  const dir=document.getElementById('inCalle').value.trim();
+  const col=document.getElementById('inColonia').value.trim();
+  const cp =document.getElementById('inCP').value.trim();
+  if(!dir){ setStatus('error','Ingresa una dirección.'); return; }
+  buscando=true;
+  document.getElementById('btnAgregar').disabled=true;
+  setStatus('loading','Geocodificando dirección…');
+  try{
+    const {lat,lng,dir:dirFmt}=await geocodificarM03(dir,col,cp);
+    const munDetec=detectarMunicipioPorCoords(lat,lng);
+    if(munDetec && munDetec!==munActual) actualizarMunBtn(munDetec);
+    setStatus('loading','Consultando zonificación…');
+    const munId=VUJ_MUNICIPIOS[munActual]||39;
+    const zona=await consultarVisorJalisco(lat,lng,munId);
+    predios.push({dir:dirFmt,zona,sup:zona.superficie_predio||0,municipio:munActual,lat,lng});
+    guardarHist(dirFmt,zona._clave_bd||zona.uso||'—',munActual);
+    renderTodo();
+    setStatus('','');
+    limpiarBusqueda();
+  }catch(e){
+    setStatus('error',e.message||'Error al consultar. Verifica la dirección o el municipio seleccionado.');
+  }finally{
+    buscando=false;
+    document.getElementById('btnAgregar').disabled=false;
+  }
+}
+
+// ── BUSCAR POR CLAVE CATASTRAL — Tab Predial ──────────────────────────────
+async function buscarCatM03(){
+  if(buscando) return;
+  if(predios.length>=2){ setStatus('error','Máximo 2 predios simultáneos.'); return; }
+  const cat=document.getElementById('inCat').value.trim();
+  if(!cat){ setStatus('error','Ingresa la clave catastral.'); return; }
+  buscando=true;
+  setStatus('loading','Buscando predio por clave catastral…');
+  try{
+    const res=await vujWfs('VUJ:predios',`clave_catastral LIKE '%${cat}%'`,1);
+    if(!res.length||!res[0].geometry) throw new Error('Clave catastral no encontrada. Verifica el municipio seleccionado.');
+    const coords=res[0].geometry.coordinates[0];
+    const lat=coords.reduce((s,c)=>s+c[1],0)/coords.length;
+    const lng=coords.reduce((s,c)=>s+c[0],0)/coords.length;
+    const munDetec=detectarMunicipioPorCoords(lat,lng);
+    if(munDetec && munDetec!==munActual) actualizarMunBtn(munDetec);
+    setStatus('loading','Consultando zonificación…');
+    const munId=VUJ_MUNICIPIOS[munActual]||39;
+    const zona=await consultarVisorJalisco(lat,lng,munId);
+    predios.push({dir:'Clave: '+cat,zona,sup:zona.superficie_predio||0,municipio:munActual,lat,lng});
+    guardarHist('Clave: '+cat,zona._clave_bd||zona.uso||'—',munActual);
+    renderTodo();
+    setStatus('','');
+    limpiarBusqueda();
+  }catch(e){
+    setStatus('error',e.message||'Error al consultar la clave catastral.');
+  }finally{
+    buscando=false;
+  }
+}
+
+// ── BUSCAR POR COORDENADAS — Tab Coords ───────────────────────────────────
+async function buscarCoordsM03(){
+  if(buscando) return;
+  if(predios.length>=2){ setStatus('error','Máximo 2 predios simultáneos.'); return; }
+  const lat=parseFloat(document.getElementById('inLat').value);
+  const lng=parseFloat(document.getElementById('inLng').value);
+  if(isNaN(lat)||isNaN(lng)){ setStatus('error','Ingresa latitud y longitud válidas.'); return; }
+  if(lat<20.3||lat>21.0||lng<-103.8||lng>-103.0){ setStatus('error','Coordenadas fuera del AMG. Verifica que sean correctas.'); return; }
+  buscando=true;
+  setStatus('loading','Consultando zonificación…');
+  try{
+    const munDetec=detectarMunicipioPorCoords(lat,lng);
+    if(munDetec && munDetec!==munActual) actualizarMunBtn(munDetec);
+    const munId=VUJ_MUNICIPIOS[munActual]||39;
+    const zona=await consultarVisorJalisco(lat,lng,munId);
+    predios.push({dir:lat.toFixed(5)+', '+lng.toFixed(5),zona,sup:zona.superficie_predio||0,municipio:munActual,lat,lng});
+    guardarHist(lat.toFixed(5)+', '+lng.toFixed(5),zona._clave_bd||zona.uso||'—',munActual);
+    renderTodo();
+    setStatus('','');
+  }catch(e){
+    setStatus('error',e.message||'Error al consultar coordenadas.');
+  }finally{
+    buscando=false;
+  }
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+renderHist();
+cargarDesdeM01();
+</script>
+</body>
+</html>

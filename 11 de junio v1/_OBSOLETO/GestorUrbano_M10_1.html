@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 10 — Pre-dictamen de Uso de Suelo · Gestor Urbano Jalisco</title>
+<style>
+:root{
+  --sans:'Segoe UI',system-ui,sans-serif;
+  --mono:'Menlo','Consolas',monospace;
+  --bg:#F8F9FA; --bg2:#FFFFFF; --bg3:#F1F3F4; --bg4:#E8EAED;
+  --text:#1A1A1A; --text2:#444; --text3:#777;
+  --border:#E0E0E0; --border2:#C8C8C8;
+  --accent:#1A3A8F; --accent-lt:#EEF2FF;
+  --green:#1B6B3A; --green-lt:#F0FDF4;
+  --red:#B91C1C; --red-lt:#FEF2F2;
+  --amber:#92400E; --amber-lt:#FFFBEB;
+}
+[data-theme="dark"]{
+  --bg:#111827; --bg2:#1F2937; --bg3:#374151; --bg4:#4B5563;
+  --text:#F9FAFB; --text2:#D1D5DB; --text3:#9CA3AF;
+  --border:#374151; --border2:#4B5563;
+  --accent-lt:#1e2d5a; --green-lt:#052e16; --red-lt:#450a0a; --amber-lt:#451a03;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── NAV ── */
+.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50}
+.nav-logo{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.3px;white-space:nowrap}
+.nav-logo span{font-weight:400;color:var(--text3)}
+.nav-right{margin-left:auto;display:flex;gap:8px}
+.btn-nav{background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);padding:5px 11px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all .15s}
+.btn-nav:hover{background:var(--bg4);color:var(--text)}
+.btn-nav.accent{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-nav.accent:hover{background:#1531a0}
+.btn-nav.green{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-nav.green:hover{opacity:.9}
+
+/* ── MAIN ── */
+.main{max-width:820px;margin:0 auto;padding:24px 16px 60px}
+.page-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--text3);margin-bottom:20px}
+
+/* ── EMPTY STATE ── */
+.empty-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:40px 24px;text-align:center}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-title{font-size:17px;font-weight:600;color:var(--text);margin-bottom:8px}
+.empty-desc{font-size:13px;color:var(--text3);line-height:1.6;max-width:380px;margin:0 auto 20px}
+.empty-btn{display:inline-block;background:var(--accent);color:#fff;border:none;border-radius:7px;padding:10px 20px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;text-decoration:none}
+
+/* ── FORM COMPLEMENTO ── */
+.form-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:16px}
+.form-card h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-grid.cols3{grid-template-columns:1fr 1fr 1fr}
+.form-field{display:flex;flex-direction:column;gap:4px}
+.form-field.full{grid-column:1/-1}
+.form-field label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.form-field input,.form-field select,.form-field textarea{
+  background:var(--bg3);border:1px solid var(--border);border-radius:6px;
+  color:var(--text);padding:7px 10px;font-family:var(--sans);font-size:13px;
+  outline:none;transition:border .15s
+}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--accent)}
+.form-field textarea{resize:vertical;min-height:56px;line-height:1.5}
+
+/* ── ALERT ── */
+.alert{display:flex;align-items:flex-start;gap:10px;border-radius:8px;padding:10px 14px;font-size:12px;line-height:1.5;margin-bottom:14px}
+.alert.warn{background:var(--amber-lt);border:1px solid #FDE68A;color:var(--amber)}
+.alert.info{background:var(--accent-lt);border:1px solid #BFDBFE;color:var(--accent)}
+
+/* ── DICTAMEN ── */
+.dictamen{background:#fff;color:#1a1a1a;border:1px solid #d0d0d0;border-radius:10px;overflow:hidden;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+
+.dict-header{background:#1A3A8F;color:#fff;padding:18px 24px}
+.dict-header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.dict-title{font-size:15px;font-weight:700;letter-spacing:.2px;margin-bottom:2px}
+.dict-subtitle{font-size:11px;opacity:.8}
+.dict-folio{text-align:right}
+.dict-folio-num{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.15);border-radius:4px;padding:3px 8px;white-space:nowrap}
+.dict-folio-label{font-size:10px;opacity:.7;margin-bottom:3px}
+.dict-mun-strip{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.2);display:flex;gap:16px;flex-wrap:wrap}
+.dict-mun-item{font-size:11px;opacity:.85}
+.dict-mun-item strong{display:block;font-size:12px;opacity:1}
+
+.dict-section{border-bottom:1px solid #e8e8e8;padding:14px 24px}
+.dict-section:last-child{border-bottom:none}
+.dict-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#1A3A8F;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.dict-section-title::after{content:'';flex:1;height:1px;background:#e4e8f4}
+
+.dict-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px dashed #eee;font-size:12px}
+.dict-row:last-child{border-bottom:none}
+.dict-row-label{color:#555;flex:0 0 auto;max-width:55%}
+.dict-row-val{font-weight:600;color:#1a1a1a;text-align:right;flex:1}
+.dict-row-val.na{color:#999;font-weight:400;font-style:italic}
+
+.dict-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dict-grid.cols4{grid-template-columns:repeat(4,1fr)}
+.dict-param{background:#f4f6fb;border-radius:6px;padding:8px 10px;text-align:center}
+.dict-param-val{font-size:18px;font-weight:700;color:#1A3A8F;line-height:1}
+.dict-param-label{font-size:10px;color:#666;margin-top:3px;line-height:1.3}
+
+.dict-usos{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.uso-tag{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:500}
+.uso-tag.perm{background:#dcfce7;color:#166534}
+.uso-tag.cond{background:#fef9c3;color:#854d0e}
+.uso-tag.proh{background:#fee2e2;color:#991b1b}
+
+.dict-restricciones{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.rest-box{background:#f9fafb;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;text-align:center}
+.rest-box-val{font-size:15px;font-weight:700;color:#1a1a1a}
+.rest-box-label{font-size:10px;color:#777;margin-top:2px}
+
+.dict-disclaimer{background:#FFF8E7;border-top:2px solid #F59E0B;padding:12px 24px;font-size:10px;color:#78350F;line-height:1.6}
+.dict-disclaimer strong{display:block;margin-bottom:3px;font-size:11px}
+
+/* ── PRINT ACTIONS ── */
+.print-actions{display:flex;gap:10px;justify-content:flex-end;margin-bottom:16px}
+.btn-print{background:var(--green);color:#fff;border:none;border-radius:7px;padding:9px 18px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px}
+.btn-print:hover{opacity:.9}
+.btn-secondary{background:var(--bg3);color:var(--text2);border:1px solid var(--border2);border-radius:7px;padding:9px 16px;font-family:var(--sans);font-size:13px;cursor:pointer}
+.btn-secondary:hover{background:var(--bg4)}
+
+/* ── FOOTER ── */
+.footer{text-align:center;font-size:11px;color:var(--text3);margin-top:32px;padding-top:16px;border-top:1px solid var(--border)}
+
+/* ── PRINT MEDIA ── */
+@media print{
+  .nav,.print-actions,.form-card,.footer,.page-title,.page-sub{display:none!important}
+  body{background:#fff;color:#000;font-size:11pt}
+  .main{max-width:100%;padding:0;margin:0}
+  .alert.warn{display:none}
+  .dictamen{
+    border:none;border-radius:0;box-shadow:none;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact
+  }
+  .dict-header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .dict-param{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .uso-tag{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .dict-disclaimer{-webkit-print-color-adjust:exact;print-color-adjust:exact;page-break-inside:avoid}
+  .dict-section{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<!-- ── NAV ── -->
+<nav class="nav no-print">
+  <div class="nav-logo">Gestor Urbano <span>Jalisco AMG</span></div>
+  <div class="nav-right">
+    <a href="index.html" class="btn-nav">← Menú</a>
+    <a href="GestorUrbano_M01_3.html" class="btn-nav">📍 Uso de suelo</a>
+    <button onclick="toggleTheme()" class="btn-nav" id="btnTheme">🌙</button>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="page-title">Módulo 10 — Pre-dictamen de Uso de Suelo</div>
+  <div class="page-sub">Documento orientativo con los parámetros normativos del predio consultado.</div>
+
+  <!-- ESTADO: sin datos -->
+  <div id="stateEmpty" style="display:none">
+    <div class="empty-card">
+      <div class="empty-icon">📄</div>
+      <div class="empty-title">No hay consulta activa</div>
+      <div class="empty-desc">Para generar un pre-dictamen primero realiza una consulta de uso de suelo en el Módulo 01. Los datos se transfieren automáticamente.</div>
+      <a href="GestorUrbano_M01_3.html" class="empty-btn">Ir al Módulo 01 →</a>
+    </div>
+  </div>
+
+  <!-- ESTADO: datos cargados -->
+  <div id="stateLoaded" style="display:none">
+
+    <!-- Alerta vigencia -->
+    <div id="alertVigencia" class="alert warn" style="display:none">
+      ⚠️ <span id="alertVigenciaMsg"></span>
+    </div>
+
+    <!-- Campos complementarios -->
+    <div class="form-card no-print">
+      <h3>📝 Datos del proyecto (opcionales — aparecen en el dictamen)</h3>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Superficie del terreno (m²)</label>
+          <input type="number" id="inSup" placeholder="Ej. 250" min="0" oninput="renderDictamen()">
+        </div>
+        <div class="form-field">
+          <label>Tipo de proyecto</label>
+          <select id="inTipo" onchange="renderDictamen()">
+            <option value="">— Sin especificar —</option>
+            <option value="Licencia de construcción nueva">Licencia de construcción nueva</option>
+            <option value="Ampliación o remodelación">Ampliación o remodelación</option>
+            <option value="Cambio de uso de suelo">Cambio de uso de suelo</option>
+            <option value="Licencia de giro comercial">Licencia de giro comercial</option>
+            <option value="Subdivisión / fusión de predios">Subdivisión / fusión de predios</option>
+            <option value="Dictamen de factibilidad">Dictamen de factibilidad</option>
+            <option value="Consulta de referencia">Consulta de referencia</option>
+          </select>
+        </div>
+        <div class="form-field full">
+          <label>Descripción breve del proyecto (opcional)</label>
+          <textarea id="inDesc" rows="2" placeholder="Ej. Edificio plurifamiliar de 6 niveles con planta baja comercial" oninput="renderDictamen()"></textarea>
+        </div>
+        <div class="form-field">
+          <label>Nombre / Razón social del solicitante</label>
+          <input type="text" id="inSolicitante" placeholder="Opcional" oninput="renderDictamen()">
+        </div>
+        <div class="form-field">
+          <label>Elaborado por (arquitecto / DRO)</label>
+          <input type="text" id="inProfesional" placeholder="Opcional" oninput="renderDictamen()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="print-actions">
+      <button class="btn-secondary" onclick="limpiarDatos()">🗑 Nueva consulta</button>
+      <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+    </div>
+
+    <!-- DICTAMEN -->
+    <div id="dictamen" class="dictamen"></div>
+
+  </div>
+</div>
+
+<div class="footer no-print">
+  Gestor Urbano Jalisco AMG · Módulo 10 — Pre-dictamen de Uso de Suelo · Orientativo, sin valor oficial
+</div>
+
+<script>
+/* ── TEMA ── */
+(function(){var t=localStorage.getItem('gu_theme');if(t)document.documentElement.setAttribute('data-theme',t)})();
+function toggleTheme(){
+  var d=document.documentElement;
+  var cur=d.getAttribute('data-theme')||'light';
+  var next=cur==='dark'?'light':'dark';
+  d.setAttribute('data-theme',next);
+  localStorage.setItem('gu_theme',next);
+  document.getElementById('btnTheme').textContent=next==='dark'?'☀️':'🌙';
+}
+(function(){var t=localStorage.getItem('gu_theme');document.getElementById('btnTheme').textContent=t==='dark'?'☀️':'🌙'})();
+
+/* ── NOMBRES DISPLAY ── */
+const MUN_NOMBRES = {
+  guadalajara: 'Guadalajara (GDL)',
+  zapopan:     'Zapopan (ZPN)',
+  tlaquepaque: 'San Pedro Tlaquepaque (TLQ)',
+  tlajomulco:  'Tlajomulco de Zúñiga (TLA)',
+  tonala:      'Tonalá (TON)'
+};
+const MUN_ABREV = {
+  guadalajara:'GDL', zapopan:'ZPN', tlaquepaque:'TLQ', tlajomulco:'TLA', tonala:'TON'
+};
+
+/* ── ESTADO GLOBAL ── */
+var _datos = null;      // { zona (obj), dir, municipio, lat, lng, sup, ts, source }
+var _zonaEs = null;     // objeto zona completo
+
+/* ── CARGA DE DATOS ── */
+function cargarDatos(){
+  // Intentar GU_m01_a_m03 (zona completa)
+  try{
+    var raw = localStorage.getItem('GU_m01_a_m03');
+    if(raw){
+      var d = JSON.parse(raw);
+      if(d && d.zona && typeof d.zona === 'object' && d.zona.cos !== undefined){
+        _datos = d;
+        _datos.source = 'm01_a_m03';
+        return true;
+      }
+    }
+  }catch(e){}
+
+  // Fallback: GU_predio_activo (datos mínimos)
+  try{
+    var raw2 = localStorage.getItem('GU_predio_activo');
+    if(raw2){
+      var d2 = JSON.parse(raw2);
+      if(d2 && d2.dir){
+        _datos = d2;
+        _datos.source = 'predio_activo';
+        // zona es string, no objeto
+        return true;
+      }
+    }
+  }catch(e){}
+
+  return false;
+}
+
+/* ── HELPERS ── */
+function fmt(v, unidad){
+  if(v===null||v===undefined||v===''||v==='—'||v===0) return null;
+  return v + (unidad?' '+unidad:'');
+}
+function fmtNum(v, decimals){
+  if(!v && v!==0) return null;
+  var n = parseFloat(v);
+  if(isNaN(n)||n===0) return null;
+  return n%1===0 ? n.toString() : n.toFixed(decimals||2);
+}
+function fmtPct(v){
+  if(!v && v!==0) return null;
+  var n = parseFloat(v);
+  if(isNaN(n)||n===0) return null;
+  return (n>0&&n<=1 ? Math.round(n*100) : Math.round(n))+'%';
+}
+function folio(mun, ts){
+  var abr = MUN_ABREV[mun]||'GDL';
+  var d = new Date(ts||Date.now());
+  var pad = n => String(n).padStart(2,'0');
+  var date = d.getFullYear().toString().slice(2)+pad(d.getMonth()+1)+pad(d.getDate());
+  var uid = Math.random().toString(36).slice(2,6).toUpperCase();
+  return 'GU-'+abr+'-'+date+'-'+uid;
+}
+function splitUsos(str){
+  if(!str) return [];
+  return str.split(/[·\|,]/).map(u=>u.trim()).filter(Boolean);
+}
+function esCond(u){ return /condicionado/i.test(u); }
+function limpiarUso(u){ return u.replace(/\(condicionado\)/i,'').trim(); }
+
+/* ── FOLIO PERSISTENTE ── */
+var _folio = '';
+function getFolio(){
+  if(!_folio){
+    var ts = (_datos&&_datos.ts)||Date.now();
+    var mun = (_datos&&_datos.municipio)||'guadalajara';
+    _folio = folio(mun, ts);
+  }
+  return _folio;
+}
+
+/* ── RENDER DICTAMEN ── */
+function renderDictamen(){
+  if(!_datos) return;
+  var z = (typeof _datos.zona === 'object') ? _datos.zona : null;
+  var mun = _datos.municipio||'guadalajara';
+
+  var sup = parseFloat(document.getElementById('inSup').value)||_datos.sup||0;
+  var tipo = document.getElementById('inTipo').value;
+  var desc = document.getElementById('inDesc').value.trim();
+  var solicitante = document.getElementById('inSolicitante').value.trim();
+  var profesional = document.getElementById('inProfesional').value.trim();
+
+  var now = new Date();
+  var pad = n=>String(n).padStart(2,'0');
+  var fechaStr = pad(now.getDate())+'/'+pad(now.getMonth()+1)+'/'+now.getFullYear();
+  var horaStr  = pad(now.getHours())+':'+pad(now.getMinutes());
+
+  // ── HEADER ──
+  var html = '<div class="dict-header">';
+  html += '<div class="dict-header-top">';
+  html += '<div>';
+  html += '<div class="dict-title">PRE-DICTAMEN DE USO DE SUELO</div>';
+  html += '<div class="dict-subtitle">Gestor Urbano Jalisco · Área Metropolitana de Guadalajara</div>';
+  html += '</div>';
+  html += '<div class="dict-folio">';
+  html += '<div class="dict-folio-label">Folio</div>';
+  html += '<div class="dict-folio-num">'+getFolio()+'</div>';
+  html += '</div>';
+  html += '</div>';
+  html += '<div class="dict-mun-strip">';
+  html += '<div class="dict-mun-item"><strong>'+fechaStr+' '+horaStr+'</strong>Fecha y hora</div>';
+  html += '<div class="dict-mun-item"><strong>'+(MUN_NOMBRES[mun]||mun)+'</strong>Municipio</div>';
+  if(tipo) html += '<div class="dict-mun-item"><strong>'+tipo+'</strong>Tipo de consulta</div>';
+  html += '</div>';
+  html += '</div>'; // dict-header
+
+  // ── SECCIÓN 1: DATOS DEL PREDIO ──
+  html += '<div class="dict-section">';
+  html += '<div class="dict-section-title">1. Datos del predio</div>';
+
+  html += '<div class="dict-row"><span class="dict-row-label">Domicilio consultado</span><span class="dict-row-val">'+(escHtml(_datos.dir)||'—')+'</span></div>';
+  if(_datos.lat && _datos.lng){
+    html += '<div class="dict-row"><span class="dict-row-label">Coordenadas (WGS84)</span><span class="dict-row-val" style="font-family:var(--mono);font-size:11px">'+_datos.lat.toFixed(6)+', '+_datos.lng.toFixed(6)+'</span></div>';
+  }
+  if(sup>0){
+    html += '<div class="dict-row"><span class="dict-row-label">Superficie del terreno</span><span class="dict-row-val">'+sup.toLocaleString('es-MX')+' m²</span></div>';
+  }
+  if(solicitante){
+    html += '<div class="dict-row"><span class="dict-row-label">Solicitante</span><span class="dict-row-val">'+escHtml(solicitante)+'</span></div>';
+  }
+  if(profesional){
+    html += '<div class="dict-row"><span class="dict-row-label">Profesional responsable</span><span class="dict-row-val">'+escHtml(profesional)+'</span></div>';
+  }
+  if(desc){
+    html += '<div class="dict-row"><span class="dict-row-label">Descripción del proyecto</span><span class="dict-row-val">'+escHtml(desc)+'</span></div>';
+  }
+  html += '</div>'; // dict-section
+
+  // ── SECCIÓN 2: ZONIFICACIÓN ──
+  html += '<div class="dict-section">';
+  html += '<div class="dict-section-title">2. Zonificación</div>';
+
+  if(z){
+    var claveZ = z._clave_bd || z.uso || z.clave || '—';
+    var descZ  = z.ppp || z.zona || '—';
+    var fuenteZ = z._bd_local_usada ? 'Base de datos local (BD-'+MUN_ABREV[mun]+')' : 'GeoServer WMS — Visor Urbano Jalisco';
+
+    html += '<div class="dict-row"><span class="dict-row-label">Clave de zonificación</span><span class="dict-row-val" style="font-size:15px;color:#1A3A8F">'+claveZ+'</span></div>';
+    if(descZ && descZ!==claveZ){
+      html += '<div class="dict-row"><span class="dict-row-label">Descripción</span><span class="dict-row-val">'+escHtml(descZ)+'</span></div>';
+    }
+    html += '<div class="dict-row"><span class="dict-row-label">Fuente</span><span class="dict-row-val">'+fuenteZ+'</span></div>';
+    if(z.modo||z.mod_viv){
+      html += '<div class="dict-row"><span class="dict-row-label">Modo de edificación</span><span class="dict-row-val">'+(z.modo||z.mod_viv)+'</span></div>';
+    }
+  } else {
+    // Solo tenemos la clave como string
+    html += '<div class="dict-row"><span class="dict-row-label">Clave de zonificación</span><span class="dict-row-val" style="font-size:15px;color:#1A3A8F">'+escHtml(String(_datos.zona||'—'))+'</span></div>';
+    html += '<div class="dict-row"><span class="dict-row-label">Parámetros detallados</span><span class="dict-row-val na">No disponibles — consulte M01 para datos completos</span></div>';
+  }
+  html += '</div>';
+
+  // ── SECCIÓN 3: PARÁMETROS URBANÍSTICOS (solo si zona completa) ──
+  if(z && (z.cos||z.cus)){
+    html += '<div class="dict-section">';
+    html += '<div class="dict-section-title">3. Parámetros urbanísticos</div>';
+
+    // Grid principal: COS, CUS, Altura, Sup mín
+    html += '<div class="dict-grid cols4" style="margin-bottom:12px">';
+
+    var cosVal = fmtNum(z.cos);
+    var cosPct = fmtPct(z.cos);
+    html += '<div class="dict-param"><div class="dict-param-val">'+(cosVal||'—')+'</div><div class="dict-param-label">COS<br>(Coef. Ocupación Suelo)</div></div>';
+
+    var cusVal = fmtNum(z.cus);
+    html += '<div class="dict-param"><div class="dict-param-val">'+(cusVal||'—')+'</div><div class="dict-param-label">CUS<br>(Coef. Utilización Suelo)</div></div>';
+
+    var altVal = z.alt_max||'—';
+    html += '<div class="dict-param"><div class="dict-param-val">'+altVal+'</div><div class="dict-param-label">Altura máx.<br>(m o niveles)</div></div>';
+
+    var supMinVal = z.sup_min||'—';
+    html += '<div class="dict-param"><div class="dict-param-val">'+supMinVal+'</div><div class="dict-param-label">Superficie<br>mínima (m²)</div></div>';
+    html += '</div>'; // dict-grid
+
+    // Parámetros adicionales en filas
+    if(fmtNum(z.cus_opt)){
+      html += '<div class="dict-row"><span class="dict-row-label">CUS Optativo</span><span class="dict-row-val">'+fmtNum(z.cus_opt)+'</span></div>';
+    }
+    if(z.cus_max && z.cus_max!=='0'){
+      html += '<div class="dict-row"><span class="dict-row-label">CUS Máximo</span><span class="dict-row-val">'+z.cus_max+'</span></div>';
+    }
+    if(z.fre_min){
+      html += '<div class="dict-row"><span class="dict-row-label">Frente mínimo</span><span class="dict-row-val">'+z.fre_min+' ml</span></div>';
+    }
+    if(fmtNum(z.icus)){
+      html += '<div class="dict-row"><span class="dict-row-label">iCUS (Índice de CUS)</span><span class="dict-row-val">'+fmtNum(z.icus)+'</span></div>';
+    }
+
+    // Superficies calculadas si hay terreno
+    if(sup>0 && z.cos>0){
+      html += '<div style="margin-top:10px;padding:10px;background:#EEF2FF;border-radius:6px;font-size:11px;color:#1A3A8F">';
+      html += '<strong style="display:block;margin-bottom:6px">Cálculo para '+sup.toLocaleString('es-MX')+' m² de terreno</strong>';
+      html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">';
+
+      var supDesplante = Math.round(sup * parseFloat(z.cos));
+      html += '<div><div style="font-size:15px;font-weight:700">'+supDesplante.toLocaleString('es-MX')+'<small> m²</small></div><div>Desplante máx.</div></div>';
+
+      if(z.cus>0){
+        var supConst = Math.round(sup * parseFloat(z.cus));
+        html += '<div><div style="font-size:15px;font-weight:700">'+supConst.toLocaleString('es-MX')+'<small> m²</small></div><div>Const. máx. (CUS)</div></div>';
+      }
+      if(z.cus_opt>0){
+        var supOpt = Math.round(sup * parseFloat(z.cus_opt));
+        html += '<div><div style="font-size:15px;font-weight:700">'+supOpt.toLocaleString('es-MX')+'<small> m²</small></div><div>Const. máx. (CUS opt.)</div></div>';
+      }
+      html += '</div></div>';
+    }
+
+    html += '</div>'; // dict-section parámetros
+  }
+
+  // ── SECCIÓN 4: RESTRICCIONES ──
+  if(z && (z.rest_f1||z.rest_l1||z.rest_p1)){
+    html += '<div class="dict-section">';
+    html += '<div class="dict-section-title">4. Restricciones de edificación</div>';
+    html += '<div class="dict-restricciones">';
+
+    var rf = z.rest_f1||'—', rl = z.rest_l1||'—', rp = z.rest_p1||'—';
+    html += '<div class="rest-box"><div class="rest-box-val">'+rf+'</div><div class="rest-box-label">Restricción frontal</div></div>';
+    html += '<div class="rest-box"><div class="rest-box-val">'+rl+'</div><div class="rest-box-label">Restricción lateral (c/lado)</div></div>';
+    html += '<div class="rest-box"><div class="rest-box-val">'+rp+'</div><div class="rest-box-label">Restricción posterior</div></div>';
+    html += '</div>';
+    html += '</div>';
+  }
+
+  // ── SECCIÓN 5: USOS DEL SUELO ──
+  if(z && z.uso_permitido){
+    html += '<div class="dict-section">';
+    html += '<div class="dict-section-title">5. Usos del suelo compatibles</div>';
+
+    var usosPerm = splitUsos(z.uso_permitido);
+    if(usosPerm.length){
+      html += '<div style="margin-bottom:6px;font-size:11px;color:#555;font-weight:600">Permitidos y condicionados:</div>';
+      html += '<div class="dict-usos">';
+      usosPerm.forEach(function(u){
+        var cls = esCond(u) ? 'cond' : 'perm';
+        html += '<span class="uso-tag '+cls+'">'+escHtml(limpiarUso(u))+(esCond(u)?' ⚑':'')+'</span>';
+      });
+      html += '</div>';
+    }
+
+    if(z.uso_condicionado){
+      var usosCond = splitUsos(z.uso_condicionado);
+      if(usosCond.length){
+        html += '<div style="margin-top:8px;margin-bottom:4px;font-size:11px;color:#555;font-weight:600">Condicionados adicionales:</div>';
+        html += '<div class="dict-usos">';
+        usosCond.forEach(function(u){ html += '<span class="uso-tag cond">'+escHtml(u.trim())+' ⚑</span>'; });
+        html += '</div>';
+      }
+    }
+
+    if(z.uso_prohibido){
+      var usosProh = splitUsos(z.uso_prohibido);
+      if(usosProh.length){
+        html += '<div style="margin-top:8px;margin-bottom:4px;font-size:11px;color:#555;font-weight:600">Prohibidos:</div>';
+        html += '<div class="dict-usos">';
+        usosProh.forEach(function(u){ html += '<span class="uso-tag proh">'+escHtml(u.trim())+'</span>'; });
+        html += '</div>';
+      }
+    }
+
+    html += '<div style="margin-top:8px;font-size:10px;color:#999">⚑ Los usos condicionados requieren autorización específica de la autoridad municipal.</div>';
+    html += '</div>';
+  }
+
+  // ── SECCIÓN 6: REFERENCIAS NORMATIVAS ──
+  html += '<div class="dict-section">';
+  html += '<div class="dict-section-title">6. Referencias normativas y siguientes pasos</div>';
+  html += '<div style="font-size:11px;color:#444;line-height:1.8">';
+
+  var mAbrev = MUN_ABREV[mun]||'GDL';
+  if(mun==='guadalajara'){
+    html += '• Plan Parcial de Desarrollo Urbano vigente del distrito correspondiente — Ayuntamiento de Guadalajara<br>';
+    html += '• Plan de Ordenamiento Territorial Metropolitano (POTmet 2024) — IMEPLAN<br>';
+    html += '• Reglamento de Gestión del Desarrollo Urbano para el Municipio de Guadalajara<br>';
+    html += '• Ley de Ingresos del Municipio de Guadalajara 2026 (tarifas de derechos)<br>';
+  } else if(mun==='zapopan'){
+    html += '• Plan Parcial de Desarrollo Urbano vigente — H. Ayuntamiento de Zapopan<br>';
+    html += '• Plan de Ordenamiento Territorial Metropolitano (POTmet 2024) — IMEPLAN<br>';
+    html += '• Reglamento de Gestión del Desarrollo Urbano de Zapopan<br>';
+    html += '• Ley de Ingresos del Municipio de Zapopan 2026 (tarifas de derechos)<br>';
+  } else {
+    html += '• Plan Parcial de Desarrollo Urbano vigente — Ayuntamiento de '+( MUN_NOMBRES[mun]||mun)+'<br>';
+    html += '• Plan de Ordenamiento Territorial Metropolitano (POTmet 2024) — IMEPLAN<br>';
+    html += '• Ley de Ingresos Municipal 2026<br>';
+  }
+  html += '• Verificar con la Dirección de Ordenamiento Territorial del municipio ante cualquier trámite.<br>';
+  html += '</div>';
+
+  // Siguientes pasos
+  html += '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">';
+  html += '<a href="GestorUrbano_M05_2.html" style="font-size:11px;background:#EEF2FF;color:#1A3A8F;border-radius:4px;padding:4px 9px;text-decoration:none;font-weight:600">📋 Requisitos licencia (M05)</a>';
+  html += '<a href="GestorUrbano_M08_1.html" style="font-size:11px;background:#F0FDF4;color:#166534;border-radius:4px;padding:4px 9px;text-decoration:none;font-weight:600">💰 Calcular derechos (M08)</a>';
+  html += '<a href="GestorUrbano_M03_3.html" style="font-size:11px;background:#FFF8E7;color:#92400E;border-radius:4px;padding:4px 9px;text-decoration:none;font-weight:600">📐 Potencial constructivo (M03)</a>';
+  html += '</div>';
+  html += '</div>';
+
+  // ── DISCLAIMER ──
+  html += '<div class="dict-disclaimer">';
+  html += '<strong>⚠️ AVISO IMPORTANTE — Documento orientativo sin valor oficial</strong>';
+  html += 'Este pre-dictamen es generado automáticamente con fines informativos a partir de fuentes públicas de datos geoespaciales y normativos. Los parámetros urbanísticos mostrados son referenciales y pueden no reflejar la totalidad de las restricciones aplicables al predio. Para cualquier trámite oficial se requiere la verificación directa en la Dirección de Ordenamiento Territorial del municipio correspondiente. La información tiene carácter orientativo y no sustituye el dictamen oficial emitido por la autoridad competente. Gestor Urbano Jalisco AMG no asume responsabilidad por decisiones basadas en este documento. Fecha de consulta: '+fechaStr+' '+horaStr+'.';
+  html += '</div>';
+
+  html += '</div>'; // fin dictamen
+
+  document.getElementById('dictamen').innerHTML = html;
+}
+
+/* ── INIT ── */
+function init(){
+  var ok = cargarDatos();
+  if(!ok){
+    document.getElementById('stateEmpty').style.display = 'block';
+    return;
+  }
+  document.getElementById('stateLoaded').style.display = 'block';
+
+  // Pre-llenar sup si viene de m01_a_m03
+  if(_datos.sup && _datos.sup > 0){
+    document.getElementById('inSup').value = _datos.sup;
+  }
+
+  // Advertencia de vigencia
+  if(_datos.ts){
+    var mins = Math.round((Date.now() - _datos.ts) / 60000);
+    var alertEl = document.getElementById('alertVigencia');
+    var msgEl   = document.getElementById('alertVigenciaMsg');
+    if(_datos.source === 'm01_a_m03' && mins > 5){
+      alertEl.style.display = 'flex';
+      msgEl.textContent = 'Los datos provienen de una consulta de hace '+mins+' minutos. Se recomienda verificar desde el Módulo 01 si el predio ha cambiado.';
+    } else if(_datos.source === 'predio_activo'){
+      alertEl.style.display = 'flex';
+      alertEl.className = 'alert info';
+      msgEl.textContent = 'Datos cargados desde tu última consulta de uso de suelo. Para obtener parámetros completos (COS/CUS/restricciones), consulta el predio desde el Módulo 01 y usa el botón "Ir al Módulo 03" antes de abrir este módulo.';
+    }
+  }
+
+  renderDictamen();
+}
+
+function limpiarDatos(){
+  if(confirm('¿Deseas iniciar una nueva consulta? Se redirigirá al Módulo 01.')){
+    localStorage.removeItem('GU_m01_a_m03');
+    window.location.href = 'GestorUrbano_M01_3.html';
+  }
+}
+
+function escHtml(str){
+  if(!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

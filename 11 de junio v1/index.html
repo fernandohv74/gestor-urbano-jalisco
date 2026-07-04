@@ -290,4 +290,32 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
 </div>
 
 <footer>
-  <span class="foo
+  <span class="footer-txt">© 2026 Gestor Urbano Jalisco AMG — Herramienta de orientación técnica, no sustituye trámites oficiales.</span>
+  <div class="footer-stack">
+    <span class="stack-tag">HTML · CSS · JS</span>
+    <span class="stack-tag">Sin frameworks</span>
+    <span class="stack-tag">Google Maps API</span>
+    <span class="stack-tag">GeoServer WMS/WFS</span>
+  </div>
+</footer>
+
+<script>
+function applyTheme(theme) {
+  document.body.classList.toggle('light', theme === 'light');
+  var btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = theme === 'light' ? '☀️ Modo claro' : '🌙 Modo oscuro';
+}
+function toggleTheme() {
+  var isLight = document.body.classList.contains('light');
+  var next = isLight ? 'dark' : 'light';
+  applyTheme(next);
+  try { localStorage.setItem('gu_theme', next); } catch(e) {}
+}
+(function() {
+  var saved = null;
+  try { saved = localStorage.getItem('gu_theme'); } catch(e) {}
+  if (saved === 'light') applyTheme('light');
+})();
+</script>
+</body>
+</html>

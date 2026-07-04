@@ -1913,7 +1913,8 @@ async function llamarAPI(laminasLote, config, esLoteUnico) {
 
   if (!resp.ok) {
     const err = await resp.json().catch(() => ({}));
-    const msg = err.error?.message || '';
+    // El proxy puede mandar error como string ({error:"texto"}) o como objeto anidado ({error:{message:"texto"}})
+    const msg = (typeof err.error === 'string' ? err.error : err.error?.message) || '';
     // Errores específicos con mensajes claros para el usuario
     if (msg.includes('credit balance') || msg.includes('too low') || msg.includes('billing')) {
       throw new Error('__CREDITOS_AGOTADOS__');

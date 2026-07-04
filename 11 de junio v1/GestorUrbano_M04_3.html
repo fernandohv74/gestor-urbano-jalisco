@@ -7,6 +7,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="gu-design-system.css">
+<!-- pdf.js — usado para rasterizar paginas de PDF antes de comprimirlas (ver comprimirImagenFile / pdfAPaginasComprimidas) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+<script>
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+  }
+</script>
 <script>
 (function(){
   var t=localStorage.getItem('gu_theme');
@@ -1596,47 +1603,149 @@ uploadZone.addEventListener('drop', e => {
 // Click en botón seleccionar
 // Click manejado por onclick en el HTML
 
-function agregarArchivos(files) {
-  const disponibles = MAX_FILES - archivos.length;
-  if (disponibles <= 0) {
-    mostrarError(`🚫 Ya alcanzaste el máximo de ${MAX_FILES} láminas. Elimina alguna antes de agregar más.`);
-    return;
+// ══════════════════════════════════════════════════════════════════════════
+// COMPRESION DE LAMINAS — evita superar el limite de 4.5MB por peticion
+// que impone Vercel a las funciones serverless (api/claude-proxy.js).
+// Cada lamina se redimensiona a un maximo de 1920px en el lado mas largo y
+// se comprime a JPEG calidad 0.7; si el base64 resultante supera 1MB se
+// vuelve a comprimir a calidad 0.5. Los PDF se rasterizan pagina por pagina
+// con pdf.js antes de aplicar la misma compresion.
+// ══════════════════════════════════════════════════════════════════════════
+const GU_LADO_MAX       = 1920;
+const GU_CALIDAD_JPEG   = 0.7;
+const GU_CALIDAD_JPEG_2 = 0.5;
+const GU_LIMITE_B64     = 1 * 1024 * 1024; // 1 MB, medido sobre el string base64
+
+// Redimensiona (si hace falta) y comprime un <img> ya cargado. Si el base64
+// resultante a calidad GU_CALIDAD_JPEG supera GU_LIMITE_B64, reintenta a
+// GU_CALIDAD_JPEG_2.
+function _comprimirDesdeImagen(imgEl) {
+  let w = imgEl.naturalWidth  || imgEl.width;
+  let h = imgEl.naturalHeight || imgEl.height;
+  const ladoMax = Math.max(w, h);
+  if (ladoMax > GU_LADO_MAX) {
+    const escala = GU_LADO_MAX / ladoMax;
+    w = Math.max(1, Math.round(w * escala));
+    h = Math.max(1, Math.round(h * escala));
   }
-  const aLeer = files.slice(0, disponibles);
-  if (files.length > disponibles) {
-    mostrarError(`Solo puedes subir hasta ${MAX_FILES} láminas. Se agregarán las primeras ${disponibles}.`);
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(imgEl, 0, 0, w, h);
+
+  let calidad = GU_CALIDAD_JPEG;
+  let dataUrl = canvas.toDataURL('image/jpeg', calidad);
+  let b64 = dataUrl.split(',')[1] || '';
+  if (b64.length > GU_LIMITE_B64) {
+    calidad = GU_CALIDAD_JPEG_2;
+    dataUrl = canvas.toDataURL('image/jpeg', calidad);
+    b64 = dataUrl.split(',')[1] || '';
   }
+  return { dataUrl, base64: b64, mime: 'image/jpeg' };
+}
 
-  let pendientes = aLeer.length;
-  if (pendientes === 0) return;
+function _dataUrlAImagen(dataUrl) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload  = () => resolve(img);
+    img.onerror = () => reject(new Error('No se pudo procesar la imagen'));
+    img.src = dataUrl;
+  });
+}
 
-  let erroresTamanio = [];
-
-  aLeer.forEach(file => {
-    if (file.size > 12 * 1024 * 1024) {
-      const pesoMB = (file.size / 1024 / 1024).toFixed(1);
-      erroresTamanio.push(`🚫 "${file.name}" pesa ${pesoMB} MB y excede el máximo de 12 MB — no se cargó. Comprime el PDF en ilovepdf.com antes de subirlo.`);
-      pendientes--;
-      if (pendientes === 0) {
-        actualizarUI();
-        if (erroresTamanio.length > 0) mostrarError(erroresTamanio.join(' | '));
-      }
-      return;
-    }
-    const mime = file.type === 'application/pdf' ? 'application/pdf'
-               : (file.type || 'image/jpeg');
+// Lee un File de imagen, lo redimensiona y comprime. Devuelve una entrada
+// lista para 'archivos': { base64, mime, nombre, size, dataUrl }.
+function comprimirImagenFile(file) {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
+    reader.onerror = () => reject(new Error('No se pudo leer el archivo'));
     reader.onload = ev => {
-      const b64 = ev.target.result.split(',')[1];
-      archivos.push({ base64: b64, mime, nombre: file.name, size: file.size, dataUrl: ev.target.result });
-      pendientes--;
-      if (pendientes === 0) {
-        actualizarUI();
-        if (erroresTamanio.length > 0) mostrarError(erroresTamanio.join(' | '));
-      }
+      _dataUrlAImagen(ev.target.result).then(img => {
+        const { dataUrl, base64, mime } = _comprimirDesdeImagen(img);
+        resolve({ base64, mime, nombre: file.name, size: Math.round(base64.length * 0.75), dataUrl });
+      }).catch(reject);
     };
     reader.readAsDataURL(file);
   });
+}
+
+// Rasteriza cada pagina de un PDF con pdf.js y aplica la misma compresion
+// que a las imagenes. Devuelve un arreglo de entradas (una por pagina).
+async function pdfAPaginasComprimidas(file) {
+  if (!window.pdfjsLib) {
+    throw new Error('El analizador de PDF (pdf.js) no cargó — revisa tu conexión e intenta de nuevo.');
+  }
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const paginas = [];
+  const nombreBase = file.name.replace(/\.pdf$/i, '');
+
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    // Escala 2x antes de comprimir para partir de buena resolución
+    const viewport = page.getViewport({ scale: 2 });
+    const canvasPdf = document.createElement('canvas');
+    canvasPdf.width  = viewport.width;
+    canvasPdf.height = viewport.height;
+    const ctxPdf = canvasPdf.getContext('2d');
+    await page.render({ canvasContext: ctxPdf, viewport }).promise;
+
+    const imgTmp = await _dataUrlAImagen(canvasPdf.toDataURL('image/jpeg', GU_CALIDAD_JPEG));
+    const { dataUrl, base64, mime } = _comprimirDesdeImagen(imgTmp);
+    const sufijo = pdf.numPages > 1 ? ` (pág. ${i}/${pdf.numPages})` : '';
+    paginas.push({
+      base64, mime,
+      nombre: nombreBase + sufijo,
+      size: Math.round(base64.length * 0.75),
+      dataUrl
+    });
+  }
+  return paginas;
+}
+
+async function agregarArchivos(files) {
+  if (archivos.length >= MAX_FILES) {
+    mostrarError(`🚫 Ya alcanzaste el máximo de ${MAX_FILES} láminas. Elimina alguna antes de agregar más.`);
+    return;
+  }
+
+  let erroresTamanio = [];
+  let limiteAlcanzado = false;
+
+  for (const file of files) {
+    if (archivos.length >= MAX_FILES) { limiteAlcanzado = true; break; }
+
+    if (file.size > 12 * 1024 * 1024) {
+      const pesoMB = (file.size / 1024 / 1024).toFixed(1);
+      erroresTamanio.push(`🚫 "${file.name}" pesa ${pesoMB} MB y excede el máximo de 12 MB — no se cargó. Comprime el PDF en ilovepdf.com antes de subirlo.`);
+      continue;
+    }
+
+    try {
+      if (file.type === 'application/pdf') {
+        const paginas = await pdfAPaginasComprimidas(file);
+        for (const pag of paginas) {
+          if (archivos.length >= MAX_FILES) { limiteAlcanzado = true; break; }
+          archivos.push(pag);
+        }
+      } else {
+        const entrada = await comprimirImagenFile(file);
+        archivos.push(entrada);
+      }
+    } catch (e) {
+      erroresTamanio.push(`⚠️ No se pudo procesar "${file.name}": ${e.message}`);
+    }
+
+    // Refrescar la UI progresivamente para que el usuario vea avance en lotes grandes
+    actualizarUI();
+  }
+
+  if (limiteAlcanzado) {
+    erroresTamanio.push(`Solo puedes subir hasta ${MAX_FILES} láminas. Se agregaron las primeras ${MAX_FILES}.`);
+  }
+  actualizarUI();
+  if (erroresTamanio.length > 0) mostrarError(erroresTamanio.join(' | '));
 }
 
 function actualizarUI() {

@@ -851,9 +851,11 @@ const NORMATIVA = {
    - Pendiente máxima de rampa: 18%
    - Carril de circulación a 90°: mínimo 5.00 m de ancho
 
-8. RESTRICCIONES DE CONSTRUCCIÓN (Arts. 1332–1336, Reg. Gestión Integral GDL):
-   - Las restricciones frontal, lateral y posterior están definidas en el Plan Parcial vigente
-   - Ninguna edificación puede construirse dentro de las restricciones
+8. RESTRICCIONES DE CONSTRUCCIÓN (Arts. 1332–1336 y 58 Bis, Reg. Gestión Integral GDL):
+   - Las restricciones frontal y lateral están definidas en el Plan Parcial vigente. Ninguna edificación puede construirse dentro de ellas
+   - RESTRICCIÓN POSTERIOR DINÁMICA (Art. 58 Bis, Fracción II) — NO es un valor fijo del Plan Parcial: se calcula como el 25% de la altura total de la edificación (cota vertical desde el nivel de banqueta hasta el punto más alto), con un mínimo de 3.00 m en cualquier caso. Fórmula: RP_efectiva = max(3.00 m, altura_total_m × 0.25)
+   - Excepción: se permite ocupar parcial o totalmente la restricción posterior en planta baja si esa porción de la edificación no excede 3.00 m de altura
+   - Excepción: los predios cuyo lindero posterior colinde con espacios abiertos de titularidad pública quedan exentos de esta restricción
 
 9. ACCESIBILIDAD UNIVERSAL (Arts. 241, 249 Bis, 276, Reg. Gestión Integral GDL):
    - Rampas peatonales: ancho mínimo 1.50 m libre, pendiente máxima 6%
@@ -1812,6 +1814,7 @@ function cambiarArchivo() {
   archivos = [];
   _ultimoResultado = null;
   _ultimoConfig = null;
+  try { localStorage.removeItem('gu_m04_sesion_actual'); } catch(e) {}
   // Resetear los 3 selectores a vacío (detección automática)
   document.getElementById('sel-municipio').value = '';
   document.getElementById('sel-tipo').value = '';
@@ -2203,7 +2206,9 @@ async function analizarPlano() {
 // ══════════════════════════════════════════════════════════════════════════
 // RENDER RESULTADO
 // ══════════════════════════════════════════════════════════════════════════
-function renderResultado(r, config) {
+function renderResultado(r, config, opts) {
+  opts = opts || {};
+  const _guardarHist = opts.guardarHistorial !== false;
   _ultimoResultado = r;
 
   // ── PASO 1: Inyectar los 3 campos detectados por la IA en los selects ──
@@ -2466,9 +2471,16 @@ function renderResultado(r, config) {
     document.getElementById('nombre-guardado-msg').style.display = 'none';
   }
 
-  // Guardar en historial y actualizar panel
-  guardarEnHistorial(r, config);
-  renderHistorialPanel();
+  // Guardar en historial y actualizar panel (solo si es un análisis nuevo, no al reabrir uno del historial)
+  if (_guardarHist) {
+    guardarEnHistorial(r, config);
+    renderHistorialPanel();
+  }
+
+  // Guardar sesión actual para que el resultado no se pierda si el usuario navega a otro módulo y regresa
+  try {
+    localStorage.setItem('gu_m04_sesion_actual', JSON.stringify({ r, config, ts: Date.now() }));
+  } catch(e) { /* localStorage lleno o no disponible: no es crítico */ }
 
   // Calcular y mostrar estudios y trámites requeridos
   renderEstudiosRequeridos(r, config);
@@ -3003,6 +3015,7 @@ function nuevoAnalisis() {
   archivos = [];
   _ultimoResultado = null;
   _ultimoConfig = null;
+  try { localStorage.removeItem('gu_m04_sesion_actual'); } catch(e) {}
   // Resetear los 3 selectores a vacío
   document.getElementById('sel-municipio').value = '';
   document.getElementById('sel-tipo').value = '';
@@ -3144,7 +3157,7 @@ function irAM05() {
     alert('Error al guardar datos para M05: ' + e.message);
     return;
   }
-  window.location.href = 'GestorUrbano_M05_1.html';
+  window.location.href = 'GestorUrbano_M05_2.html';
 }
 
 // Mostrar/ocultar botón M01 según si hay dirección disponible post-análisis
@@ -3196,6 +3209,8 @@ function guardarEnHistorial(r, config) {
       elementos: (r.elementos || []).map(e => ({ id: e.id, estado: e.estado })),
       datos_solapa: r.datos_solapa || {},
       estudios: estudiosNombres,
+      resultado: r,       // resultado completo — permite reabrir el análisis desde el historial
+      config: config,
     };
     hist.unshift(entrada);
     localStorage.setItem(HIST_KEY, JSON.stringify(hist.slice(0, HIST_MAX)));
@@ -3233,7 +3248,7 @@ function renderHistorialPanel() {
       : '';
     return `<div class="hist-item">
       <span class="hist-sem ${h.semaforo}"></span>
-      <div class="hist-info">
+      <div class="hist-info" onclick="reabrirHistEntry(${i})" style="cursor:pointer" title="Clic para ver el resultado completo de este análisis">
         <div class="hist-nombre">${h.nombreProyecto}</div>
         <div class="hist-meta">${fecha} · ${munNom} · ${semTexto[h.semaforo] || h.semaforo}</div>
       </div>
@@ -3257,6 +3272,18 @@ function borrarHistEntry(idx) {
     localStorage.setItem(HIST_KEY, JSON.stringify(hist));
     renderHistorialPanel();
   } catch(e) {}
+}
+
+// Reabre el resultado completo de una entrada del historial (clic sobre el nombre/fecha)
+function reabrirHistEntry(idx) {
+  const hist = cargarHistorial();
+  const entry = hist[idx];
+  if (!entry) return;
+  if (!entry.resultado) {
+    mostrarError('Este análisis del historial es de una versión anterior y solo guardó el resumen, no el detalle completo. Los análisis nuevos ya se pueden reabrir completos.');
+    return;
+  }
+  renderResultado(entry.resultado, entry.config || {}, { guardarHistorial: false });
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -3414,6 +3441,16 @@ function guToggleTheme(){
 // Inicializar panel de historial al cargar
 document.addEventListener('DOMContentLoaded', function() {
   renderHistorialPanel();
+  // Restaurar el último resultado mostrado si el usuario navegó a otro módulo y regresó
+  try {
+    const raw = localStorage.getItem('gu_m04_sesion_actual');
+    if (raw) {
+      const sesion = JSON.parse(raw);
+      if (sesion && sesion.r && sesion.config) {
+        renderResultado(sesion.r, sesion.config, { guardarHistorial: false });
+      }
+    }
+  } catch(e) { /* silencioso */ }
 });
 
 </script>

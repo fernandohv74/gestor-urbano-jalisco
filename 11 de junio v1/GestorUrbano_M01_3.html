@@ -5203,7 +5203,7 @@ function actualizarSim(sup, _cosOverride, _cusOverride){
   // Criterio 56° — actualizar si hay medición activa
   actualizar56();
 
-  // RP posterior efectiva — Reg. Gestión Integral GDL Art. Fracc. II
+  // RP posterior efectiva — Reg. Gestión Integral GDL Art. 58 Bis, Fracción II
   const _rp_base    = parseFloat(datosZona.rest_p1) || 0;
   const _entrepiso  = parseFloat(document.getElementById('inputEntrepiso')?.value) || 3.0;
   const _nivSim     = cos > 0 ? Math.max(1, Math.round(cus / cos)) : 1;
@@ -5808,7 +5808,7 @@ function descargarFicha(){
         <div class="gu-rest-box"><div class="rest-v">${rl||0} m</div><div class="rest-l">Lateral</div></div>
         <div class="gu-rest-box"><div class="rest-v" style="color:#B45309">${rpEfec} m</div><div class="rest-l">Posterior ef.</div></div>
       </div>
-      ${(_fichaEsGDL&&rpEfec>rp)?`<div style="font-size:7px;color:#92400E;background:#FFFBEB;border-left:2px solid #F59E0B;padding:3px 7px;border-radius:0 3px 3px 0;margin-bottom:5px">📐 RP efectiva = max(${rp} m base, 25% × ${alturaFC} m altura) = <strong>${rpEfec} m</strong> — Reg. Gestión Integral GDL, Art. Fracc. II</div>`:''}
+      ${(_fichaEsGDL&&rpEfec>rp)?`<div style="font-size:7px;color:#92400E;background:#FFFBEB;border-left:2px solid #F59E0B;padding:3px 7px;border-radius:0 3px 3px 0;margin-bottom:5px">📐 RP efectiva = max(${rp} m base, 25% × ${alturaFC} m altura) = <strong>${rpEfec} m</strong> — Reg. Gestión Integral GDL, Art. 58 Bis, Fracción II</div>`:''}
       ${(_fichaEsGDL&&_anchoCalle56>0)?(()=>{
         const _h56f=Math.round((_anchoCalle56+rf)*Math.tan(56*Math.PI/180)*100)/100;
         const _dist56f=Math.round((_anchoCalle56+rf)*100)/100;

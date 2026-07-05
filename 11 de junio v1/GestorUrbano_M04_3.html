@@ -799,13 +799,12 @@ const NORMATIVA = {
    - Ancho mínimo: 1.50 m (GDL es más exigente que el REZ estatal de 1.20 m)
    - Huella mínima: 0.30 m, máxima: 0.50 m
    - Contrahuella: mínimo 0.10 m, máximo 0.15 m
-   - Relación 2 contrahuellas + huella = entre 0.63 y 0.64 m
    - Máximo 12 escalones entre descansos (GDL es más exigente que REZ de 15)
    - Descanso mínimo: 1.50 m de longitud por el ancho de la escalera
-   - Pasamanos: superior 0.90 m, inferior 0.75 m, diámetro 0.04 m
-   - Altura libre bajo rampa: mínimo 1.90 m
+   - Pasamanos: superior 0.90 m, inferior 0.75 m, diámetro 0.04 m, área de aproximación 2.10 m, separación al muro 0.30 m, protección en borde lateral 0.05-0.10 m de altura
    - Sin bocel en escalones; franja de contraste de 0.025 m en borde
-   - Escaleras de caracol: diámetro mínimo 1.20 m
+   - En accesos a edificios públicos y equipamientos: señalamiento Braille obligatorio en pasamanos
+   - Escaleras de caracol: diámetro mínimo 1.20 m; altura libre bajo rampa mínimo 1.90 m; relación 2 contrahuellas + huella entre 0.63 y 0.64 m (estos 3 datos provienen del Art. 224, Reg. Zonificación GDL — vigente para lo no cubierto por la reforma del Art. 249 Bis)
 
 2. PASILLOS Y CORREDORES (Art. 223 Cuadro 58, Reg. Zonificación GDL):
    - Corredores interiores en viviendas: mínimo 0.90 m
@@ -845,7 +844,7 @@ const NORMATIVA = {
    - Auto estándar: 5.00 m × 2.50 m mínimo
    - Motocicleta: 2.50 m × 1.50 m
    - Personas con movilidad reducida (PMR): 5.00 m × 3.80 m con zona de transferencia de 1.50 m lateral
-   - 1 cajón PMR por cada 25 cajones regulares (mín. 1)
+   - Al menos 2 cajones PMR por cada 25 cajones regulares ubicados (Art. 276 Fr. I inciso a) — situados lo más próximo posible a la entrada o frente al elevador, techados
    - 1 ciclopuerto por cada 20 cajones (mín. 1)
    - Altura libre: 2.30 m planta baja, 2.10 m pisos superiores
    - Pendiente máxima de rampa: 18%
@@ -858,7 +857,8 @@ const NORMATIVA = {
    - Excepción: los predios cuyo lindero posterior colinde con espacios abiertos de titularidad pública quedan exentos de esta restricción
 
 9. ACCESIBILIDAD UNIVERSAL (Arts. 241, 249 Bis, 276, Reg. Gestión Integral GDL):
-   - Rampas peatonales: ancho mínimo 1.50 m libre, pendiente máxima 6%
+   - Rampas peatonales (banqueta-arroyo vial, Art. 241): ancho mínimo 2.00 m (1.50 m solo si hay imposibilidad constructiva comprobada); pendiente longitudinal máxima 4% normal — 6%/8%/10% solo como "ajuste razonable" con desarrollo máximo de 10/8/6 m respectivamente
+   - Pasamanos de rampa (cuando aplique ajuste razonable): doble altura 0.90 m y 0.75 m, diámetro 0.04 m, área de aproximación 2.10 m, protección de borde 0.05-0.10 m
    - Banqueta previa a la rampa: mínimo 1.60 m de ancho libre
    - Escaleras accesibles: ancho mínimo 1.80 m libre de pasamanos, huellas de 0.34 m
    - Guías táctiles en circulaciones, escaleras y elevadores
@@ -917,8 +917,8 @@ const NORMATIVA = {
 6. ELEVADORES (Art. 138, Reglamento de Construcción Zapopan):
    - OBLIGATORIO en edificaciones con más de 4 niveles cubiertos incluyendo planta baja
    - Excepción: plurifamiliar hasta 5 niveles si cada vivienda ≤ 80 m² (excluye indivisos y áreas comunes)
-   - Cabina mínima interior libre: 1.50 × 1.50 m (Art. 251 REZ)
-   - Puerta mínima: 1.00 m de ancho
+   - Cabina mínima interior libre: 1.50 × 1.50 m (Norma Técnica de Accesibilidad Universal ZPN, Art. 22 Fr. III)
+   - Puerta mínima: 1.20 m de ancho (Norma Técnica de Accesibilidad Universal ZPN, Art. 22 Fr. IV)
    - Pasamanos en 3 lados internos
    - Controles a 1.20 m de altura con botones en relieve
    - Exactitud en parada respecto al nivel de piso
@@ -946,11 +946,11 @@ const NORMATIVA = {
 
 9. ACCESIBILIDAD UNIVERSAL (Art. 38 Fr. IX Reglamento Construcción ZPN / Norma Técnica Accesibilidad Universal ZPN 2019):
    - Ruta accesible obligatoria desde el alineamiento del inmueble hasta cada área de servicio
-   - Rampas peatonales: ancho mínimo 1.00 m libre entre pasamanos, pendiente máxima 6%
+   - Rampas peatonales de acceso: ancho mínimo 1.20 m libre entre pasamanos, pendiente entre 4% y 8% (Art. 17 Fr. I) — el 6% fijo solo aplica a rampas de estacionamiento PCD (Art. 11 Fr. VI), no a rampas peatonales generales
    - Longitud máxima de rampa: 6.00 m; si es mayor, descansos de 1.50 m
-   - Pasamanos: tubulares 1½ pulgadas, a 0.90 m y segundo a 0.75 m, separados 0.50 m de pared
+   - Pasamanos: altura 90-105 cm, diámetro 3.5-4.5 cm, separados 3.5-4.5 cm de pared (Art. 17 Fr. II)
    - Cajón PMR: 3.80 × 5.00 m con franja de maniobra de 1.40 m; letrero a 2.50 m de altura
-   - Elevador cabina mínima 1.50 × 1.50 m, puerta 1.00 m, controles a 1.20 m con Braille
+   - Elevador cabina mínima 1.50 × 1.50 m, puerta 1.20 m, controles a 1.20 m con Braille
    - Pavimento táctil en rutas accesibles, escaleras y cambios de nivel
    - Señalamiento ISA en cajones, elevadores y sanitarios accesibles
 

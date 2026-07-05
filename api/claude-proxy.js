@@ -28,6 +28,18 @@ export default async function handler(req, res) {
       });
     }
     // Llamar a la API de Anthropic
+    const modeloFinal = body.model || 'claude-sonnet-4-6';
+    // Los modelos Opus (razonamiento extendido) ya no aceptan un temperature personalizado
+    const esOpus = modeloFinal.includes('opus');
+    const payloadAnthropic = {
+      model:      modeloFinal,
+      max_tokens: body.max_tokens || 4000,
+      system:     body.system || '',
+      messages:   body.messages
+    };
+    if (!esOpus) {
+      payloadAnthropic.temperature = body.temperature ?? 0;
+    }
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -35,13 +47,7 @@ export default async function handler(req, res) {
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify({
-        model:      body.model || 'claude-sonnet-4-6',
-        max_tokens: body.max_tokens || 4000,
-        temperature: body.temperature ?? 0,
-        system:     body.system || '',
-        messages:   body.messages
-      })
+      body: JSON.stringify(payloadAnthropic)
     });
     const data = await response.json();
     // Manejar errores de la API de Anthropic

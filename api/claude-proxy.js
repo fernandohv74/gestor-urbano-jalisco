@@ -31,12 +31,32 @@ export default async function handler(req, res) {
     const modeloFinal = body.model || 'claude-sonnet-4-6';
     // Los modelos Opus (razonamiento extendido) ya no aceptan un temperature personalizado
     const esOpus = modeloFinal.includes('opus');
+    // Prompt caching: el bloque normativo que manda M04 en body.system es
+    // estatico por municipio — no cambia entre lotes de un mismo analisis
+    // ni entre analisis del mismo municipio dentro de la ventana de cache
+    // de Anthropic (5 min por defecto). Marcarlo como 'ephemeral' hace que
+    // esas llamadas repetidas paguen ~10% del precio normal por esos
+    // tokens de entrada en vez del 100%. No requiere header beta — el
+    // parametro cache_control ya es parte estable de la API de Mensajes.
+    let systemPayload;
+    if (Array.isArray(body.system)) {
+      // Ya viene particionado en bloques — se respeta tal cual
+      systemPayload = body.system;
+    } else if (typeof body.system === 'string' && body.system.length > 0) {
+      systemPayload = [
+        { type: 'text', text: body.system, cache_control: { type: 'ephemeral' } }
+      ];
+    } else {
+      systemPayload = undefined;
+    }
     const payloadAnthropic = {
       model:      modeloFinal,
       max_tokens: body.max_tokens || 4000,
-      system:     body.system || '',
       messages:   body.messages
     };
+    if (systemPayload) {
+      payloadAnthropic.system = systemPayload;
+    }
     if (!esOpus) {
       payloadAnthropic.temperature = body.temperature ?? 0;
     }

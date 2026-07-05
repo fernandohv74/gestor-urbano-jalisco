@@ -1282,7 +1282,7 @@ Dependencias: "Dirección de Permisos y Licencias de Construcción del Ayuntamie
 - Si el plano es de TONALÁ → municipio_detectado: "TON"
 - Si no puedes determinarlo → municipio_detectado: null → aplica NORMATIVA GDL como fallback`;
 
-  return `Analiza ${numLam > 1 ? 'las láminas adjuntas' : 'el plano adjunto'} y verifica su cumplimiento con la normativa vigente del Área Metropolitana de Guadalajara. ${contextoLote}
+  const userText = `Analiza ${numLam > 1 ? 'las láminas adjuntas' : 'el plano adjunto'} y verifica su cumplimiento con la normativa vigente del Área Metropolitana de Guadalajara. ${contextoLote}
 
 ${bloquePaso0}
 
@@ -1301,7 +1301,13 @@ ${config.cajonesProyecto ? '- Cajones indicados en proyecto: ' + config.cajonesP
 ${config.cajonesPmr ? '- Cajones PMR indicados: ' + config.cajonesPmr : ''}
 ${config.alturaEntrepiso ? '- Altura de entrepiso indicada: ' + config.alturaEntrepiso + ' m' : ''}
 ${config.supVivTipo ? '- Superficie vivienda tipo: ' + config.supVivTipo + ' m²' : ''}
-${numLam > 1 ? '- Láminas analizadas: ' + nomLam : ''}
+${numLam > 1 ? '- Láminas analizadas: ' + nomLam : ''}`;
+
+  // Bloque ESTATICO (cacheable): system prompt + normativa del municipio +
+  // instrucciones fijas. No depende de los datos del proyecto capturados
+  // por el usuario, solo del municipio — se envia como 'system' para que
+  // el proxy lo marque con cache_control (prompt caching).
+  const systemText = `${SYSTEM_PROMPT}
 
 ${bloqueNormativa}
 
@@ -1462,6 +1468,8 @@ REGLAS CRÍTICAS:
 - Estado "atencion" = cumple pero con incertidumbre o marginalmente.
 - Para locales_habitables específicamente: si no hay cotas claramente legibles en el plano, SIEMPRE usa "nd". Nunca estimes áreas sin cotas explícitas.
 - REGLA DE SEMÁFORO: el estado "nd" en locales_habitables NO debe penalizar el semáforo general — trátalo igual que "na" para efectos del dictamen. Solo penaliza el semáforo si detectas un incumplimiento real con cota legible ("incumple"). Un "nd" en locales_habitables nunca debe mover el semáforo de verde a amarillo.`;
+
+  return { systemText, userText };
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1867,7 +1875,13 @@ FORMATO DE SALIDA:
 
 // Llama a la API con un lote de láminas y devuelve el resultado parseado
 async function llamarAPI(laminasLote, config, esLoteUnico) {
-  const prompt = buildPrompt(config, esLoteUnico);
+  // buildPrompt separa el bloque ESTATICO (system prompt + normativa del
+  // municipio + instrucciones fijas — identico entre lotes de un mismo
+  // analisis y entre analisis del mismo municipio) del bloque VARIABLE
+  // (datos del proyecto capturados por el usuario, que cambian siempre).
+  // El bloque estatico se manda como 'system' para que el proxy lo marque
+  // con cache_control y Anthropic lo reutilice (prompt caching).
+  const { systemText, userText } = buildPrompt(config, esLoteUnico);
   const contentConLabels = [];
   laminasLote.forEach((a, i) => {
     const numGlobal = archivos.indexOf(a) + 1;
@@ -1877,20 +1891,15 @@ async function llamarAPI(laminasLote, config, esLoteUnico) {
       source: { type: 'base64', media_type: a.mime, data: a.base64 }
     });
   });
-  contentConLabels.push({ type: 'text', text: prompt });
-
-  // Insertar el system prompt como primer bloque de texto en el mensaje user
-  const contentFinal = [
-    { type: 'text', text: SYSTEM_PROMPT },
-    ...contentConLabels
-  ];
+  contentConLabels.push({ type: 'text', text: userText });
 
   const body = {
     model: (document.getElementById('sel-modelo')?.value || 'claude-sonnet-4-6'),
     max_tokens: 5000,
     temperature: 0,
+    system: systemText,
     messages: [
-      { role: 'user', content: contentFinal }
+      { role: 'user', content: contentConLabels }
     ]
   };
 

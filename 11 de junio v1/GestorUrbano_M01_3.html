@@ -2958,18 +2958,11 @@ function construirResultadoBDLocal(b, clave, lat, lng, fuente){
 
 async function consultarArcGISZapopan(lat, lng){
   try{
-    const base = 'https://mapa.zapopan.gob.mx/arcgis/rest/services/PPDU/PPDU_estrategias/MapServer/identify';
-    const params = new URLSearchParams({
-      geometry: JSON.stringify({x: lng, y: lat}),
-      geometryType: 'esriGeometryPoint',
-      layers: 'all',
-      tolerance: '2',
-      mapExtent: `${lng-0.001},${lat-0.001},${lng+0.001},${lat+0.001}`,
-      imageDisplay: '800,600,96',
-      returnGeometry: 'false',
-      f: 'json'
-    });
-    const r = await fetch(`${base}?${params}`, {signal: AbortSignal.timeout(6000)});
+    // Se llama vía proxy serverless propio (api/arcgis-zapopan-proxy.js) en
+    // vez de directo a mapa.zapopan.gob.mx — el navegador bloqueaba la
+    // llamada directa por CORS (el servidor de Zapopan no manda el header
+    // Access-Control-Allow-Origin para dominios externos).
+    const r = await fetch(`/api/arcgis-zapopan-proxy?lat=${lat}&lng=${lng}`, {signal: AbortSignal.timeout(8000)});
     if(!r.ok) return null;
     const data = await r.json();
     const resultados = data.results||[];
@@ -3002,7 +2995,12 @@ async function consultarVisorJalisco(lat, lng, munId){
   // ══════════════════════════════════════════════════════════════════
   if(munId === 120){
     // 1. ArcGIS Zapopan — clave exacta del polígono
-    const claveArcGIS = await consultarArcGISZapopan(lat, lng);
+    // BUG CORREGIDO: antes decía "const claveArcGIS" aquí, lo que creaba una
+    // variable nueva dentro de este bloque (sombreaba a la de la función) —
+    // el resultado real de ArcGIS nunca llegaba al resto de la función y se
+    // perdía en silencio, cayendo siempre al respaldo VUJ aunque ArcGIS
+    // hubiera respondido bien.
+    claveArcGIS = await consultarArcGISZapopan(lat, lng);
     if(claveArcGIS){
       // 2a. BD local con clave ArcGIS exacta
       const bdRes = vujBDLocalNormas(`municipio_id=120 AND clave LIKE '%${claveArcGIS}%'`);

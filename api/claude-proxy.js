@@ -70,6 +70,14 @@ export default async function handler(req, res) {
       body: JSON.stringify(payloadAnthropic)
     });
     const data = await response.json();
+    // Log temporal para verificar el prompt caching — revisar en Vercel > Logs.
+    // cache_read_input_tokens > 0 confirma que esta llamada reutilizo el
+    // bloque normativo cacheado de una llamada anterior (mismo municipio,
+    // dentro de la ventana de ~5 min). cache_creation_input_tokens > 0
+    // confirma que esta llamada acaba de escribir el bloque al cache.
+    if (data.usage) {
+      console.log('[claude-proxy] usage:', JSON.stringify(data.usage));
+    }
     // Manejar errores de la API de Anthropic
     if (!response.ok) {
       console.error('Error Anthropic:', data);

@@ -80,6 +80,11 @@
 .loading-panel{display:none;background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:28px 24px;text-align:center;transition:background var(--t),border-color var(--t)}
 .loading-spinner{width:36px;height:36px;border:3px solid var(--border2);border-top-color:var(--brand);border-radius:50%;animation:gu-spin .7s linear infinite;margin:0 auto 16px}
 @keyframes gu-spin{to{transform:rotate(360deg)}}
+
+/* Procesando láminas (compresión de imágenes/PDF antes de habilitar Analizar) */
+.upload-processing{display:none;align-items:center;justify-content:center;gap:10px;padding:12px 14px;color:var(--text2);font-size:12.5px;background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-md);margin-top:8px}
+.upload-processing.visible{display:flex}
+.upload-processing-spinner{width:16px;height:16px;border:2.5px solid var(--border2);border-top-color:var(--brand);border-radius:50%;animation:gu-spin .7s linear infinite;flex-shrink:0}
 .loading-steps{list-style:none;padding:0;margin:12px 0 0;text-align:left;display:inline-block}
 .loading-steps li{font-size:12px;color:var(--text3);padding:4px 0;transition:color var(--t)}
 .loading-steps li.active{color:var(--brand);font-weight:500}
@@ -310,6 +315,10 @@
       <div class="upload-title">Selecciona los planos desde tu computadora</div>
       <div class="upload-hint">JPG · PNG · WEBP · PDF · Máx. 12 MB por archivo · Hasta 10 láminas</div>
       <button class="btn-seleccionar" id="btn-seleccionar" type="button" onclick="document.getElementById('file-input').click()">📂 Seleccionar archivos</button>
+    </div>
+    <div class="upload-processing" id="upload-processing">
+      <div class="upload-processing-spinner"></div>
+      <span id="upload-processing-label">Procesando láminas…</span>
     </div>
     <div id="files-count-label" class="files-count" style="display:none"></div>
     <div class="files-grid" id="files-grid"></div>
@@ -1722,32 +1731,52 @@ async function agregarArchivos(files) {
   let erroresTamanio = [];
   let limiteAlcanzado = false;
 
-  for (const file of files) {
-    if (archivos.length >= MAX_FILES) { limiteAlcanzado = true; break; }
+  // Indicador de "procesando" — se muestra mientras se leen/comprimen las
+  // láminas (puede tardar varios segundos por página en PDFs grandes),
+  // para que el usuario sepa que algo está pasando antes de que se habilite
+  // el botón de Analizar.
+  const procEl = document.getElementById('upload-processing');
+  const procLabel = document.getElementById('upload-processing-label');
+  const totalArchivos = files.length;
+  procEl.classList.add('visible');
 
-    if (file.size > 12 * 1024 * 1024) {
-      const pesoMB = (file.size / 1024 / 1024).toFixed(1);
-      erroresTamanio.push(`🚫 "${file.name}" pesa ${pesoMB} MB y excede el máximo de 12 MB — no se cargó. Comprime el PDF en ilovepdf.com antes de subirlo.`);
-      continue;
-    }
+  try {
+    let idx = 0;
+    for (const file of files) {
+      idx++;
+      if (archivos.length >= MAX_FILES) { limiteAlcanzado = true; break; }
 
-    try {
-      if (file.type === 'application/pdf') {
-        const paginas = await pdfAPaginasComprimidas(file);
-        for (const pag of paginas) {
-          if (archivos.length >= MAX_FILES) { limiteAlcanzado = true; break; }
-          archivos.push(pag);
-        }
-      } else {
-        const entrada = await comprimirImagenFile(file);
-        archivos.push(entrada);
+      procLabel.textContent = totalArchivos > 1
+        ? `Procesando ${idx} de ${totalArchivos} — ${file.name}`
+        : `Procesando ${file.name}…`;
+
+      if (file.size > 12 * 1024 * 1024) {
+        const pesoMB = (file.size / 1024 / 1024).toFixed(1);
+        erroresTamanio.push(`🚫 "${file.name}" pesa ${pesoMB} MB y excede el máximo de 12 MB — no se cargó. Comprime el PDF en ilovepdf.com antes de subirlo.`);
+        continue;
       }
-    } catch (e) {
-      erroresTamanio.push(`⚠️ No se pudo procesar "${file.name}": ${e.message}`);
-    }
 
-    // Refrescar la UI progresivamente para que el usuario vea avance en lotes grandes
-    actualizarUI();
+      try {
+        if (file.type === 'application/pdf') {
+          const paginas = await pdfAPaginasComprimidas(file);
+          for (const pag of paginas) {
+            if (archivos.length >= MAX_FILES) { limiteAlcanzado = true; break; }
+            archivos.push(pag);
+          }
+        } else {
+          const entrada = await comprimirImagenFile(file);
+          archivos.push(entrada);
+        }
+      } catch (e) {
+        erroresTamanio.push(`⚠️ No se pudo procesar "${file.name}": ${e.message}`);
+      }
+
+      // Refrescar la UI progresivamente para que el usuario vea avance en lotes grandes
+      actualizarUI();
+    }
+  } finally {
+    // Ocultar el indicador siempre, incluso si algo falla inesperadamente
+    procEl.classList.remove('visible');
   }
 
   if (limiteAlcanzado) {

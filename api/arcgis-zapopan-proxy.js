@@ -1,9 +1,22 @@
 // api/arcgis-zapopan-proxy.js
-// Proxy serverless para el servicio ArcGIS de Zapopan (PPDU/PPDU_estrategias).
-// El servicio es publico (no requiere API key) — este proxy existe unicamente
-// para evitar el bloqueo por CORS al llamar directo desde el navegador, ya
-// que mapa.zapopan.gob.mx no manda headers Access-Control-Allow-Origin para
-// dominios externos como gestorurbanoamg.vercel.app.
+// Proxy serverless para la capa oficial de Utilizacion de Suelo de Zapopan.
+//
+// CORRECCION (2026-07-06): se descubrio, inspeccionando el trafico de red del
+// mapa oficial (mapa.zapopan.gob.mx/mapa_urbano/), que el servicio real NO es
+// ArcGIS REST (PPDU/PPDU_estrategias) como se asumio originalmente, sino un
+// servicio GeoServer WFS:
+//   https://mapa.zapopan.gob.mx:8000/geoserver/geomatica/ows
+//   typeName = geomatica:zpn_e3_utilizacion_suelo
+// Atributo de clave de zonificacion: cve_util (ej. "MR-APD"). CRS: EPSG:4326
+// (mismo lat/lng que usa la app, sin reproyectar). El mapa oficial descarga
+// la capa completa (~6000 poligonos) una sola vez y hace el point-in-polygon
+// en el navegador (Leaflet); aqui hacemos lo mismo pero acotando con un BBOX
+// pequeno alrededor del punto para no traer toda la capa en cada consulta.
+//
+// Se conserva el nombre del archivo/funcion ("arcgis-zapopan-proxy") y el
+// formato de respuesta (results[].layerName / .attributes.CLAVE) por
+// compatibilidad con el codigo cliente existente en M01/M02
+// (consultarArcGISZapopan) — no requiere cambios en esos archivos.
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -17,29 +30,8 @@ export default async function handler(req, res) {
   if (Number.isNaN(latNum) || Number.isNaN(lngNum)) {
     return res.status(400).json({ error: 'lat y lng deben ser numeros validos' });
   }
-  try {
-    const params = new URLSearchParams({
-      geometry: JSON.stringify({ x: lngNum, y: latNum }),
-      geometryType: 'esriGeometryPoint',
-      layers: 'all',
-      tolerance: '2',
-      mapExtent: `${lngNum - 0.001},${latNum - 0.001},${lngNum + 0.001},${latNum + 0.001}`,
-      imageDisplay: '800,600,96',
-      returnGeometry: 'false',
-      f: 'json'
-    });
-    const url = `https://mapa.zapopan.gob.mx/arcgis/rest/services/PPDU/PPDU_estrategias/MapServer/identify?${params}`;
-    const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    const data = await response.json();
-    // Log temporal de diagnostico — revisar en Vercel > Logs si la clave que
-    // regresa este servicio coincide con lo que muestra mapa_urbano (puede
-    // ser un servicio/capa distinto al que usa el mapa oficial interactivo).
-    console.log('[arcgis-zapopan-proxy] status:', response.status, 'results:', JSON.stringify((data.results || []).map(r => ({ layerName: r.layerName, attrs: r.attributes }))));
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    return res.status(200).json(data);
-  } catch (error) {
-    return res.status(500).json({ error: 'Error al consultar ArcGIS Zapopan: ' + error.message });
-  }
-}
+
+  // Point-in-polygon (ray casting) sobre un anillo de coordenadas [[lng,lat],...]
+  function puntoEnAnillo(x, y, anillo) {
+    let dentro = false;
+    for (let i = 0, j = anillo.length - 1; i < anillo.length

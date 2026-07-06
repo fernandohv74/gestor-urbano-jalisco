@@ -31,6 +31,10 @@ export default async function handler(req, res) {
     const url = `https://mapa.zapopan.gob.mx/arcgis/rest/services/PPDU/PPDU_estrategias/MapServer/identify?${params}`;
     const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
     const data = await response.json();
+    // Log temporal de diagnostico — revisar en Vercel > Logs si la clave que
+    // regresa este servicio coincide con lo que muestra mapa_urbano (puede
+    // ser un servicio/capa distinto al que usa el mapa oficial interactivo).
+    console.log('[arcgis-zapopan-proxy] status:', response.status, 'results:', JSON.stringify((data.results || []).map(r => ({ layerName: r.layerName, attrs: r.attributes }))));
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');

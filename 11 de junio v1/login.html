@@ -73,7 +73,7 @@ button:disabled{opacity:.6;cursor:not-allowed}
     <form id="login-form">
       <label for="password">Clave de acceso</label>
       <div class="field-wrap">
-        <input type="password" class="pw-input" id="password" name="password" autocomplete="current-password" autofocus required>
+        <input type="password" class="pw-input" id="password" name="password" autocomplete="off" autofocus required>
         <button type="button" class="toggle-eye" id="toggle-eye" aria-label="Mostrar clave" aria-pressed="false">
           <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path>
@@ -93,6 +93,13 @@ const submitBtn = document.getElementById('submit-btn');
 const toggleEye = document.getElementById('toggle-eye');
 const passwordInput = document.getElementById('password');
 const eyeIcon = document.getElementById('eye-icon');
+
+// Nunca dejar la clave visible/precargada en el campo: ni por autocompletado
+// del navegador ni por el cache de "atras/adelante" (bfcache) al volver a
+// esta pagina tras cerrar sesion. Se limpia al cargar y cada vez que la
+// pagina vuelve a mostrarse desde el bfcache.
+passwordInput.value = '';
+window.addEventListener('pageshow', function(){ passwordInput.value = ''; });
 
 // Ícono de "ojo abierto" (clave oculta) vs "ojo tachado" (clave visible)
 const EYE_OPEN = '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle>';

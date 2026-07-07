@@ -36,11 +36,20 @@ body{
 h1{font-size:19px;font-weight:600;color:#0F0F0E;text-align:center;margin-bottom:6px}
 p.sub{font-size:13px;color:#666;text-align:center;margin-bottom:28px}
 label{display:block;font-size:13px;font-weight:500;color:#333;margin-bottom:6px}
-input[type=password]{
-  width:100%;padding:11px 14px;border:1px solid rgba(0,0,0,0.16);border-radius:10px;
-  font-size:15px;margin-bottom:16px;transition:border-color .15s;
+.field-wrap{position:relative;margin-bottom:16px}
+input[type=password],input[type=text].pw-input{
+  width:100%;padding:11px 44px 11px 14px;border:1px solid rgba(0,0,0,0.16);border-radius:10px;
+  font-size:15px;transition:border-color .15s;
 }
-input[type=password]:focus{outline:none;border-color:#1A2744}
+input.pw-input:focus{outline:none;border-color:#1A2744}
+.toggle-eye{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  width:32px;height:32px;border:0;background:transparent;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;color:#888;
+  padding:0;transition:background .15s,color .15s;
+}
+.toggle-eye:hover{background:#F0F0EE;color:#333}
+.toggle-eye svg{width:18px;height:18px}
 button{
   width:100%;padding:12px;border:0;border-radius:10px;background:#1A2744;color:#fff;
   font-size:15px;font-weight:500;cursor:pointer;transition:background .15s;
@@ -63,7 +72,15 @@ button:disabled{opacity:.6;cursor:not-allowed}
     <div class="error" id="error-box"></div>
     <form id="login-form">
       <label for="password">Clave de acceso</label>
-      <input type="password" id="password" name="password" autocomplete="current-password" autofocus required>
+      <div class="field-wrap">
+        <input type="password" class="pw-input" id="password" name="password" autocomplete="current-password" autofocus required>
+        <button type="button" class="toggle-eye" id="toggle-eye" aria-label="Mostrar clave" aria-pressed="false">
+          <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+      </div>
       <button type="submit" id="submit-btn">Entrar</button>
     </form>
     <div class="footer">Área Metropolitana de Guadalajara</div>
@@ -73,6 +90,21 @@ button:disabled{opacity:.6;cursor:not-allowed}
 const form = document.getElementById('login-form');
 const errorBox = document.getElementById('error-box');
 const submitBtn = document.getElementById('submit-btn');
+const toggleEye = document.getElementById('toggle-eye');
+const passwordInput = document.getElementById('password');
+const eyeIcon = document.getElementById('eye-icon');
+
+// Ícono de "ojo abierto" (clave oculta) vs "ojo tachado" (clave visible)
+const EYE_OPEN = '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle>';
+const EYE_OFF = '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.4 10.4 0 0 1 12 5c7 0 11 7 11 7a21.6 21.6 0 0 1-2.94 3.94M14.12 14.12a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+
+toggleEye.addEventListener('click', function() {
+  const visible = passwordInput.type === 'text';
+  passwordInput.type = visible ? 'password' : 'text';
+  eyeIcon.innerHTML = visible ? EYE_OPEN : EYE_OFF;
+  toggleEye.setAttribute('aria-label', visible ? 'Mostrar clave' : 'Ocultar clave');
+  toggleEye.setAttribute('aria-pressed', String(!visible));
+});
 
 function paramRedirect() {
   const params = new URLSearchParams(window.location.search);

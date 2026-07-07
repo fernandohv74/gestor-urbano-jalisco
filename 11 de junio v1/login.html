@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestor Urbano Jalisco — Acceso</title>
+<!--
+  login.html — pantalla de acceso simple (clave única compartida)
+  Gestor Urbano Jalisco AMG
+
+  Es la única página que middleware.js deja pasar sin sesión válida.
+  Envía la clave a api/auth-login.js, que la compara contra la variable
+  de entorno GU_ACCESS_PASSWORD y, si coincide, pone la cookie de sesión
+  que middleware.js revisa en cada petición al resto de la plataforma.
+
+  Autocontenida a propósito (CSS/JS inline, sin depender de
+  gu-design-system.css ni de ningún otro archivo) para que el
+  middleware solo tenga que excluir esta única ruta.
+-->
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:#F9FAFB;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  padding:20px;
+}
+.card{
+  width:100%;max-width:380px;background:#FFFFFF;border:0.5px solid rgba(0,0,0,0.1);
+  border-radius:16px;padding:36px 32px;box-shadow:0 8px 30px rgba(0,0,0,0.06);
+}
+.logo{
+  width:48px;height:48px;border-radius:12px;background:#1A2744;color:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:600;
+  font-size:18px;margin:0 auto 20px;
+}
+h1{font-size:19px;font-weight:600;color:#0F0F0E;text-align:center;margin-bottom:6px}
+p.sub{font-size:13px;color:#666;text-align:center;margin-bottom:28px}
+label{display:block;font-size:13px;font-weight:500;color:#333;margin-bottom:6px}
+input[type=password]{
+  width:100%;padding:11px 14px;border:1px solid rgba(0,0,0,0.16);border-radius:10px;
+  font-size:15px;margin-bottom:16px;transition:border-color .15s;
+}
+input[type=password]:focus{outline:none;border-color:#1A2744}
+button{
+  width:100%;padding:12px;border:0;border-radius:10px;background:#1A2744;color:#fff;
+  font-size:15px;font-weight:500;cursor:pointer;transition:background .15s;
+}
+button:hover{background:#2D3A6B}
+button:disabled{opacity:.6;cursor:not-allowed}
+.error{
+  display:none;background:#FDECEC;border:1px solid #F5B5B5;color:#B42318;
+  font-size:13px;border-radius:8px;padding:10px 12px;margin-bottom:16px;
+}
+.error.visible{display:block}
+.footer{margin-top:22px;text-align:center;font-size:12px;color:#999}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">GU</div>
+    <h1>Gestor Urbano Jalisco AMG</h1>
+    <p class="sub">Acceso restringido — plataforma en fase de pruebas</p>
+    <div class="error" id="error-box"></div>
+    <form id="login-form">
+      <label for="password">Clave de acceso</label>
+      <input type="password" id="password" name="password" autocomplete="current-password" autofocus required>
+      <button type="submit" id="submit-btn">Entrar</button>
+    </form>
+    <div class="footer">Área Metropolitana de Guadalajara</div>
+  </div>
+
+<script>
+const form = document.getElementById('login-form');
+const errorBox = document.getElementById('error-box');
+const submitBtn = document.getElementById('submit-btn');
+
+function paramRedirect() {
+  const params = new URLSearchParams(window.location.search);
+  const r = params.get('redirect');
+  // Solo permitir rutas internas — nunca redirigir a un dominio externo
+  if (r && r.startsWith('/') && !r.startsWith('//')) return r;
+  return '/index.html';
+}
+
+form.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  errorBox.classList.remove('visible');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Verificando…';
+
+  try {
+    const password = document.getElementById('password').value;
+    const r = await fetch('/api/auth-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    });
+    const data = await r.json();
+
+    if (r.ok && data.ok) {
+      window.location.href = paramRedirect();
+      return;
+    }
+    errorBox.textContent = data.error || 'Clave incorrecta. Intenta de nuevo.';
+    errorBox.classList.add('visible');
+  } catch (err) {
+    errorBox.textContent = 'Error de conexión. Intenta de nuevo.';
+    errorBox.classList.add('visible');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Entrar';
+  }
+});
+</script>
+</body>
+</html>

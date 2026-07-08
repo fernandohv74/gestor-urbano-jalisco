@@ -5796,6 +5796,11 @@ function descargarFicha(){
   const permitidos=splitUsos2(z.uso_per);
   const condicionados=splitUsos2(z.uso_con);
   const fecha=new Date().toLocaleDateString('es-MX',{year:'numeric',month:'long',day:'numeric'});
+  const _calle   = document.getElementById('inCalle')?.value.trim()||'';
+  const _colonia = document.getElementById('inColonia')?.value.trim()||'';
+  const _cp      = document.getElementById('inCP')?.value.trim()||'';
+  const _domicilio = [_calle,_colonia,_cp].filter(Boolean).join(', ')
+    || (latActual&&lngActual ? latActual.toFixed(5)+', '+lngActual.toFixed(5) : '');
 
   const w=window.open('','_blank');
   w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
@@ -5863,6 +5868,7 @@ function descargarFicha(){
     </div>
   </div>
 
+  ${_domicilio?`<div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:4px;padding:5px 10px;margin-bottom:8px;font-size:9px;color:#1E3A5F"><span style="font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:#1D4ED8">Predio consultado:</span> ${_domicilio}</div>`:''}
   <div class="layout">
 
   <!-- ══ COLUMNA IZQUIERDA ══ -->

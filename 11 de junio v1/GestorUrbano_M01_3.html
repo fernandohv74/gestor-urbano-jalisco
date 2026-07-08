@@ -1936,7 +1936,9 @@ function iniciarMapaResultado(lat, lng) {
             format: 'image/png',
             transparent: true,
             opacity: 0.8,
-            version: '1.1.1'
+            version: '1.1.1',
+            maxZoom: 21,
+            maxNativeZoom: 19
           }).addTo(_mapaLeaflet);
         } else {
           _mapaBaseWMS.addTo(_mapaLeaflet);

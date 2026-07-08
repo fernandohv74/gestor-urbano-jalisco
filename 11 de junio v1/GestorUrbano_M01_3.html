@@ -5814,7 +5814,7 @@ function descargarFicha(){
     .col{display:flex;flex-direction:column;gap:7px}
     .sec{font-size:8px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#fff;background:#1F4E79;padding:3px 8px;border-radius:3px;margin-bottom:5px;print-color-adjust:exact;-webkit-print-color-adjust:exact}
     .sec.rojo{background:#991B1B}
-    .sec.verde{background:var(--uso-p-brd)}
+    .sec.verde{background:#065F46;print-color-adjust:exact;-webkit-print-color-adjust:exact}
     .g2{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:5px}
     .g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-bottom:5px}
     .box{background:#F0F4FA;border:1px solid #D1D9E6;border-radius:4px;padding:6px 8px;print-color-adjust:exact;-webkit-print-color-adjust:exact}
@@ -5976,7 +5976,7 @@ function descargarFicha(){
           <div style="font-size:7px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">${label}</div>
           <div style="font-size:9px;color:#374151;margin-bottom:4px">${fmt(p._supRef||supBase)} m² construibles<br><span style="color:#6B7280">${p.base}</span></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
-            <div style="text-align:center;background:#F0FDF4;border-radius:3px;padding:4px"><div style="font-size:7px;color:#6B7280">Propios</div><div style="font-size:18px;font-weight:700;font-family:monospace;color:${color}">${p.cajones}</div><div style="font-size:7px;color:#6B7280;margin-top:1px">cajones</div></div>
+            <div style="text-align:center;background:#F0FDF4;border-radius:3px;padding:4px"><div style="font-size:7px;color:#6B7280">Permitidos</div><div style="font-size:18px;font-weight:700;font-family:monospace;color:${color}">${p.cajones}</div><div style="font-size:7px;color:#6B7280;margin-top:1px">cajones</div></div>
             <div style="text-align:center;background:#F0FDF4;border-radius:3px;padding:4px"><div style="font-size:7px;color:#6B7280">Total</div><div style="font-size:18px;font-weight:700;font-family:monospace;color:${color}">${p.total}</div><div style="font-size:7px;color:#6B7280;margin-top:1px">cajones</div></div>
           </div>
         </div>`;

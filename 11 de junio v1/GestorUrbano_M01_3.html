@@ -4513,7 +4513,7 @@ function renderizar(zona,todos){
   const condicionados= tieneBDUsos && zona.uso_con ? splitUsos(zona.uso_con) : (!esVUJ && zona.uso_con ? splitUsos(zona.uso_con) : []);
   const vistos=calcularVistos(patGlobal);
   const semaforo=vistos.some(v=>v.u==='alta')?'rojo':(vistos.length||zona._bd_local_usada)?'amarillo':'verde';
-  const semTxt=semaforo==='verde'?'Sin restricciones patrimoniales detectadas':semaforo==='amarillo'?(zona._bd_local_usada&&!vistos.length?'Normas de referencia — requiere consulta a los Planes Parciales o a la Dirección de Ordenamiento del Territorio':'Restricciones condicionales — vistos buenos requeridos'):'Restricciones graves — dictamen de organismos federales requerido (INAH/Cultura Jalisco)';
+  const semTxt=semaforo==='verde'?'Sin restricciones patrimoniales detectadas':semaforo==='amarillo'?(zona._bd_local_usada&&!vistos.length?'Normas de referencia — requiere consulta a los Planes Parciales o a la Dirección de Ordenamiento del Territorio':'Restricciones condicionales — vistos buenos requeridos'):'Restricciones graves — dictamen de organismos patrimoniales requerido (INAH / Cultura Jalisco)';
   const cos=parseFloat(zona.cos)||0,cus=parseFloat(zona.cus)||0;
   const nivCalc=cos>0?Math.round(cus/cos*10)/10:'—';
 
@@ -5886,7 +5886,7 @@ function descargarFicha(){
     <div>
       <div class="sec rojo">Patrimonio Cultural</div>
       <div class="pat-box">
-        <div class="pat-title">⚠️ Vistos buenos federales requeridos antes de cualquier obra</div>
+        <div class="pat-title">⚠️ Vistos buenos federales y estatales requeridos antes de cualquier obra</div>
         <div class="pat-row"><strong>Perímetro:</strong> ${pat.zona||'Zona de Protección del Centro Histórico'}</div>
         <div class="pat-row"><strong>Clasificación:</strong> ${pat.clasificacion||'Monumento Histórico por Determinación de Ley'}</div>
         <div class="pat-donde">

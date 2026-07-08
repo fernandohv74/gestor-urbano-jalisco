@@ -581,6 +581,7 @@ input[type=range]::-webkit-slider-thumb{
           </button>
           <div id="medir56Result" style="display:none;font-size:11px;font-family:monospace;color:#D97706;background:#FFFBEB;border:1px solid #FDE68A;border-radius:5px;padding:3px 8px;font-weight:600"></div>
           <input type="number" id="anchoManual56" min="0.5" max="150" step="0.1" placeholder="✏️ m manual" title="Escribe el ancho de la vialidad en metros" style="width:110px;padding:4px 8px;font-size:12px;font-family:var(--sans);border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg3);color:var(--text1);outline:none;font-weight:500">
+          <div id="vialidentInfo" style="display:none;font-size:11px;font-family:var(--sans);color:var(--text2);background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:3px 8px"></div>
           <div id="pinMovidoBadge" class="gu-pin-badge">
             Pin ajustado manualmente — resultado actualizado
           </div>
@@ -4820,6 +4821,11 @@ function renderizar(zona,todos){
     const esDiccionario = window._fuenteGeocodif === 'diccionario';
     vialDiv.style.display = (esVial || esDiccionario) ? 'flex' : 'none';
   }
+  if(municipioActual==='guadalajara'){
+    const _vi = document.getElementById('vialidentInfo');
+    if(_vi) _vi.style.display = 'none';
+    detectarVialidadGDL(lat, lng);
+  }
   if(mapaContainer) mapaContainer.style.display = 'block';
 
   // Si pin movido: mantener mapa, solo refrescar badge y botón
@@ -4959,6 +4965,31 @@ function _syncBotonesGDL(){
   }
 }
 
+async function detectarVialidadGDL(lat, lng){
+  const el = document.getElementById('vialidentInfo');
+  if(!el) return;
+  try{
+    const cql = encodeURIComponent('DWITHIN(geom,POINT('+lng+' '+lat+'),50,meters)');
+    const url = 'https://visorgeoserver.guadalajara.gob.mx/geoserver/vu2/wfs'
+      +'?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&typeName=vu2:GDL_E1_Jerarquia_Vial'
+      +'&maxFeatures=3&outputFormat=application/json&CQL_FILTER='+cql;
+    const ctrl = new AbortController();
+    const t = setTimeout(()=>ctrl.abort(), 6000);
+    const r = await fetch(url, {signal: ctrl.signal});
+    clearTimeout(t);
+    const d = await r.json();
+    const feats = (d.features||[]);
+    if(!feats.length){ el.style.display='none'; return; }
+    const p = feats[0].properties;
+    const nombre = (p.NOMBRE||'').trim();
+    const jerarq = (p.JERARQUIA||'').trim();
+    if(nombre){
+      el.textContent = 'Vialidad: ' + nombre + (jerarq ? ' (' + jerarq + ')' : '');
+      el.style.display = 'inline-block';
+    }
+  }catch(e){ /* silencioso */ }
+}
+
 function limpiarMedicion56(){
   _anchoCalle56 = 0;
   if(_medir56Line && _mapaLeaflet){ try{_mapaLeaflet.removeLayer(_medir56Line);}catch(e){} _medir56Line=null; }
@@ -4971,6 +5002,8 @@ function limpiarMedicion56(){
   if(res){ res.style.display = 'none'; res.textContent = ''; }
   const inp56 = document.getElementById('anchoManual56');
   if(inp56) inp56.value = '';
+  const _vi56 = document.getElementById('vialidentInfo');
+  if(_vi56) _vi56.style.display = 'none';
   if(_ventana3D && !_ventana3D.closed) actualizar3D();
 }
 

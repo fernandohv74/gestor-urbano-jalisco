@@ -576,6 +576,9 @@ input[type=range]::-webkit-slider-thumb{
           <button id="btnMedir56" title="Mide el ancho de la vialidad para calcular la altura máxima por criterio de 56°" style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);color:var(--text2);padding:6px 12px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--t-fast)">
             📏 Medir vialidad
           </button>
+          <button id="btnMapaBase" title="Mostrar capa catastral GDL con linderos precisos de predio" style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);color:var(--text2);padding:6px 12px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--t-fast)">
+            🏘️ Ver catastro
+          </button>
           <div id="medir56Result" style="display:none;font-size:11px;font-family:monospace;color:#D97706;background:#FFFBEB;border:1px solid #FDE68A;border-radius:5px;padding:3px 8px;font-weight:600"></div>
           <input type="number" id="anchoManual56" min="0.5" max="150" step="0.1" placeholder="✏️ m manual" title="Escribe el ancho de la vialidad en metros" style="width:110px;padding:4px 8px;font-size:12px;font-family:var(--sans);border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg3);color:var(--text1);outline:none;font-weight:500">
           <div id="pinMovidoBadge" class="gu-pin-badge">
@@ -898,6 +901,8 @@ let _medir56Mode  = false;  // true = modo medición activo
 let _medir56PuntoA = null;  // L.LatLng del primer click
 let _medir56Markers = [];   // marcadores temporales del medidor
 let _medir56Line = null;    // L.Polyline de la medición
+let _mapaBaseWMS     = null;   // capa WMS catastral GDL (MapaBase)
+let _mapaBaseVisible = false;  // estado del toggle catastro
 
 // ══════════════════════════════════════════════════
 // HISTORIAL — últimas 5 consultas en localStorage
@@ -1799,6 +1804,10 @@ function iniciarMapaResultado(lat, lng) {
     _mapaLeaflet = null;
     _markerActual = null;
   }
+  _mapaBaseWMS = null;
+  _mapaBaseVisible = false;
+  const _btnMB = document.getElementById('btnMapaBase');
+  if(_btnMB){ _btnMB.textContent='🏘️ Ver catastro'; _btnMB.style.cssText=''; }
 
   _mapaLeaflet = L.map('mapaResultado', {
     zoomControl: true,
@@ -1910,6 +1919,37 @@ function iniciarMapaResultado(lat, lng) {
         btnMedir.style.borderColor = '';
         btnMedir.style.color = '';
         _mapaLeaflet.getContainer().style.cursor = '';
+      }
+    };
+  }
+
+  // Handler: toggle capa catastral GDL
+  const btnMapaBase = document.getElementById('btnMapaBase');
+  if(btnMapaBase){
+    btnMapaBase.onclick = function(){
+      _mapaBaseVisible = !_mapaBaseVisible;
+      if(_mapaBaseVisible){
+        if(!_mapaBaseWMS){
+          _mapaBaseWMS = L.tileLayer.wms('https://visorgeoserver.guadalajara.gob.mx/geoserver/vu2/wms', {
+            layers: 'MapaBase',
+            format: 'image/png',
+            transparent: true,
+            opacity: 0.8,
+            version: '1.1.1'
+          }).addTo(_mapaLeaflet);
+        } else {
+          _mapaBaseWMS.addTo(_mapaLeaflet);
+        }
+        btnMapaBase.textContent = '🏘️ Ocultar catastro';
+        btnMapaBase.style.background = '#EFF6FF';
+        btnMapaBase.style.borderColor = '#3B82F6';
+        btnMapaBase.style.color = '#1D4ED8';
+      } else {
+        if(_mapaBaseWMS) _mapaLeaflet.removeLayer(_mapaBaseWMS);
+        btnMapaBase.textContent = '🏘️ Ver catastro';
+        btnMapaBase.style.background = '';
+        btnMapaBase.style.borderColor = '';
+        btnMapaBase.style.color = '';
       }
     };
   }
@@ -4013,7 +4053,7 @@ function calcularVistos(pat){
   if(zona)
     v.push({u:'media',t:'Zona patrimonial: '+zona+' — autorización de imagen urbana requerida',
       f:'Predio en zona de protección patrimonial catalogada por el Estado de Jalisco',
-      d:'📍 Secretaría de Cultura del Estado de Jalisco — Av. Hidalgo 1074, Col. Ladrón de Guevara, Guadalajara. Tel. (33) 3030-5500. También notificar a la Dir. de Ordenamiento Territorial del municipio.'});
+      d:'📍 Secretaría de Cultura Jalisco — Centro Cultural Patio Los Ángeles, Calle Cuitláhuac 305, Guadalajara. Tel. (33) 3030-5500. También notificar a la Dir. de Ordenamiento Territorial del municipio.'});
   return v;
 }
 
@@ -5798,7 +5838,7 @@ function descargarFicha(){
         <div class="pat-row"><strong>Clasificación:</strong> ${pat.clasificacion||'Monumento Histórico por Determinación de Ley'}</div>
         <div class="pat-donde">
           ${(pat.clasificacion||'').includes('Histórico')?'📍 <strong>INAH:</strong> Av. Alcalde 1351, Miraflores, GDL. (33) 3613-1827<br>':''}
-          📍 <strong>Sec. Cultura Jalisco:</strong> Av. Hidalgo 1074, Ladrón de Guevara. (33) 3030-5500
+          📍 <strong>Sec. Cultura Jalisco:</strong> Centro Cultural Patio Los Ángeles, Calle Cuitláhuac 305. (33) 3030-5500
         </div>
       </div>
     </div>`:''}
@@ -5847,7 +5887,7 @@ function descargarFicha(){
             <div style="background:#FFFBEB;border:2px solid #D97706;border-radius:4px;padding:5px;text-align:center">
               <div style="font-size:7px;color:#78350F;font-weight:700;text-transform:uppercase;margin-bottom:2px">Altura máx. 56°</div>
               <div style="font-size:14px;font-weight:700;color:#92400E;font-family:monospace">${_h56f} m</div>
-              <div style="font-size:7px;color:#92400E">≈ ${_niv56f} niveles × ${entrepiso_fc} m</div>
+              <div style="font-size:7px;color:#92400E">≈ ${_niv56f} niveles × ${entrepiso_fc} m entrepiso</div>
             </div>
           </div>
         </div>`;

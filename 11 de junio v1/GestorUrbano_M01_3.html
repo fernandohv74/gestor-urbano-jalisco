@@ -5262,7 +5262,7 @@ function calcularCajones(uso, supConst, supTerreno, cajonesTexto){
 }
 
 function actualizarSim(sup, _cosOverride, _cusOverride){
-  if(!datosZona||!sup)return;
+  if(!datosZona)return;
   const hayOverride = _cosOverride !== undefined && _cusOverride !== undefined;
   const cos=parseFloat(_cosOverride||datosZona.cos)||0,cus=parseFloat(_cusOverride||datosZona.cus)||0;
   const icos=hayOverride ? 0 : (parseFloat(datosZona.icos)||0);
@@ -5293,6 +5293,7 @@ function actualizarSim(sup, _cosOverride, _cusOverride){
       </div>
     </div>
   `;
+  if(!sup){const sn=document.getElementById('simNota');if(sn)sn.innerHTML='';return;}
 
   document.getElementById('simNota').innerHTML =
     `Terreno: ${fmt(sup)} m² · COS ${cos} · CUS ${cus} · iCOS ${icos} · iCUS ${icus}${tdd?' · TDD disponible':''}.` +

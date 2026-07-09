@@ -312,7 +312,7 @@ function guToggleTheme(){
 
   <!-- iCUS EXCEDENCIA — solo GDL y ZPN -->
   <div id="wrap-icus-toggle" style="display:none">
-    <label class="chk-row"><input type="checkbox" id="chk-icus" onchange="toggleICUS();onInputChange()"> Excedencia de iCUS (contribuci&#243;n por intensidad de construcci&#243;n adicional) <span style="font-size:10px;color:var(--text3);margin-left:4px">&#8212; requiere coef. iCUS y sup. terreno</span></label>
+    <label class="chk-row"><input type="checkbox" id="chk-icus" onchange="toggleICUS();onInputChange()"> <span id="lbl-icus-toggle">Excedencia de iCUS</span> <span id="lbl-icus-sub" style="font-size:10px;color:var(--text3);margin-left:4px">&#8212; requiere coef. iCUS y sup. terreno</span></label>
     <div id="wrap-icus-inputs" style="display:none;padding:4px 12px 4px 36px">
       <div class="form-grid" style="margin-top:4px;max-width:440px">
         <div class="field">
@@ -781,6 +781,13 @@ function selMun(mun, el) {
       const chkICUS = document.getElementById('chk-icus');
       if (chkICUS) { chkICUS.checked = false; toggleICUS(); }
     }
+    // Etiqueta dinámica según municipio
+    const lblTog = document.getElementById('lbl-icus-toggle');
+    const lblSub = document.getElementById('lbl-icus-sub');
+    if (lblTog) lblTog.textContent = mun === 'ZPN' ? 'Excedencia de CUS Máx' : 'Excedencia de iCUS';
+    if (lblSub) lblSub.innerHTML   = mun === 'ZPN'
+      ? '&#8212; requiere coef. CUS M&#225;x y sup. terreno'
+      : '&#8212; requiere coef. iCUS y sup. terreno';
   }
   onUsoChange();
 }
@@ -1068,7 +1075,7 @@ function calcular() {
         const subICUS = Math.round(mICUS * T_ZPN);
         total += subICUS;
         rows.push({
-          concepto: 'Contribuci&#243;n iCUS &#8212; excedencia de intensidad de construcci&#243;n'
+          concepto: 'Excedencia de CUS M&#225;x &#8212; contribuci&#243;n por densificaci&#243;n'
                   + '<br><span class="subtotal-badge">' + mICUS.toLocaleString('es-MX') + ' m&#178; &times; $1,595/m&#178;</span>',
           tarifa: '$1,595/m²',
           base:   mICUS.toLocaleString('es-MX') + ' m²',

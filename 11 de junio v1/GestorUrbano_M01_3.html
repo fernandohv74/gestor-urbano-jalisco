@@ -5786,7 +5786,7 @@ function descargarFicha(){
   const rl   = parseFloat(coefsSel?.rest_l || z.rest_l1)||0;
   const rp   = parseFloat(coefsSel?.rest_p || z.rest_p1)||0;
   const entrepiso_fc = parseFloat(document.getElementById('inputEntrepiso')?.value) || 3.0;
-  const niveles_fc   = cos > 0 ? Math.max(1, Math.round((cus+icus)/cos)) : 1;
+  const niveles_fc   = (cos+icos) > 0 ? Math.max(1, Math.round((cus+icus)/(cos+icos))) : 1;
   const alturaFC     = Math.round(niveles_fc * entrepiso_fc * 100) / 100;
   const _fichaEsGDL  = municipioActual === 'guadalajara';
   const rpEfec       = _fichaEsGDL ? Math.round(Math.max(rp, alturaFC * 0.25) * 100) / 100 : rp;
@@ -5917,7 +5917,7 @@ function descargarFicha(){
         <div class="box"><div class="box-l">Sup. mín.</div><div class="box-v" style="font-size:11px">${coefsSel?.sup||z.sup_min||'N/A'}${(coefsSel?.sup||z.sup_min)?' m²':''}</div></div>
         <div class="box"><div class="box-l">Frente mín.</div><div class="box-v" style="font-size:11px">${coefsSel?.frente||z.fre_min||'N/A'}${(coefsSel?.frente||z.fre_min)?' m':''}</div></div>
       </div>
-      <div style="font-size:8px;color:#1F4E79;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:3px;padding:4px 8px;margin-top:4px">📐 Niveles teóricos = (CUS + iCUS) ÷ COS = ('+cus+' + '+icus+') ÷ '+cos+' = <strong>'+niveles_fc+' niveles</strong></div>
+      <div style="font-size:8px;color:#1F4E79;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:3px;padding:4px 8px;margin-top:4px">📐 Niveles teóricos = (CUS + iCUS) ÷ (COS + iCOS) = ('+cus+' + '+icus+') ÷ ('+cos+' + '+icos+') = <strong>'+niveles_fc+' niveles</strong></div>
     </div>
 
     <div>

@@ -1274,6 +1274,77 @@ function calcularSoloSIAPA(t) {
   document.getElementById('result-panel').style.display = '';
 }
 
+// ── REFRENDO / PRÓRROGA ───────────────────────────────────────────────────────
+function calcularRefrendo() {
+  const meses = parseInt(document.getElementById('inp-refrendo').value) || 0;
+  const div   = document.getElementById('refrendo-result');
+  if (!meses || meses < 1) { div.style.display = 'none'; div.innerHTML = ''; return; }
+
+  const costo = costoLicenciaBase;
+  if (!costo || costo <= 0) {
+    div.innerHTML = '<span style="color:var(--text3);font-size:11px">Calcula primero la licencia para obtener el costo base.</span>';
+    div.style.display = 'block';
+    return;
+  }
+
+  let costoRefrendo = 0, detalle = '', artRef = '';
+
+  if (munActual === 'GDL') {
+    const limite5A   = 30; // meses adicionales hasta completar 5 años de vigencia total
+    const mesesBajos = Math.min(meses, limite5A);
+    const mesesAltos = Math.max(0, meses - limite5A);
+    const rf1 = mesesBajos > 0 ? costo * 0.025 * mesesBajos : 0;
+    const rf2 = mesesAltos > 0 ? costo * 0.050 * mesesAltos : 0;
+    costoRefrendo = rf1 + rf2;
+    if (mesesBajos > 0 && mesesAltos > 0) {
+      detalle = mesesBajos + ' mes' + (mesesBajos > 1 ? 'es' : '') + ' &times; 2.5% = ' + fmt(rf1)
+              + ' &nbsp;+&nbsp; '
+              + mesesAltos + ' mes' + (mesesAltos > 1 ? 'es' : '') + ' &times; 5.0% = ' + fmt(rf2);
+    } else if (mesesBajos > 0) {
+      detalle = mesesBajos + ' mes' + (mesesBajos > 1 ? 'es' : '') + ' &times; 2.5% sobre ' + fmt(costo);
+    } else {
+      detalle = mesesAltos + ' mes' + (mesesAltos > 1 ? 'es' : '') + ' &times; 5.0% sobre ' + fmt(costo);
+    }
+    artRef = 'Art. 49 Fracc. II &middot; Vigencia base: 30 meses';
+  } else if (munActual === 'ZPN') {
+    const bimestres = Math.ceil(meses / 2);
+    costoRefrendo = costo * 0.05 * bimestres;
+    detalle = bimestres + ' bimestre' + (bimestres > 1 ? 's' : '') + ' &times; 5% sobre ' + fmt(costo);
+    artRef = 'Art. 82, Ley Ingresos ZPN 2026 &middot; Vigencia base: 24 meses';
+  } else if (munActual === 'TLQ') {
+    const bimestres = Math.ceil(meses / 2);
+    costoRefrendo = costo * 0.10 * bimestres;
+    detalle = bimestres + ' bimestre' + (bimestres > 1 ? 's' : '') + ' &times; 10% sobre ' + fmt(costo);
+    artRef = 'Art. 63 Fracc. IV, Ley Ingresos TLQ 2026 &middot; Vigencia base: 24 meses';
+  } else {
+    const nombreMun = munActual === 'TLA' ? 'Tlajomulco' : 'Ton&#225;l&#225;';
+    div.innerHTML = '<span style="color:var(--sem-am-txt,#92400e);font-size:12px">'
+      + '&#9888; La tasa de pr&#243;rroga de ' + nombreMun + ' no est&#225; especificada en la Ley de Ingresos 2026 disponible. '
+      + 'Solicita la c&#233;dula de c&#225;lculo directamente en ventanilla.'
+      + '</span>';
+    div.style.display = 'block';
+    return;
+  }
+
+  const vigBase  = munActual === 'GDL' ? 30 : 24;
+  const vigTotal = vigBase + meses;
+  div.innerHTML = detalle
+    + '<br><span class="rf-detalle">'
+    + 'Vigencia total: <strong>' + vigTotal + ' meses</strong>'
+    + ' (' + Math.floor(vigTotal / 12) + ' a&ntilde;os ' + (vigTotal % 12) + ' meses)'
+    + ' &middot; ' + artRef
+    + '</span>'
+    + '<span class="rf-total">Refrendo estimado: ' + fmt(costoRefrendo) + '</span>';
+  div.style.display = 'block';
+}
+
+function limpiarRefrendo() {
+  document.getElementById('inp-refrendo').value = '';
+  const div = document.getElementById('refrendo-result');
+  div.style.display = 'none';
+  div.innerHTML = '';
+}
+
 // ── DEEP LINK M05 → M08 ───────────────────────────────────────────────────────
 (function leerDeepLinkM05(){
   var raw = localStorage.getItem('GU_m05_a_m08');

@@ -5912,12 +5912,12 @@ function descargarFicha(){
         <div class="box"><div class="box-l">iCUS</div><div class="box-v">${icus}</div><div class="box-s">Const. Indirecta</div></div>
       </div>
       <div class="g4">
-        <div class="box"><div class="box-l">Altura máx.</div><div class="box-v" style="font-size:11px">${z.alt_max||'Resultante'}</div><div class="box-s">CUS÷COS=${cos>0?Math.round(cus/cos*10)/10:'—'} niv.</div></div>
+        <div class="box"><div class="box-l">Altura máx.</div><div class="box-v" style="font-size:11px">${z.alt_max||'Resultante'}</div><div class="box-s">(CUS+iCUS)÷(COS+iCOS)=${niveles_fc} niv.</div></div>
         <div class="box"><div class="box-l">Retranqueo</div><div class="box-v" style="font-size:11px">${coefsSel?.modo||z.retranq||'No aplica'}</div></div>
         <div class="box"><div class="box-l">Sup. mín.</div><div class="box-v" style="font-size:11px">${coefsSel?.sup||z.sup_min||'N/A'}${(coefsSel?.sup||z.sup_min)?' m²':''}</div></div>
         <div class="box"><div class="box-l">Frente mín.</div><div class="box-v" style="font-size:11px">${coefsSel?.frente||z.fre_min||'N/A'}${(coefsSel?.frente||z.fre_min)?' m':''}</div></div>
       </div>
-      <div style="font-size:8px;color:#1F4E79;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:3px;padding:4px 8px;margin-top:4px">📐 Niveles teóricos = (CUS + iCUS) ÷ (COS + iCOS) = ('+cus+' + '+icus+') ÷ ('+cos+' + '+icos+') = <strong>'+niveles_fc+' niveles</strong></div>
+      <div style="font-size:8px;color:#1F4E79;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:3px;padding:4px 8px;margin-top:4px">📐 Niveles teóricos = (CUS + iCUS) ÷ (COS + iCOS) = (${cus} + ${icus}) ÷ (${cos} + ${icos}) = <strong>${niveles_fc} niveles</strong></div>
     </div>
 
     <div>

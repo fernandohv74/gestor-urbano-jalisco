@@ -727,6 +727,7 @@ const RETRANQUEO = {
 // ══════════════════════════════════════════════════
 let municipioActual = 'guadalajara';
 let datosZona = null;
+let _restaurandoHistorial = null;
 let todosPoligonos = [];
 let _idxZonaGDLActivo = 0;
 let zonasVUJ = []; // Zonas múltiples del VUJ para municipios no-Zapopan
@@ -965,6 +966,11 @@ function recargarHistorial(idx){
     const msgs={guadalajara:'✅ Guadalajara — API Visor Urbano GDL activa',zapopan:'✅ Zapopan — Mapa Urbano Zapopan activo · BD local PDU ZPN-01 2023 (respaldo)',tlajomulco:'✅ Tlajomulco de Zúñiga — API Visor Urbano Jalisco activa',tlaquepaque:'✅ San Pedro Tlaquepaque — API Visor Urbano Jalisco activa',tonala:'✅ Tonalá — API Visor Urbano Jalisco activa'};
     const nota=document.getElementById('muniNota');
     if(nota) nota.textContent=msgs[munHistorial]||'✅ API activa';
+    _restaurandoHistorial = {
+      sup:       item.sup       || 0,
+      entrepiso: item.entrepiso || null,
+      ancho56:   item.ancho56   || null
+    };
     procesarCoordenadas(item.lat, item.lng);
   }catch(e){}
 }
@@ -1987,6 +1993,7 @@ function iniciarMapaResultado(lat, lng) {
         const resEl = document.getElementById('medir56Result');
         if(resEl){ resEl.style.display='inline-block'; resEl.textContent=`✏️ ${_anchoCalle56} m (manual)`; }
         actualizar56();
+        _saveAncho56Historial(v);
       }
     });
   }
@@ -4838,6 +4845,29 @@ function renderizar(zona,todos){
   document.getElementById('simInput').value=0;
   document.getElementById('simSlider').value=0;
   actualizarSim(0);
+  if (_restaurandoHistorial) {
+    const _r = _restaurandoHistorial;
+    _restaurandoHistorial = null;
+    if (_r.sup > 0) {
+      document.getElementById('simInput').value = _r.sup;
+      document.getElementById('simSlider').value = Math.min(_r.sup, 10000);
+      actualizarSim(_r.sup);
+    }
+    if (_r.entrepiso !== null) {
+      const _ep = document.getElementById('inputEntrepiso');
+      if (_ep) _ep.value = _r.entrepiso;
+    }
+    if (_r.ancho56) {
+      const _inp56 = document.getElementById('anchoManual56');
+      if (_inp56) {
+        _inp56.value = _r.ancho56;
+        _anchoCalle56 = Math.round(_r.ancho56 * 10) / 10;
+        const _resEl = document.getElementById('medir56Result');
+        if (_resEl) { _resEl.style.display='inline-block'; _resEl.textContent='✏️ ' + _anchoCalle56 + ' m (manual)'; }
+        if (typeof actualizar56 === 'function') actualizar56();
+      }
+    }
+  }
 
   // Guardar en historial
   const dirBuscada = document.getElementById('inCalle').value.trim() ||
@@ -4924,6 +4954,18 @@ function _saveSupHistorial(sup){
   try{
     const h=JSON.parse(localStorage.getItem('gu_historial')||'[]');
     if(h.length){h[0].sup=sup;localStorage.setItem('gu_historial',JSON.stringify(h));}
+  }catch(e){}
+}
+function _saveEntrepisoHistorial(v){
+  try{
+    const h=JSON.parse(localStorage.getItem('gu_historial')||'[]');
+    if(h.length){h[0].entrepiso=parseFloat(v)||3.0;localStorage.setItem('gu_historial',JSON.stringify(h));}
+  }catch(e){}
+}
+function _saveAncho56Historial(v){
+  try{
+    const h=JSON.parse(localStorage.getItem('gu_historial')||'[]');
+    if(h.length&&v>0){h[0].ancho56=parseFloat(v)||0;localStorage.setItem('gu_historial',JSON.stringify(h));}
   }catch(e){}
 }
 
@@ -5788,7 +5830,11 @@ function cerrarTT(){document.getElementById('tooltip').style.display='none';}
 document.addEventListener('click',e=>{const tt=document.getElementById('tooltip');if(tt.style.display!=='none'&&!tt.contains(e.target))cerrarTT();});
 
 // Cargar historial al inicio
-window.addEventListener('load', () => { renderHistorial(); });
+window.addEventListener('load', () => {
+  renderHistorial();
+  const _epEl = document.getElementById('inputEntrepiso');
+  if (_epEl) _epEl.addEventListener('input', function(){ _saveEntrepisoHistorial(parseFloat(this.value)||3.0); });
+});
 
 // ══════════════════════════════════════════════════
 // DESCARGAR FICHA — estilo Visor Urbano oficial

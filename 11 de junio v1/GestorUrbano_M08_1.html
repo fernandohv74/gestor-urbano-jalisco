@@ -310,6 +310,26 @@ function guToggleTheme(){
     <label class="chk-row"><input type="checkbox" id="chk-revision" checked onchange="onInputChange()"> Revisión de proyecto (por revisión)</label>
   </div>
 
+  <!-- iCUS EXCEDENCIA — solo GDL y ZPN -->
+  <div id="wrap-icus-toggle" style="display:none">
+    <label class="chk-row"><input type="checkbox" id="chk-icus" onchange="toggleICUS();onInputChange()"> Excedencia de iCUS (contribuci&#243;n por intensidad de construcci&#243;n adicional) <span style="font-size:10px;color:var(--text3);margin-left:4px">&#8212; requiere coef. iCUS y sup. terreno</span></label>
+    <div id="wrap-icus-inputs" style="display:none;padding:4px 12px 4px 36px">
+      <div class="form-grid" style="margin-top:4px;max-width:440px">
+        <div class="field">
+          <label style="font-size:11px">Coef. iCUS <span style="color:var(--text3)">(ej. 0.7)</span></label>
+          <input type="number" id="inp-icus-coef" placeholder="0.7" min="0" step="0.01" oninput="onInputChange()">
+        </div>
+        <div class="field">
+          <label style="font-size:11px">Sup. terreno (m&#178;)</label>
+          <input type="number" id="inp-icus-sup" placeholder="ej. 300" min="0" step="0.01" oninput="onInputChange()">
+        </div>
+      </div>
+      <div id="wrap-zpn-ecpd" style="display:none;margin-top:2px">
+        <label class="chk-row" style="font-size:12px;padding-left:0"><input type="checkbox" id="chk-zpn-ecpd" onchange="onInputChange()"> Incluir ECPD fijo (solo si hay CUS m&#225;ximo) <span style="font-size:10px;color:var(--text3)">+$15,349</span></label>
+      </div>
+    </div>
+  </div>
+
   <label class="chk-row"><input type="checkbox" id="chk-siapa" onchange="toggleSIAPADen();onInputChange()"> Factibilidad SIAPA (agua potable y drenaje) <span style="font-size:10px;color:var(--text3);margin-left:4px">&#8212; requiere sup. del predio</span></label>
   <div id="wrap-siapa-den" style="display:none;padding:6px 12px 2px 36px">
     <div class="field" style="max-width:320px">
@@ -752,6 +772,16 @@ function selMun(mun, el) {
   // Aviso sin tarifas para TLQ/TLA/TON
   const banSinTar = document.getElementById('banner-sin-tarifas');
   if (banSinTar) banSinTar.style.display = TARIFAS[mun]?.sinTarifas ? '' : 'none';
+  // iCUS: solo GDL y ZPN tienen contribución por intensidad
+  const wrapICUS = document.getElementById('wrap-icus-toggle');
+  if (wrapICUS) {
+    const icusVisible = (mun === 'GDL' || mun === 'ZPN');
+    wrapICUS.style.display = icusVisible ? '' : 'none';
+    if (!icusVisible) {
+      const chkICUS = document.getElementById('chk-icus');
+      if (chkICUS) { chkICUS.checked = false; toggleICUS(); }
+    }
+  }
   onUsoChange();
 }
 
@@ -776,6 +806,15 @@ function toggleSIAPADen() {
   var chk = document.getElementById('chk-siapa');
   var wrap = document.getElementById('wrap-siapa-den');
   wrap.style.display = chk && chk.checked ? 'block' : 'none';
+}
+
+function toggleICUS() {
+  const chk     = document.getElementById('chk-icus');
+  const wrap    = document.getElementById('wrap-icus-inputs');
+  const zpnEcpd = document.getElementById('wrap-zpn-ecpd');
+  const active  = chk && chk.checked;
+  if (wrap)    wrap.style.display    = active ? 'block' : 'none';
+  if (zpnEcpd) zpnEcpd.style.display = (active && munActual === 'ZPN') ? 'block' : 'none';
 }
 
 function onUsoChange() { /* live recalc si ya hay resultado */ }
@@ -1002,6 +1041,61 @@ function calcular() {
     total += subAmb;
     const rangoLabel = sup <= 3400 ? 'hasta 3,400 m²' : sup <= 15000 ? '3,401-15,000 m²' : sup <= 30000 ? '15,001-30,000 m²' : 'mayor de 30,000 m²';
     rows.push({ concepto: 'Evaluación de Impacto Ambiental<br><span class="subtotal-badge">' + rangoLabel + '</span>', tarifa: fmt(subAmb), base: 'Por proyecto', sub: subAmb, art: t.impactoAmbientalArt });
+  }
+
+  // -- Excedencia iCUS (GDL y ZPN) --
+  const chkICUS = document.getElementById('chk-icus');
+  if (chkICUS && chkICUS.checked) {
+    const icusCoef = parseFloat(document.getElementById('inp-icus-coef').value) || 0;
+    const icusSup  = parseFloat(document.getElementById('inp-icus-sup').value)  || 0;
+    if (icusCoef > 0 && icusSup > 0) {
+      const mICUS = Math.round(icusCoef * icusSup * 100) / 100;
+      if (munActual === 'GDL') {
+        const T_GDL   = 1516;
+        const subICUS = Math.round(mICUS * T_GDL);
+        total += subICUS;
+        rows.push({
+          concepto: 'Contribuci&#243;n iCUS &#8212; excedencia de intensidad de construcci&#243;n'
+                  + '<br><span class="subtotal-badge">' + mICUS.toLocaleString('es-MX') + ' m&#178; &times; $1,516/m&#178;</span>',
+          tarifa: '$1,516/m²',
+          base:   mICUS.toLocaleString('es-MX') + ' m²',
+          sub:    subICUS,
+          art:    'Art. 37, Ley Ingresos GDL 2026'
+        });
+      } else if (munActual === 'ZPN') {
+        const T_ZPN   = 1595;
+        const T_ECPD  = 15349;
+        const subICUS = Math.round(mICUS * T_ZPN);
+        total += subICUS;
+        rows.push({
+          concepto: 'Contribuci&#243;n iCUS &#8212; excedencia de intensidad de construcci&#243;n'
+                  + '<br><span class="subtotal-badge">' + mICUS.toLocaleString('es-MX') + ' m&#178; &times; $1,595/m&#178;</span>',
+          tarifa: '$1,595/m²',
+          base:   mICUS.toLocaleString('es-MX') + ' m²',
+          sub:    subICUS,
+          art:    'Art. 62, Ley Ingresos ZPN 2026'
+        });
+        const chkECPD = document.getElementById('chk-zpn-ecpd');
+        if (chkECPD && chkECPD.checked) {
+          total += T_ECPD;
+          rows.push({
+            concepto: 'ECPD &#8212; Contribuci&#243;n por Densificaci&#243;n (cuota fija)'
+                    + '<br><span class="subtotal-badge">Solo cuando aplica CUS m&#225;ximo</span>',
+            tarifa: fmt(T_ECPD),
+            base:   'Cuota fija',
+            sub:    T_ECPD,
+            art:    'Art. 62, Ley Ingresos ZPN 2026'
+          });
+        }
+      }
+    } else {
+      rows.push({
+        concepto: 'Excedencia iCUS &#8212; ingresa coef. y sup. terreno',
+        tarifa: '&#8212;', base: '&#8212;', sub: null,
+        art: 'Ingresa coef. iCUS y sup. terreno para calcular el importe',
+        infoRow: true, infoVal: 'Sin datos'
+      });
+    }
   }
 
   // -- Filas informativas (sin costo) --

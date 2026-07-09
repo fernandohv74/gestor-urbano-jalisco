@@ -1001,10 +1001,12 @@ function actualizar3D(){
   const rf   = parseFloat(coefsSel?.rest_f || z.rest_f1)||0;
   const rl   = parseFloat(coefsSel?.rest_l || z.rest_l1)||0;
   const rp   = parseFloat(coefsSel?.rest_p || z.rest_p1)||0;
+  const icos = parseFloat(z.icos)||0;
+  const icus = parseFloat(z.icus)||0;
   const uso  = _usoSeleccionado || z.uso||z.clave||'—';
   const zona = z.zona||z.clave||'—';
   const muni = z.municipio||'';
-  const niveles = cos>0 ? Math.max(1, Math.round(cus/cos)) : 1;
+  const niveles = (cos+icos)>0 ? Math.max(1, Math.round((cus+icus)/(cos+icos))) : 1;
   const frente = Math.sqrt(sup * 2/3);
   const fondo  = Math.sqrt(sup * 3/2);
   const edifFrente = Math.max(1, frente - rl*2);
@@ -4326,7 +4328,8 @@ function cambiarPoligono(idx){
   const permitidos   = z.uso_per ? splitUsos(z.uso_per) : [];
   const condicionados= z.uso_con ? splitUsos(z.uso_con) : [];
   const cos = parseFloat(z.cos)||0, cus = parseFloat(z.cus)||0;
-  const nivCalc = cos>0 ? Math.round(cus/cos*10)/10 : '—';
+  const icos = parseFloat(z.icos)||0, icus = parseFloat(z.icus)||0;
+  const nivCalc = (cos+icos)>0 ? Math.round((cus+icus)/(cos+icos)*10)/10 : '—';
 
   // Actualizar coeficientes
   const cc = document.getElementById('cardCoeficientes');
@@ -4515,7 +4518,8 @@ function renderizar(zona,todos){
   const semaforo=vistos.some(v=>v.u==='alta')?'rojo':(vistos.length||zona._bd_local_usada)?'amarillo':'verde';
   const semTxt=semaforo==='verde'?'Sin restricciones patrimoniales detectadas':semaforo==='amarillo'?(zona._bd_local_usada&&!vistos.length?'Normas de referencia — requiere consulta a los Planes Parciales o a la Dirección de Ordenamiento del Territorio':'Restricciones condicionales — vistos buenos requeridos'):'Restricciones graves — dictamen de organismos patrimoniales requerido (INAH / Cultura Jalisco)';
   const cos=parseFloat(zona.cos)||0,cus=parseFloat(zona.cus)||0;
-  const nivCalc=cos>0?Math.round(cus/cos*10)/10:'—';
+  const _icos=parseFloat(zona.icos)||0,_icus=parseFloat(zona.icus)||0;
+  const nivCalc=(cos+_icos)>0?Math.round((cus+_icus)/(cos+_icos)*10)/10:'—';
 
   // Sección de usos — diferente para GDL (badges) y VUJ (descripción)
   // Frase en lenguaje ciudadano — calculada antes del template para evitar backticks anidados
@@ -5319,7 +5323,7 @@ function actualizarSim(sup, _cosOverride, _cusOverride){
   // RP posterior efectiva — Reg. Gestión Integral GDL Art. 58 Bis, Fracción II
   const _rp_base    = parseFloat(datosZona.rest_p1) || 0;
   const _entrepiso  = parseFloat(document.getElementById('inputEntrepiso')?.value) || 3.0;
-  const _nivSim     = cos > 0 ? Math.max(1, Math.round(cus / cos)) : 1;
+  const _nivSim     = (cos+icos) > 0 ? Math.max(1, Math.round((cus+icus) / (cos+icos))) : 1;
   const _altSim     = Math.round(_nivSim * _entrepiso * 100) / 100;
   const _esGDL      = municipioActual === 'guadalajara';
   const _rpEfe      = _esGDL ? Math.round(Math.max(_rp_base, _altSim * 0.25) * 100) / 100 : _rp_base;

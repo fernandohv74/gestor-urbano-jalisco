@@ -1390,6 +1390,33 @@ function limpiarRefrendo() {
   div.innerHTML = '';
 }
 
+// ── DEEP LINK M01 → M08 ───────────────────────────────────────────────────────
+(function leerDeepLinkM01(){
+  var raw = localStorage.getItem('GU_m01_a_m08');
+  if (!raw) return;
+  try {
+    var d = JSON.parse(raw);
+    if (!d || (Date.now() - d.ts) > 600000) { localStorage.removeItem('GU_m01_a_m08'); return; }
+
+    if (d.mun) {
+      var btnMun = document.getElementById('btn-mun-' + d.mun);
+      if (btnMun) selMun(d.mun, btnMun);
+    }
+    if (d.supPredio) { var el = document.getElementById('inp-sup-predio'); if (el) el.value = d.supPredio; }
+    if (d.niveles)   { var el = document.getElementById('inp-niveles');    if (el) el.value = d.niveles; }
+
+    localStorage.removeItem('GU_m01_a_m08');
+
+    var banner = document.createElement('div');
+    banner.style.cssText = 'background:rgba(26,39,68,.06);border:0.5px solid var(--brand);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text2);margin-bottom:12px';
+    banner.innerHTML = '&#9989; <strong>Datos recibidos desde M01</strong> &#8212; revisa los campos, ingresa la superficie de construcci&#243;n y presiona Calcular.';
+    var wrap = document.querySelector('.m08-wrap');
+    if (wrap) wrap.insertBefore(banner, wrap.firstChild);
+  } catch(e) {
+    localStorage.removeItem('GU_m01_a_m08');
+  }
+})();
+
 // ── DEEP LINK M05 → M08 ───────────────────────────────────────────────────────
 (function leerDeepLinkM05(){
   var raw = localStorage.getItem('GU_m05_a_m08');

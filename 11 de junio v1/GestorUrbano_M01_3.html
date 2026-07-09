@@ -553,9 +553,9 @@ input[type=range]::-webkit-slider-thumb{
         <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zM7 4h2v5H7V4zm0 6h2v2H7v-2z"/></svg>
         Verificar giro comercial en M02
       </button>
-      <button class="gu-btn-m03" id="btnIrM04" onclick="irAM04()" style="border-color:rgba(139,92,246,.4);color:#8B5CF6">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zM6.5 4.5l4 3.5-4 3.5V4.5z"/></svg>
-        Consultar con IA normativa en M04
+      <button class="gu-btn-m03" id="btnIrM08" onclick="irAM08()" style="border-color:rgba(37,99,235,.4);color:#2563eb">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M13 2H3a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1V3a1 1 0 00-1-1zM6 11H4V9h2v2zm0-4H4V5h2v2zm3 4H7V9h2v2zm0-4H7V5h2v2zm3 4h-2V9h2v2zm0-4h-2V5h2v2z"/></svg>
+        Calcular derechos de licencia en M08
       </button>
     </div>
 
@@ -2994,8 +2994,26 @@ function irAM02(){
   window.location.href = 'GestorUrbano_M02_4.html';
 }
 
-function irAM04(){
-  window.location.href = 'GestorUrbano_M04_3.html';
+function irAM08(){
+  const zonaActiva = window._zonaActivaM01 || datosZona;
+  if(!zonaActiva){ alert('Primero realiza una consulta de uso de suelo.'); return; }
+  const munMap = { guadalajara:'GDL', zapopan:'ZPN', tlaquepaque:'TLQ', tlajomulco:'TLA', tonala:'TON' };
+  const mun  = munMap[municipioActual] || 'GDL';
+  const cos  = parseFloat(zonaActiva.cos)||0;
+  const cus  = parseFloat(zonaActiva.cus)||0;
+  const icos = parseFloat(zonaActiva.icos)||0;
+  const icus = parseFloat(zonaActiva.icus)||0;
+  const niv  = (cos+icos)>0 ? Math.max(1, Math.round((cus+icus)/(cos+icos))) : 0;
+  const sup  = parseFloat(document.getElementById('simInput')?.value)||0;
+  try{
+    localStorage.setItem('GU_m01_a_m08', JSON.stringify({
+      mun,
+      supPredio: sup || undefined,
+      niveles:   niv || undefined,
+      ts:        Date.now()
+    }));
+  }catch(e){}
+  window.location.href = 'GestorUrbano_M08_1.html';
 }
 
 // Construye el objeto resultado directamente desde la BD local (sin VUJ)

@@ -5786,7 +5786,7 @@ function descargarFicha(){
   const rl   = parseFloat(coefsSel?.rest_l || z.rest_l1)||0;
   const rp   = parseFloat(coefsSel?.rest_p || z.rest_p1)||0;
   const entrepiso_fc = parseFloat(document.getElementById('inputEntrepiso')?.value) || 3.0;
-  const niveles_fc   = cos > 0 ? Math.max(1, Math.round(cus/cos)) : 1;
+  const niveles_fc   = cos > 0 ? Math.max(1, Math.round((cus+icus)/cos)) : 1;
   const alturaFC     = Math.round(niveles_fc * entrepiso_fc * 100) / 100;
   const _fichaEsGDL  = municipioActual === 'guadalajara';
   const rpEfec       = _fichaEsGDL ? Math.round(Math.max(rp, alturaFC * 0.25) * 100) / 100 : rp;
@@ -5917,6 +5917,7 @@ function descargarFicha(){
         <div class="box"><div class="box-l">Sup. mín.</div><div class="box-v" style="font-size:11px">${coefsSel?.sup||z.sup_min||'N/A'}${(coefsSel?.sup||z.sup_min)?' m²':''}</div></div>
         <div class="box"><div class="box-l">Frente mín.</div><div class="box-v" style="font-size:11px">${coefsSel?.frente||z.fre_min||'N/A'}${(coefsSel?.frente||z.fre_min)?' m':''}</div></div>
       </div>
+      <div style="font-size:8px;color:#1F4E79;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:3px;padding:4px 8px;margin-top:4px">📐 Niveles teóricos = (CUS + iCUS) ÷ COS = ('+cus+' + '+icus+') ÷ '+cos+' = <strong>'+niveles_fc+' niveles</strong></div>
     </div>
 
     <div>
@@ -5946,7 +5947,6 @@ function descargarFicha(){
             <div style="background:#FFFBEB;border:2px solid #D97706;border-radius:4px;padding:5px;text-align:center">
               <div style="font-size:7px;color:#78350F;font-weight:700;text-transform:uppercase;margin-bottom:2px">Altura máx. 56°</div>
               <div style="font-size:14px;font-weight:700;color:#92400E;font-family:monospace">${_h56f} m</div>
-              <div style="font-size:7px;color:#92400E">≈ ${_niv56f} niveles × ${entrepiso_fc} m entrepiso</div>
             </div>
           </div>
         </div>`;
@@ -5977,16 +5977,20 @@ function descargarFicha(){
       const parkBase = calcularCajones(z.uso, supBase, sup);
       const parkIcus = icus > 0 ? calcularCajones(z.uso, supIcus, sup) : null;
       if(!parkBase || parkBase.cajones === 0) return '';
-      const cajonRow = (p, label, color) => `
-        <div style="background:#fff;border:1px solid #D1FAE5;border-radius:5px;padding:7px 8px">
-          <div style="font-size:7px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">${label}</div>
-          <div style="font-size:9px;color:#374151;margin-bottom:4px">${fmt(p._supRef||supBase)} m² construibles<br><span style="color:#6B7280">${p.base}</span></div>
-          <div style="display:grid;grid-template-columns:${p.cajonesVisita>0?'1fr 1fr 1fr':'1fr 1fr'};gap:4px">
-            <div style="text-align:center;background:#F0FDF4;border-radius:3px;padding:4px"><div style="font-size:7px;color:#6B7280">Cajones propios</div><div style="font-size:18px;font-weight:700;font-family:monospace;color:${color}">${p.cajones}</div></div>
-            ${p.cajonesVisita>0?`<div style="text-align:center;background:#F0FDF4;border-radius:3px;padding:4px"><div style="font-size:7px;color:#6B7280">Cajones visita</div><div style="font-size:18px;font-weight:700;font-family:monospace;color:${color}">${p.cajonesVisita}</div></div>`:''}
-            <div style="text-align:center;background:#065F46;border-radius:3px;padding:4px;print-color-adjust:exact;-webkit-print-color-adjust:exact"><div style="font-size:7px;color:#D1FAE5">Total requerido</div><div style="font-size:18px;font-weight:700;font-family:monospace;color:#fff">${p.total}</div></div>
-          </div>
-        </div>`;
+      const cajonRow = (p, label, color) => {
+        const cols = p.cajonesVisita > 0 ? '1fr 1fr 1fr' : '1fr 1fr';
+        const visitaBox = p.cajonesVisita > 0
+          ? '<div style="text-align:center;background:#F0FDF4;border-radius:3px;padding:4px"><div style="font-size:7px;color:#6B7280">Cajones visita</div><div style="font-size:18px;font-weight:700;font-family:monospace;color:' + color + '">' + p.cajonesVisita + '</div></div>'
+          : '';
+        return '<div style="background:#fff;border:1px solid #D1FAE5;border-radius:5px;padding:7px 8px">'
+          + '<div style="font-size:7px;font-weight:700;color:' + color + ';text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">' + label + '</div>'
+          + '<div style="font-size:9px;color:#374151;margin-bottom:4px">' + fmt(p._supRef||supBase) + ' m² construibles<br><span style="color:#6B7280">' + p.base + '</span></div>'
+          + '<div style="display:grid;grid-template-columns:' + cols + ';gap:4px">'
+          + '<div style="text-align:center;background:#F0FDF4;border-radius:3px;padding:4px"><div style="font-size:7px;color:#6B7280">Cajones propios</div><div style="font-size:18px;font-weight:700;font-family:monospace;color:' + color + '">' + p.cajones + '</div></div>'
+          + visitaBox
+          + '<div style="text-align:center;background:#065F46;border-radius:3px;padding:4px;print-color-adjust:exact;-webkit-print-color-adjust:exact"><div style="font-size:7px;color:#D1FAE5">Total requerido</div><div style="font-size:18px;font-weight:700;font-family:monospace;color:#fff">' + p.total + '</div></div>'
+          + '</div></div>';
+      };
       parkBase._supRef = supBase;
       if(parkIcus) parkIcus._supRef = supIcus;
       return `<div>

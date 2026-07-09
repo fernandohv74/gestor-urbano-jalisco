@@ -1274,6 +1274,44 @@ function calcularSoloSIAPA(t) {
   document.getElementById('result-panel').style.display = '';
 }
 
+// ── NUEVO ANÁLISIS ────────────────────────────────────────────────────────────
+function nuevoAnalisis() {
+  // Municipio y tipo de obra — vía las mismas funciones que usan los botones
+  selMun('GDL', document.getElementById('btn-mun-GDL'));
+  selTipo('nueva', document.querySelector('.tipo-btn[data-tipo="nueva"]'));
+
+  // Inputs numéricos y fecha
+  ['inp-uso','inp-sup','inp-frente','inp-ml','inp-sup-predio','inp-niveles','inp-fecha-inicio']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.tagName === 'SELECT' ? el.selectedIndex = 0 : el.value = '';
+    });
+
+  // Checkboxes — restaurar valores por defecto de carga
+  const defaults = {
+    'chk-alineamiento': true, 'chk-habitabilidad': true,
+    'chk-dtude': true, 'chk-planos': true,
+    'chk-bitacora': false, 'chk-patrimonio': false,
+    'chk-revision': true, 'chk-siapa': false,
+    'chk-eit': false, 'chk-int-vial': false,
+    'chk-imp-amb': false, 'chk-icus': false, 'chk-zpn-ecpd': false
+  };
+  Object.entries(defaults).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.checked = val;
+  });
+
+  // Paneles expandibles — cerrar
+  toggleSIAPADen();
+  toggleICUS();
+
+  // Resultado
+  costoLicenciaBase = 0;
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('btn-reset').style.display = 'none';
+  limpiarRefrendo();
+}
+
 // ── REFRENDO / PRÓRROGA ───────────────────────────────────────────────────────
 function calcularRefrendo() {
   const meses = parseInt(document.getElementById('inp-refrendo').value) || 0;

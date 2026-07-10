@@ -2329,7 +2329,16 @@ const VUJ_BD_LOCAL = {
       indice_edificacion: '0', porcentaje_jardinado_restriccion_frontal: '20',
       cajones_estacionamiento: 'Ver Norma General No. 22',
       observaciones: '⚠️ USO HABITACIONAL PROHIBIDO (NG1 frac.IV PDU). PDU §5.2.4.3.5. COS 0.80 (CS-R e ind.) / 0.50 (Parque Industrial). ⚠️ CUS VOLUMÉTRICO para usos industriales (m³ edificados ÷ m² de terreno, NO igual al CUS superficial): CS-R→2.40 superficial | MFM→7.00 m³/m² | SI→8.00 m³/m² | IJ→6.00 m³/m² | I1→8.00 m³/m² | I2/I3→10.50 m³/m². El simulador muestra CUS 2.40 (CS-R); para usos industriales el cálculo volumétrico es distinto — consultar la tabla completa §5.2.4.3.5. Nota[9]: superficie libre post-COS mínimo 30% verde. Rest.Post 12ml si colinda MV-habitacional o equipamiento. Sup.mín 1500m² y frente 30ml solo subdivisión.',
-      uso_permitido: 'CS-R · MFM · SI · IJ · I1/I2/I3 — NO habitacional',
+      uso_permitido: 'CS-R · MFM · SI · IJ · I1 · I2 · I3',
+      coefs_por_uso: {
+        'CS-R': { cos:'0.80', cus:'2.40',             sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
+        'MFM':  { cos:'0.80', cus:'7.00 m³/m²', cus_vol:true, sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
+        'SI':   { cos:'0.80', cus:'8.00 m³/m²', cus_vol:true, sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
+        'IJ':   { cos:'0.50', cus:'6.00 m³/m²', cus_vol:true, sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
+        'I1':   { cos:'0.80', cus:'8.00 m³/m²', cus_vol:true, sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
+        'I2':   { cos:'0.80', cus:'10.50 m³/m²', cus_vol:true, sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
+        'I3':   { cos:'0.80', cus:'10.50 m³/m²', cus_vol:true, sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
+      },
       municipio_id: 120,
     },
     // APD — ÁREAS/CORREDORES CON POTENCIAL DE DESARROLLO + C.U.S.MAX.
@@ -2614,7 +2623,14 @@ const VUJ_BD_LOCAL = {
       indice_edificacion: '0', porcentaje_jardinado_restriccion_frontal: '20',
       cajones_estacionamiento: 'Ver Norma General No. 22',
       observaciones: '⚠️ USO HABITACIONAL PROHIBIDO. ⚠️ COS DIFERENTE a MR estándar: CS-R→COS 0.70 CUS 2.10 | IJ→COS 0.50 | SI→COS 0.70 CUS 6.00m³ | MFM→CUS 7.00m³. PDU ZPN-02/04 2023 §5.2.4.3.5 PPE. Altura sujeta a NG14. Nota [9]: superficie libre ≥30% verde.',
-      uso_permitido: 'CS-R · MFM · SI · IJ · I1 — NO habitacional',
+      uso_permitido: 'CS-R · MFM · SI · IJ · I1',
+      coefs_por_uso: {
+        'CS-R': { cos:'0.70', cus:'2.10',             sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
+        'MFM':  { cos:'0.70', cus:'7.00 m³/m²', cus_vol:true, sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
+        'SI':   { cos:'0.70', cus:'6.00 m³/m²', cus_vol:true, sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
+        'IJ':   { cos:'0.50', cus:'6.00 m³/m²', cus_vol:true, sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
+        'I1':   { cos:'0.70', cus:'8.00 m³/m²', cus_vol:true, sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
+      },
       municipio_id: 120,
     },
 
@@ -5465,8 +5481,8 @@ function seleccionarUso(event, clave, esCondicionado) {
   if(!coefs) { mostrarTT(event, claveTooltip); return; }
 
   // Resaltar badge seleccionado
-  document.querySelectorAll('.uso-badge').forEach(b => b.classList.remove('gu-uso-sel'));
-  event.target.classList.add('uso-sel');
+  document.querySelectorAll('.gu-uso-badge').forEach(b => b.classList.remove('gu-uso-sel'));
+  event.target.classList.add('gu-uso-sel');
   _usoSeleccionado = clave;
 
   // Sincronizar campos de arriba con los coefs del uso seleccionado
@@ -5485,10 +5501,13 @@ function seleccionarUso(event, clave, esCondicionado) {
   set('dynJARD',  pctSimple(coefs.jar));
   set('dynALT',   'Resultante COS/CUS');
   const cosN = parseFloat(coefs.cos)||0, cusN = parseFloat(coefs.cus)||0;
-  const nivStr = cosN>0 ? `CUS ${coefs.cus} ÷ COS ${coefs.cos} = ${Math.round(cusN/cosN*10)/10} niv.` : '';
+  const nivStr = (cosN>0 && !coefs.cus_vol)
+    ? `CUS ${coefs.cus} ÷ COS ${coefs.cos} = ${Math.round(cusN/cosN*10)/10} niv.`
+    : (coefs.cus_vol ? '⚠️ CUS volumétrico (m³/m²) — no equivale a niveles directamente' : '');
+  set('dynALT',    coefs.cus_vol ? 'Ver dictamen — CUS volumétrico' : 'Resultante COS/CUS');
   set('dynALTsub', nivStr);
   set('dynCOSsub', 'Coeficiente de Ocupación del Suelo');
-  set('dynCUSsub', 'Coeficiente de Utilización del Suelo');
+  set('dynCUSsub', coefs.cus_vol ? 'CUS Volumétrico (m³ edificados ÷ m² terreno)' : 'Coeficiente de Utilización del Suelo');
   // Restricciones
   const fmtRest = v => (!v||v==='—'||v==='0') ? '—' : v+' m';
   set('dynRESTF', coefs.rest_f ? coefs.rest_f+' m' : '—');
@@ -5522,9 +5541,9 @@ function seleccionarUso(event, clave, esCondicionado) {
         <div style="font-size:9px;color:var(--text3);margin-top:2px">Ocupación del suelo</div>
       </div>
       <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:8px 10px;text-align:center">
-        <div style="font-size:10px;color:var(--text3);margin-bottom:3px">CUS</div>
-        <div style="font-size:18px;font-family:var(--mono);color:var(--brand-light)">${fmtVal(coefs.cus)}</div>
-        <div style="font-size:9px;color:var(--text3);margin-top:2px">Utilización del suelo</div>
+        <div style="font-size:10px;color:var(--text3);margin-bottom:3px">CUS${coefs.cus_vol?' <span style="background:var(--yellow);color:#000;border-radius:3px;padding:0 4px;font-size:8px;font-weight:700">VOL</span>':''}</div>
+        <div style="font-size:${coefs.cus_vol?'14':'18'}px;font-family:var(--mono);color:var(--brand-light)">${fmtVal(coefs.cus)}</div>
+        <div style="font-size:9px;color:var(--text3);margin-top:2px">${coefs.cus_vol?'m³ edificados / m² terreno':'Utilización del suelo'}</div>
       </div>
       <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:8px 10px;text-align:center">
         <div style="font-size:10px;color:var(--text3);margin-bottom:3px">Modo</div>
@@ -5615,7 +5634,7 @@ function seleccionarUso(event, clave, esCondicionado) {
 function cerrarCoefsUso(){
   const p=document.getElementById('coefsUsoPanel');
   if(p){p.style.display='none';}
-  document.querySelectorAll('.uso-badge').forEach(b=>b.classList.remove('gu-uso-sel'));
+  document.querySelectorAll('.gu-uso-badge').forEach(b=>b.classList.remove('gu-uso-sel'));
   _usoSeleccionado=null;
   // Restaurar simulador completo con coefs originales
   const sup = parseFloat(document.getElementById('simInput')?.value)||300;

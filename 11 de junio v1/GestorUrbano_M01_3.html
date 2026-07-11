@@ -5151,6 +5151,17 @@ function _renderCajones(supConst, supConstIcus, sup, cajonesTexto, uso){
         ${park.base}
       </div>` : `
       ${hasIcus?`<div style="font-size:9px;color:var(--text3);font-weight:600;margin-bottom:4px;padding:2px 6px;background:rgba(255,255,255,.07);border-radius:3px;display:inline-block">Base (CUS)</div>`:''}
+      ${park.esHabEnCS ? `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:${hasIcus?'6':'8'}px">
+        <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;text-align:center">
+          <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:var(--uso-p-txt)">${park.cajones}</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">Mínimo requerido</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;text-align:center">
+          <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:var(--brand-light)">${park.cajMax !== null ? park.cajMax : '∞'}</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">Máximo permitido</div>
+        </div>
+      </div>` : `
       <div style="display:grid;grid-template-columns:1fr 1fr ${park.cajonesVisita>0?'1fr':''};gap:10px;margin-bottom:${hasIcus?'6':'8'}px">
         <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;text-align:center">
           <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:var(--uso-p-txt)">${park.cajones}</div>
@@ -5165,10 +5176,21 @@ function _renderCajones(supConst, supConstIcus, sup, cajonesTexto, uso){
           <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:var(--uso-p-txt)">${park.total}</div>
           <div style="font-size:10px;color:var(--text2);margin-top:2px">Total requerido</div>
         </div>
-      </div>
+      </div>`}
       ${hasIcus && park2 && (park2.cajones>0||park2.esTexto) ? `
       <div style="background:rgba(20,184,166,.08);border:1px solid rgba(20,184,166,.25);border-radius:6px;padding:8px 10px;margin-bottom:8px">
         <div style="font-size:9px;color:var(--teal);font-weight:600;margin-bottom:6px">⊕ Con iCUS — ${fmt(supConstIcus)} m²</div>
+        ${park2.esHabEnCS ? `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;text-align:center">
+            <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:var(--teal)">${park2.cajones}</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:2px">Mínimo requerido</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;text-align:center">
+            <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:var(--brand-light)">${park2.cajMax !== null ? park2.cajMax : '∞'}</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:2px">Máximo permitido</div>
+          </div>
+        </div>` : `
         <div style="display:grid;grid-template-columns:1fr 1fr ${park2.cajonesVisita>0?'1fr':''};gap:10px">
           <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;text-align:center">
             <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:var(--teal)">${park2.cajones}</div>
@@ -5183,7 +5205,7 @@ function _renderCajones(supConst, supConstIcus, sup, cajonesTexto, uso){
             <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:var(--teal)">${park2.total}</div>
             <div style="font-size:10px;color:var(--text2);margin-top:2px">Total requerido</div>
           </div>
-        </div>
+        </div>`}
       </div>
       `:''}`}
       <div style="font-size:10px;color:var(--text3);line-height:1.6">
@@ -5208,17 +5230,21 @@ function _renderCajones(supConst, supConstIcus, sup, cajonesTexto, uso){
       const clave = ((z._clave_bd||z.uso||z.ppp||'')+'').trim().toUpperCase();
       const usos = (((z.uso_per||z.uso_permitido||''))+' '+((z.uso_con||z.uso_condicionado||''))).toUpperCase();
       // Si la zona ES un tipo CS directo
-      if(/^CS1\b/.test(clave)) return {CS1:'aplica',CS2:'no',CS3:'no'};
-      if(/^CS2\b/.test(clave)) return {CS1:'aplica',CS2:'aplica',CS3:'no'};
-      if(/^CS3\b/.test(clave)||/^CS4\b/.test(clave)) return {CS1:'aplica',CS2:'aplica',CS3:'aplica'};
-      if(/^CS-V\b/.test(clave)||clave==='CSV') return {CS1:'aplica',CS2:'no',CS3:'no'};
+      if(/^CS1\b/.test(clave)) return {CS1:'aplica',CS2:'no',CS3:'no',CS4:'no',CS5:'no'};
+      if(/^CS2\b/.test(clave)) return {CS1:'aplica',CS2:'aplica',CS3:'no',CS4:'no',CS5:'no'};
+      if(/^CS3\b/.test(clave)) return {CS1:'aplica',CS2:'aplica',CS3:'aplica',CS4:'no',CS5:'no'};
+      if(/^CS4\b/.test(clave)) return {CS1:'aplica',CS2:'aplica',CS3:'aplica',CS4:'aplica',CS5:'no'};
+      if(/^CS5\b/.test(clave)) return {CS1:'aplica',CS2:'aplica',CS3:'aplica',CS4:'aplica',CS5:'aplica'};
+      if(/^CS-V\b/.test(clave)||clave==='CSV') return {CS1:'aplica',CS2:'no',CS3:'no',CS4:'no',CS5:'no'};
       // Basado en usos explícitos de la zona
-      if(usos.includes('CS3')||usos.includes('CS4')) return {CS1:'aplica',CS2:'aplica',CS3:'aplica'};
-      if(usos.includes('CS2')) return {CS1:'aplica',CS2:'aplica',CS3:'no'};
-      if(usos.includes('CS1')||usos.includes('CS-V')||usos.includes('CSV')) return {CS1:'aplica',CS2:'no',CS3:'no'};
+      if(usos.includes('CS5')) return {CS1:'aplica',CS2:'aplica',CS3:'aplica',CS4:'aplica',CS5:'aplica'};
+      if(usos.includes('CS4')) return {CS1:'aplica',CS2:'aplica',CS3:'aplica',CS4:'aplica',CS5:'no'};
+      if(usos.includes('CS3')) return {CS1:'aplica',CS2:'aplica',CS3:'aplica',CS4:'no',CS5:'no'};
+      if(usos.includes('CS2')) return {CS1:'aplica',CS2:'aplica',CS3:'no',CS4:'no',CS5:'no'};
+      if(usos.includes('CS1')||usos.includes('CS-V')||usos.includes('CSV')) return {CS1:'aplica',CS2:'no',CS3:'no',CS4:'no',CS5:'no'};
       // Zonas habitacionales puras — solo CS1 condicionado
-      if(/^H[12]\b/.test(clave)||clave==='H1'||clave==='H2') return {CS1:'cond',CS2:'no',CS3:'no'};
-      if(/^H[34]\b/.test(clave)||clave==='H3'||clave==='H4') return {CS1:'aplica',CS2:'cond',CS3:'no'};
+      if(/^H[12]\b/.test(clave)||clave==='H1'||clave==='H2') return {CS1:'cond',CS2:'no',CS3:'no',CS4:'no',CS5:'no'};
+      if(/^H[34]\b/.test(clave)||clave==='H3'||clave==='H4') return {CS1:'aplica',CS2:'cond',CS3:'no',CS4:'no',CS5:'no'};
       return null; // sin info → mostrar todo
     };
     const csApl = _detectCs();
@@ -5226,6 +5252,8 @@ function _renderCajones(supConst, supConstIcus, sup, cajonesTexto, uso){
       {clave:'CS1', label:'Comercio vecinal',  minAbs:0,    maxAbs:1,    minRat:null, maxRat:null,  nota:'Tiendas, servicios de barrio',    desc:'Mín: 0 · Máx: 1 cajón'},
       {clave:'CS2', label:'Comercio barrial',   minAbs:0,    maxAbs:null, minRat:null, maxRat:80,    nota:'Restaurantes, oficinas, centros',  desc:'Mín: 0 · Máx: 1/80 m²'},
       {clave:'CS3', label:'Comercio distrital', minAbs:null, maxAbs:null, minRat:80,   maxRat:80/3,  nota:'Plaza comercial, súper regional',  desc:'Mín: 1/80 m² · Máx: 3/80 m²'},
+      {clave:'CS4', label:'Comercio intensivo', minAbs:null, maxAbs:null, minRat:80,   maxRat:80/6,  nota:'Grandes superficies, departamentales', desc:'Mín: 1/80 m² · Máx: 6/80 m²'},
+      {clave:'CS5', label:'Comercio máximo',    minAbs:null, maxAbs:null, minRat:80,   maxRat:80/9,  nota:'Centros regionales, macro comercios',  desc:'Mín: 1/80 m² · Máx: 9/80 m²'},
     ];
     const _cajMinCom = (sup, n) => n.minAbs !== null ? n.minAbs : (n.minRat ? Math.ceil(sup / n.minRat) : 0);
     const _cajMaxCom = (sup, n) => n.maxAbs !== null ? n.maxAbs : (n.maxRat ? Math.ceil(sup / n.maxRat) : 0);
@@ -5346,12 +5374,14 @@ function calcularCajones(uso, supConst, supTerreno, cajonesTexto){
     const supViv = Math.max(20, _supPorVivienda || 80);
     const numVivs = Math.max(1, Math.floor(supConst / supViv));
     const hClass = supViv > 300 ? 'H1' : supViv > 120 ? 'H2' : supViv > 90 ? 'H3' : 'H4';
-    const maxPorViv = hClass==='H1' ? 'sin límite' : hClass==='H2' ? '3 máx' : hClass==='H3' ? '2 máx' : '1 máx';
+    const maxFactor = hClass==='H2' ? 3 : hClass==='H3' ? 2 : hClass==='H4' ? 1 : null;
+    const cajMax = maxFactor !== null ? numVivs * maxFactor : null;
+    const maxPorViv = hClass==='H1' ? 'sin límite' : hClass==='H2' ? '3/viv máx' : hClass==='H3' ? '2/viv máx' : '1/viv máx';
     return {
       codigo, label:`Vivienda en zona ${codigo} (${hClass})`,
-      cajones: numVivs, cajonesVisita: 0, total: numVivs,
+      cajones: numVivs, cajMax, cajonesVisita: 0, total: numVivs,
       base: `${numVivs} viviendas est. (${fmt(supConst)} m² ÷ ${supViv} m²/viv)`,
-      detalle: `${hClass}: ${supViv} m²/viv → 1 cajón mín, ${maxPorViv}`,
+      detalle: `${hClass}: ${supViv} m²/viv → 1 cajón/viv mín · ${maxPorViv}`,
       hClass, esHabEnCS: true
     };
   }

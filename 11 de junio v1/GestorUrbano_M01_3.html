@@ -5223,14 +5223,20 @@ function _renderCajones(supConst, supConstIcus, sup, cajonesTexto, uso){
     };
     const csApl = _detectCs();
     const niveles = [
-      {clave:'CS1', label:'Comercio vecinal',   ratio:40, nota:'Tiendas, servicios de barrio'},
-      {clave:'CS2', label:'Comercio barrial',    ratio:30, nota:'Restaurantes, oficinas, centros'},
-      {clave:'CS3', label:'Comercio distrital',  ratio:25, nota:'Plaza comercial, súper regional'},
+      {clave:'CS1', label:'Comercio vecinal',  minAbs:0,    maxAbs:1,    minRat:null, maxRat:null,  nota:'Tiendas, servicios de barrio',    desc:'Mín: 0 · Máx: 1 cajón'},
+      {clave:'CS2', label:'Comercio barrial',   minAbs:0,    maxAbs:null, minRat:null, maxRat:80,    nota:'Restaurantes, oficinas, centros',  desc:'Mín: 0 · Máx: 1/80 m²'},
+      {clave:'CS3', label:'Comercio distrital', minAbs:null, maxAbs:null, minRat:80,   maxRat:80/3,  nota:'Plaza comercial, súper regional',  desc:'Mín: 1/80 m² · Máx: 3/80 m²'},
     ];
+    const _cajMinCom = (sup, n) => n.minAbs !== null ? n.minAbs : (n.minRat ? Math.ceil(sup / n.minRat) : 0);
+    const _cajMaxCom = (sup, n) => n.maxAbs !== null ? n.maxAbs : (n.maxRat ? Math.ceil(sup / n.maxRat) : 0);
     const rows = niveles.map(n=>{
       const apl = csApl ? csApl[n.clave] : 'aplica';
-      const caj = Math.ceil(supConst / n.ratio);
-      const caj2 = hasIcus ? Math.ceil(supConstIcus / n.ratio) : null;
+      const cajMin = _cajMinCom(supConst, n);
+      const cajMax = _cajMaxCom(supConst, n);
+      const cajMin2 = hasIcus ? _cajMinCom(supConstIcus, n) : null;
+      const cajMax2 = hasIcus ? _cajMaxCom(supConstIcus, n) : null;
+      const cajStr  = cajMin===cajMax ? `${cajMax}` : `${cajMin}–${cajMax}`;
+      const cajStr2 = cajMin2===cajMax2 ? `${cajMax2}` : `${cajMin2}–${cajMax2}`;
       if(apl === 'no'){
         return `<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);opacity:0.5">
           <div>
@@ -5246,25 +5252,25 @@ function _renderCajones(supConst, supConstIcus, sup, cajonesTexto, uso){
           <span style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--brand)">${n.clave}</span>
           <span style="font-size:11px;color:var(--text2);margin-left:6px">${n.label}</span>
           ${apl==='cond'?`<span style="font-size:9px;background:rgba(234,179,8,.15);color:#ca8a04;border-radius:3px;padding:1px 5px;margin-left:5px">condicionado</span>`:''}
-          <div style="font-size:10px;color:var(--text3)">${n.nota} · 1 cajón / ${n.ratio} m²</div>
+          <div style="font-size:10px;color:var(--text3)">${n.nota} · ${n.desc}</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:10px">
           <div style="text-align:center">
-            <div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--brand);line-height:1">${caj}</div>
+            <div style="font-family:var(--mono);font-size:16px;font-weight:600;color:var(--brand);line-height:1">${cajStr}</div>
             ${hasIcus?`<div style="font-size:8px;color:var(--text3)">base</div>`:''}
           </div>
-          ${hasIcus && caj2!==null?`
+          ${hasIcus && cajMin2!==null?`
           <div style="text-align:center;border-left:1px solid var(--border);padding-left:8px">
-            <div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--teal);line-height:1">${caj2}</div>
+            <div style="font-family:var(--mono);font-size:16px;font-weight:600;color:var(--teal);line-height:1">${cajStr2}</div>
             <div style="font-size:8px;color:var(--teal)">iCUS</div>
           </div>`:''}
         </div>
       </div>`;
     }).join('');
     el.innerHTML=`<div style="background:var(--bg3);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px">
-      <div style="font-weight:600;color:var(--text);margin-bottom:8px">🏪 Cajones requeridos — Comercial${hasIcus?` <span style="font-size:10px;color:var(--teal);font-weight:400">(base / con iCUS)</span>`:''}</div>
+      <div style="font-weight:600;color:var(--text);margin-bottom:8px">🏪 Cajones Comercial — mín requerido · máx permitido${hasIcus?` <span style="font-size:10px;color:var(--teal);font-weight:400">(base / con iCUS)</span>`:''}</div>
       ${rows}
-      <div style="font-size:10px;color:var(--text3);margin-top:6px">Base: ${fmt(supConst)} m²${hasIcus?` · iCUS: ${fmt(supConstIcus)} m²`:''} · Reglamento GDL${csApl?` · Zona ${(datosZona&&(datosZona._clave_bd||datosZona.uso))||''}`:''}</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:6px">Base: ${fmt(supConst)} m²${hasIcus?` · iCUS: ${fmt(supConstIcus)} m²`:''} · RGIM Cap. VI, Art. 278 I · GDL${csApl?` · Zona ${(datosZona&&(datosZona._clave_bd||datosZona.uso))||''}`:''}</div>
     </div>`;
   }
 }

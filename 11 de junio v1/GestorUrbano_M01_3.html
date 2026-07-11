@@ -5110,6 +5110,7 @@ function limpiarMedicion56(){
 
 // ── MODO CAJONES ─────────────────────────────────────────────────────────────
 let _cajonesMode = 'hab';
+let _supPorVivienda = 80;
 function setCajonesMode(modo){
   _cajonesMode = modo;
   const bHab = document.getElementById('btnCajHab');
@@ -5137,6 +5138,14 @@ function _renderCajones(supConst, supConstIcus, sup, cajonesTexto, uso){
     const cajonesHTML = park && (park.cajones>0||park.esTexto) ? `
     <div style="background:#0D1F0D;border:1px solid var(--uso-p-brd);border-radius:7px;padding:12px;margin-top:8px">
       <div style="font-size:10px;color:var(--uso-p-txt);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">🅿️ Cajones de estacionamiento requeridos — 🏠 Vivienda</div>
+      ${park.esHabEnCS ? `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:5px 10px;background:rgba(255,255,255,.04);border-radius:5px;border:1px solid var(--border)">
+        <span style="font-size:10px;color:var(--text2)">m²/vivienda:</span>
+        <input type="number" id="inpSupViv" value="${_supPorVivienda}" min="20" max="500" step="10"
+          style="width:64px;padding:2px 6px;border-radius:4px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);font-size:12px;font-family:var(--mono)"
+          onchange="_supPorVivienda=Math.max(20,parseInt(this.value)||80);setCajonesMode('hab')">
+        <span style="font-size:10px;color:var(--teal)">${park.hClass} — 1 cajón/viv mín</span>
+      </div>` : ''}
       ${park.esTexto ? `
       <div style="background:var(--bg3);border-radius:6px;padding:10px 12px;margin-bottom:8px;font-size:12px;color:var(--text2);line-height:1.6">
         ${park.base}
@@ -5181,6 +5190,8 @@ function _renderCajones(supConst, supConstIcus, sup, cajonesTexto, uso){
         ${!park.esTexto?`Base: ${park.base} · ${park.detalle}<br>`:''}
         📋 ${park.esVUJ||park.esTexto
           ? `Reglamento de estacionamiento del municipio correspondiente. ${park.esTexto?'<strong>'+park.detalle+'</strong>':''}`
+          : park.esHabEnCS
+          ? `Fuente: <strong>RGIM Cap. VI, Art. 278 III</strong> — Reglamento para la Gestión Integral del Municipio de Guadalajara. <em>Cada municipio del AMG aplica su propio reglamento.</em>`
           : `Fuente: <strong>Anexo de Normas de Estacionamiento</strong> — Reglamento de Gestión del Desarrollo Urbano del Municipio de Guadalajara (reforma Abril 2025). <em>Cada municipio del AMG aplica su propio reglamento.</em>`}
       </div>
     </div>` : park && park.cajones===0 && !park.esTexto ? `
@@ -5259,8 +5270,8 @@ function _renderCajones(supConst, supConstIcus, sup, cajonesTexto, uso){
 }
 
 // ══════════════════════════════════════════════════
-// TABLA DE CAJONES — Reglamento de Gestión del
-// Desarrollo Urbano de Guadalajara (Abril 2025)
+// TABLA DE CAJONES — RGIM Cap. VI, Art. 278
+// Reglamento para la Gestión Integral del Municipio de Guadalajara
 // Nota: cada municipio tiene coeficientes propios.
 // ══════════════════════════════════════════════════
 const CAJONES_GDL = {
@@ -5324,6 +5335,20 @@ function calcularCajones(uso, supConst, supTerreno, cajonesTexto){
 
   // GDL — lógica original por código
   const codigo = (uso||'').split('/').pop().split('-')[0].toUpperCase().trim();
+  // RGIM Art. 278 III — vivienda en zona CS (clasificación por tamaño de unidad)
+  if(/^CS\d/i.test(codigo) && _cajonesMode === 'hab'){
+    const supViv = Math.max(20, _supPorVivienda || 80);
+    const numVivs = Math.max(1, Math.floor(supConst / supViv));
+    const hClass = supViv > 300 ? 'H1' : supViv > 120 ? 'H2' : supViv > 90 ? 'H3' : 'H4';
+    const maxPorViv = hClass==='H1' ? 'sin límite' : hClass==='H2' ? '3 máx' : hClass==='H3' ? '2 máx' : '1 máx';
+    return {
+      codigo, label:`Vivienda en zona ${codigo} (${hClass})`,
+      cajones: numVivs, cajonesVisita: 0, total: numVivs,
+      base: `${numVivs} viviendas est. (${fmt(supConst)} m² ÷ ${supViv} m²/viv)`,
+      detalle: `${hClass}: ${supViv} m²/viv → 1 cajón mín, ${maxPorViv}`,
+      hClass, esHabEnCS: true
+    };
+  }
   const reg = CAJONES_GDL[codigo];
   if(!reg || !reg.cajones || !reg.por) return null;
 

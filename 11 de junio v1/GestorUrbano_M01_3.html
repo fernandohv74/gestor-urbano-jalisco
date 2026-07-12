@@ -2554,7 +2554,7 @@ const VUJ_BD_LOCAL = {
         'EI-V': {cos:'0.70',cus:'1.60',sup:'—',frente:'8', rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Variable',nota:'Equipamiento vecinal',ide:'—'},
         'CS-V': {cos:'0.80',cus:'2.40',sup:'90', frente:'6', rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Variable',nota:'Máx. 200 m² por local [nota 6]',ide:'—'},
         'MB':   {cos:'0.80',cus:'1.60',sup:'320',frente:'16',rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Variable',nota:'⚠️ Condicionado — Mixto Barrial',ide:'—'},
-        'MFD':  {cos:'0.80',cus:'1.60',sup:'140',frente:'12',rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Variable',nota:'⚠️ Condicionado — manufactura domiciliaria',ide:'—'},
+        'MFD':  {cos:'0.80',cus:'1.60',sup:'140',frente:'12',rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Variable',nota:'⚠️ Condicionado — manufactura domiciliaria',ide:'90'},
         'MFM':  {cos:'0.80',cus:'8.00 m³/m²',cus_vol:true,sup:'180',frente:'15',rest_f:'5',rest_l:'Ver plano',rest_p:'12',jar:'0.20',modo:'Variable',nota:'⚠️ Condicionado — CUS volumétrico',ide:'—'},
         'SI':   {cos:'0.80',cus:'8.00 m³/m²',cus_vol:true,sup:'600',frente:'15',rest_f:'5',rest_l:'Ver plano',rest_p:'12',jar:'0.20',modo:'Variable',nota:'⚠️ Condicionado — CUS volumétrico',ide:'—'},
         'I1':   {cos:'0.80',cus:'8.00 m³/m²',cus_vol:true,sup:'600',frente:'15',rest_f:'5',rest_l:'Ver plano',rest_p:'12',jar:'0.20',modo:'Variable',nota:'⚠️ Condicionado — CUS volumétrico',ide:'—'},
@@ -4535,14 +4535,31 @@ function renderizar(zona,todos){
   // Ej: "H4-V(condicionado)" → "H4-V", "TH(condicionado)" → "TH"
   const splitUsos = s => {
     if(!s) return [];
-    const clean = u => u.trim().replace(/\(condicionado\)/i,'').trim();
-    if(s.includes('|')) return s.split('|').map(clean).filter(Boolean);
-    if(s.includes('\xB7')) return s.split('\xB7').map(clean).filter(Boolean);
-    if(s.includes('·')) return s.split('·').map(clean).filter(Boolean);
+    const clean = u => u.trim().replace(/\(condicionados?\)/i,'').trim();
+    const expand = u => { const c=clean(u); return c.includes('/')?c.split('/').map(x=>x.trim()).filter(Boolean):[c]; };
+    if(s.includes('|')) return s.split('|').flatMap(expand).filter(Boolean);
+    if(s.includes('\xB7')) return s.split('\xB7').flatMap(expand).filter(Boolean);
+    if(s.includes('·')) return s.split('·').flatMap(expand).filter(Boolean);
     return s.split('-').filter(Boolean);
   };
-  const permitidos   = tieneBDUsos && zona.uso_per ? splitUsos(zona.uso_per) : (!esVUJ && zona.uso_per ? splitUsos(zona.uso_per) : []);
-  const condicionados= tieneBDUsos && zona.uso_con ? splitUsos(zona.uso_con) : (!esVUJ && zona.uso_con ? splitUsos(zona.uso_con) : []);
+  // Separar permitidos/condicionados: tokens con (condicionado/s) en uso_per van a condicionados
+  const _sepUsos = s => {
+    if(!s) return { p:[], c:[] };
+    const _isC = t => /\(condicionados?\)/i.test(t.trim());
+    const _clean = u => u.trim().replace(/\(condicionados?\)/i,'').trim();
+    const _exp = u => { const c=_clean(u); return c.includes('/')?c.split('/').map(x=>x.trim()).filter(Boolean):[c]; };
+    let raw;
+    if(s.includes('|')) raw=s.split('|');
+    else if(s.includes('\xB7')) raw=s.split('\xB7');
+    else if(s.includes('·')) raw=s.split('·');
+    else raw=[s];
+    const p=[], c=[];
+    raw.forEach(t => { const keys=_exp(t); if(_isC(t)) c.push(...keys); else p.push(...keys); });
+    return { p:p.filter(Boolean), c:c.filter(Boolean) };
+  };
+  const _sep = tieneBDUsos && zona.uso_per ? _sepUsos(zona.uso_per) : { p: splitUsos(!esVUJ&&zona.uso_per?zona.uso_per:''), c: splitUsos(!esVUJ&&zona.uso_con?zona.uso_con:'') };
+  const permitidos   = _sep.p;
+  const condicionados= (tieneBDUsos ? _sep.c : []).concat(tieneBDUsos&&zona.uso_con?splitUsos(zona.uso_con):[]);
   const vistos=calcularVistos(patGlobal);
   const semaforo=vistos.some(v=>v.u==='alta')?'rojo':(vistos.length||zona._bd_local_usada)?'amarillo':'verde';
   const semTxt=semaforo==='verde'?'Sin restricciones patrimoniales detectadas':semaforo==='amarillo'?(zona._bd_local_usada&&!vistos.length?'Normas de referencia — requiere consulta a los Planes Parciales o a la Dirección de Ordenamiento del Territorio':'Restricciones condicionales — vistos buenos requeridos'):'Restricciones graves — dictamen de organismos patrimoniales requerido (INAH / Cultura Jalisco)';

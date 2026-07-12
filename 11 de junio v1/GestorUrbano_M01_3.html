@@ -5684,9 +5684,10 @@ function seleccionarUso(event, clave, esCondicionado) {
         const info = USO_INFO[clave]||{};
         const supD = (sup * cosUso).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
         const supC = (sup * cusUso).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
+        const _entrepiso = parseFloat(document.getElementById('inputEntrepiso')?.value)||3.0;
         const _altMax = cosUso > 0 ? fmt(Math.round(cusUso/cosUso*10)/10) : '—';
         const _msgCus = coefs.cus_vol
-          ? '⚡ <strong>CUS volumétrico — ' + clave + ':</strong> En un terreno de <strong>' + fmt(sup) + ' m²</strong> el <strong>volumen edificado máximo</strong> es <strong>' + supC + ' m³</strong>. Altura máx. resultante: <strong>' + _altMax + ' m</strong> (CUS÷COS). Para m² construibles, divide entre la altura de entrepiso elegida (p.&nbsp;ej. 3&nbsp;m → ' + fmt(Math.round(sup*cusUso/3)) + '&nbsp;m²).'
+          ? '⚡ <strong>CUS volumétrico — ' + clave + ':</strong> En un terreno de <strong>' + fmt(sup) + ' m²</strong> el <strong>volumen edificado máximo</strong> es <strong>' + supC + ' m³</strong>. Altura máx. resultante: <strong>' + _altMax + ' m</strong> (CUS÷COS). Con entrepiso de <strong>' + _entrepiso.toFixed(1) + ' m</strong> → <strong>' + fmt(Math.round(sup*cusUso/_entrepiso)) + ' m² construibles</strong> estimados.'
           : '🏗️ <strong>En términos simples para ' + clave + ':</strong> En un terreno de <strong>' + fmt(sup) + ' m²</strong> puedes construir una huella máxima de <strong>' + supD + ' m²</strong> por nivel, y hasta <strong>' + supC + ' m²</strong> totales.';
         simNota.innerHTML = `
           <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:6px;font-size:13px;color:var(--text2);line-height:1.7">

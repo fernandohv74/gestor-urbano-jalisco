@@ -4345,9 +4345,10 @@ function cambiarPoligono(idx){
   const z = datosZona;
   const splitUsos = s => {
     if(!s) return [];
-    const clean = u => u.trim().replace(/\(condicionado\)/i,'').trim();
-    if(s.includes('|')) return s.split('|').map(clean).filter(Boolean);
-    if(s.includes('·')) return s.split('·').map(clean).filter(Boolean);
+    const clean = u => u.trim().replace(/\(condicionados?\)/i,'').trim();
+    const expand = u => { const c=clean(u); return c.includes('/')?c.split('/').map(x=>x.trim()).filter(Boolean):[c]; };
+    if(s.includes('|')) return s.split('|').flatMap(expand).filter(Boolean);
+    if(s.includes('·')) return s.split('·').flatMap(expand).filter(Boolean);
     return s.split('-').filter(Boolean);
   };
   const permitidos   = z.uso_per ? splitUsos(z.uso_per) : [];
@@ -4389,14 +4390,16 @@ function cambiarPoligono(idx){
       const usosDiv = cu.querySelector('.usos-wrap');
       if(usosDiv){
         const frase = generarFraseUso(permitidos, condicionados, z.uso);
+        const tieneCoefs = !!(z._coefs_por_uso && Object.keys(z._coefs_por_uso||{}).length);
+        const mkClick = (u, esC) => tieneCoefs ? `seleccionarUso(event,'${u}',${esC})` : `mostrarTT(event,'${u}')`;
         usosDiv.innerHTML = `
         <div style="background:${frase.bg};border:1px solid ${frase.color}33;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--text2);line-height:1.6">
           ${frase.icon} ${frase.texto}
         </div>
-        <div style="font-size:11px;color:var(--text2);margin-bottom:7px">✅ Usos permitidos (${permitidos.length}) — haz clic para ver definición</div>
-        <div style="margin-bottom:14px">${permitidos.map(u=>`<span class="gu-uso-badge gu-uso-p" onclick="mostrarTT(event,'${u}')" title="${(USO_INFO[u]||{}).n||u}">${u}</span>`).join('')}</div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:7px">✅ Usos permitidos (${permitidos.length}) — haz clic para ver ${tieneCoefs?'coeficientes':'definición'}</div>
+        <div style="margin-bottom:14px">${permitidos.map(u=>`<span class="gu-uso-badge gu-uso-p" onclick="${mkClick(u,false)}" title="${(USO_INFO[u]||{}).n||u}">${u}</span>`).join('')}</div>
         <div style="font-size:11px;color:var(--text2);margin-bottom:7px">⚠️ Condicionados (${condicionados.length}) — requieren dictamen adicional</div>
-        <div>${condicionados.map(u=>`<span class="gu-uso-badge gu-uso-c" onclick="mostrarTT(event,'${u}')" title="${(USO_INFO[u]||{}).n||u}">${u}</span>`).join('')}</div>`;
+        <div>${condicionados.map(u=>`<span class="gu-uso-badge gu-uso-c" onclick="${mkClick(u,true)}" title="${(USO_INFO[u]||{}).n||u}">${u}</span>`).join('')}</div>`;
       }
       cu.style.opacity = '1';
     }, 150);

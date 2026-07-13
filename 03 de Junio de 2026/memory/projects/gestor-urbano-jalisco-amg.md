@@ -18,10 +18,10 @@ Plataforma de módulos para consulta de uso de suelo, licencias y trámites en l
 | **M01** | `11 de junio v1/GestorUrbano_M01_3.html` | **Activo — calibrando ZPN** | GDL completo (coefs, cajones RGIM, CUS vol, patrimonio, WFS vialidad). ZPN: 8 zonas multi-uso (MV4-APR, MV3-APR, MV4-ADC, MV4-PPE, MV3-PPE, MV1-ADC, MV1-PPE, MV2-PPE) con `coefs_por_uso`, badges clickeables, IDE dinámico. Zonas simples ZPN y TLQ/TLA/TON: pendientes |
 | M02 | `GestorUrbano_M02_4.html` | Activo | Viabilidad rápida de giro comercial; sin cambios recientes |
 | M03 | `GestorUrbano_M03_3.html` | Activo | Normas de construcción GDL+ZPN; TLA/TLQ/TON deshabilitados |
-| M04 | `11 de junio v1/GestorUrbano_M04_3.html` | Activo | Asistente IA normativo vía proxy serverless (`api/claude-proxy.js`); prompt caching; hasta 15 láminas; correcciones normativas ZPN/GDL/TLQ/TON |
+| M04 | `11 de junio v1/GestorUrbano_M04_3.html` | Activo | Asistente IA normativo vía proxy serverless (`api/claude-proxy.js`); prompt caching; hasta 15 láminas; correcciones normativas ZPN/GDL/TLQ/TON; trazabilidad de fuentes por lámina (lamina_fuente + laminas_clasificadas) |
 | M05 | `GestorUrbano_M05_2.html` | Activo | Requisitos licencia de construcción GDL+ZPN |
 | M06 | `GestorUrbano_M06_1.html` | Activo | Simulador licencia de funcionamiento |
-| M07 | `GestorUrbano_M07_1.html` | Activo | Directorio (26 organismos) + Glosario (48 términos) + Fuentes (35) |
+| M07 | `11 de junio v1/GestorUrbano_M07_1.html` | Activo | Directorio (26 organismos) + Glosario (74 términos) + Fuentes (54 con URLs completas) |
 | M08 | `11 de junio v1/GestorUrbano_M08_1.html` | Activo | Calculadora costos de construcción; refrendo; toggle iCUS/excedencia; limpiar análisis; deep link desde M01 |
 | M09 | `GestorUrbano_M09_1.html` | Activo | Monitor Normativo (alertas de vencimiento) |
 | M10 | `GestorUrbano_M10_1.html` | Sin acceso | Pre-dictamen Uso de Suelo (PDF) — existe pero no está en index |
@@ -53,7 +53,7 @@ Plataforma de módulos para consulta de uso de suelo, licencias y trámites en l
 - Proxy Claude: `api/claude-proxy.js`
 - Auth serverless: `api/auth-login.js`, `api/auth-logout.js`, `middleware.js`
 
-## Pendientes técnicos al 12 jul 2026 (actualizado)
+## Pendientes técnicos al 13 jul 2026 (actualizado)
 
 - IDE corregido en 6 zonas multi-uso (commit b9862dc): MV4-APR CS-V/MB, MV3-APR H3-H/H3-V/CS-V/MB/MFD, MV4-ADC CS-V/MFD, MV4-PPE CS-V/MFD, MV3-PPE H3-H/CS-V/MFD, MV2-PPE H2-U/H2-H.
 - Zonas ZPN simples (MB, MC, MD, MR): ya tienen `indice_edificacion` correcto, sin `coefs_por_uso` — confirmado por PDU ZPN-10. CS4/CS5 son categorías de cajones, no zonas. MR-U/MR-M/MR-A no existen en BD ni PDFs.

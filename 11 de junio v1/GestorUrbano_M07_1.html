@@ -1164,6 +1164,42 @@ const GLOSARIO = [
     categoria:'organismos',
     def:'Órgano colegiado del Municipio de Tonalá que evalúa y dictamina las solicitudes de establecimientos considerados de control especial según el Acuerdo 135 (2025): cantinas, centros nocturnos, establecimientos con baile, venta de alcohol, entre otros. El consejo revisa la solicitud, realiza visita de inspección, recibe opinión de vecinos y emite dictamen en un plazo definido. Su aprobación es requisito previo para tramitar la licencia de funcionamiento en esa categoría.',
     ejemplo:'Una cervecería artesanal que quiere abrir en Tonalá (giro con venta de alcohol para consumo en el lugar) debe primero presentar su solicitud ante el Consejo de Giros Restringidos. El consejo verifica la distancia a escuelas, el impacto en la colonia, y recaba opinión de los vecinos antes de emitir su dictamen. Sin ese dictamen favorable, el trámite de licencia no procede en Padrón y Licencias del municipio.'
+  },
+  {
+    ico:'🏙️', termino:'IMEPLAN', nombre:'Instituto Metropolitano de Planeación del AMG',
+    categoria:'organismos',
+    def:'Organismo público intermunicipal creado en 2014 que planifica y coordina el desarrollo urbano y territorial de la Zona Metropolitana de Guadalajara. Es el autor del POTmet 2042, que establece los Perímetros de Contención Urbana y las directrices metropolitanas de uso de suelo, movilidad e infraestructura. Sus dictámenes tienen jerarquía sobre los planes municipales para proyectos de escala metropolitana.',
+    ejemplo:'Un desarrollo inmobiliario de gran escala en Tlajomulco que impacta la movilidad de toda la zona metropolitana requiere dictamen de IMEPLAN antes de que el municipio pueda emitir el uso de suelo. El POTmet que emitió IMEPLAN define si el predio está dentro del Perímetro A, B o fuera de perímetros.'
+  },
+  {
+    ico:'🌿', termino:'Área libre / Área verde', nombre:'Área Libre y Área Verde Obligatoria',
+    categoria:'coeficientes',
+    def:'Proporción del predio que debe quedar libre de construcción en planta baja, determinada como el complemento del COS (Área libre = 1 − COS). Se subdivide en: Área libre permeable (suelo natural, jardín o superficie que permite infiltración pluvial) y Área verde obligatoria (porcentaje mínimo de vegetación que exige el reglamento). Un COS de 0.70 obliga a dejar libre el 30% del terreno; parte de ese 30% debe ser área verde real. Relevante para calcular el Impacto Hidrológico Cero (IHC).',
+    ejemplo:'Un predio de 500 m² con COS 0.60 puede construir máximo 300 m² en planta baja. Los 200 m² restantes son área libre; si el reglamento exige 10% de área verde, el propietario debe destinar al menos 50 m² a jardín o vegetación real, no pavimento.'
+  },
+  {
+    ico:'🏘️', termino:'Densidad habitacional', nombre:'Densidad Habitacional (viviendas/hectárea)',
+    categoria:'zonificacion',
+    def:'Número máximo de viviendas que el PDU o PPDU permite edificar por hectárea de terreno en una zona determinada. Controla la intensidad de uso habitacional independientemente del CUS. Una zona con alta densidad permite más unidades de vivienda aunque sean de menor tamaño; una zona de baja densidad limita el número de viviendas aunque el predio sea grande. Se expresa como VIV/ha (viviendas por hectárea) o UNI/ha (unidades por hectárea).',
+    ejemplo:'Una zona H3 en Guadalajara puede tener densidad de 120 VIV/ha. Un predio de 2,000 m² (0.2 ha) solo podría tener hasta 24 viviendas aunque el CUS permitiera construir más superficie. Si el promotor quiere más unidades debe fraccionar o tramitar un cambio de densidad.'
+  },
+  {
+    ico:'📐', termino:'Polígono de actuación', nombre:'Polígono de Actuación Urbanística',
+    categoria:'zonificacion',
+    def:'Delimitación territorial establecida en un PPDU que define un área específica donde se coordinan acciones de desarrollo, regeneración o mejoramiento urbano de manera integral. Permite que varios predios actúen en conjunto para cumplir obligaciones de urbanización, cesión de áreas verdes y equipamiento, transferencia de potencial o proyectos de redensificación. Dentro del polígono, los propietarios pueden celebrar convenios entre sí y con el municipio para distribuir cargas y beneficios.',
+    ejemplo:'Un conjunto de 8 predios vecinos en el Centro de Guadalajara que individualmente no cumplen el frente mínimo para proyectos de redensificación, pueden constituir un polígono de actuación. Así actúan como una sola unidad, comparten la obligación de ceder área verde y pueden acceder colectivamente al mecanismo de Transferencia de Derechos de Desarrollo.'
+  },
+  {
+    ico:'🤝', termino:'Área de cesión municipal', nombre:'Área de Cesión para Destinos Municipales',
+    categoria:'tramites',
+    def:'Proporción del predio o superficie equivalente que el propietario o desarrollador debe ceder gratuitamente al municipio como condición para autorizar subdivisiones, fusiones, fraccionamientos o proyectos de gran escala. La cesión se destina a vías públicas, áreas verdes, equipamiento urbano o donación al fondo municipal. El porcentaje varía según el municipio y el tipo de desarrollo; en algunos casos puede cubrirse con pago en efectivo equivalente al valor del terreno a ceder. Se registra en el Registro Público de la Propiedad y es requisito previo a la autorización de la subdivisión.',
+    ejemplo:'Un desarrollador que quiere subdividir un terreno de 3,000 m² en Guadalajara en 6 lotes debe ceder al municipio el porcentaje de área establecido para destinos públicos (jardín vecinal, vialidad interna, etc.) antes de que se autorice el plano de subdivisión. Sin la escritura de cesión, el RPP no inscribe los nuevos lotes.'
+  },
+  {
+    ico:'⚡', termino:'TDD — Transferencia de Derechos de Desarrollo', nombre:'Transferencia de Derechos de Desarrollo Urbano (TDD)',
+    categoria:'coeficientes',
+    def:'Mecanismo normativo establecido en el Capítulo VIII del RGIM de Guadalajara que permite ceder los derechos excedentes de edificación (CUS/iCUS no utilizados) de un predio emisor a un predio receptor dentro de la misma zona o zonas compatibles. El predio emisor normalmente es un bien patrimonial, área natural o predio subutilizado que no puede o no quiere aprovechar todo su potencial de construcción. El predio receptor adquiere esa capacidad adicional de edificación, pagando al fondo municipal administrado por IMEPLAN/Ayuntamiento. El trámite requiere Dictamen Técnico de la Dirección de Ordenamiento del Territorio.',
+    ejemplo:'Una casona catalogada en el Centro Histórico de Guadalajara no puede demolerse ni aumentar sus metros construidos. Sus derechos de desarrollo excedentes (diferencia entre lo que se podría construir según CUS y lo que tiene actualmente) se transfieren a un edificio en construcción en la misma zona. El nuevo edificio paga al fondo municipal y puede agregar pisos adicionales que de otro modo no podría.'
   }
 ];
 

@@ -3091,6 +3091,13 @@ function nuevoAnalisis() {
   // Limpiar nombre del proyecto
   const campoNombre = document.getElementById('p-nombre-proyecto');
   if (campoNombre) campoNombre.value = '';
+  // Limpiar campos opcionales del formulario
+  ['p-sup','p-frente','p-rf','p-rl','p-rp','p-cos',
+   'p-sup-const','p-num-viv','p-cajones','p-cajones-pmr','p-altura','p-sup-viv',
+   'p-dro','p-nombre-resultado'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
   // Ocultar badges
   document.getElementById('badge-municipio').style.display = 'none';
   document.getElementById('badge-tipo').style.display = 'none';

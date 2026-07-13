@@ -2104,15 +2104,24 @@ function consolidarResultados(resultados) {
     });
   });
 
-  // Dictamen: concatenar todos
+  // Dictamen: concatenar todos (soporta campo 'dictamen' array y 'dictamen_general' string)
+  const getTexto = r => Array.isArray(r.dictamen) && r.dictamen.length
+    ? r.dictamen.filter(Boolean).join('\n\n')
+    : (r.dictamen_general || '');
   const dictamen_general = resultados
-    .map((r, i) => resultados.length > 1 ? `[Láminas ${i*LOTE_MAX+1}–${Math.min((i+1)*LOTE_MAX, archivos.length)}] ${r.dictamen_general}` : r.dictamen_general)
+    .map((r, i) => {
+      const txt = getTexto(r);
+      return resultados.length > 1
+        ? `[Láminas ${i*LOTE_MAX+1}–${Math.min((i+1)*LOTE_MAX, archivos.length)}] ${txt}`
+        : txt;
+    })
     .join('\n\n');
 
   return {
     semaforo,
     resumen: `Análisis de ${archivos.length} láminas — ${semaforo === 'verde' ? 'sin incumplimientos' : semaforo === 'rojo' ? 'incumplimientos detectados' : 'requiere atención'}`,
     dictamen_general,
+    laminas_clasificadas: resultados.flatMap(r => r.laminas_clasificadas || []),
     elementos: Object.values(mapaElementos),
   };
 }

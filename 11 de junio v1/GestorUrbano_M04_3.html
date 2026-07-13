@@ -1461,8 +1461,12 @@ Estructura exacta:
       "observacion": "descripción específica de lo observado",
       "medidas_observadas": "dimensiones detectadas o nd",
       "articulo": "artículo y reglamento exacto",
-      "recomendacion": "acción correctiva concreta o null si cumple"
+      "recomendacion": "acción correctiva concreta o null si cumple",
+      "lamina_fuente": "número y nombre de la lámina de donde se extrajo este dato, p.ej. 'L-02 Planta Baja', o null"
     }
+  ],
+  "laminas_clasificadas": [
+    { "numero": 1, "nombre": "nombre_archivo.jpg", "tipo": "portada|planta_baja|planta_alta|fachada|corte|instalaciones|estructural|detalle|otro", "relevante": true }
   ]
 }
 
@@ -1476,7 +1480,9 @@ REGLAS CRÍTICAS:
 - Estado "na" = elemento que NO APLICA a este tipo de proyecto (ej. elevador en casa baja, ciclopuerto en unifamiliar). Es distinto de "nd": "na" significa que la norma no exige ese elemento aquí.
 - Estado "atencion" = cumple pero con incertidumbre o marginalmente.
 - Para locales_habitables específicamente: si no hay cotas claramente legibles en el plano, SIEMPRE usa "nd". Nunca estimes áreas sin cotas explícitas.
-- REGLA DE SEMÁFORO: el estado "nd" en locales_habitables NO debe penalizar el semáforo general — trátalo igual que "na" para efectos del dictamen. Solo penaliza el semáforo si detectas un incumplimiento real con cota legible ("incumple"). Un "nd" en locales_habitables nunca debe mover el semáforo de verde a amarillo.`;
+- REGLA DE SEMÁFORO: el estado "nd" en locales_habitables NO debe penalizar el semáforo general — trátalo igual que "na" para efectos del dictamen. Solo penaliza el semáforo si detectas un incumplimiento real con cota legible ("incumple"). Un "nd" en locales_habitables nunca debe mover el semáforo de verde a amarillo.
+- lamina_fuente: para cada elemento, indica el número y nombre de la lámina de donde extrajiste la información normativa (ej. "L-01 Planta de Azotea", "L-03 Fachada Sur"). Si el dato proviene de varias láminas, cita la principal. Usa null si el elemento no pudo verificarse en ninguna lámina.
+- laminas_clasificadas: lista TODAS las láminas recibidas. "tipo" describe su contenido (portada, planta_baja, planta_alta, fachada, corte, instalaciones, estructural, detalle, otro). "relevante": true si aportó datos normativos verificables, false si fue portada, sello u hoja sin cotas.`;
 
   return { systemText, userText };
 }
@@ -2388,6 +2394,7 @@ function renderResultado(r, config, opts) {
         ${el.estado === 'na' ? `<div style="margin-bottom:8px;padding:8px 12px;background:var(--bg3);border-left:3px solid var(--border2);border-radius:0 var(--r-md) var(--r-md) 0;font-size:11px;color:var(--text2);line-height:1.6">— <strong>No aplica</strong> — La normativa no exige este elemento para el tipo de proyecto detectado. No representa un incumplimiento.</div>` : ''}
         <div class="observacion">${el.observacion || '—'}</div>
         ${el.medidas_observadas ? `<div style="font-size:11px; color:var(--text3); margin-top:6px; font-family:var(--mono);">📐 ${el.medidas_observadas}</div>` : ''}
+        ${el.lamina_fuente ? `<div style="font-size:10px;color:var(--text3);margin-top:4px;">📁 Fuente: ${el.lamina_fuente}</div>` : ''}
         ${el.recomendacion ? `<div style="margin-top:8px; padding:8px 12px; background:rgba(245,158,11,.1); border-radius:6px; font-size:12px; color:var(--sem-am-txt);">💡 ${el.recomendacion}</div>` : ''}
         ${desc ? `<div class="norma-ref">📖 Norma: ${desc}</div>` : ''}
         ${el.articulo ? `<div class="norma-ref" style="margin-top:3px;">⚖️ Fundamento: ${el.articulo}</div>` : ''}
@@ -2405,6 +2412,30 @@ function renderResultado(r, config, opts) {
         🔍 <strong>¿Por qué todo aparece como "No verificable"?</strong><br>
         La IA analizó el plano pero no pudo leer las dimensiones y elementos con suficiente certeza para emitir un dictamen. Esto ocurre cuando: (1) la imagen tiene baja resolución, (2) las cotas del plano son muy pequeñas o están borrosas, o (3) el plano es una fotografía tomada con ángulo. <strong>Sube el plano en mayor resolución o en formato PDF directo desde el software de diseño</strong> para obtener resultados precisos.
       </div>`;
+  }
+
+  // Láminas analizadas: sección de trazabilidad
+  if (Array.isArray(r.laminas_clasificadas) && r.laminas_clasificadas.length > 0) {
+    const relevantes = r.laminas_clasificadas.filter(l => l.relevante);
+    const noRelevantes = r.laminas_clasificadas.filter(l => !l.relevante);
+    const tipoLabel = { portada:'Portada', planta_baja:'Planta Baja', planta_alta:'Planta Alta', fachada:'Fachada', corte:'Corte', instalaciones:'Instalaciones', estructural:'Estructural', detalle:'Detalle', otro:'Otra' };
+    const tipoIco   = { portada:'📄', planta_baja:'🏠', planta_alta:'🏢', fachada:'🖼️', corte:'✂️', instalaciones:'🔌', estructural:'🏗️', detalle:'🔍', otro:'📋' };
+    let lHtml = `<div style="margin-top:16px;padding:12px 16px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);font-size:12px;color:var(--text2);line-height:1.6;transition:background var(--t),border-color var(--t)">`;
+    lHtml += `<div style="font-weight:600;color:var(--text1);margin-bottom:8px;">📂 Láminas analizadas</div>`;
+    if (relevantes.length > 0) {
+      lHtml += `<div style="margin-bottom:6px;font-size:11px;color:var(--text3);font-weight:500;letter-spacing:.03em">CON DATOS NORMATIVOS</div>`;
+      relevantes.forEach(l => {
+        lHtml += `<div style="display:flex;gap:6px;align-items:baseline;margin-bottom:3px;">${tipoIco[l.tipo]||'📋'} <span style="color:var(--text1);font-family:var(--mono);font-size:11px;">L-${String(l.numero).padStart(2,'0')}</span> <span>${l.nombre}</span> <span style="color:var(--text3);font-size:10px;">${tipoLabel[l.tipo]||l.tipo}</span></div>`;
+      });
+    }
+    if (noRelevantes.length > 0) {
+      lHtml += `<div style="margin-top:8px;margin-bottom:6px;font-size:11px;color:var(--text3);font-weight:500;letter-spacing:.03em">SIN DATOS NORMATIVOS</div>`;
+      noRelevantes.forEach(l => {
+        lHtml += `<div style="display:flex;gap:6px;align-items:baseline;margin-bottom:3px;opacity:0.55;">${tipoIco[l.tipo]||'📋'} <span style="font-family:var(--mono);font-size:11px;">L-${String(l.numero).padStart(2,'0')}</span> <span>${l.nombre}</span> <span style="font-size:10px;">${tipoLabel[l.tipo]||l.tipo}</span></div>`;
+      });
+    }
+    lHtml += `</div>`;
+    document.getElementById('elementos-list').innerHTML += lHtml;
   }
 
   // Dictamen: array de párrafos (campo "dictamen") con fallback a dictamen_general

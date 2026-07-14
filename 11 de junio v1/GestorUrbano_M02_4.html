@@ -5302,7 +5302,7 @@ const GU_SCIAN_GDL = [
   {c:'722515',n:'Nevería · Heladería · Juguería · Café',ns:'Cafeterías, fuentes de sodas, neverías, refresquerías y similares',u:'CS2',x:''},
   {c:'722516',n:'Cafetería · Autoservicio',ns:'Restaurantes de autoservicio',u:'CS2',x:''},
   {c:'722517',n:'Pizza · Hamburguesas · Pollo asado',ns:'Restaurantes con servicio de preparación de pizzas, hamburguesas, hot dogs y pollos asados',u:'CS2',x:''},
-  {c:'722518',n:'Para llevar · Lonchería · Fonda express',ns:'Restaurantes que preparan otro tipo de alimentos para llevar',u:'CS2',x:''},
+  {c:'722518',n:'Para llevar · Lonchería · Lonche · Fonda express',ns:'Restaurantes que preparan otro tipo de alimentos para llevar',u:'CS2',x:''},
   {c:'722519',n:'Puestos de comida callejeros',ns:'Servicios de preparación y venta de alimentos en puestos de venta callejeros y similares',u:'CS2',x:''},
   {c:'811111',n:'Taller mecánico (automóviles)',ns:'Servicio de mantenimiento y reparación de automóviles y camiones',u:'CS4',x:''},
   {c:'811112',n:'Taller eléctrico automotriz',ns:'Reparación del sistema eléctrico de automóviles y camiones',u:'CS4',x:''},
@@ -6469,7 +6469,8 @@ async function detectarGiroIA(){
   // Quitar prefijos de intención: "quiero poner un SPA" → "SPA"
   const desc=raw.replace(/^(?:quiero|quiere|quisiera|queremos|me gustar[íi]a|voy a|planeamos|planea|necesito|busco|quer[íi]a|requiero|piensa|pensamos)\s+(?:poner|abrir|instalar|montar|establecer|tener|ponen|abre|abren|instala|renta|rentar|dedicarme a|dedicarme)\s+(?:un|una|el|la|lo|los|las|mi|nuestro|nuestra|el negocio de)?\s*/i,'').trim()||raw;
   const activos=window._girosActivos||[...(window._girosP||[]),...(window._girosC||[])];
-  const palabras=norm(desc).split(/\s+/).filter(function(p){return p.length>2;});
+  const STOP=new Set(['venta','vende','vender','vendo','compra','comprar','servicio','servicios','articulo','articulos','producto','productos','otro','otros','otra','otras','menor','mayor','comercio','negocio','los','las','con','sin','por','que','del','una','uno','sus','les']);
+  const palabras=norm(desc).split(/\s+/).filter(function(p){return p.length>2&&!STOP.has(p);});
   const _stem=function(w){if(w.length>=6&&w.endsWith('eria'))return w.slice(0,-4);return w.length>=6?w.slice(0,-2):w.length===5?w.slice(0,-1):w;};
   const _filDirecto=function(kws){
     return activos.filter(function(g){

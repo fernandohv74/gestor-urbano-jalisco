@@ -3249,11 +3249,67 @@ function renderizar(zona,todos){
       <!-- Botones de zona -->
       <div id="zonaBtnsGiro" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"></div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px">
-        <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--text2)">
-          Buscar giro compatible
+        <!-- PESTAÑAS -->
+        <div style="display:flex;border-bottom:1px solid var(--border)">
+          <button id="m02tabIA" onclick="m02TabIA()"
+            style="flex:1;padding:11px 8px;background:var(--brand-pale);border:none;border-radius:10px 0 0 0;
+                   font-family:var(--sans);font-size:12px;font-weight:600;color:var(--brand-light);
+                   cursor:pointer;border-bottom:2px solid var(--brand);transition:all .2s">
+            ✨ Describir con IA
+          </button>
+          <button id="m02tabManual" onclick="m02TabManual()"
+            style="flex:1;padding:11px 8px;background:var(--bg2);border:none;border-radius:0 10px 0 0;
+                   font-family:var(--sans);font-size:12px;font-weight:500;color:var(--text3);
+                   cursor:pointer;border-bottom:2px solid transparent;transition:all .2s">
+            🔍 Buscar manual
+          </button>
         </div>
-        <div style="padding:12px 16px">
-          <!-- Filtro -->
+        <!-- MODO IA (principal / default) -->
+        <div id="panelModoIA" style="padding:14px 16px">
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">
+            <span style="font-size:10px;color:var(--text3);align-self:center;flex-shrink:0">Ej.:</span>
+            <button onclick="m02ChipEj(this.textContent)" style="font-size:11px;padding:3px 9px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;color:var(--text2);cursor:pointer;font-family:var(--sans)">tortería artesanal</button>
+            <button onclick="m02ChipEj(this.textContent)" style="font-size:11px;padding:3px 9px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;color:var(--text2);cursor:pointer;font-family:var(--sans)">taller mecánico</button>
+            <button onclick="m02ChipEj(this.textContent)" style="font-size:11px;padding:3px 9px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;color:var(--text2);cursor:pointer;font-family:var(--sans)">estética de mascotas</button>
+            <button onclick="m02ChipEj(this.textContent)" style="font-size:11px;padding:3px 9px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;color:var(--text2);cursor:pointer;font-family:var(--sans)">consultorio dental</button>
+            <button onclick="m02ChipEj(this.textContent)" style="font-size:11px;padding:3px 9px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;color:var(--text2);cursor:pointer;font-family:var(--sans)">bodega de materiales</button>
+          </div>
+          <textarea id="iaDescInput" rows="3"
+            placeholder="Describe tu negocio con tus propias palabras&#10;Ej: quiero poner un puesto de hot dogs en la calle"
+            style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border);
+                   border-radius:7px;padding:10px 12px;color:var(--text);font-family:var(--sans);
+                   font-size:13px;outline:none;resize:none;transition:border-color .2s;margin-bottom:10px;display:block"
+            onfocus="this.style.borderColor='var(--brand)'"
+            onblur="this.style.borderColor='var(--border)'"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();detectarGiroIA()}"></textarea>
+          <button id="btnDetectarIA" onclick="detectarGiroIA()"
+            style="width:100%;background:var(--brand);color:#fff;border:none;border-radius:7px;
+                   padding:11px;font-family:var(--sans);font-size:13px;font-weight:600;
+                   cursor:pointer;transition:opacity .2s">
+            ✨ Detectar giro
+          </button>
+          <div id="iaResultPanel" style="display:none;margin-top:12px">
+            <div style="background:var(--brand-pale);border:1px solid var(--brand);border-radius:8px;padding:12px 14px;margin-bottom:10px">
+              <div id="iaResultCodigo" style="font-family:var(--mono);font-size:11px;color:var(--brand-light);margin-bottom:3px"></div>
+              <div id="iaResultNombre" style="font-size:13px;font-weight:600;margin-bottom:6px"></div>
+              <div id="iaResultExp" style="font-size:11px;color:var(--text2);line-height:1.5"></div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button onclick="confirmarGiroIA()"
+                style="flex:1;background:var(--brand);color:#fff;border:none;border-radius:7px;
+                       padding:10px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer">
+                ✓ Verificar viabilidad →
+              </button>
+              <button onclick="cancelarGiroIA()"
+                style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;
+                       padding:10px 14px;font-family:var(--sans);font-size:12px;color:var(--text2);cursor:pointer">
+                No, cambiar
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- MODO MANUAL (secundario) -->
+        <div id="panelModoManual" style="padding:12px 16px;display:none">
           <div style="display:flex;gap:8px;margin-bottom:10px">
             <input type="text" id="giroFiltro" placeholder="Escribe el tipo de negocio: restaurante, farmacia..."
               oninput="filtrarGirosM02(this.value)"
@@ -3270,13 +3326,9 @@ function renderizar(zona,todos){
               onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'"
               onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">🗑️</button>
           </div>
-
-          <!-- Lista de giros -->
           <div id="giroLista" style="max-height:350px;overflow-y:auto;
             border:1px solid var(--border);border-radius:7px;background:var(--bg3);
             margin-bottom:10px"></div>
-
-          <!-- Giro seleccionado -->
           <div id="giroBadge" style="display:none;background:var(--brand-pale);
             border:1px solid var(--brand);border-radius:7px;padding:10px 14px;
             margin-bottom:10px;position:relative">
@@ -3285,8 +3337,6 @@ function renderizar(zona,todos){
             <div id="giroBadgeClave" style="font-family:var(--mono);font-size:11px;color:var(--brand-light);margin-bottom:3px"></div>
             <div id="giroBadgeNombre" style="font-size:13px;font-weight:500"></div>
           </div>
-
-          <!-- Botón verificar -->
           <button id="btnVerifGiro" onclick="verificarGiro()" disabled
             style="width:100%;background:var(--brand);color:#fff;border:none;border-radius:7px;
                    padding:12px;font-family:var(--sans);font-size:14px;font-weight:500;
@@ -6393,6 +6443,85 @@ function clearGiroM02(){
   _giroSeleccionado=null;
   const b=document.getElementById('giroBadge'); if(b) b.style.display='none';
   const btn=document.getElementById('btnVerifGiro'); if(btn){btn.disabled=true;btn.style.opacity='.5';}
+}
+
+// ──── IA Detector de giro ──────────────────────────────────────
+function m02TabIA(){
+  const pIA=document.getElementById('panelModoIA'), pM=document.getElementById('panelModoManual');
+  if(pIA) pIA.style.display='block';
+  if(pM)  pM.style.display='none';
+  const tIA=document.getElementById('m02tabIA'), tM=document.getElementById('m02tabManual');
+  if(tIA){tIA.style.background='var(--brand-pale)';tIA.style.color='var(--brand-light)';tIA.style.fontWeight='600';tIA.style.borderBottom='2px solid var(--brand)';}
+  if(tM) {tM.style.background='var(--bg2)';tM.style.color='var(--text3)';tM.style.fontWeight='500';tM.style.borderBottom='2px solid transparent';}
+}
+function m02TabManual(){
+  const pIA=document.getElementById('panelModoIA'), pM=document.getElementById('panelModoManual');
+  if(pIA) pIA.style.display='none';
+  if(pM)  pM.style.display='block';
+  const tIA=document.getElementById('m02tabIA'), tM=document.getElementById('m02tabManual');
+  if(tM) {tM.style.background='var(--brand-pale)';tM.style.color='var(--brand-light)';tM.style.fontWeight='600';tM.style.borderBottom='2px solid var(--brand)';}
+  if(tIA){tIA.style.background='var(--bg2)';tIA.style.color='var(--text3)';tIA.style.fontWeight='500';tIA.style.borderBottom='2px solid transparent';}
+  setTimeout(()=>{const f=document.getElementById('giroFiltro');if(f)f.focus();},100);
+}
+function m02ChipEj(txt){
+  const inp=document.getElementById('iaDescInput'); if(inp){inp.value=txt.trim();inp.focus();}
+}
+async function detectarGiroIA(){
+  const inp=document.getElementById('iaDescInput');
+  const desc=(inp&&inp.value||'').trim();
+  if(!desc){if(inp)inp.focus();return;}
+  const btn=document.getElementById('btnDetectarIA');
+  const rp=document.getElementById('iaResultPanel');
+  if(rp) rp.style.display='none';
+  if(btn){btn.disabled=true;btn.textContent='⏳ Detectando…';}
+  try{
+    const ES_LOCAL=location.hostname==='localhost'||location.hostname==='127.0.0.1';
+    const body={
+      model:'claude-haiku-4-5-20251001',
+      max_tokens:300,
+      system:'Eres un clasificador de giros comerciales del sistema SCIAN México. Dado un negocio descrito en lenguaje coloquial, identifica el código SCIAN de 6 dígitos más preciso. Responde SOLO con JSON válido sin markdown ni explicaciones externas: {"codigo":"XXXXXX","nombre":"Nombre oficial del giro","explicacion":"Una oración breve de por qué ese código corresponde."}',
+      messages:[{role:'user',content:'Negocio: '+desc}]
+    };
+    let resp;
+    if(ES_LOCAL){
+      resp=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':window.ANTHROPIC_KEY||'','anthropic-version':'2023-06-01'},
+        body:JSON.stringify(body)
+      });
+    } else {
+      resp=await fetch('/api/claude-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    }
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    const data=await resp.json();
+    let txt=((data.content&&data.content[0]&&data.content[0].text)||'{}').replace(/```json?/g,'').replace(/```/g,'').trim();
+    const parsed=JSON.parse(txt);
+    if(!parsed.codigo) throw new Error('Sin código SCIAN en respuesta');
+    window._iaGiroDetectado={codigo:parsed.codigo,nombre:parsed.nombre||desc,explicacion:parsed.explicacion||''};
+    const rc=document.getElementById('iaResultCodigo');
+    const rn=document.getElementById('iaResultNombre');
+    const re=document.getElementById('iaResultExp');
+    if(rc) rc.textContent=parsed.codigo;
+    if(rn) rn.textContent=parsed.nombre||desc;
+    if(re) re.textContent=parsed.explicacion||'';
+    if(rp) rp.style.display='block';
+  }catch(e){
+    alert('No se pudo detectar el giro. Intenta ser más específico o usa "Buscar manual".
+
+Error: '+(e.message||e));
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='✨ Detectar giro';}
+  }
+}
+function confirmarGiroIA(){
+  const g=window._iaGiroDetectado; if(!g) return;
+  seleccionarGiroM02(g.codigo, g.nombre);
+  verificarGiro();
+}
+function cancelarGiroIA(){
+  const rp=document.getElementById('iaResultPanel'); if(rp) rp.style.display='none';
+  window._iaGiroDetectado=null;
+  const inp=document.getElementById('iaDescInput'); if(inp){inp.value='';inp.focus();}
 }
 
 function getMensajeM2(clave, condGiro, zonaActual){

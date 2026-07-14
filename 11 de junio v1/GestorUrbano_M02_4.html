@@ -6469,12 +6469,18 @@ async function detectarGiroIA(){
   const activos=window._girosActivos||[...(window._girosP||[]),...(window._girosC||[])];
   // Paso 1: filtrar catálogo directamente con las palabras del usuario (sin IA)
   const palabras=norm(desc).split(/\s+/).filter(function(p){return p.length>2;});
+  // Stem básico para español: quita última(s) vocal/letra para manejar plurales y variantes
+  const _stem=function(w){return w.length>=6?w.slice(0,-2):w.length===5?w.slice(0,-1):w;};
   const _filDirecto=function(kws){
     return activos.filter(function(g){
       const n=norm(g.nombre);
       const ns=norm(g.ns);
       const c=(g.codigo||'').toLowerCase();
-      return kws.some(function(kw){return n.includes(kw)||ns.includes(kw)||c.startsWith(kw);});
+      return kws.some(function(kw){
+        if(n.includes(kw)||ns.includes(kw)||c.startsWith(kw)) return true;
+        const st=_stem(kw);
+        return st!==kw&&(n.includes(st)||ns.includes(st));
+      });
     });
   };
   const _renderLista=function(fil){

@@ -6472,8 +6472,9 @@ async function detectarGiroIA(){
   const _filDirecto=function(kws){
     return activos.filter(function(g){
       const n=norm(g.nombre);
+      const ns=norm(g.ns);
       const c=(g.codigo||'').toLowerCase();
-      return kws.some(function(kw){return n.includes(kw)||c.startsWith(kw);});
+      return kws.some(function(kw){return n.includes(kw)||ns.includes(kw)||c.startsWith(kw);});
     });
   };
   const _renderLista=function(fil){

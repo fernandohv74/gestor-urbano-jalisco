@@ -6506,9 +6506,7 @@ async function detectarGiroIA(){
     if(re) re.textContent=parsed.explicacion||'';
     if(rp) rp.style.display='block';
   }catch(e){
-    alert('No se pudo detectar el giro. Intenta ser más específico o usa "Buscar manual".
-
-Error: '+(e.message||e));
+    alert('No se pudo detectar el giro. Intenta ser más específico o usa "Buscar manual". Error: '+(e.message||e));
   }finally{
     if(btn){btn.disabled=false;btn.textContent='✨ Detectar giro';}
   }

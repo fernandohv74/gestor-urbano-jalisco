@@ -5330,16 +5330,16 @@ const GU_SCIAN_GDL = [
   {c:'811492',n:'Reparación y mantenimiento de motocicletas',u:'CS3',x:''},
   {c:'811493',n:'Reparación y mantenimiento de bicicletas',u:'CS1',x:''},
   {c:'811499',n:'Reparaciones del hogar',ns:'Reparación y mantenimiento de otros artículos para el hogar y personales',u:'CS2',x:''},
-  {c:'812110',n:'Salones y clínicas de belleza y peluquerías',u:'CS2',x:''},
-  {c:'812120',n:'Baños públicos',u:'CS3',x:''},
-  {c:'812130',n:'Sanitarios públicos y bolerías',u:'CS1',x:''},
+  {c:'812110',n:'Peluquería · Estética · Spa',ns:'Salones y clínicas de belleza y peluquerías',u:'CS2',x:''},
+  {c:'812120',n:'Baños públicos · Sauna · Vapor',ns:'Baños públicos',u:'CS3',x:''},
+  {c:'812130',n:'Bolería · Sanitarios',ns:'Sanitarios públicos y bolerías',u:'CS1',x:''},
   {c:'812210',n:'Lavandería · Tintorería',ns:'Servicio de lavado y planchado de ropa a domicilio y en establecimientos',u:'CS1',x:''},
   {c:'812310',n:'Estacionamiento · Pensión · Valet',ns:'Estacionamientos y pensiones para automóviles',u:'CS4',x:''},
   {c:'812321',n:'Panteón · Cementerio (privado)',ns:'Administración de cementerios pertenecientes al sector privado',u:'RIS',x:''},
   {c:'812322',n:'Panteón · Cementerio (público)',ns:'Administración de cementerios pertenecientes al sector público',u:'RIS',x:''},
-  {c:'812410',n:'Estacionamientos y pensiones para vehículos automotores',u:'CS3',x:''},
-  {c:'812910',n:'Servicios de revelado e impresión de fotografías',u:'CS2',x:''},
-  {c:'812990',n:'Otros servicios personales',u:'CS3',x:''},
+  {c:'812410',n:'Estacionamiento · Pensión',ns:'Estacionamientos y pensiones para vehículos automotores',u:'CS3',x:''},
+  {c:'812910',n:'Foto · Impresión de fotografías',ns:'Servicios de revelado e impresión de fotografías',u:'CS2',x:''},
+  {c:'812990',n:'Servicios personales · Masajes · Spa',ns:'Otros servicios personales',u:'CS3',x:''},
   {c:'813110',n:'Asociaciones, organizaciones y cámaras de productores,',u:'CS3',x:''},
   {c:'813120',n:'Asociaciones y organizaciones laborales y sindicales',u:'CS3',x:''},
   {c:'813130',n:'Asociaciones y organizaciones de profesionistas',u:'CS3',x:''},
@@ -6456,8 +6456,8 @@ function m02ChipEj(txt){
 }
 async function detectarGiroIA(){
   const inp=document.getElementById('iaDescInput');
-  const desc=(inp&&inp.value||'').trim();
-  if(!desc){if(inp)inp.focus();return;}
+  const raw=(inp&&inp.value||'').trim();
+  if(!raw){if(inp)inp.focus();return;}
   const btn=document.getElementById('btnDetectarIA');
   const lg=document.getElementById('iaListaGiros');
   const lc=document.getElementById('iaListaCount');
@@ -6465,6 +6465,8 @@ async function detectarGiroIA(){
   if(lg) lg.style.display='none';
   if(btn){btn.disabled=true;btn.textContent='⏳ Buscando…';}
   const norm=function(s){return(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();};
+  // Quitar prefijos de intención: "quiero poner un SPA" → "SPA"
+  const desc=raw.replace(/^(?:quiero|quiere|quisiera|queremos|me gustar[íi]a|voy a|planeamos|planea|necesito|busco|quer[íi]a|requiero|piensa|pensamos)\s+(?:poner|abrir|instalar|montar|establecer|tener|ponen|abre|abren|instala|renta|rentar|dedicarme a|dedicarme)\s+(?:un|una|el|la|lo|los|las|mi|nuestro|nuestra|el negocio de)?\s*/i,'').trim()||raw;
   const activos=window._girosActivos||[...(window._girosP||[]),...(window._girosC||[])];
   const palabras=norm(desc).split(/\s+/).filter(function(p){return p.length>2;});
   const _stem=function(w){if(w.length>=6&&w.endsWith('eria'))return w.slice(0,-4);return w.length>=6?w.slice(0,-2):w.length===5?w.slice(0,-1):w;};
@@ -6477,7 +6479,6 @@ async function detectarGiroIA(){
         if(n.includes(kw)||ns.includes(kw)||c.startsWith(kw)) return true;
         const st=_stem(kw);
         if(st===kw) return false;
-        // Stem match: excluir manufactura/primario (1xx-3xx) para evitar falsos positivos
         if(/^[123]/.test(c)) return false;
         return n.includes(st)||ns.includes(st);
       });
@@ -6491,7 +6492,6 @@ async function detectarGiroIA(){
     }).join('');
   };
   let fil=palabras.length>0?_filDirecto(palabras):[];
-  // Con 4+ resultados directos no gastar tokens IA
   if(fil.length>=4){
     if(lc) lc.textContent=fil.length+' giro'+(fil.length!==1?'s':'')+' encontrados';
     if(li) li.innerHTML=_renderLista(fil);
@@ -6499,14 +6499,13 @@ async function detectarGiroIA(){
     if(btn){btn.disabled=false;btn.textContent='✨ Detectar giro';}
     return;
   }
-  // < 4 resultados directos: llamar IA para añadir subtipos relacionados
   if(btn) btn.textContent='⏳ Consultando IA…';
   try{
     const ES_LOCAL=location.hostname==='localhost'||location.hostname==='127.0.0.1';
     const body={
       model:'claude-haiku-4-5-20251001',
       max_tokens:100,
-      system:'Dado un negocio en lenguaje coloquial, da 2-3 palabras clave del catálogo SCIAN México: el tipo principal Y subtipos relacionados. Ejemplos: tortería→tortas,antojitos; veterinaria→mascotas,veterinaria; pastelería→pasteles,panadería. SOLO JSON: {"busqueda":"termino1","alt":"termino2","alt2":"termino3 o vacio"}',
+      system:'Dado un tipo de negocio en español (ignora frases como "quiero poner" o "me gustaría abrir"), da 2-3 palabras clave del catálogo SCIAN México incluyendo el tipo principal Y subtipos relacionados. Ejemplos: spa→spa,belleza,masaje; tortería→tortas,antojitos; veterinaria→mascotas,veterinaria. SOLO JSON: {"busqueda":"termino1","alt":"termino2","alt2":"termino3 o vacio"}',
       messages:[{role:'user',content:'Negocio: '+desc}]
     };
     let resp;
@@ -6522,7 +6521,6 @@ async function detectarGiroIA(){
     const kws=[parsed.busqueda,parsed.alt,parsed.alt2].map(norm).filter(function(k){return k&&k.length>2;});
     if(kws.length>0){
       const filIA=_filDirecto(kws);
-      // Merge: agregar resultados IA que no estén ya en directos
       const vistos=new Set(fil.map(function(g){return g.codigo;}));
       filIA.forEach(function(g){if(!vistos.has(g.codigo)){fil.push(g);vistos.add(g.codigo);}});
     }
@@ -6532,7 +6530,6 @@ async function detectarGiroIA(){
     }
     if(lg) lg.style.display='block';
   }catch(e){
-    // Si IA falla pero hay directos, mostrarlos igual
     if(lc) lc.textContent=fil.length>0?fil.length+' giro'+(fil.length!==1?'s':'')+' encontrados':'Sin resultados';
     if(li) li.innerHTML=fil.length>0?_renderLista(fil):'<div style="padding:12px;font-size:12px;color:var(--text3)">No se pudo consultar la IA. Usa "Buscar manual".</div>';
     if(lg) lg.style.display='block';

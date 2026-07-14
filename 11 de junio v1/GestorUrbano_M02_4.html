@@ -6480,7 +6480,8 @@ async function detectarGiroIA(){
   const _renderLista=function(fil){
     return fil.map(function(g){
       const nombre=g.nombre.replace(/'/g,"\\'");
-      return '<div onclick="seleccionarGiroM02(\''+g.codigo+'\',\''+nombre+'\');verificarGiro()" style="padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px;align-items:center;font-size:12px" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\'\'"><span style="font-family:var(--mono);font-size:10px;color:var(--uso-p-txt);min-width:54px;flex-shrink:0">'+g.codigo+'</span><span style="flex:1">'+g.nombre+'</span></div>';
+      const ns=g.ns&&g.ns!==g.nombre?'<span style="display:block;font-size:10px;color:var(--text3);margin-top:1px">'+g.ns+'</span>':'';
+      return '<div onclick="seleccionarGiroM02(\''+g.codigo+'\',\''+nombre+'\');verificarGiro()" style="padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px;align-items:center;font-size:12px" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\'\'"><span style="font-family:var(--mono);font-size:10px;color:var(--uso-p-txt);min-width:54px;flex-shrink:0">'+g.codigo+'</span><span style="flex:1"><span style="display:block">'+g.nombre+'</span>'+ns+'</span></div>';
     }).join('');
   };
   let fil=palabras.length>0?_filDirecto(palabras):[];

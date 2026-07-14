@@ -6460,14 +6460,45 @@ async function detectarGiroIA(){
   if(!desc){if(inp)inp.focus();return;}
   const btn=document.getElementById('btnDetectarIA');
   const lg=document.getElementById('iaListaGiros');
+  const lc=document.getElementById('iaListaCount');
+  const li=document.getElementById('iaListaItems');
   if(lg) lg.style.display='none';
-  if(btn){btn.disabled=true;btn.textContent='⏳ Detectando…';}
+  if(btn){btn.disabled=true;btn.textContent='⏳ Buscando…';}
+  // Normalizar texto: quitar acentos y pasar a minúsculas
+  const norm=function(s){return(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();};
+  const activos=window._girosActivos||[...(window._girosP||[]),...(window._girosC||[])];
+  // Paso 1: filtrar catálogo directamente con las palabras del usuario (sin IA)
+  const palabras=norm(desc).split(/\s+/).filter(function(p){return p.length>2;});
+  const _filDirecto=function(kws){
+    return activos.filter(function(g){
+      const n=norm(g.nombre);
+      const c=(g.codigo||'').toLowerCase();
+      return kws.some(function(kw){return n.includes(kw)||c.startsWith(kw);});
+    });
+  };
+  const _renderLista=function(fil){
+    return fil.map(function(g){
+      const nombre=g.nombre.replace(/'/g,"\\'");
+      return '<div onclick="seleccionarGiroM02(\''+g.codigo+'\',\''+nombre+'\');verificarGiro()" style="padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px;align-items:center;font-size:12px" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\'\'"><span style="font-family:var(--mono);font-size:10px;color:var(--uso-p-txt);min-width:54px;flex-shrink:0">'+g.codigo+'</span><span style="flex:1">'+g.nombre+'</span></div>';
+    }).join('');
+  };
+  let fil=palabras.length>0?_filDirecto(palabras):[];
+  if(fil.length>0){
+    // Resultados directos — sin gastar tokens de IA
+    if(lc) lc.textContent=fil.length+' giro'+(fil.length!==1?'s':'')+' encontrados';
+    if(li) li.innerHTML=_renderLista(fil);
+    if(lg) lg.style.display='block';
+    if(btn){btn.disabled=false;btn.textContent='✨ Detectar giro';}
+    return;
+  }
+  // Paso 2: sin resultados directos — llamar a Claude para obtener sinónimos del catálogo
+  if(btn) btn.textContent='⏳ Consultando IA…';
   try{
     const ES_LOCAL=location.hostname==='localhost'||location.hostname==='127.0.0.1';
     const body={
       model:'claude-haiku-4-5-20251001',
       max_tokens:80,
-      system:'Dado un negocio en lenguaje coloquial, extrae 1 o 2 palabras clave para buscar en un catálogo SCIAN México. Responde SOLO JSON: {"busqueda":"palabra principal","alt":"segunda palabra o vacio"}',
+      system:'Dado un negocio en lenguaje coloquial, extrae 1 o 2 palabras clave que aparecerían en un catálogo de giros comerciales SCIAN México (nombres técnicos, no coloquiales). Responde SOLO JSON: {"busqueda":"termino1","alt":"termino2 o vacio"}',
       messages:[{role:'user',content:'Negocio: '+desc}]
     };
     let resp;
@@ -6484,34 +6515,16 @@ async function detectarGiroIA(){
     const data=await resp.json();
     let txt=((data.content&&data.content[0]&&data.content[0].text)||'{}').replace(/```json?/g,'').replace(/```/g,'').trim();
     const parsed=JSON.parse(txt);
-    const kw1=(parsed.busqueda||'').toLowerCase().trim();
-    const kw2=(parsed.alt||'').toLowerCase().trim();
-    if(!kw1) throw new Error('Sin keywords en respuesta IA');
-    // Filtrar catálogo local con las keywords — siempre del catálogo con uso_gdl asignado
-    const activos=window._girosActivos||[...(window._girosP||[]),...(window._girosC||[])];
-    const fil=activos.filter(function(g){
-      const n=(g.nombre||'').toLowerCase();
-      const c=(g.codigo||'').toLowerCase();
-      if(n.includes(kw1)||c.startsWith(kw1)) return true;
-      if(kw2&&(n.includes(kw2)||c.startsWith(kw2))) return true;
-      return false;
-    });
-    const lc=document.getElementById('iaListaCount');
-    const li=document.getElementById('iaListaItems');
+    const kws=[parsed.busqueda,parsed.alt].map(norm).filter(function(k){return k.length>2;});
+    if(kws.length>0) fil=_filDirecto(kws);
     if(lc) lc.textContent=fil.length>0?fil.length+' giro'+(fil.length!==1?'s':'')+' encontrados':'Sin resultados para "'+desc+'"';
     if(li){
-      if(fil.length===0){
-        li.innerHTML='<div style="padding:12px;font-size:12px;color:var(--text3)">No hay giros en esta zona para esa descripción. Prueba con otra palabra o usa "Buscar manual".</div>';
-      } else {
-        li.innerHTML=fil.map(function(g){
-          const nombre=g.nombre.replace(/\'/g,"\\'");
-          return '<div onclick="seleccionarGiroM02(\''+g.codigo+'\',\''+nombre+'\');verificarGiro()" style="padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px;align-items:center;font-size:12px" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\'\'"><span style="font-family:var(--mono);font-size:10px;color:var(--uso-p-txt);min-width:54px;flex-shrink:0">'+g.codigo+'</span><span style="flex:1">'+g.nombre+'</span></div>';
-        }).join('');
-      }
+      li.innerHTML=fil.length>0?_renderLista(fil):'<div style="padding:12px;font-size:12px;color:var(--text3)">No hay giros en esta zona para esa descripción. Prueba con otra palabra o usa la pestaña "Buscar manual".</div>';
     }
     if(lg) lg.style.display='block';
   }catch(e){
-    alert('No se pudo detectar el giro. Intenta ser más específico o usa "Buscar manual". Error: '+(e.message||e));
+    if(li) li.innerHTML='<div style="padding:12px;font-size:12px;color:var(--text3)">No se pudo consultar la IA. Usa "Buscar manual".</div>';
+    if(lg) lg.style.display='block';
   }finally{
     if(btn){btn.disabled=false;btn.textContent='✨ Detectar giro';}
   }
@@ -6520,7 +6533,6 @@ function cancelarGiroIA(){
   const lg=document.getElementById('iaListaGiros'); if(lg) lg.style.display='none';
   const inp=document.getElementById('iaDescInput'); if(inp){inp.value='';inp.focus();}
 }
-
 function getMensajeM2(clave, condGiro, zonaActual){
   const c = (clave||'').toUpperCase();
   const base = c.replace(/-.*$/,'');

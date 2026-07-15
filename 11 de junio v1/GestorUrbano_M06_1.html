@@ -1819,8 +1819,10 @@ function renderResultado(giro, mun, sup, tramiteLabel) {
   var dHtml = '<div class="section-hdr">Estimacion de costos</div><div class="fee-box">';
   var total = 0;
   if (mun === 'GDL') {
-    dHtml += '<div class="fee-row"><div class="fee-label">Solicitud (forma valorada)<div class="fundamento">Art. 74 Fracc. I-1, Ley Ingresos GDL 2026</div></div><div class="fee-val">$57</div></div>';
+    dHtml += '<div class="fee-row"><div class="fee-label">Solicitud (forma valorada)<div class="fundamento">Art. 74 Fracc. I num. 1, Ley Ingresos GDL 2026</div></div><div class="fee-val">$57</div></div>';
     total += 57;
+    dHtml += '<div class="fee-row"><div class="fee-label">Impreso o digital de licencia<div class="fundamento">Art. 74 Fracc. I num. 14, Ley Ingresos GDL 2026</div></div><div class="fee-val">$618</div></div>';
+    total += 618;
   }
   if (hayDerecho && tarAlc) {
     dHtml += '<div class="fee-row"><div class="fee-label">Derecho de licencia de giro (anual)<div class="fundamento">'+tarAlc.art+'</div></div><div class="fee-val">'+fmt(tarAlc.tarifa)+'</div></div>';

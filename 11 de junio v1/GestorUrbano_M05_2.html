@@ -659,6 +659,9 @@ function generarChecklist() {
     } else if (esUnifamiliar && numViv >= 10) {
       movilidadReq = true;
       movilidadMotivo = `${numViv} unidades unifamiliares (≥10) — Art. 73-I Regl. Movilidad GDL`;
+    } else if (['comercio','oficinas','industria','mixto'].includes(tipoUso)) {
+      movilidadReq = true;
+      movilidadMotivo = `Uso ${tipoUso} — usos no habitacionales sin excepción · Art. 73 Regl. Movilidad GDL`;
     }
   } else if (munActual === 'ZPN') {
     if (numViv >= 15) {
@@ -669,10 +672,13 @@ function generarChecklist() {
       movilidadMotivo = `Uso ${tipoUso} — Dictamen de Integración Vial requerido por DTUDE · Art. 45 Regl. Movilidad ZPN`;
     }
   } else if (['TLQ','TLA','TON'].includes(munActual)) {
+    const munNMov = {TLQ:'Tlaquepaque',TLA:'Tlajomulco',TON:'Tonalá'}[munActual];
     if (numViv >= 15) {
       movilidadReq = true;
-      const munN = {TLQ:'Tlaquepaque',TLA:'Tlajomulco',TON:'Tonalá'}[munActual];
-      movilidadMotivo = `${numViv} viviendas — verificar umbral aplicable con Dirección de Movilidad ${munN} (referencia supletoria: ≥15 viviendas)`;
+      movilidadMotivo = `${numViv} viviendas — verificar umbral aplicable con Dirección de Movilidad ${munNMov} (referencia supletoria: ≥15 viviendas)`;
+    } else if (['comercio','oficinas','industria','mixto'].includes(tipoUso)) {
+      movilidadReq = true;
+      movilidadMotivo = `Uso ${tipoUso} — verificar requisito de estudio de integración vial con Dirección de Movilidad ${munNMov} (marco supletorio: Regl. Movilidad Jalisco)`;
     }
   }
 
@@ -723,6 +729,11 @@ function generarChecklist() {
     titulo: `Punto Limpio requerido — superficie ${sup.toLocaleString()} m²`,
     texto: 'Proyectos ≥1,000 m² deben instalar Punto Limpio para residuos de construcción. Solicitar ante Dirección de Medio Ambiente GDL.'
   });
+  if (munActual === 'GDL' && (sup > 3500 || niveles > 6)) alertas.push({
+    tipo: 'warn',
+    titulo: 'Evaluación de Impacto Ambiental — GDL',
+    texto: `${sup > 3500 ? `Superficie ${sup.toLocaleString()} m² de construcción` : `${niveles} niveles`} — requiere autorización de impacto ambiental de la Dirección de Medio Ambiente GDL como prerrequisito de la licencia · Art. 183 Fracc. II y Art. 184 bis Regl. Medio Ambiente GDL.`
+  });
   if (esHistorico) alertas.push({
     tipo: 'danger',
     titulo: 'Zona patrimonial / Centro Histórico',
@@ -735,10 +746,12 @@ function generarChecklist() {
       ? 'Cambio de uso de suelo requiere autorización de la Dirección de Medio Ambiente de Zapopan (Arts. 20-25 Código Ambiental ZPN) como prerequisito de la licencia de construcción.'
       : 'Uso industrial requiere estudio de impacto ambiental preventivo (Art. 54 Fracc. IV Regl. Urbanización ZPN) · Obtener autorización de la Dirección de Medio Ambiente ZPN como prerequisito de la licencia de construcción.'
   });
-  if (['TLQ','TLA','TON'].includes(munActual) && esCambioUso) alertas.push({
+  if (['TLQ','TLA','TON'].includes(munActual) && (esCambioUso || tipoUso === 'industria' || sup > 3500 || niveles > 6)) alertas.push({
     tipo: 'warn',
-    titulo: `Impacto Ambiental — ${munN3}`,
-    texto: `Cambio de uso de suelo puede requerir dictamen ambiental previo de la Dirección de Medio Ambiente de ${munN3}. Verificar con la dependencia antes de iniciar trámite.`
+    titulo: `Evaluación de Impacto Ambiental — ${munN3}`,
+    texto: esCambioUso
+      ? `Cambio de uso de suelo puede requerir dictamen ambiental previo de la Dirección de Medio Ambiente de ${munN3}. Verificar con la dependencia antes de iniciar trámite.`
+      : `Uso ${tipoUso}${sup > 3500 ? ` · ${sup.toLocaleString()} m²` : ''}${niveles > 6 ? ` · ${niveles} niveles` : ''} — puede requerir evaluación de impacto ambiental · Verificar con la Dirección de Medio Ambiente de ${munN3} antes de iniciar trámite.`
   });
 
   // ── Documentos base ──
@@ -757,7 +770,7 @@ function generarChecklist() {
         tipoObra, niveles, numViv })
     : isMun3
       ? docsCondMun({ esMoral, esPromotorFisico, esCondominio, esArrendamiento,
-          movilidadReq, esCambioUso, esHistorico, numViv, mun: munActual })
+          movilidadReq, esCambioUso, esHistorico, numViv, tipoUso, sup, niveles, mun: munActual })
       : docsCondZPN({ esMoral, esPromotorFisico, esCondominio, esArrendamiento,
           movilidadReq, esCambioUso, esHistorico, numViv, tipoUso });
 
@@ -931,6 +944,11 @@ function docsCondGDL(ctx) {
     docs.push({ nombre: 'Solicitud de instalación de Punto Limpio', detalle: `Proyectos ≥1,000 m² (${ctx.sup.toLocaleString()} m²) · Dirección de Medio Ambiente GDL · Para gestión de residuos de construcción y demolición · Art. 36 Regl. Gestión Integral GDL`, pres: 'Copia' });
   }
 
+  // Evaluación de Impacto Ambiental por tamaño — Art. 183 Fracc. II Regl. MA GDL
+  if (ctx.sup > 3500 || ctx.niveles > 6) {
+    docs.push({ nombre: 'Autorización de Impacto Ambiental — Dirección de Medio Ambiente GDL', detalle: `${ctx.sup > 3500 ? `Superficie ${ctx.sup.toLocaleString()} m² de construcción` : `${ctx.niveles} niveles`} · Art. 183 Fracc. II Regl. de Protección del Medio Ambiente GDL · Requisito PREVIO a la licencia de construcción (Art. 184 bis) · Tramitar ante Dirección de Medio Ambiente GDL`, pres: 'Copia' });
+  }
+
   return docs;
 }
 
@@ -1101,11 +1119,17 @@ function docsCondMun(ctx) {
   }
 
   if (ctx.movilidadReq) {
-    docs.push({ nombre: 'Dictamen de Impacto Vial o Movilidad', detalle: `${ctx.numViv} viviendas · Verificar umbral y dependencia responsable con la ${dep} · Tramitar ANTES de la licencia de construcción`, pres: 'Copia' });
+    const detMovMun = (ctx.numViv >= 15)
+      ? `${ctx.numViv} viviendas · Verificar umbral y dependencia responsable con la ${dep} · Tramitar ANTES de la licencia de construcción`
+      : `Uso ${ctx.tipoUso} — verificar requisito de estudio de integración vial con la ${dep} · Marco supletorio: Regl. Movilidad Jalisco · Tramitar ANTES de la licencia de construcción`;
+    docs.push({ nombre: 'Dictamen de Impacto Vial o Movilidad', detalle: detMovMun, pres: 'Copia' });
   }
 
-  if (ctx.esCambioUso) {
-    docs.push({ nombre: 'Dictamen / Evaluación ambiental', detalle: `Cambio de uso de suelo puede requerir autorización de la Dirección de Medio Ambiente de ${munN} como prerequisito · Verificar con la ${dep}`, pres: 'Copia' });
+  if (ctx.esCambioUso || ctx.tipoUso === 'industria' || ctx.sup > 3500 || ctx.niveles > 6) {
+    const detAmbMun = ctx.esCambioUso
+      ? `Cambio de uso de suelo puede requerir autorización de la Dirección de Medio Ambiente de ${munN} como prerequisito · Verificar con la ${dep}`
+      : `Uso ${ctx.tipoUso}${ctx.sup > 3500 ? ` · ${(ctx.sup||0).toLocaleString()} m²` : ''}${ctx.niveles > 6 ? ` · ${ctx.niveles} niveles` : ''} — puede requerir evaluación de impacto ambiental · Verificar con la Dirección de Medio Ambiente de ${munN} antes de iniciar trámite`;
+    docs.push({ nombre: 'Dictamen / Evaluación ambiental', detalle: detAmbMun, pres: 'Copia' });
   }
 
   if (ctx.esHistorico) {

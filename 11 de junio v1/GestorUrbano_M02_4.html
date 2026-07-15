@@ -6372,11 +6372,13 @@ function filtrarGirosM02(q){
     ? activos
     : activos.filter(g => {
         const nombre = (g.nombre||'').toLowerCase();
+        const ns = (g.ns||'').toLowerCase();
         const codigo = (g.codigo||'').toLowerCase();
         if(codigo.startsWith(ql)) return true;
         if(nombre.includes(ql)) return true;
+        if(ns.includes(ql)) return true;
         const palabras = ql.split(/\s+/).filter(p => p.length > 2);
-        if(palabras.length > 1 && palabras.every(p => nombre.includes(p))) return true;
+        if(palabras.length > 1 && palabras.every(p => nombre.includes(p) || ns.includes(p))) return true;
         return false;
       });
   const lista = document.getElementById('giroLista');

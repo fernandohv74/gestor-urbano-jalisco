@@ -200,8 +200,13 @@ body { display: block !important; margin: 0; padding: 0; font-family: -apple-sys
 .ac-input:focus { outline: none; border-color: var(--accent); }
 .ac-input.has-value { border-color: var(--accent); }
 .ac-list { position: absolute; top: calc(100% - 1px); left: 0; right: 0; background: var(--bg2); border: 1px solid var(--accent); border-top: none; border-radius: 0 0 8px 8px; max-height: 340px; overflow-y: auto; z-index: 200; display: none; box-shadow: 0 6px 20px rgba(0,0,0,.12); }
-.ac-item { padding: 9px 13px; font-size: 13px; cursor: pointer; border-bottom: 1px solid var(--border); color: var(--text1); }
+.ac-item { padding: 8px 13px; cursor: pointer; border-bottom: 1px solid var(--border); color: var(--text1); display:flex; align-items:flex-start; gap:8px; }
 .ac-item:hover, .ac-item.ac-active { background: var(--accent); color: #fff; }
+.ac-code { font-size:11px; color:var(--text2); font-variant-numeric:tabular-nums; min-width:54px; flex-shrink:0; padding-top:2px; }
+.ac-text { flex:1; min-width:0; }
+.ac-name { font-size:13px; font-weight:600; display:block; }
+.ac-desc { font-size:11px; color:var(--text2); display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ac-item:hover .ac-code,.ac-item.ac-active .ac-code,.ac-item:hover .ac-desc,.ac-item.ac-active .ac-desc { color:rgba(255,255,255,.75); }
 .ac-empty { padding: 10px 13px; font-size: 12px; color: var(--text3); font-style: italic; }
 .ac-count { font-size: 10px; color: var(--text3); padding: 4px 13px 6px; border-top: 1px solid var(--border); background: var(--bg3); }
 /* RESULTADO */
@@ -3365,294 +3370,304 @@ var SCIAN_DATA = {
   "ZAPATERIA":["466311","Comercio al por menor de alfombras, cortinas, tapices y similares"]
 };
 
-var SCIAN_NS = {
-  "ABARROTES":["Comercio   al   por   menor   en   tiendas   de   abarrotes, ultramarinos y misc"],
-  "ACADEMIA DE ACTIVIDADES DEPORTIVAS Y DE ESPARCIMIENTO":["Promotores del sector privado de espectáculos artísticos, culturales, deportivos"],
-  "ACADEMIA DE ACTIVIDADES TÉCNICAS Y DE CAPACITACIÓN":["Otros servicios profesionales, científicos y técnicos"],
-  "ACADEMIA DE NATACION":["Otros servicios educativos proporcionados por el sector privado"],
-  "ACCESORIOS AUTOMOTRICES":["Comercio al por menor en supermercados"],
-  "ACCESORIOS DE VESTIR":["Comercio al por menor de bisutería y accesorios de vestir"],
-  "ACCESORIOS FOTOGRAFICOS":["Comercio al por menor de equipo y material fotográfico"],
-  "ACCESORIOS PARA SEGURIDAD INDUSTRIAL Y DOMESTICA":["Servicios de protección y custodia mediante el monitoreo de sistemas de segurida"],
-  "ACCESORIOS Y AUTOPARTES SEMINUEVAS":["Comercio  al  por  menor  de  partes  y  refacciones  usadas para automóviles, c"],
-  "ACEITES Y LUBRICANTES":["Comercio  al  por  menor  de  aceites  y  grasas  lubricantes, aditivos y simila"],
-  "ACUARIO":["Piscicultura y otra acuicultura, excepto camaronicultura"],
-  "AGEN. DE AUTOTRANSPORTES":["Servicios de mudanzas"],
-  "AGEN. DE PUBLICIDAD":["Agencias de publicidad"],
-  "AGENCIA DE MENSAJERIA Y PAQUETERIA":["Servicios de empacado y etiquetado"],
-  "AGENCIA DE MOTOCICLETAS":["Comercio al por menor de motocicletas"],
-  "AGENCIA DE VIAJES":["Agencias de viajes","Agencias de viajes y servicios de reservaciones"],
-  "AGENCIAS NOTICIOSAS":["Servicios de distribución de audio y video en tiempo real (streaming), redes soc"],
-  "ALFOMBRAS":["Comercio al por menor de alfombras, cortinas, tapices y similares"],
-  "ALIMENTOS":["Beneficios del arroz","Congelación de guisos y otros alimentos preparados","Conservación de frutas y verduras por procesos distintos a la congelación y la d","Conservación de guisos y otros alimentos preparados por procesos distintos a la ","Deshidratación de frutas y verduras","Elaboración de alimentos frescos para consumo inmediato"],
-  "ALIMENTOS PARA CONSUMO INMEDIATO":["Elaboración de alimentos frescos para consumo inmediato"],
-  "ALIMENTOS PARA LLEVAR":["Elaboración de alimentos frescos para consumo inmediato","Elaboración de otros alimentos procesados y envasados"],
-  "ALIMENTOS PARA USO ANIMAL":["Comercio al por menor de otros alimentos","Elaboración de alimentos balanceados para animales"],
-  "ALQUILER DE APARATOS ELECTRICOS Y ELECTRONICOS":["Alquiler de aparatos eléctricos y electrónicos para el hogar y personales"],
-  "ALQUILER DE ART. DE OFICINA":["Alquiler  de  equipo  de  cómputo  y  de  otras  máquinas  y mobiliario de ofici"],
-  "ALQUILER DE AUTOMOVILES CON CHOFER":["*Alquiler de automóviles con chofer"],
-  "ALQUILER DE ROPA":["Alquiler de prendas de vestir"],
-  "ALQUILER SIN INTERMEDIACION DE OFICINAS Y LOCALES COMERCIALES":["*Alquiler    sin    intermediación    de    oficinas    y    locales comerciales"],
-  "ALQUILER SIN INTERMEDIACION DE VIVIENDAS AMUEBLADAS":["*Alquiler sin intermediación de viviendas amuebladas"],
-  "ALQUILER SIN INTERMEDIACION DE VIVIENDAS NO AMUEBLADAS":["*Alquiler sin intermediación de viviendas no amuebladas"],
-  "ALUMINIO":["Comercio  al  por  mayor  de  materiales  metálicos  para  la construcción y la "],
-  "ANIMALES":["Cunicultura y explotación de animales con pelaje fino","Explotación de animales combinada con aprovechamiento forestal","Explotación de otros animales","Explotación de équidos","Restaurantes con servicio de preparación de alimentos a la carta o de comida cor","Servicios relacionados con la cría y explotación de animales"],
-  "ANTIGUEDADES":["Comercio al por menor de antigüedades y obras de arte"],
-  "ANUNCIO SEMIESTRUCTURAL LUMINOSO":["Agencias de anuncios publicitarios"],
-  "ANUNCIO SEMIESTRUCTURAL OPACO":["Agencias de compra de medios a petición del cliente"],
-  "ANUNCIO SIN ESTRUCTURA LUMINOSO":["Agencias de anuncios publicitarios"],
-  "ANUNCIO SIN ESTRUCTURA OPACO":["Agencias de anuncios publicitarios"],
-  "APARATO MUSICAL":["Fabricación de instrumentos musicales"],
-  "APARATOS ELECTRODOMESTICOS":["Comercio al por menor de electrodomésticos menores y aparatos de línea blanca"],
-  "APARATOS ELECTRONICOS":["Comercio al por mayor de electrodomésticos menores y aparatos de línea blanca"],
-  "APARATOS ORTOPEDICOS":["Comercio al por menor de artículos ortopédicos"],
-  "APARATOS Y ACCESORIOS MUSICALES":["Comercio al por menor de instrumentos musicales"],
-  "ART. DE BELLEZA":["Comercio al por menor de artículos de perfumería y cosméticos"],
-  "ART. DE DECORACION":["Diseño y decoración de interiores"],
-  "ART. DE JARDINERIA":["Comercio al por menor de muebles para jardín"],
-  "ART. DE LIMPIEZA":["Comercio al por menor de artículos para la limpieza"],
-  "ART. DE PIEL":["Comercio al por menor de ropa de cuero, de piel y de otros artículos de estos ma"],
-  "ART. PARA FIESTA":["Fabricación de otros productos de cartón y papel"],
-  "ART. PROMOCIONALES":["Distribución de material publicitario"],
-  "ARTESANIAS":["Comercio al por menor en tiendas de artesanías"],
-  "ARTICULOS DEPORTIVOS":["Comercio al por menor de artículos y aparatos deportivos"],
-  "ARTICULOS PARA ALBERCA":["Comercio al por menor de artículos para albercas y otros artículos"],
-  "ARTICULOS PARA DISEÑO Y PINTURA":["Comercio al por mayor de artículos y accesorios para diseño y pintura artística"],
-  "ARTICULOS PARA EL HOGAR":["Comercio al por menor de muebles para el hogar"],
-  "ARTICULOS RELIGIOSOS":["Comercio al por menor de artículos religiosos"],
-  "ARTICULOS Y ACCESORIOS MILITARES":["Fabricación de banderas y otros productos textiles no clasificados en otra parte"],
-  "ARTISTAS, ESCRITORES Y TECNICOS INDEPENDIENTES":["Artistas, escritores y técnicos independientes"],
-  "ASESORIA EN INVERSIONES":["Asesoría en inversiones"],
-  "ASOCIACIONES Y ORGANIZACIONES CIVILES":["Asociaciones y organizaciones civiles"],
-  "BANQUETES":["Servicios de preparación de alimentos para ocasiones especiales"],
-  "BASCULA":["Comercio al por mayor de maquinaria y equipo para otros servicios y para activid"],
-  "BAZAR":["Comercio al por menor de artículos usados"],
-  "BEBIDAS SIN CONTENIDO ALCOHOLICO":["Comercio al por menor de bebidas no alcohólicas y hielo","Elaboración de concentrados, polvos, jarabes y esencias de sabor para bebidas","Elaboración de malta"],
-  "BICICLETAS":["Comercio al por menor de bicicletas y triciclos"],
-  "BILLETES DE LOTERÍA":["Venta de billetes de lotería, pronósticos deportivos y otros boletos de sorteo"],
-  "BISUTERIA":["Joyería de metales y piedras no preciosos y de otros materiales"],
-  "BLANCOS":["Comercio al por menor de blancos"],
-  "BODEGA (EXCLUSIVA PARA ANEXO)":["Comercio al por mayor de abarrotes"],
-  "BOLERIA":["Sanitarios públicos y Bolerías"],
-  "BONETERIA Y MERCERÍA":["Comercio al por menor de artículos de mercería y bonetería"],
-  "BOTANAS":["Elaboración de botanas"],
-  "BUFETES JURIDICOS":["Bufetes jurídicos"],
-  "CAFE":["Beneficio del café","Elaboración de café instantáneo","Elaboración de café tostado y molido destinado a unidades que lo comercializan"],
-  "CAFETERIA":["Elaboración de café instantáneo"],
-  "CAJA POPULAR":["Cajas, cooperativas y sociedades financieras de ahorro y préstamo popular"],
-  "CAJAS DE CARTON, MATERIAL DE EMPAQUE":["Comercio al por mayor de envases en general, papel y cartón para la industria"],
-  "CAMARA DE REFRIGERACION":["Fabricación de equipo de refrigeración industrial y comercial"],
-  "CAMPISMO":["Comercio al por mayor de artículos y aparatos deportivos"],
-  "CARBON Y LEÑA":["Comercio al por menor de otros combustibles"],
-  "CARNE EMPACADA":["Comercio al por menor de carnes rojas","Explotación de bovinos para la producción conjunta de leche y carne","Explotación de bovinos para la producción de carne","Explotación de bovinos para otros propósitos"],
-  "CARNES FRIAS":["Comercio al por menor de leche, otros productos lácteos y embutidos","Elaboración de embutidos y otras conservas de carne de ganado, aves y otros anim","Elaboración de manteca y otras grasas animales comestibles"],
-  "CARNICERIA":["Comercio al por mayor de carnes rojas","Comercio al por menor de carne de ganado y cerdo en tiendas especializadas"],
-  "CARNITAS Y CHICHARRÓN":["Comercio al por menor de otros alimentos"],
-  "CASA DE BOLSA":["Banca central"],
-  "CASA DE CAMBIO":["Casas de cambio","Casas de cambio y centros cambiarios"],
-  "CASA DE HUESPEDES":["Pensiones y casas de huéspedes"],
-  "CENTRO DE COPIADO":["Servicios de fotocopiado, fax y afines"],
-  "CENTRO DE DISTRIBUCION DE MASA Y TORTILLA":["Comercio al por menor de otros alimentos"],
-  "CENTRO TERAPEUTICO":["Consultorios de quiropráctica del sector privado"],
-  "CEREALES Y SEMILLAS":["Comercio al por menor de semillas y granos alimenticios, especias y chiles secos"],
-  "CERRAJERIA":["Cerrajerías"],
-  "CLASES DE CORTE Y CONFECCION":["Escuelas del sector público dedicadas a la enseñanza de oficios"],
-  "CLASES DE MANUALIDADES":["Escuelas del sector público dedicadas a la enseñanza de oficios"],
-  "CLASES DE REGULARIZACION":["Servicios de profesores particulares"],
-  "COMERCIO AL POR MAYOR DE BLANCOS":["Comercio al por mayor de blancos"],
-  "COMERCIO AL POR MAYOR DE CUEROS Y PIELES":["Comercio al por mayor de cueros y pieles"],
-  "COMERCIO AL POR MAYOR DE DISCOS Y CASETES":["Comercio al por mayor de grabaciones de audio y video en medios físicos"],
-  "COMERCIO AL POR MAYOR DE FIBRAS, HILOS Y TELAS":["Comercio al por mayor de fibras, hilos y telas"],
-  "COMERCIO AL POR MAYOR DE LIBROS":["Comercio al por mayor de libros"],
-  "COMERCIO AL POR MAYOR DE PINTURA":["Comercio al por mayor de pintura"],
-  "COMERCIO AL POR MAYOR DE VIDRIOS Y ESPEJOS":["Comercio al por mayor de vidrios y espejos"],
-  "COMPRA VENTA AL POR MAYOR DE MOBILIARIO, EQUIPO E INSTRUMENTAL MEDICO":["Comercio al por mayor de mobiliario, equipo e instrumental médico y de laborator"],
-  "COMPRA VENTA CERRADURAS INTELIGENTES Y CAJAS FUERTES":["Comercio al por menor en ferreterías y tlapalerías"],
-  "COMPRA VENTA DE SISTEMA DE COMPUTO Y CONSUMIBLES":["Comercio al por menor de mobiliario, equipo y accesorios de cómputo"],
-  "COMPRA Y VENTA DE LLANTAS":["Comercio al por menor de llantas y cámaras para automóviles, camionetas y camion"],
-  "CONSERVAS ALIMENTICIAS":["Comercio al por mayor de conservas alimenticias"],
-  "CONSULTORIOS":["Consultorios de medicina general del sector privado"],
-  "CREMERIA":["Comercio al por mayor de leche y otros productos lácteos"],
-  "CRISTALERIA":["Comercio al por menor de cristalería, loza y utensilios de cocina"],
-  "CULTIVO DE JITOMATE O TOMATE ROJO":["Cultivo de jitomate o tomate rojo"],
-  "DEPILACION CON CERA":["Salones y clínicas de belleza y peluquerías"],
-  "DEPORTISTAS PROFESIONALES":["Deportistas profesionales"],
-  "DESECHABLES":["Comercio al por mayor de artículos desechables"],
-  "DISEÑO DE ANUNCIOS A MANO Y POR COMPUTADORA":["Servicios de diseño de sistemas de cómputo y servicios relacionados"],
-  "DISEÑO DE ANUNCIOS, ROTULOS, LONAS Y TOLDOS LUMINOSOS":["Diseño gráfico"],
-  "DISEÑO E IMPRESION":["Diseño gráfico"],
-  "DISTRIBUCION DE PELICULAS Y AUDIOVISUALES":["Distribución de películas y de otros materiales audiovisuales"],
-  "DULCERIA":["Comercio al por menor de dulces y materias  primas para repostería"],
-  "EDICION DE DIRECTORIOS Y DE LISTAS DE CORREO":["Edición de directorios y listas de correo en formato electrónico"],
-  "EDICION DE LIBROS":["Edición de libros en formato electrónico"],
-  "EDICION DE LIBROS INTEGRADA CON LA IMPRESION":["Edición de libros integrada con la impresión"],
-  "EDICION DE PERIODICOS":["Edición de periódicos en formato electrónico"],
-  "EDICION DE REVISTAS Y OTRAS PUBLICACIONES PERIODICAS":["Edición de revistas y otras publicaciones periódicas integradas con la impresión"],
-  "ELEVADORES":["Otras instalaciones y equipamiento en construcciones"],
-  "EMPAQUES EN GENERAL":["Comercio al por menor de materiales para la construcción en tiendas de autoservi"],
-  "EQUIPO DE ILUMINACION":["Comercio al por mayor de equipo y material eléctrico"],
-  "EQUIPO MEDICO":["Comercio al por mayor de mobiliario, equipo e instrumental médico y de laborator"],
-  "ESCALERA ELECTRICA":["Comercio al por mayor de otra maquinaria y equipo de uso general"],
-  "ESTETICA":["Salones y clínicas de belleza y peluquerías"],
-  "ESTUDIOS FOTOGRAFICOS":["Servicio de fotografía y videograbación"],
-  "EXP. DE AGUA PURIFICADA":["Purificación y embotellado de agua"],
-  "EXP. DE POLLO":["Comercio al por menor de carne de ave"],
-  "EXPENDIO EN ENVASE CERRADO DE ALCOHOL PARA USO MEDICO":["Farmacias sin minisúper"],
-  "FARMACIA":["Comercio al por mayor de productos farmacéuticos","Comercio al por menor de medicamentos"],
-  "FERTILIZANTES":["Comercio al por mayor de fertilizantes, plaguicidas y semillas para siembra"],
-  "FLORERIA":["Comercio al por menor de plantas y flores naturales"],
-  "FLORICULTURA EN INVERNADEROS Y OTRAS ESTRUCTURAS AGRICOLAS PROTEGIDAS":["Floricultura en invernaderos y otras estructuras agrícolas protegidas"],
-  "FONDA":["Restaurantes con servicio de preparación de alimentos a la carta o de comida cor"],
-  "FOTOCOPIADORA":["Servicios de fotocopiado, fax y afines"],
-  "FRUTAS Y VERDURAS":["Comercio al por menor de frutas y verduras frescas"],
-  "FUENTE DE SODAS":["Restaurantes que preparan otro tipo de alimentos para llevar"],
-  "GALERIA DE ARTE":["Comercio al por menor de antigüedades y obras de arte"],
-  "GRANJA":["Explotación de caprinos","Explotación de gallinas para la producción de huevo fértil","Explotación de gallinas para la producción de huevo para plato","Explotación de guajolotes o pavos","Explotación de otras aves para producción de carne y huevo","Explotación de ovinos","Explotación de pollos para la producción de carne","Explotación de porcinos en granja","Explotación de porcinos en traspatio","Otros servicios relacionados con la agricultura"],
-  "HUEVO":["Explotación de gallinas para la producción de huevo para plato"],
-  "IMPRENTA":["Comercio al por mayor de maquinaria y equipo para la industria manufacturera"],
-  "INCUBADORA":["Comercio al por mayor de mobiliario, equipo e instrumental médico y de laborator","Producción de aves en incubadora"],
-  "INMOBILIARIA":["Inmobiliarias y corredores de bienes raíces"],
-  "INMOBILIARIAS Y CORREDORES DE BIENES RAICES":["Otros servicios relacionados con los servicios inmobiliarios"],
-  "INST. BANCARIA Y DE CDTO.":["Almacenes generales de depósito"],
-  "INST. DE EQUIPO DE SONIDO":["Comercio al por mayor de partes y refacciones nuevas para automóviles, camioneta"],
-  "INSTALACION DE ACCESORIOS AUTOMOTRICES":["Comercio al por menor de automóviles y camionetas nuevos"],
-  "JOYERIA":["Orfebrería y joyería de metales y piedras preciosos"],
-  "JUEGOS MECANICOS Y ELECTROMECANICOS":["Parques de diversiones y temáticos del sector privado"],
-  "JUGUETERIA":["Comercio al por menor de juguetes"],
-  "LAB. FOTOGRAFICO":["Servicios de revelado e impresión de fotografías"],
-  "LABORATORIO":["Servicios de laboratorios de pruebas"],
-  "LABORATORIO DENTAL":["Fabricación de equipo no electrónico para uso médico, dental y para laboratorio"],
-  "LAVADEROS PUBLICOS":["Lavanderías y tintorerías"],
-  "LECHERIA":["Elaboración de derivados y fermentos lácteos","Elaboración de leche en polvo, condensada y evaporada, y de fórmulas","Elaboración de leche líquida","Explotación de bovinos para la producción de leche"],
-  "LENCERIA":["Comercio al por menor de lencería"],
-  "LIBRERIAS":["Comercio al por menor de libros"],
-  "MANUALIDADES":["Comercio al por menor de otros artículos para la decoración de interiores"],
-  "MANUFACTURA DOMICILIARIA":["Otras industrias manufactureras"],
-  "MAQUINARIA EN GENERAL":["Maquinado de piezas para maquinaria y equipo en general"],
-  "MAQUINAS TRAGAMONEDAS":["Comercio al por mayor de maquinaria de equipo para otros servicios y para activi"],
-  "MARCOS Y MOLDURAS":["Realización de trabajos de carpintería en el lugar de la construcción"],
-  "MARISCOS EN ESTADO NATURAL":["Camaronicultura y acuicultura de otros crustáceos en agua dulce","Camaronicultura y acuicultura de otros crustáceos en agua salada","Comercio al por mayor de pescados y mariscos","Otra acuicultura","Piscicultura en agua dulce"],
-  "MARISCOS PROCESADOS PARA CONSUMO HUMANO":["Comercio al por mayor de pescados y mariscos"],
-  "MASA Y TORTILLAS":["Elaboración de tortillas de maíz y molienda de nixtamal"],
-  "MASAJES TERAPEUTICOS":["Otros consultorios del sector privado para el cuidado de la salud"],
-  "MATERIA PRIMA":["Elaboración de azúcar de caña","Elaboración de cereales par el desayuno","Elaboración de chocolate y productos de chocolate","Elaboración de dulces, chicles, y productos de confitería que no sean de chocola","Elaboración de féculas y otros almidones y sus derivados","Elaboración de otros azúcares"],
-  "MATERIAL DISCOGRAFICO":["Comercio al por menor de grabaciones de audio y video en medios físicos"],
-  "MATERIAL ELECTRICO":["Comercio al por mayor de equipo y material eléctrico"],
-  "MATERIALES DE CONSTRUCCION":["Comercio al por menor de materiales para la construcción en general"],
-  "MESA DE BILLAR":["Billares"],
-  "MESA DE JUEGO":["Fabricación de artículos deportivos"],
-  "MINI-SUPER":["Comercio al por menor en supermercados"],
-  "MISCELANEA":["Comercio al por menor en tiendas de abarrotes, ultramarinos y misceláneas"],
-  "MUEBLERIAS":["Comercio al por menor en tiendas departamentales"],
-  "MUSEO":["Museos"],
-  "MUSEOS DEL SECTOR PRIVADO":["Museos del sector privado"],
-  "MUSICOS Y CANCIONEROS":["Cantantes y grupos musicales del sector privado"],
-  "NEVERIA":["Comercio al por menor de paletas de hielo y helados"],
-  "NOTARIAS PUBLICAS":["Notarías Públicas"],
-  "OFICINA VIRTUAL":["Operadores de servicios de telecomunicaciones inalámbricas"],
-  "OPTICA":["Comercio al por menor de lentes"],
-  "OTROS SERVICIOS DE CONSULTORIA CIENTIFICA Y TECNICA":["Servicios de investigación científica y desarrollo en ciencias naturales y exact"],
-  "OTROS SERVICIOS DE LIMPIEZA":["Otros servicios de limpieza"],
-  "PALENQUE":["Alquiles sin intermediación de teatros, estadios, auditorios y similares"],
-  "PALETERIA":["Comercio al por mayor de otros alimentos","Elaboración de helados y paletas"],
-  "PANADERIA":["Panificación tradicional"],
-  "PAPELERIA":["Comercio al por mayor de artículos de papelería"],
-  "PASTELERIA Y POSTRES":["Comercio al por mayor de dulces y materias primas para repostería","Elaboración de gelatinas y otros postres en polvo","Elaboración de levadura"],
-  "PAÑALES":["Comercio al por menor en supermercados"],
-  "PINTURAS":["Comercio al por menor de pintura"],
-  "PISOS":["Colocación de pisos cerámicos y azulejos","Colocación de pisos flexibles y de madera","Comercio al por menor de pisos y recubrimientos cerámicos"],
-  "PISOS, AZULEJOS Y ACCESORIOS PARA BAÑO":["Comercio al por mayor de cemento, tabique y grava"],
-  "PISTA DE PATINAJE (HIELO)":["Centros de acondicionamiento físico del sector privado"],
-  "PISTAS DE ACTIVIDADES DEPORTIVAS Y DE ESPARCIMIENTO":["Centros de acondicionamiento físico del sector público"],
-  "PLANCHADURÍA":["Lavanderías y tintorerías"],
-  "PLASTICOS":["Comercio al por mayor de artículos desechables"],
-  "PODOLOGIA":["Escuelas de educación técnica superior del sector privado"],
-  "PRESTACION DE SERVICIOS":["Asesoría en inversiones"],
-  "PRESTAMOS":["Cajas, cooperativas y sociedades financieras de ahorro y préstamo popular"],
-  "PRESTAMOS PRENDARIOS":["Banca múltiple"],
-  "PRODUCTOS AGROPECUARIOS":["Beneficios de productos agrícolas","Comercio al por menor de frutas y verduras frescas","Elaboración de harina de maíz","Elaboración de harina de otros productos agrícolas","Elaboración de harina de trigo","Otros servicios relacionados con la agricultura"],
-  "PRODUCTOS DE REPOSTERIA":["Comercio al por menor de dulces y materias primas para repostería"],
-  "PRODUCTOS LACTEOS":["Comercio al por menor de leche, otros productos lácteos y embutidos"],
-  "PRODUCTOS QUIMICOS DE LIMPIEZA":["Comercio al por menor de artículos para la limpieza"],
-  "PRONOSTICOS DEPORTIVOS":["Venta de billetes de lotería, pronósticos deportivos y otros boletos de sorteo"],
-  "REFACCIONARIA":["Comercio  al  por  mayor  de  partes  y  refacciones  nuevas para automóviles, c"],
-  "RENTA DE CANCHAS":["Alquiles sin intermediación de teatros, estadios, auditorios y similares"],
-  "RENTA DE SISTEMA DE COMPUTO":["Alquiler de equipo de cómputo y de otras máquinas y mobiliario de oficina"],
-  "REPARACION DE PARTES MECANICAS E HIDRAULICAS":["Reparación mecánica en general de automóviles y camiones"],
-  "ROPA":["Confección en serie de ropa interior y de dormir"],
-  "ROSTICERIA":["Restaurantes con servicio de preparación de pizzas, hamburguesas, hot dogs y pol"],
-  "ROTULISTAS":["Servicios de rotulación y otros servicios de publicidad"],
-  "ROTULOS":["Agencias de publicidad"],
-  "SERVICIOS AUTOMOTRICES":["Rectificación de partes de motor de automóviles y camiones"],
-  "SERVICIOS FUNERARIOS":["Servicios funerarios"],
-  "TALLER DE APARATOS ELECTRODOMESTICOS":["Reparación y mantenimiento de equipo electrónico de uso doméstico"],
-  "TALLER DE APARATOS ELECTRONICOS Y ELECTRICOS":["Reparación y mantenimiento de otro equipo electrónico y de equipo de precisión"],
-  "TALLER DE COSTURA":["Confección, bordado y deshilado de productos textiles","Escuelas del sector público dedicadas a la enseñanza de oficios"],
-  "TALLER MECANICO":["Otros servicios de reparación y mantenimiento de automóviles y camiones"],
-  "TAPICERÍA":["Tapicería de automóviles y camiones","Tapizado y retapizado de muebles para el hogar"],
-  "TELAS":["Confección, bordado y deshilado de productos textiles"],
-  "TELEFONOS CELULARES":["Comercio al por menor de teléfonos y otros aparatos de comunicación"],
-  "TERRAZA CAMPESTRE CON MUSICA VIVO Y PISTA BAILE":["Alquiler sin intermediación de salones para fiestas y convenciones"],
-  "TIENDA DE AUTOSERVICIO":["Comercio al por menor de supermercados"],
-  "TIENDA DEPARTAMENTAL":["Comercio al por menor en tiendas departamentales"],
-  "TLAPALERIA":["Comercio al por menor en ferreterías y tlapalerías"],
-  "TRANSFORMACION DE ALIMENTOS":["Elaboración de otros alimentos procesados y envasados"],
-  "VENTA DE ARTICULOS EROTICOS-SEXUALES (SEX SHOP)":["Comercio al por menor de otros artículos de uso personal"],
-  "VENTA DE DISFRACES VESTIMENTA REGIONAL Y VESTIDOS DE NOVIA":["Comercio al por menor de disfraces, trajes típicos y vestidos de novia"],
-  "VENTA DE HERRAJES EN GENERAL":["Comercio al por mayor de materiales metálicos para la construcción y la manufact"],
-  "VETERINARIA":["Servicios veterinarios para mascotas prestados por el sector privado"],
-  "VIVERO":["Viveros forestales"],
-  "YOGA":["Escuelas de deporte del sector privado"]
+var SCIAN_ENT = {
+  "ABARROTES":[["461110","Comercio   al   por   menor   en   tiendas   de   abarrotes, ultramarinos y misc"]],
+  "ACADEMIA DE ACTIVIDADES DEPORTIVAS Y DE ESPARCIMIENTO":[["711311","Promotores del sector privado de espectáculos artísticos, culturales, deportivos"]],
+  "ACADEMIA DE ACTIVIDADES TÉCNICAS Y DE CAPACITACIÓN":[["541990","Otros servicios profesionales, científicos y técnicos"]],
+  "ACADEMIA DE NATACION":[["611698","Otros servicios educativos proporcionados por el sector privado"]],
+  "ACCESORIOS AUTOMOTRICES":[["462111","Comercio al por menor en supermercados"]],
+  "ACCESORIOS DE VESTIR":[["463215","Comercio al por menor de bisutería y accesorios de vestir"]],
+  "ACCESORIOS FOTOGRAFICOS":[["465214","Comercio al por menor de equipo y material fotográfico"]],
+  "ACCESORIOS PARA SEGURIDAD INDUSTRIAL Y DOMESTICA":[["561620","Servicios de protección y custodia mediante el monitoreo de sistemas de segurida"]],
+  "ACCESORIOS Y AUTOPARTES SEMINUEVAS":[["468212","Comercio  al  por  menor  de  partes  y  refacciones  usadas para automóviles, c"]],
+  "ACEITES Y LUBRICANTES":[["468420","Comercio  al  por  menor  de  aceites  y  grasas  lubricantes, aditivos y simila"]],
+  "ACUARIO":[["112515","Piscicultura y otra acuicultura, excepto camaronicultura"]],
+  "AGEN. DE AUTOTRANSPORTES":[["484210","Servicios de mudanzas"]],
+  "AGEN. DE PUBLICIDAD":[["541810","Agencias de publicidad"]],
+  "AGENCIA DE MENSAJERIA Y PAQUETERIA":[["561910","Servicios de empacado y etiquetado"]],
+  "AGENCIA DE MOTOCICLETAS":[["468311","Comercio al por menor de motocicletas"]],
+  "AGENCIA DE VIAJES":[["561510","Agencias de viajes y servicios de reservaciones"]],
+  "AGENCIAS NOTICIOSAS":[["516210","Servicios de distribución de audio y video en tiempo real (streaming), redes soc"]],
+  "ALFOMBRAS":[["466311","Comercio al por menor de alfombras, cortinas, tapices y similares"]],
+  "ALIMENTOS":[["311993","Elaboración de alimentos frescos para consumo inmediato"],["311211","Beneficios del arroz"],["311412","Congelación de guisos y otros alimentos preparados"],["311421","Deshidratación de frutas y verduras"],["311422","Conservación de frutas y verduras por procesos distintos a la congelación y la d"],["311423","Conservación de guisos y otros alimentos preparados por procesos distintos a la "]],
+  "ALIMENTOS PARA CONSUMO INMEDIATO":[["311993","Elaboración de alimentos frescos para consumo inmediato"]],
+  "ALIMENTOS PARA LLEVAR":[["311993","Elaboración de alimentos frescos para consumo inmediato"],["311999","Elaboración de otros alimentos procesados y envasados"]],
+  "ALIMENTOS PARA USO ANIMAL":[["311110","Elaboración de alimentos balanceados para animales"],["461190","Comercio al por menor de otros alimentos"]],
+  "ALQUILER DE APARATOS ELECTRICOS Y ELECTRONICOS":[["532210","Alquiler de aparatos eléctricos y electrónicos para el hogar y personales"]],
+  "ALQUILER DE ART. DE OFICINA":[["532420","Alquiler  de  equipo  de  cómputo  y  de  otras  máquinas  y mobiliario de ofici"]],
+  "ALQUILER DE AUTOMOVILES CON CHOFER":[["485320","*Alquiler de automóviles con chofer"]],
+  "ALQUILER DE ROPA":[["532281","Alquiler de prendas de vestir"]],
+  "ALQUILER SIN INTERMEDIACION DE OFICINAS Y LOCALES COMERCIALES":[["531114","*Alquiler    sin    intermediación    de    oficinas    y    locales comerciales"]],
+  "ALQUILER SIN INTERMEDIACION DE VIVIENDAS AMUEBLADAS":[["531111","*Alquiler sin intermediación de viviendas amuebladas"]],
+  "ALQUILER SIN INTERMEDIACION DE VIVIENDAS NO AMUEBLADAS":[["531112","*Alquiler sin intermediación de viviendas no amuebladas"]],
+  "ALUMINIO":[["434221","Comercio  al  por  mayor  de  materiales  metálicos  para  la construcción y la "]],
+  "ANIMALES":[["115210","Servicios relacionados con la cría y explotación de animales"],["722511","Restaurantes con servicio de preparación de alimentos a la carta o de comida cor"],["112920","Explotación de équidos"],["112930","Cunicultura y explotación de animales con pelaje fino"],["112991","Explotación de animales combinada con aprovechamiento forestal"],["112999","Explotación de otros animales"]],
+  "ANTIGUEDADES":[["466313","Comercio al por menor de antigüedades y obras de arte"]],
+  "ANUNCIO SEMIESTRUCTURAL LUMINOSO":[["541850","Agencias de anuncios publicitarios"]],
+  "ANUNCIO SEMIESTRUCTURAL OPACO":[["541830","Agencias de compra de medios a petición del cliente"]],
+  "ANUNCIO SIN ESTRUCTURA LUMINOSO":[["541850","Agencias de anuncios publicitarios"]],
+  "ANUNCIO SIN ESTRUCTURA OPACO":[["541850","Agencias de anuncios publicitarios"]],
+  "APARATO MUSICAL":[["339991","Fabricación de instrumentos musicales"]],
+  "APARATOS ELECTRODOMESTICOS":[["466112","Comercio al por menor de electrodomésticos menores y aparatos de línea blanca"]],
+  "APARATOS ELECTRONICOS":[["433510","Comercio al por mayor de electrodomésticos menores y aparatos de línea blanca"]],
+  "APARATOS ORTOPEDICOS":[["464122","Comercio al por menor de artículos ortopédicos"]],
+  "APARATOS Y ACCESORIOS MUSICALES":[["465216","Comercio al por menor de instrumentos musicales"]],
+  "ART. DE BELLEZA":[["465111","Comercio al por menor de artículos de perfumería y cosméticos"]],
+  "ART. DE DECORACION":[["541410","Diseño y decoración de interiores"]],
+  "ART. DE JARDINERIA":[["466113","Comercio al por menor de muebles para jardín"]],
+  "ART. DE LIMPIEZA":[["467115","Comercio al por menor de artículos para la limpieza"]],
+  "ART. DE PIEL":[["463216","Comercio al por menor de ropa de cuero, de piel y de otros artículos de estos ma"]],
+  "ART. PARA FIESTA":[["322299","Fabricación de otros productos de cartón y papel"]],
+  "ART. PROMOCIONALES":[["541870","Distribución de material publicitario"]],
+  "ARTESANIAS":[["465915","Comercio al por menor en tiendas de artesanías"]],
+  "ARTICULOS DEPORTIVOS":[["465215","Comercio al por menor de artículos y aparatos deportivos"]],
+  "ARTICULOS PARA ALBERCA":[["467117","Comercio al por menor de artículos para albercas y otros artículos"]],
+  "ARTICULOS PARA DISEÑO Y PINTURA":[["435312","Comercio al por mayor de artículos y accesorios para diseño y pintura artística"]],
+  "ARTICULOS PARA EL HOGAR":[["466111","Comercio al por menor de muebles para el hogar"]],
+  "ARTICULOS RELIGIOSOS":[["465913","Comercio al por menor de artículos religiosos"]],
+  "ARTICULOS Y ACCESORIOS MILITARES":[["314999","Fabricación de banderas y otros productos textiles no clasificados en otra parte"]],
+  "ARTISTAS, ESCRITORES Y TECNICOS INDEPENDIENTES":[["711510","Artistas, escritores y técnicos independientes"]],
+  "ASESORIA EN INVERSIONES":[["523910","Asesoría en inversiones"]],
+  "ASOCIACIONES Y ORGANIZACIONES CIVILES":[["813230","Asociaciones y organizaciones civiles"]],
+  "BANQUETES":[["722320","Servicios de preparación de alimentos para ocasiones especiales"]],
+  "BASCULA":[["435319","Comercio al por mayor de maquinaria y equipo para otros servicios y para activid"]],
+  "BAZAR":[["466410","Comercio al por menor de artículos usados"]],
+  "BEBIDAS SIN CONTENIDO ALCOHOLICO":[["461213","Comercio al por menor de bebidas no alcohólicas y hielo"],["311930","Elaboración de concentrados, polvos, jarabes y esencias de sabor para bebidas"],["311215","Elaboración de malta"]],
+  "BICICLETAS":[["465213","Comercio al por menor de bicicletas y triciclos"]],
+  "BILLETES DE LOTERÍA":[["713291","Venta de billetes de lotería, pronósticos deportivos y otros boletos de sorteo"]],
+  "BISUTERIA":[["339913","Joyería de metales y piedras no preciosos y de otros materiales"]],
+  "BLANCOS":[["463112","Comercio al por menor de blancos"]],
+  "BODEGA (EXCLUSIVA PARA ANEXO)":[["431110","Comercio al por mayor de abarrotes"]],
+  "BOLERIA":[["812130","Sanitarios públicos y Bolerías"]],
+  "BONETERIA Y MERCERÍA":[["463113","Comercio al por menor de artículos de mercería y bonetería"]],
+  "BOTANAS":[["311910","Elaboración de botanas"]],
+  "BUFETES JURIDICOS":[["541110","Bufetes jurídicos"]],
+  "CAFE":[["311921","Beneficio del café"],["311922","Elaboración de café tostado y molido destinado a unidades que lo comercializan"],["311923","Elaboración de café instantáneo"]],
+  "CAFETERIA":[["311923","Elaboración de café instantáneo"]],
+  "CAJA POPULAR":[["522320","Cajas, cooperativas y sociedades financieras de ahorro y préstamo popular"]],
+  "CAJAS DE CARTON, MATERIAL DE EMPAQUE":[["434223","Comercio al por mayor de envases en general, papel y cartón para la industria"]],
+  "CAMARA DE REFRIGERACION":[["333412","Fabricación de equipo de refrigeración industrial y comercial"]],
+  "CAMPISMO":[["433313","Comercio al por mayor de artículos y aparatos deportivos"]],
+  "CARBON Y LEÑA":[["468419","Comercio al por menor de otros combustibles"]],
+  "CARNE EMPACADA":[["461121","Comercio al por menor de carnes rojas"],["112110","Explotación de bovinos para la producción de carne"],["112131","Explotación de bovinos para la producción conjunta de leche y carne"],["112139","Explotación de bovinos para otros propósitos"]],
+  "CARNES FRIAS":[["461150","Comercio al por menor de leche, otros productos lácteos y embutidos"],["311613","Elaboración de embutidos y otras conservas de carne de ganado, aves y otros anim"],["311614","Elaboración de manteca y otras grasas animales comestibles"]],
+  "CARNICERIA":[["461121","Comercio al por menor de carne de ganado y cerdo en tiendas especializadas"],["431121","Comercio al por mayor de carnes rojas"]],
+  "CARNITAS Y CHICHARRÓN":[["461190","Comercio al por menor de otros alimentos"]],
+  "CASA DE BOLSA":[["521110","Banca central"]],
+  "CASA DE CAMBIO":[["522310","Casas de cambio y centros cambiarios"],["523121","Casas de cambio"]],
+  "CASA DE HUESPEDES":[["721311","Pensiones y casas de huéspedes"]],
+  "CENTRO DE COPIADO":[["561431","Servicios de fotocopiado, fax y afines"]],
+  "CENTRO DE DISTRIBUCION DE MASA Y TORTILLA":[["461190","Comercio al por menor de otros alimentos"]],
+  "CENTRO TERAPEUTICO":[["621311","Consultorios de quiropráctica del sector privado"]],
+  "CEREALES Y SEMILLAS":[["461140","Comercio al por menor de semillas y granos alimenticios, especias y chiles secos"]],
+  "CERRAJERIA":[["811491","Cerrajerías"]],
+  "CLASES DE CORTE Y CONFECCION":[["611511","Escuelas del sector público dedicadas a la enseñanza de oficios"]],
+  "CLASES DE MANUALIDADES":[["611512","Escuelas del sector público dedicadas a la enseñanza de oficios"]],
+  "CLASES DE REGULARIZACION":[["611691","Servicios de profesores particulares"]],
+  "COMERCIO AL POR MAYOR DE BLANCOS":[["432112","Comercio al por mayor de blancos"]],
+  "COMERCIO AL POR MAYOR DE CUEROS Y PIELES":[["432113","Comercio al por mayor de cueros y pieles"]],
+  "COMERCIO AL POR MAYOR DE DISCOS Y CASETES":[["433311","Comercio al por mayor de grabaciones de audio y video en medios físicos"]],
+  "COMERCIO AL POR MAYOR DE FIBRAS, HILOS Y TELAS":[["432111","Comercio al por mayor de fibras, hilos y telas"]],
+  "COMERCIO AL POR MAYOR DE LIBROS":[["433420","Comercio al por mayor de libros"]],
+  "COMERCIO AL POR MAYOR DE PINTURA":[["434226","Comercio al por mayor de pintura"]],
+  "COMERCIO AL POR MAYOR DE VIDRIOS Y ESPEJOS":[["434227","Comercio al por mayor de vidrios y espejos"]],
+  "COMPRA VENTA AL POR MAYOR DE MOBILIARIO, EQUIPO E INSTRUMENTAL MEDICO":[["435313","Comercio al por mayor de mobiliario, equipo e instrumental médico y de laborator"]],
+  "COMPRA VENTA CERRADURAS INTELIGENTES Y CAJAS FUERTES":[["467111","Comercio al por menor en ferreterías y tlapalerías"]],
+  "COMPRA VENTA DE SISTEMA DE COMPUTO Y CONSUMIBLES":[["466211","Comercio al por menor de mobiliario, equipo y accesorios de cómputo"]],
+  "COMPRA Y VENTA DE LLANTAS":[["468213","Comercio al por menor de llantas y cámaras para automóviles, camionetas y camion"]],
+  "CONSERVAS ALIMENTICIAS":[["431193","Comercio al por mayor de conservas alimenticias"]],
+  "CONSULTORIOS":[["621111","Consultorios de medicina general del sector privado"]],
+  "CREMERIA":[["431160","Comercio al por mayor de leche y otros productos lácteos"]],
+  "CRISTALERIA":[["466114","Comercio al por menor de cristalería, loza y utensilios de cocina"]],
+  "CULTIVO DE JITOMATE O TOMATE ROJO":[["111211","Cultivo de jitomate o tomate rojo"]],
+  "DEPILACION CON CERA":[["812110","Salones y clínicas de belleza y peluquerías"]],
+  "DEPORTISTAS PROFESIONALES":[["711211","Deportistas profesionales"]],
+  "DESECHABLES":[["434240","Comercio al por mayor de artículos desechables"]],
+  "DISEÑO DE ANUNCIOS A MANO Y POR COMPUTADORA":[["541510","Servicios de diseño de sistemas de cómputo y servicios relacionados"]],
+  "DISEÑO DE ANUNCIOS, ROTULOS, LONAS Y TOLDOS LUMINOSOS":[["541430","Diseño gráfico"]],
+  "DISEÑO E IMPRESION":[["541430","Diseño gráfico"]],
+  "DISTRIBUCION DE PELICULAS Y AUDIOVISUALES":[["512120","Distribución de películas y de otros materiales audiovisuales"]],
+  "DULCERIA":[["461160","Comercio al por menor de dulces y materias  primas para repostería"]],
+  "EDICION DE DIRECTORIOS Y DE LISTAS DE CORREO":[["513141","Edición de directorios y listas de correo en formato electrónico"]],
+  "EDICION DE LIBROS":[["513131","Edición de libros en formato electrónico"]],
+  "EDICION DE LIBROS INTEGRADA CON LA IMPRESION":[["513132","Edición de libros integrada con la impresión"]],
+  "EDICION DE PERIODICOS":[["513111","Edición de periódicos en formato electrónico"]],
+  "EDICION DE REVISTAS Y OTRAS PUBLICACIONES PERIODICAS":[["513122","Edición de revistas y otras publicaciones periódicas integradas con la impresión"]],
+  "ELEVADORES":[["238290","Otras instalaciones y equipamiento en construcciones"]],
+  "EMPAQUES EN GENERAL":[["467116","Comercio al por menor de materiales para la construcción en tiendas de autoservi"]],
+  "EQUIPO DE ILUMINACION":[["434225","Comercio al por mayor de equipo y material eléctrico"]],
+  "EQUIPO MEDICO":[["435313","Comercio al por mayor de mobiliario, equipo e instrumental médico y de laborator"]],
+  "ESCALERA ELECTRICA":[["435419","Comercio al por mayor de otra maquinaria y equipo de uso general"]],
+  "ESTETICA":[["812110","Salones y clínicas de belleza y peluquerías"]],
+  "ESTUDIOS FOTOGRAFICOS":[["541920","Servicio de fotografía y videograbación"]],
+  "EXP. DE AGUA PURIFICADA":[["311212","Purificación y embotellado de agua"]],
+  "EXP. DE POLLO":[["461122","Comercio al por menor de carne de ave"]],
+  "EXPENDIO EN ENVASE CERRADO DE ALCOHOL PARA USO MEDICO":[["464111","Farmacias sin minisúper"]],
+  "FARMACIA":[["464111","Comercio al por menor de medicamentos"],["433110","Comercio al por mayor de productos farmacéuticos"]],
+  "FERTILIZANTES":[["434111","Comercio al por mayor de fertilizantes, plaguicidas y semillas para siembra"]],
+  "FLORERIA":[["466312","Comercio al por menor de plantas y flores naturales"]],
+  "FLORICULTURA EN INVERNADEROS Y OTRAS ESTRUCTURAS AGRICOLAS PROTEGIDAS":[["111422","Floricultura en invernaderos y otras estructuras agrícolas protegidas"]],
+  "FONDA":[["722511","Restaurantes con servicio de preparación de alimentos a la carta o de comida cor"]],
+  "FOTOCOPIADORA":[["561431","Servicios de fotocopiado, fax y afines"]],
+  "FRUTAS Y VERDURAS":[["461130","Comercio al por menor de frutas y verduras frescas"]],
+  "FUENTE DE SODAS":[["722518","Restaurantes que preparan otro tipo de alimentos para llevar"]],
+  "GALERIA DE ARTE":[["466313","Comercio al por menor de antigüedades y obras de arte"]],
+  "GRANJA":[["115119","Otros servicios relacionados con la agricultura"],["112211","Explotación de porcinos en granja"],["112212","Explotación de porcinos en traspatio"],["112311","Explotación de gallinas para la producción de huevo fértil"],["112312","Explotación de gallinas para la producción de huevo para plato"],["112320","Explotación de pollos para la producción de carne"],["112330","Explotación de guajolotes o pavos"],["112390","Explotación de otras aves para producción de carne y huevo"],["112410","Explotación de ovinos"],["112420","Explotación de caprinos"]],
+  "HUEVO":[["112312","Explotación de gallinas para la producción de huevo para plato"]],
+  "IMPRENTA":[["435220","Comercio al por mayor de maquinaria y equipo para la industria manufacturera"]],
+  "INCUBADORA":[["435313","Comercio al por mayor de mobiliario, equipo e instrumental médico y de laborator"],["112340","Producción de aves en incubadora"]],
+  "INMOBILIARIA":[["531210","Inmobiliarias y corredores de bienes raíces"]],
+  "INMOBILIARIAS Y CORREDORES DE BIENES RAICES":[["531319","Otros servicios relacionados con los servicios inmobiliarios"]],
+  "INST. BANCARIA Y DE CDTO.":[["493111","Almacenes generales de depósito"]],
+  "INST. DE EQUIPO DE SONIDO":[["436112","Comercio al por mayor de partes y refacciones nuevas para automóviles, camioneta"]],
+  "INSTALACION DE ACCESORIOS AUTOMOTRICES":[["468111","Comercio al por menor de automóviles y camionetas nuevos"]],
+  "JOYERIA":[["339912","Orfebrería y joyería de metales y piedras preciosos"]],
+  "JUEGOS MECANICOS Y ELECTROMECANICOS":[["713111","Parques de diversiones y temáticos del sector privado"]],
+  "JUGUETERIA":[["465212","Comercio al por menor de juguetes"]],
+  "LAB. FOTOGRAFICO":[["812910","Servicios de revelado e impresión de fotografías"]],
+  "LABORATORIO":[["541380","Servicios de laboratorios de pruebas"]],
+  "LABORATORIO DENTAL":[["339111","Fabricación de equipo no electrónico para uso médico, dental y para laboratorio"]],
+  "LAVADEROS PUBLICOS":[["812210","Lavanderías y tintorerías"]],
+  "LECHERIA":[["112120","Explotación de bovinos para la producción de leche"],["311511","Elaboración de leche líquida"],["311512","Elaboración de leche en polvo, condensada y evaporada, y de fórmulas"],["311513","Elaboración de derivados y fermentos lácteos"]],
+  "LENCERIA":[["463213","Comercio al por menor de lencería"]],
+  "LIBRERIAS":[["465312","Comercio al por menor de libros"]],
+  "MANUALIDADES":[["466319","Comercio al por menor de otros artículos para la decoración de interiores"]],
+  "MANUFACTURA DOMICILIARIA":[["339999","Otras industrias manufactureras"]],
+  "MAQUINARIA EN GENERAL":[["332710","Maquinado de piezas para maquinaria y equipo en general"]],
+  "MAQUINAS TRAGAMONEDAS":[["435319","Comercio al por mayor de maquinaria de equipo para otros servicios y para activi"]],
+  "MARCOS Y MOLDURAS":[["2338350","Realización de trabajos de carpintería en el lugar de la construcción"]],
+  "MARISCOS EN ESTADO NATURAL":[["431123","Comercio al por mayor de pescados y mariscos"],["112513","Camaronicultura y acuicultura de otros crustáceos en agua salada"],["112514","Camaronicultura y acuicultura de otros crustáceos en agua dulce"],["112515","Piscicultura en agua dulce"],["112516","Piscicultura en agua dulce"],["112519","Otra acuicultura"]],
+  "MARISCOS PROCESADOS PARA CONSUMO HUMANO":[["431123","Comercio al por mayor de pescados y mariscos"]],
+  "MASA Y TORTILLAS":[["311830","Elaboración de tortillas de maíz y molienda de nixtamal"]],
+  "MASAJES TERAPEUTICOS":[["621398","Otros consultorios del sector privado para el cuidado de la salud"]],
+  "MATERIA PRIMA":[["311221","Elaboración de féculas y otros almidones y sus derivados"],["311230","Elaboración de cereales par el desayuno"],["311311","Elaboración de azúcar de caña"],["311319","Elaboración de otros azúcares"],["311140","Elaboración de dulces, chicles, y productos de confitería que no sean de chocola"],["311350","Elaboración de chocolate y productos de chocolate"]],
+  "MATERIAL DISCOGRAFICO":[["465211","Comercio al por menor de grabaciones de audio y video en medios físicos"]],
+  "MATERIAL ELECTRICO":[["434225","Comercio al por mayor de equipo y material eléctrico"]],
+  "MATERIALES DE CONSTRUCCION":[["467116","Comercio al por menor de materiales para la construcción en general"]],
+  "MESA DE BILLAR":[["713991","Billares"]],
+  "MESA DE JUEGO":[["339920","Fabricación de artículos deportivos"]],
+  "MINI-SUPER":[["462111","Comercio al por menor en supermercados"]],
+  "MISCELANEA":[["461110","Comercio al por menor en tiendas de abarrotes, ultramarinos y misceláneas"]],
+  "MUEBLERIAS":[["462210","Comercio al por menor en tiendas departamentales"]],
+  "MUSEO":[["712111","Museos"]],
+  "MUSEOS DEL SECTOR PRIVADO":[["712111","Museos del sector privado"]],
+  "MUSICOS Y CANCIONEROS":[["711131","Cantantes y grupos musicales del sector privado"]],
+  "NEVERIA":[["461170","Comercio al por menor de paletas de hielo y helados"]],
+  "NOTARIAS PUBLICAS":[["541120","Notarías Públicas"]],
+  "OFICINA VIRTUAL":[["517312","Operadores de servicios de telecomunicaciones inalámbricas"]],
+  "OPTICA":[["464121","Comercio al por menor de lentes"]],
+  "OTROS SERVICIOS DE CONSULTORIA CIENTIFICA Y TECNICA":[["541711","Servicios de investigación científica y desarrollo en ciencias naturales y exact"]],
+  "OTROS SERVICIOS DE LIMPIEZA":[["561790","Otros servicios de limpieza"]],
+  "PALENQUE":[["531115","Alquiles sin intermediación de teatros, estadios, auditorios y similares"]],
+  "PALETERIA":[["431199","Comercio al por mayor de otros alimentos"],["311520","Elaboración de helados y paletas"]],
+  "PANADERIA":[["311812","Panificación tradicional"]],
+  "PAPELERIA":[["433410","Comercio al por mayor de artículos de papelería"]],
+  "PASTELERIA Y POSTRES":[["431180","Comercio al por mayor de dulces y materias primas para repostería"],["311991","Elaboración de gelatinas y otros postres en polvo"],["311992","Elaboración de levadura"]],
+  "PAÑALES":[["422111","Comercio al por menor en supermercados"]],
+  "PINTURAS":[["467113","Comercio al por menor de pintura"]],
+  "PISOS":[["467112","Comercio al por menor de pisos y recubrimientos cerámicos"],["238330","Colocación de pisos flexibles y de madera"],["238340","Colocación de pisos cerámicos y azulejos"]],
+  "PISOS, AZULEJOS Y ACCESORIOS PARA BAÑO":[["434211","Comercio al por mayor de cemento, tabique y grava"]],
+  "PISTA DE PATINAJE (HIELO)":[["713943","Centros de acondicionamiento físico del sector privado"]],
+  "PISTAS DE ACTIVIDADES DEPORTIVAS Y DE ESPARCIMIENTO":[["713944","Centros de acondicionamiento físico del sector público"]],
+  "PLANCHADURÍA":[["812210","Lavanderías y tintorerías"]],
+  "PLASTICOS":[["434240","Comercio al por mayor de artículos desechables"]],
+  "PODOLOGIA":[["611211","Escuelas de educación técnica superior del sector privado"]],
+  "PRESTACION DE SERVICIOS":[["523910","Asesoría en inversiones"]],
+  "PRESTAMOS":[["522320","Cajas, cooperativas y sociedades financieras de ahorro y préstamo popular"]],
+  "PRESTAMOS PRENDARIOS":[["5232110","Banca múltiple"]],
+  "PRODUCTOS AGROPECUARIOS":[["115113","Beneficios de productos agrícolas"],["115119","Otros servicios relacionados con la agricultura"],["311212","Elaboración de harina de trigo"],["311213","Elaboración de harina de maíz"],["311214","Elaboración de harina de otros productos agrícolas"],["461130","Comercio al por menor de frutas y verduras frescas"]],
+  "PRODUCTOS DE REPOSTERIA":[["461160","Comercio al por menor de dulces y materias primas para repostería"]],
+  "PRODUCTOS LACTEOS":[["461150","Comercio al por menor de leche, otros productos lácteos y embutidos"]],
+  "PRODUCTOS QUIMICOS DE LIMPIEZA":[["467115","Comercio al por menor de artículos para la limpieza"]],
+  "PRONOSTICOS DEPORTIVOS":[["713291","Venta de billetes de lotería, pronósticos deportivos y otros boletos de sorteo"]],
+  "REFACCIONARIA":[["436112","Comercio  al  por  mayor  de  partes  y  refacciones  nuevas para automóviles, c"]],
+  "RENTA DE CANCHAS":[["531115","Alquiles sin intermediación de teatros, estadios, auditorios y similares"]],
+  "RENTA DE SISTEMA DE COMPUTO":[["532420","Alquiler de equipo de cómputo y de otras máquinas y mobiliario de oficina"]],
+  "REPARACION DE PARTES MECANICAS E HIDRAULICAS":[["811111","Reparación mecánica en general de automóviles y camiones"]],
+  "ROPA":[["315221","Confección en serie de ropa interior y de dormir"]],
+  "ROSTICERIA":[["722517","Restaurantes con servicio de preparación de pizzas, hamburguesas, hot dogs y pol"]],
+  "ROTULISTAS":[["541890","Servicios de rotulación y otros servicios de publicidad"]],
+  "ROTULOS":[["541810","Agencias de publicidad"]],
+  "SERVICIOS AUTOMOTRICES":[["811113","Rectificación de partes de motor de automóviles y camiones"]],
+  "SERVICIOS FUNERARIOS":[["812310","Servicios funerarios"]],
+  "TALLER DE APARATOS ELECTRODOMESTICOS":[["811211","Reparación y mantenimiento de equipo electrónico de uso doméstico"]],
+  "TALLER DE APARATOS ELECTRONICOS Y ELECTRICOS":[["811219","Reparación y mantenimiento de otro equipo electrónico y de equipo de precisión"]],
+  "TALLER DE COSTURA":[["611511","Escuelas del sector público dedicadas a la enseñanza de oficios"],["314991","Confección, bordado y deshilado de productos textiles"]],
+  "TALLER MECANICO":[["811199","Otros servicios de reparación y mantenimiento de automóviles y camiones"]],
+  "TAPICERÍA":[["811410","Tapizado y retapizado de muebles para el hogar"],["811122","Tapicería de automóviles y camiones"]],
+  "TELAS":[["314991","Confección, bordado y deshilado de productos textiles"]],
+  "TELEFONOS CELULARES":[["466212","Comercio al por menor de teléfonos y otros aparatos de comunicación"]],
+  "TERRAZA CAMPESTRE CON MUSICA VIVO Y PISTA BAILE":[["531113","Alquiler sin intermediación de salones para fiestas y convenciones"]],
+  "TIENDA DE AUTOSERVICIO":[["462111","Comercio al por menor de supermercados"]],
+  "TIENDA DEPARTAMENTAL":[["462210","Comercio al por menor en tiendas departamentales"]],
+  "TLAPALERIA":[["467111","Comercio al por menor en ferreterías y tlapalerías"]],
+  "TRANSFORMACION DE ALIMENTOS":[["311999","Elaboración de otros alimentos procesados y envasados"]],
+  "VENTA DE ARTICULOS EROTICOS-SEXUALES (SEX SHOP)":[["455919","Comercio al por menor de otros artículos de uso personal"]],
+  "VENTA DE DISFRACES VESTIMENTA REGIONAL Y VESTIDOS DE NOVIA":[["463214","Comercio al por menor de disfraces, trajes típicos y vestidos de novia"]],
+  "VENTA DE HERRAJES EN GENERAL":[["434221","Comercio al por mayor de materiales metálicos para la construcción y la manufact"]],
+  "VETERINARIA":[["541941","Servicios veterinarios para mascotas prestados por el sector privado"]],
+  "VIVERO":[["113211","Viveros forestales"]],
+  "YOGA":[["611621","Escuelas de deporte del sector privado"]]
 };
 
 // ── AUTOCOMPLETE — FUNCIÓN GENÉRICA ─────────────────────────────────────────
 function _acBuscar(q) {
   var q2 = q.toUpperCase().trim();
   if (!q2 || q2.length < 2) return [];
-  var matches = [];
+  var nameSeen = {}, entries = [];
+  function addGiro(name) {
+    if (nameSeen[name]) return;
+    nameSeen[name] = true;
+    var ents = SCIAN_ENT[name];
+    if (ents && ents.length) {
+      ents.forEach(function(e){ entries.push({name:name, code:e[0], desc:e[1]}); });
+    } else {
+      var sd = SCIAN_DATA[name];
+      entries.push({name:name, code:sd?sd[0]:'', desc:sd?sd[1]:''});
+    }
+  }
   // 1. Sinónimos exactos
-  if (SINONIMOS[q2]) SINONIMOS[q2].forEach(function(s){ if(matches.indexOf(s)<0) matches.push(s); });
-  // 2. Sinónimos parciales -- la query contenida en alguna clave
+  if (SINONIMOS[q2]) SINONIMOS[q2].forEach(function(s){ addGiro(s); });
+  // 2. Sinónimos parciales
   var claves = Object.keys(SINONIMOS);
   for (var i=0; i<claves.length; i++) {
     var k = claves[i];
-    if (k !== q2 && k.indexOf(q2) >= 0) {
-      SINONIMOS[k].forEach(function(s){ if(matches.indexOf(s)<0) matches.push(s); });
-    }
+    if (k !== q2 && k.indexOf(q2) >= 0) SINONIMOS[k].forEach(function(s){ addGiro(s); });
   }
-  // 3. Coincidencia parcial en nombres oficiales de giro
-  GIROS_ZPN_LISTA.forEach(function(g) {
-    if(g.indexOf(q2) >= 0 && matches.indexOf(g) < 0) matches.push(g);
-  });
-  // 4. Búsqueda en descripción SCIAN + descripciones múltiples (para queries de 4+ chars)
+  // 3. Coincidencia parcial en nombre oficial
+  GIROS_ZPN_LISTA.forEach(function(g){ if(g.indexOf(q2) >= 0) addGiro(g); });
+  // 4. Búsqueda en descripciones SCIAN (4+ chars)
   if (q2.length >= 4) {
-    var girosScian = Object.keys(SCIAN_DATA);
-    for (var j=0; j<girosScian.length; j++) {
-      var g = girosScian[j];
-      if (matches.indexOf(g) < 0) {
-        var _desc1 = SCIAN_DATA[g][1] ? SCIAN_DATA[g][1].toUpperCase() : '';
-        var _nsArr = SCIAN_NS[g];
-        var _found = (_desc1 && _desc1.indexOf(q2) >= 0);
-        if (!_found && _nsArr) {
-          for (var jj=0; jj<_nsArr.length; jj++) {
-            if (_nsArr[jj].toUpperCase().indexOf(q2) >= 0) { _found=true; break; }
-          }
+    var girosEnt = Object.keys(SCIAN_ENT);
+    for (var j=0; j<girosEnt.length; j++) {
+      var g = girosEnt[j];
+      if (!nameSeen[g]) {
+        var ents2 = SCIAN_ENT[g];
+        for (var jj=0; jj<ents2.length; jj++) {
+          if (ents2[jj][1] && ents2[jj][1].toUpperCase().indexOf(q2) >= 0) { addGiro(g); break; }
         }
-        if (_found) matches.push(g);
       }
     }
   }
-  return matches.slice(0, 18);
+  return entries.slice(0, 25);
 }
 
 function _acRender(matches, listId, onClickFn) {
   var list = document.getElementById(listId);
   if (!list) return;
   if (!matches.length) { list.style.display = 'none'; return; }
-  list.innerHTML = matches.map(function(m, i) {
-    var safe = m.replace(/'/g, "\'");
-    return '<div class="ac-item" onmousedown="'+onClickFn+'(\''+safe+'\')" data-idx="'+i+'">'+m+'</div>';
+  function _esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  list.innerHTML = matches.map(function(r, i) {
+    return '<div class="ac-item" data-fn="'+onClickFn+'" data-name="'+_esc(r.name)+'" data-code="'+_esc(r.code||'')+'" data-desc="'+_esc(r.desc||'')+'" data-idx="'+i+'">'
+      +'<span class="ac-code">'+(r.code?_esc(r.code):'')+'</span>'
+      +'<div class="ac-text"><span class="ac-name">'+_esc(r.name)+'</span>'
+      +(r.desc?'<span class="ac-desc">'+_esc(r.desc)+'</span>':'')
+      +'</div></div>';
   }).join('');
+  list.onmousedown = function(ev) {
+    var item = ev.target.closest ? ev.target.closest('.ac-item') : (function(el){ while(el && !el.classList.contains('ac-item')) el=el.parentElement; return el; })(ev.target);
+    if (item) window[item.getAttribute('data-fn')](item.getAttribute('data-name')||'', item.getAttribute('data-code')||'', item.getAttribute('data-desc')||'');
+  };
   list.style.display = 'block';
 }
 
@@ -3673,7 +3688,7 @@ function _acKeyNav(e, listId, selectFn) {
     items.forEach(function(el){ el.classList.remove('ac-active'); });
     items[prev].classList.add('ac-active');
   } else if (e.key === 'Enter') {
-    if (cur) { e.preventDefault(); window[selectFn](cur.textContent); }
+    if (cur) { e.preventDefault(); window[selectFn](cur.getAttribute('data-name')||'', cur.getAttribute('data-code')||'', cur.getAttribute('data-desc')||''); }
   } else if (e.key === 'Escape') {
     list.style.display = 'none';
   }
@@ -3687,17 +3702,18 @@ function acFiltrar() {
 }
 function acOcultar() { setTimeout(function(){ var l=document.getElementById('ac-list-zpn'); if(l) l.style.display='none'; }, 200); }
 function acKeyDown(e) { _acKeyNav(e, 'ac-list-zpn', 'acSeleccionar'); }
-function acSeleccionar(val) {
+function acSeleccionar(val, code, desc) {
   document.getElementById('inp-giro-zpn').value = val;
   document.getElementById('inp-giro-zpn').classList.add('has-value');
   document.getElementById('sel-giro-zpn').value = val;
   var list = document.getElementById('ac-list-zpn'); if(list) list.style.display='none';
-  var sd = SCIAN_DATA[val];
   var si = document.getElementById('scian-info-zpn');
   if (si) {
-    if (sd) {
-      document.getElementById('scian-id-zpn').textContent = sd[0];
-      document.getElementById('scian-nom-zpn').textContent = sd[1];
+    var c = code || (SCIAN_DATA[val] ? SCIAN_DATA[val][0] : '');
+    var d = desc || (SCIAN_DATA[val] ? SCIAN_DATA[val][1] : '');
+    if (c) {
+      document.getElementById('scian-id-zpn').textContent = c;
+      document.getElementById('scian-nom-zpn').textContent = d;
       si.style.display = '';
     } else { si.style.display = 'none'; }
   }
@@ -3711,17 +3727,18 @@ function acFiltrarGDL() {
 }
 function acOcultarGDL() { setTimeout(function(){ var l=document.getElementById('ac-list-gdl'); if(l) l.style.display='none'; }, 200); }
 function acKeyDownGDL(e) { _acKeyNav(e, 'ac-list-gdl', 'acSeleccionarGDL'); }
-function acSeleccionarGDL(val) {
+function acSeleccionarGDL(val, code, desc) {
   document.getElementById('inp-giro-gdl').value = val;
   document.getElementById('inp-giro-gdl').classList.add('has-value');
   document.getElementById('sel-giro-gdl').value = val;
   var list = document.getElementById('ac-list-gdl'); if(list) list.style.display='none';
-  var sd = SCIAN_DATA[val];
   var si = document.getElementById('scian-info-gdl');
   if (si) {
-    if (sd) {
-      document.getElementById('scian-id-gdl').textContent = sd[0];
-      document.getElementById('scian-nom-gdl').textContent = sd[1];
+    var c = code || (SCIAN_DATA[val] ? SCIAN_DATA[val][0] : '');
+    var d = desc || (SCIAN_DATA[val] ? SCIAN_DATA[val][1] : '');
+    if (c) {
+      document.getElementById('scian-id-gdl').textContent = c;
+      document.getElementById('scian-nom-gdl').textContent = d;
       si.style.display = '';
     } else { si.style.display = 'none'; }
   }
@@ -3735,7 +3752,7 @@ function acFiltrarGen() {
 }
 function acOcultarGen() { setTimeout(function(){ var l=document.getElementById('ac-list-gen'); if(l) l.style.display='none'; }, 200); }
 function acKeyDownGen(e) { _acKeyNav(e, 'ac-list-gen', 'acSeleccionarGen'); }
-function acSeleccionarGen(val) {
+function acSeleccionarGen(val, code, desc) {
   var inp = document.getElementById('inp-giro-gen');
   inp.value = val;
   inp.classList.add('has-value');

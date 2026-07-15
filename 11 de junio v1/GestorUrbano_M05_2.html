@@ -664,6 +664,9 @@ function generarChecklist() {
     if (numViv >= 15) {
       movilidadReq = true;
       movilidadMotivo = `${numViv} viviendas (umbral ≥15) — Art. 35 Regl. Movilidad ZPN`;
+    } else if (['comercio','oficinas','industria','mixto'].includes(tipoUso)) {
+      movilidadReq = true;
+      movilidadMotivo = `Uso ${tipoUso} — Dictamen de Integración Vial requerido por DTUDE · Art. 45 Regl. Movilidad ZPN`;
     }
   } else if (['TLQ','TLA','TON'].includes(munActual)) {
     if (numViv >= 15) {
@@ -725,10 +728,12 @@ function generarChecklist() {
     titulo: 'Zona patrimonial / Centro Histórico',
     texto: 'Se requiere Dictamen Técnico favorable de INAH, INBA o Secretaría de Cultura del Estado de Jalisco, según la catalogación del inmueble, previo a cualquier intervención.'
   });
-  if (munActual === 'ZPN' && esCambioUso) alertas.push({
+  if (munActual === 'ZPN' && (esCambioUso || tipoUso === 'industria')) alertas.push({
     tipo: 'warn',
     titulo: 'Evaluación de Impacto Ambiental — ZPN',
-    texto: 'Cambio de uso de suelo requiere autorización de la Dirección de Medio Ambiente de Zapopan (Arts. 20-25 Código Ambiental ZPN) como prerequisito de la licencia de construcción.'
+    texto: esCambioUso
+      ? 'Cambio de uso de suelo requiere autorización de la Dirección de Medio Ambiente de Zapopan (Arts. 20-25 Código Ambiental ZPN) como prerequisito de la licencia de construcción.'
+      : 'Uso industrial requiere estudio de impacto ambiental preventivo (Art. 54 Fracc. IV Regl. Urbanización ZPN) · Obtener autorización de la Dirección de Medio Ambiente ZPN como prerequisito de la licencia de construcción.'
   });
   if (['TLQ','TLA','TON'].includes(munActual) && esCambioUso) alertas.push({
     tipo: 'warn',
@@ -754,7 +759,7 @@ function generarChecklist() {
       ? docsCondMun({ esMoral, esPromotorFisico, esCondominio, esArrendamiento,
           movilidadReq, esCambioUso, esHistorico, numViv, mun: munActual })
       : docsCondZPN({ esMoral, esPromotorFisico, esCondominio, esArrendamiento,
-          movilidadReq, esCambioUso, esHistorico, numViv });
+          movilidadReq, esCambioUso, esHistorico, numViv, tipoUso });
 
   // Renderizar
   renderSecuencia(esUnifamiliar, esCondominio);
@@ -1003,14 +1008,25 @@ function docsCondZPN(ctx) {
     docs.push({ nombre: 'Contrato de arrendamiento vigente', detalle: 'Con autorización expresa del propietario para realizar las modificaciones · Art. 47 Regl. Construcción ZPN', pres: 'Original + 1 copia' });
   }
 
-  // Movilidad ≥15 viviendas — Art. 35 Regl. Movilidad ZPN
+  // Movilidad — Art. 35 (habitacional ≥15) o Art. 45 (usos no habitacionales) Regl. Movilidad ZPN
   if (ctx.movilidadReq) {
-    docs.push({ nombre: 'Dictamen de Impacto Vial', detalle: `${ctx.numViv} viviendas — umbral ≥15 · Dirección de Movilidad y Transporte ZPN · Art. 35 Regl. Movilidad Zapopan · Tramitar ANTES de la licencia de construcción`, pres: 'Copia' });
+    const detMov = (ctx.numViv >= 15)
+      ? `${ctx.numViv} viviendas — umbral ≥15 · Dirección de Movilidad y Transporte ZPN · Art. 35 Regl. Movilidad Zapopan · Tramitar ANTES de la licencia de construcción`
+      : `Uso ${ctx.tipoUso} — Dictamen de entradas, salidas e integración vial · Dirección de Movilidad y Transporte ZPN · Art. 45 Regl. Movilidad Zapopan · Tramitar ANTES de la licencia de construcción`;
+    docs.push({ nombre: 'Dictamen de Integración Vial / Impacto al Tránsito', detalle: detMov, pres: 'Copia' });
   }
 
-  // Cambio de uso — Art. 20 y 25 Código Ambiental ZPN
-  if (ctx.esCambioUso) {
-    docs.push({ nombre: 'Evaluación de Impacto Ambiental', detalle: 'Dirección de Medio Ambiente Zapopan · Arts. 20 y 25 Código Ambiental ZPN · La autorización ambiental es PRERREQUISITO de la licencia de construcción — debe obtenerse antes de solicitarla', pres: 'Copia' });
+  // Impacto Ambiental: cambio de uso (Art. 20-25 Código Ambiental ZPN) o uso industrial (Art. 54 Fracc. IV Regl. Urbanización ZPN)
+  if (ctx.esCambioUso || ctx.tipoUso === 'industria') {
+    const detAmb = ctx.esCambioUso
+      ? 'Dirección de Medio Ambiente Zapopan · Arts. 20 y 25 Código Ambiental ZPN · La autorización ambiental es PRERREQUISITO de la licencia de construcción — debe obtenerse antes de solicitarla'
+      : 'Uso industrial · Art. 54 Fracc. IV Regl. Urbanización ZPN · Estudio de impacto ambiental preventivo · Dirección de Medio Ambiente Zapopan · La autorización ambiental es PRERREQUISITO de la licencia de construcción';
+    docs.push({ nombre: 'Evaluación de Impacto Ambiental', detalle: detAmb, pres: 'Copia' });
+  }
+
+  // Drenaje separado — usos no habitacionales — condición DTUDE ZPN
+  if (['comercio','oficinas','industria','mixto'].includes(ctx.tipoUso)) {
+    docs.push({ nombre: 'Memoria técnica: drenaje separado y pozo de absorción', detalle: 'Sistema de drenaje separado (aguas negras / pluviales) · Pozo de absorción · Línea de demasías · Requerido por DTUDE conforme al Regl. Urbanización ZPN · Incluir en planos ejecutivos y memoria técnica del proyecto', pres: 'Incluido en planos ejecutivos' });
   }
 
   // Zona patrimonial

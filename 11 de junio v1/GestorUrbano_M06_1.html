@@ -1823,6 +1823,22 @@ function renderResultado(giro, mun, sup, tramiteLabel) {
     total += 57;
     dHtml += '<div class="fee-row"><div class="fee-label">Impreso o digital de licencia<div class="fundamento">Art. 74 Fracc. I num. 14, Ley Ingresos GDL 2026</div></div><div class="fee-val">$618</div></div>';
     total += 618;
+  } else if (mun === 'ZPN') {
+    dHtml += '<div class="fee-row"><div class="fee-label">Cédula de licencia municipal para funcionamiento<div class="fundamento">Art. 119 Fracc. I inciso h), Ley Ingresos ZPN 2026</div></div><div class="fee-val">$309</div></div>';
+    total += 309;
+  } else if (mun === 'TLQ') {
+    dHtml += '<div class="fee-row"><div class="fee-label">Formas impresas (solicitud / reposición de licencia)<div class="fundamento">Art. 118 Fracc. I inciso a), Ley Ingresos TLQ 2026</div></div><div class="fee-val">$240</div></div>';
+    total += 240;
+  } else if (mun === 'TLA') {
+    dHtml += '<div class="fee-row"><div class="fee-label">Forma de solicitud de licencia<div class="fundamento">Art. 144 Fracc. I inciso a), Ley Ingresos TLA 2026</div></div><div class="fee-val">$197</div></div>';
+    total += 197;
+    dHtml += '<div class="fee-row"><div class="fee-label">Cédula municipal de licencia de giro<div class="fundamento">Art. 144 Fracc. I inciso b), Ley Ingresos TLA 2026</div></div><div class="fee-val">$472</div></div>';
+    total += 472;
+  } else if (mun === 'TON') {
+    dHtml += '<div class="fee-row"><div class="fee-label">Forma de solicitud de licencia<div class="fundamento">Art. 61, Ley Ingresos TON 2026 — verificar monto vigente en tesorería Tonalá</div></div><div class="fee-val">$79</div></div>';
+    total += 79;
+    dHtml += '<div class="fee-row"><div class="fee-label">Tarjeta / Cédula impresa de licencia<div class="fundamento">Art. 91, Ley Ingresos TON 2026 — verificar monto vigente en tesorería Tonalá</div></div><div class="fee-val">$231</div></div>';
+    total += 231;
   }
   if (hayDerecho && tarAlc) {
     dHtml += '<div class="fee-row"><div class="fee-label">Derecho de licencia de giro (anual)<div class="fundamento">'+tarAlc.art+'</div></div><div class="fee-val">'+fmt(tarAlc.tarifa)+'</div></div>';

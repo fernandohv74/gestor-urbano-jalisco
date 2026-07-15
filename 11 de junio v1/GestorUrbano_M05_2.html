@@ -673,12 +673,15 @@ function generarChecklist() {
     }
   } else if (['TLQ','TLA','TON'].includes(munActual)) {
     const munNMov = {TLQ:'Tlaquepaque',TLA:'Tlajomulco',TON:'Tonalá'}[munActual];
+    const artMovRef = {TLQ:'Art. 28 Regl. Movilidad Tlaquepaque',TLA:'Art. 56 Regl. Movilidad Tlajomulco',TON:'Art. 31 Fracc. III Regl. Movilidad Tonalá'}[munActual];
     if (numViv >= 15) {
       movilidadReq = true;
-      movilidadMotivo = `${numViv} viviendas — verificar umbral aplicable con Dirección de Movilidad ${munNMov} (referencia supletoria: ≥15 viviendas)`;
+      movilidadMotivo = `${numViv} viviendas — umbral ≥15 · verificar con Dirección de Movilidad ${munNMov} · ref: ${artMovRef}`;
     } else if (['comercio','oficinas','industria','mixto'].includes(tipoUso)) {
       movilidadReq = true;
-      movilidadMotivo = `Uso ${tipoUso} — verificar requisito de estudio de integración vial con Dirección de Movilidad ${munNMov} (marco supletorio: Regl. Movilidad Jalisco)`;
+      movilidadMotivo = munActual === 'TON'
+        ? `Uso ${tipoUso} — verificar requisito de dictamen de movilidad con Dirección de Movilidad ${munNMov} · ${artMovRef}`
+        : `Uso ${tipoUso} — Dictamen de integración vial y/o impacto al tránsito · ${artMovRef}`;
     }
   }
 
@@ -746,13 +749,23 @@ function generarChecklist() {
       ? 'Cambio de uso de suelo requiere autorización de la Dirección de Medio Ambiente de Zapopan (Arts. 20-25 Código Ambiental ZPN) como prerequisito de la licencia de construcción.'
       : 'Uso industrial requiere estudio de impacto ambiental preventivo (Art. 54 Fracc. IV Regl. Urbanización ZPN) · Obtener autorización de la Dirección de Medio Ambiente ZPN como prerequisito de la licencia de construcción.'
   });
-  if (['TLQ','TLA','TON'].includes(munActual) && (esCambioUso || tipoUso === 'industria' || sup > 3500 || niveles > 6)) alertas.push({
-    tipo: 'warn',
-    titulo: `Evaluación de Impacto Ambiental — ${munN3}`,
-    texto: esCambioUso
-      ? `Cambio de uso de suelo puede requerir dictamen ambiental previo de la Dirección de Medio Ambiente de ${munN3}. Verificar con la dependencia antes de iniciar trámite.`
-      : `Uso ${tipoUso}${sup > 3500 ? ` · ${sup.toLocaleString()} m²` : ''}${niveles > 6 ? ` · ${niveles} niveles` : ''} — puede requerir evaluación de impacto ambiental · Verificar con la Dirección de Medio Ambiente de ${munN3} antes de iniciar trámite.`
-  });
+  const _esUsNoHab3 = ['comercio','oficinas','industria','mixto'].includes(tipoUso);
+  const _eiaReqTLA = munActual === 'TLA' && _esUsNoHab3 && sup > 500;
+  if (['TLQ','TLA','TON'].includes(munActual) && (esCambioUso || tipoUso === 'industria' || sup > 3500 || niveles > 6 || _eiaReqTLA)) {
+    const _artEiaMun = munActual === 'TLA'
+      ? (_eiaReqTLA ? 'Art. 27 Fracc. I Regl. Protección Ambiental Tlajomulco (uso no habitacional >500 m²)' : 'Regl. Protección Ambiental Tlajomulco')
+      : munActual === 'TLQ' ? 'Art. 20 Regl. MA Tlaquepaque (desarrollos inmobiliarios / cambio de uso)'
+      : 'Art. 77 Fracc. IV Regl. Construcción Tonalá (por remisión a ley estatal)';
+    alertas.push({
+      tipo: 'warn',
+      titulo: `Evaluación de Impacto Ambiental — ${munN3}`,
+      texto: esCambioUso
+        ? `Cambio de uso de suelo requiere dictamen ambiental previo · ${_artEiaMun} · Tramitar con Dirección de Medio Ambiente de ${munN3} antes de iniciar trámite.`
+        : _eiaReqTLA
+          ? `Uso no habitacional con ${sup.toLocaleString()} m² de construcción — requiere dictamen de impacto ambiental en sentido favorable o condicionado · ${_artEiaMun} · Tramitar con Dirección de Medio Ambiente Tlajomulco antes de la licencia de construcción.`
+          : `Uso ${tipoUso}${sup > 3500 ? ` · ${sup.toLocaleString()} m²` : ''}${niveles > 6 ? ` · ${niveles} niveles` : ''} — puede requerir evaluación de impacto ambiental · ${_artEiaMun} · Verificar con la Dirección de Medio Ambiente de ${munN3} antes de iniciar trámite.`
+    });
+  }
 
   // ── Documentos base ──
   const isMun3 = ['TLQ','TLA','TON'].includes(munActual);
@@ -1119,16 +1132,27 @@ function docsCondMun(ctx) {
   }
 
   if (ctx.movilidadReq) {
+    const _artMovMun = {TLQ:'Art. 28 Regl. Movilidad Tlaquepaque',TLA:'Art. 56 Regl. Movilidad Tlajomulco',TON:'Art. 31 Fracc. III Regl. Movilidad Tonalá'}[ctx.mun];
     const detMovMun = (ctx.numViv >= 15)
-      ? `${ctx.numViv} viviendas · Verificar umbral y dependencia responsable con la ${dep} · Tramitar ANTES de la licencia de construcción`
-      : `Uso ${ctx.tipoUso} — verificar requisito de estudio de integración vial con la ${dep} · Marco supletorio: Regl. Movilidad Jalisco · Tramitar ANTES de la licencia de construcción`;
-    docs.push({ nombre: 'Dictamen de Impacto Vial o Movilidad', detalle: detMovMun, pres: 'Copia' });
+      ? `${ctx.numViv} viviendas — umbral ≥15 · ${_artMovMun} · Dirección de Movilidad ${munN} · Tramitar ANTES de la licencia de construcción`
+      : ctx.mun === 'TON'
+        ? `Uso ${ctx.tipoUso} — verificar con Dirección de Movilidad Tonalá · ${_artMovMun} · Tramitar ANTES de la licencia de construcción`
+        : `Uso ${ctx.tipoUso} — Dictamen de integración vial y/o impacto al tránsito · ${_artMovMun} · Dirección de Movilidad ${munN} · Tramitar ANTES de la licencia de construcción`;
+    docs.push({ nombre: 'Dictamen de Integración Vial / Impacto al Tránsito', detalle: detMovMun, pres: 'Copia' });
   }
 
-  if (ctx.esCambioUso || ctx.tipoUso === 'industria' || ctx.sup > 3500 || ctx.niveles > 6) {
+  const _esUsNoHabMun = ['comercio','oficinas','industria','mixto'].includes(ctx.tipoUso);
+  const _eiaReqTLADoc = ctx.mun === 'TLA' && _esUsNoHabMun && ctx.sup > 500;
+  if (ctx.esCambioUso || ctx.tipoUso === 'industria' || ctx.sup > 3500 || ctx.niveles > 6 || _eiaReqTLADoc) {
+    const _artEiaMunDoc = ctx.mun === 'TLA'
+      ? (_eiaReqTLADoc ? 'Art. 27 Fracc. I Regl. Protección Ambiental Tlajomulco (uso no habitacional >500 m²)' : 'Regl. Protección Ambiental Tlajomulco')
+      : ctx.mun === 'TLQ' ? 'Art. 20 Regl. MA Tlaquepaque'
+      : 'Art. 77 Fracc. IV Regl. Construcción Tonalá';
     const detAmbMun = ctx.esCambioUso
-      ? `Cambio de uso de suelo puede requerir autorización de la Dirección de Medio Ambiente de ${munN} como prerequisito · Verificar con la ${dep}`
-      : `Uso ${ctx.tipoUso}${ctx.sup > 3500 ? ` · ${(ctx.sup||0).toLocaleString()} m²` : ''}${ctx.niveles > 6 ? ` · ${ctx.niveles} niveles` : ''} — puede requerir evaluación de impacto ambiental · Verificar con la Dirección de Medio Ambiente de ${munN} antes de iniciar trámite`;
+      ? `Cambio de uso de suelo requiere dictamen ambiental previo · ${_artEiaMunDoc} · Dirección de Medio Ambiente ${munN}`
+      : _eiaReqTLADoc
+        ? `Uso no habitacional con ${(ctx.sup||0).toLocaleString()} m² — requiere dictamen de impacto ambiental favorable o condicionado · ${_artEiaMunDoc} · Dirección de Medio Ambiente Tlajomulco · Tramitar antes de la licencia de construcción`
+        : `Uso ${ctx.tipoUso}${ctx.sup > 3500 ? ` · ${(ctx.sup||0).toLocaleString()} m²` : ''}${ctx.niveles > 6 ? ` · ${ctx.niveles} niveles` : ''} — puede requerir evaluación de impacto ambiental · ${_artEiaMunDoc} · Verificar con la Dirección de Medio Ambiente de ${munN}`;
     docs.push({ nombre: 'Dictamen / Evaluación ambiental', detalle: detAmbMun, pres: 'Copia' });
   }
 

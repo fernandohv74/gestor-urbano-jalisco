@@ -2140,10 +2140,10 @@ function leerDeepLink() {
   if (giroNom) {
     setTimeout(function() {
       if (munNom === 'ZPN') {
-        acSeleccionar(giroNom);
+        acSeleccionar(giroNom, d.giroId||'', '');
         setTimeout(function() { calcularZPN(); }, 150);
       } else if (munNom === 'GDL') {
-        acSeleccionarGDL(giroNom);
+        acSeleccionarGDL(giroNom, d.giroId||'', '');
         setTimeout(function() { calcularGDL(); }, 150);
       } else {
         var inp = document.getElementById('inp-giro-gen');
@@ -2201,10 +2201,10 @@ function guToggleTheme() {
 var SINONIMOS = {
   // Comida y bebidas
   'TAQUERIA':          ['ALIMENTOS PARA CONSUMO INMEDIATO','ALIMENTOS PARA LLEVAR','RESTAURANTE'],
-  'TACOS':             ['ALIMENTOS PARA CONSUMO INMEDIATO','ALIMENTOS PARA LLEVAR'],
+  'TACOS':             ['ALIMENTOS PARA CONSUMO INMEDIATO','ALIMENTOS PARA LLEVAR','RESTAURANTE'],
   'TAQUITOS':          ['ALIMENTOS PARA CONSUMO INMEDIATO','ALIMENTOS PARA LLEVAR'],
-  'TORTAS':            ['ALIMENTOS PARA CONSUMO INMEDIATO','ALIMENTOS PARA LLEVAR'],
-  'TORTA':             ['ALIMENTOS PARA CONSUMO INMEDIATO','ALIMENTOS PARA LLEVAR'],
+  'TORTAS':            ['ALIMENTOS PARA CONSUMO INMEDIATO','ALIMENTOS PARA LLEVAR','RESTAURANTE'],
+  'TORTA':             ['ALIMENTOS PARA CONSUMO INMEDIATO','ALIMENTOS PARA LLEVAR','RESTAURANTE'],
   'LONCHE':            ['ALIMENTOS PARA CONSUMO INMEDIATO','ALIMENTOS PARA LLEVAR'],
   'LONCHERIA':         ['ALIMENTOS PARA CONSUMO INMEDIATO','ALIMENTOS PARA LLEVAR'],
   'BIRRIERIA':         ['ALIMENTOS PARA CONSUMO INMEDIATO','RESTAURANTE'],
@@ -3430,6 +3430,7 @@ var SCIAN_ENT = {
   "ASESORIA EN INVERSIONES":[["523910","Asesoría en inversiones"]],
   "ASOCIACIONES Y ORGANIZACIONES CIVILES":[["813230","Asociaciones y organizaciones civiles"]],
   "BANQUETES":[["722320","Servicios de preparación de alimentos para ocasiones especiales"]],
+  "BAR EN RESTAURANTE":[["722412","Bares, cantinas y similares"]],
   "BASCULA":[["435319","Comercio al por mayor de maquinaria y equipo para otros servicios y para activid"]],
   "BAZAR":[["466410","Comercio al por menor de artículos usados"]],
   "BEBIDAS SIN CONTENIDO ALCOHOLICO":[["461213","Comercio al por menor de bebidas no alcohólicas y hielo"],["311930","Elaboración de concentrados, polvos, jarabes y esencias de sabor para bebidas"],["311215","Elaboración de malta"]],
@@ -3584,6 +3585,7 @@ var SCIAN_ENT = {
   "RENTA DE CANCHAS":[["531115","Alquiles sin intermediación de teatros, estadios, auditorios y similares"]],
   "RENTA DE SISTEMA DE COMPUTO":[["532420","Alquiler de equipo de cómputo y de otras máquinas y mobiliario de oficina"]],
   "REPARACION DE PARTES MECANICAS E HIDRAULICAS":[["811111","Reparación mecánica en general de automóviles y camiones"]],
+  "RESTAURANTE":[["722511","Restaurantes con servicio de preparación de alimentos a la carta o de comida corrida"],["722512","Restaurantes con servicio de preparación de pescados y mariscos"],["722513","Restaurantes con servicio de preparación de antojitos"],["722514","Restaurantes con servicio de preparación de tacos y tortas"],["722515","Cafeterías, fuentes de sodas, neverías, refresquerías y similares"],["722516","Restaurantes de autoservicio"],["722517","Restaurantes con servicio de preparación de pizzas, hamburguesas, hot dogs y pollos asados"],["722518","Restaurantes que preparan otro tipo de alimentos para llevar"],["722519","Servicios de preparación y venta de alimentos en puestos de venta callejeros y similares"],["722320","Servicios de preparación de alimentos para ocasiones especiales"],["722330","Servicios de preparación de alimentos en unidades móviles"],["722310","Servicios de comedor para empresas e instituciones"]],
   "ROPA":[["315221","Confección en serie de ropa interior y de dormir"]],
   "ROSTICERIA":[["722517","Restaurantes con servicio de preparación de pizzas, hamburguesas, hot dogs y pol"]],
   "ROTULISTAS":[["541890","Servicios de rotulación y otros servicios de publicidad"]],

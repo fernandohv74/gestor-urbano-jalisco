@@ -1782,12 +1782,11 @@ function renderResultado(giro, mun, sup, tramiteLabel) {
   if (!giro.alcohol) {
     var artRef = mun==='GDL' ? 'Art. 6 Fracc. j, Ley de Ingresos GDL 2026' : 'Transitorio b y c, Ley de Ingresos ZPN 2026';
     ccfHtml = '<details class="ccf-details">'
-      + '<summary>&#9432; Sin derecho de licencia municipal</summary>'
+      + '<summary>&#9432; Derecho de licencia sin costo — el municipio no puede cobrarlo</summary>'
       + '<div class="ccf-body">'
-      + 'Este giro está sujeto al <strong>Convenio de Coordinación Fiscal</strong> ('+ artRef +'). '
-      + 'El municipio no puede cobrar un derecho de licencia porque el negocio ya tributa al SAT (IVA/ISR). '
-      + '<br><br><strong>Lo que esto significa:</strong> no se paga el derecho de licencia en Tesorería; '
-      + 'el costo real de apertura está en los trámites previos (Uso de Suelo, Protección Civil, dictamenes, etc.).'
+      + 'Este tipo de giro ya tributa al SAT (IVA/ISR), por lo que el municipio <strong>no puede cobrar un derecho de licencia adicional</strong>. '
+      + 'Así lo establece el <strong>Convenio de Coordinación Fiscal</strong> ('+ artRef +'). '
+      + '<br><br>El gasto de apertura está en los trámites previos: Uso de Suelo, Protección Civil y dictámenes.'
       + '</div></details>';
   } else if (tarAlc && tarAlc.tarifa === 0) {
     alertHtml = '<div class="alert-box alert-info">&#9432; <strong>Exento de derechos de licencia municipal</strong> - ' + tarAlc.art + '</div>';

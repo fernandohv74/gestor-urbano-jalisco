@@ -6675,47 +6675,56 @@ async function m10LlamarClaude(base64, mimeType, nombre){
     `- Municipio: ${mun}`,
     `- Zonificación: ${zona.uso||zona.clave||'—'}`,
     zona.uso_descripcion ? `- Descripción: ${zona.uso_descripcion}` : '',
-    `- COS/iCOS máximo: ${zona.cos||'—'}`,
-    `- CUS/iCUS máximo: ${zona.cus||'—'}`,
+    `- COS/iCOS máximo (norma): ${zona.cos||'—'}`,
+    `- CUS/iCUS máximo (norma): ${zona.cus||'—'}`,
     `- Niveles máximos: ${zona.niveles||'—'}`,
     zona.lote_min   ? `- Lote mínimo: ${zona.lote_min} m²`   : '',
     zona.altura_max ? `- Altura máxima: ${zona.altura_max} m` : '',
     zona.retranqueo ? `- Retranqueo: ${zona.retranqueo}`      : '',
     zona.frente_min ? `- Frente mínimo: ${zona.frente_min} m` : '',
-    supReal         ? `- Superficie REAL del terreno (ingresada por el usuario): ${supReal} m²` : '',
+    supReal ? `- Superficie REAL del terreno (ingresada por el usuario): ${supReal} m²` : '',
   ].filter(Boolean).join('\n');
 
   let usosContexto;
   if(tieneListaOficial){
     usosContexto = `\nUsos PERMITIDOS en esta zona: ${usosP.join(', ')}`;
     if(usosC.length) usosContexto += `\nUsos CONDICIONADOS: ${usosC.join(', ')}`;
-    usosContexto += '\n(Lista oficial PDU — cruce exacto posible)';
+    usosContexto += '\n(Lista oficial PDU)';
   } else {
     usosContexto = `\nNo hay lista de usos disponible para ${mun} — infiere por la clave "${zona.uso||zona.clave||'—'}" y marca fuente_usos="inferido".`;
   }
 
   const supInstruccion = supReal
-    ? `\n\nVERIFICACIÓN DE ÁREAS Y CÁLCULO DE COS/CUS:
+    ? `\n\nEXTRACCIÓN DE ÁREAS DEL CUADRO DE ÁREAS Y CÁLCULO DE COS/iCOS · CUS/iCUS:
 El usuario indica que el terreno REAL mide ${supReal} m².
-Busca el CUADRO DE ÁREAS (solapa o tabla) del plano y extrae estos valores NUMÉRICOS:
-  a) Superficie total del TERRENO declarada en el plano (m²) → "superficie_plano"
-  b) Superficie de PLANTA BAJA / área de desplante (m²) → "superficie_pb_m2"
-  c) Superficie TOTAL CONSTRUIDA sumando todos los niveles (m²) → "superficie_total_construida_m2"
-  d) Número de NIVELES indicados en el plano → "niveles_plano"
 
-Con la superficie REAL del terreno (${supReal} m²) calcula:
-  COS/iCOS = superficie_pb_m2 ÷ ${supReal}  (norma máx: ${zona.cos||'—'})
-  CUS/iCUS = superficie_total_construida_m2 ÷ ${supReal}  (norma máx: ${zona.cus||'—'})
+En el cuadro de áreas (solapa o tabla de superficies) del plano localiza y extrae:
+  a) Superficie total del TERRENO declarada en el plano → "superficie_plano"
+  b) COS: Área en Planta Baja EXISTENTE (lo que ya está construido, a conservar)
+     Si es proyecto 100% nuevo, este valor es 0 → "cos_pb_m2"
+  c) iCOS: Área en Planta Baja NUEVA (lo que se va a construir en este proyecto) → "icos_pb_m2"
+  d) CUS: Superficie total EXISTENTE en todos los niveles (a conservar)
+     Si es proyecto 100% nuevo, este valor es 0 → "cus_total_m2"
+  e) iCUS: Superficie total NUEVA en todos los niveles de este proyecto → "icus_total_m2"
+  f) Número de niveles indicados → "niveles_plano"
 
-Si no puedes leer un valor del cuadro de áreas, devuélvelo como null (no lo inventes).`
-    : '\n(No se ingresó superficie real — omite campos de áreas; solo indica si el plano tiene cuadro de áreas legible)';
+La norma se verifica así:
+  iCOS Total = cos_pb_m2 + icos_pb_m2 (planta baja total)
+  iCUS Total = cus_total_m2 + icus_total_m2 (construcción total)
+  Con el terreno REAL de ${supReal} m²:
+    iCOS Total / ${supReal} ≤ ${zona.cos||'—'} (norma)
+    iCUS Total / ${supReal} ≤ ${zona.cus||'—'} (norma)
+
+Si el cuadro de áreas no distingue entre existente y nuevo, coloca todo en los campos "nuevo" (icos_pb_m2 e icus_total_m2) y deja los "existente" en 0.
+Si no puedes leer un valor, devuélvelo como null (no inventes números).`
+    : '\n(Sin superficie real — omite campos de áreas; solo describe si el plano tiene cuadro de áreas legible)';
 
   const system = `Eres un dictaminador de normativa urbana del AMG (Jalisco, México).
-Analiza el plano adjunto y responde tres verificaciones:
+Analiza el plano adjunto y responde:
 
-1. USO DEL SUELO: ¿Qué tipo de proyecto es? ¿Está permitido en esta zona?
-2. PARÁMETROS Y ÁREAS: Extrae valores numéricos del cuadro de áreas y calcula COS/CUS si hay terreno real.
-3. SUPERFICIE DEL TERRENO: ¿El terreno declarado en el plano coincide con el real?
+1. USO DEL SUELO: ¿Qué tipo de proyecto es? ¿Está permitido en la zona?
+2. PARÁMETROS Y ÁREAS: Extrae del cuadro de áreas los valores de COS/iCOS/CUS/iCUS y calcula los totales.
+3. SUPERFICIE DEL TERRENO: ¿La superficie declarada en el plano coincide con la real?
 
 Responde ÚNICAMENTE con JSON puro, sin markdown ni texto adicional:
 {
@@ -6723,14 +6732,16 @@ Responde ÚNICAMENTE con JSON puro, sin markdown ni texto adicional:
   "uso_clave": "clave PDU aplicable o null",
   "uso_permitido": true,
   "uso_condicionado": false,
-  "razon_uso": "frase directa máx 120 chars — por qué sí o no",
+  "razon_uso": "frase directa máx 120 chars",
   "fuente_usos": "lista_oficial|inferido",
   "resultado": "cuadra|parcialmente|no_cuadra",
-  "resumen": "frase sobre parámetros o áreas máx 120 chars",
+  "resumen": "frase sobre los parámetros máx 120 chars",
   "observaciones": ["obs 1", "obs 2"],
   "superficie_plano": null,
-  "superficie_pb_m2": null,
-  "superficie_total_construida_m2": null,
+  "cos_pb_m2": 0,
+  "icos_pb_m2": null,
+  "cus_total_m2": 0,
+  "icus_total_m2": null,
   "niveles_plano": null,
   "superficie_cuadra": "si|no|no_disponible",
   "nota_superficie": ""
@@ -6802,80 +6813,96 @@ function m10RenderizarVeredicto(r, esReapertura){
     ? `<div style="margin-top:8px;padding:6px 10px;background:var(--bg3);border-radius:6px;border-left:3px solid var(--yellow);font-size:11px;color:var(--text3);line-height:1.5">⚠️ Sin lista oficial — resultado inferido por IA. Verifica en el PDU local.</div>`
     : '';
 
-  // ── Chip 2: PARÁMETROS CON CÁLCULO COS/CUS ───────────────────────
+  // ── Chip 2: PARÁMETROS CON COS+iCOS / CUS+iCUS ───────────────────
   const supReal = r._superficie_real;
-  const pb      = typeof r.superficie_pb_m2 === 'number' ? r.superficie_pb_m2 : null;
-  const total   = typeof r.superficie_total_construida_m2 === 'number' ? r.superficie_total_construida_m2 : null;
-  const niv     = typeof r.niveles_plano === 'number' ? r.niveles_plano : null;
-
   const esGDL   = municipioActual === 'guadalajara';
   const lblCOS  = esGDL ? 'iCOS' : 'COS';
   const lblCUS  = esGDL ? 'iCUS' : 'CUS';
-
   const cosNorm = parseFloat(zona.cos);
   const cusNorm = parseFloat(zona.cus);
   const nivNorm = parseInt(zona.niveles);
 
+  // Leer campos nuevos (cos_pb_m2/icos_pb_m2) con fallback a campos anteriores
+  const cos_pb   = typeof r.cos_pb_m2  === 'number' ? r.cos_pb_m2  : 0;
+  const icos_pb  = typeof r.icos_pb_m2 === 'number' ? r.icos_pb_m2
+                 : (typeof r.superficie_pb_m2 === 'number' ? r.superficie_pb_m2 : null);
+  const cus_tot  = typeof r.cus_total_m2  === 'number' ? r.cus_total_m2  : 0;
+  const icus_tot = typeof r.icus_total_m2 === 'number' ? r.icus_total_m2
+                 : (typeof r.superficie_total_construida_m2 === 'number' ? r.superficie_total_construida_m2 : null);
+  const niv = typeof r.niveles_plano === 'number' ? r.niveles_plano : null;
+
+  const pb_total    = icos_pb !== null ? cos_pb + icos_pb : null;
+  const total_constr = icus_tot !== null ? cus_tot + icus_tot : null;
+
   let chip2HTML;
-  if(supReal && (pb !== null || total !== null)){
-    // Modo calculado: tenemos terreno real + al menos un área del plano
-    const cosCalc = pb !== null    ? +(pb    / supReal).toFixed(3) : null;
-    const cusCalc = total !== null ? +(total / supReal).toFixed(3) : null;
-    const fmtN = (v, d=2) => v !== null ? v.toFixed(d) : '—';
+  if(supReal && (pb_total !== null || total_constr !== null)){
+    const icosCalc = pb_total    !== null ? +(pb_total    / supReal).toFixed(3) : null;
+    const icusCalc = total_constr !== null ? +(total_constr / supReal).toFixed(3) : null;
 
-    const cosOk = (cosCalc !== null && !isNaN(cosNorm)) ? cosCalc <= cosNorm : null;
-    const cusOk = (cusCalc !== null && !isNaN(cusNorm)) ? cusCalc <= cusNorm : null;
-    const nivOk = (niv !== null && !isNaN(nivNorm))     ? niv <= nivNorm     : null;
+    const icosOk = (icosCalc !== null && !isNaN(cosNorm)) ? icosCalc <= cosNorm : null;
+    const icusOk = (icusCalc !== null && !isNaN(cusNorm)) ? icusCalc <= cusNorm : null;
+    const nivOk  = (niv !== null && !isNaN(nivNorm))     ? niv <= nivNorm      : null;
 
-    const hayExceso = cosOk === false || cusOk === false || nivOk === false;
-    const hayDatos  = cosCalc !== null || cusCalc !== null;
-    const todoOk    = hayDatos && cosOk !== false && cusOk !== false && nivOk !== false;
+    const hayExceso = icosOk === false || icusOk === false || nivOk === false;
+    const hayDatos  = icosCalc !== null || icusCalc !== null;
+    const todoOk    = hayDatos && icosOk !== false && icusOk !== false && nivOk !== false;
 
     const bg2  = hayExceso ? 'var(--sem-r-bg)'  : (!todoOk ? 'var(--sem-am-bg)' : 'var(--sem-v-bg)');
     const bd2  = hayExceso ? '#DC262633' : (!todoOk ? '#D9770633' : '#16A34A33');
-    const txt2 = hayExceso ? 'var(--sem-r-txt)' : (!todoOk ? 'var(--yellow)'    : 'var(--sem-v-txt)');
+    const txt2 = hayExceso ? 'var(--sem-r-txt)' : (!todoOk ? 'var(--yellow)' : 'var(--sem-v-txt)');
     const ico2 = hayExceso ? '🚫' : (!todoOk ? '⚠️' : '✅');
-    const lbl2 = hayExceso ? 'Parámetros FUERA de la norma' : (!todoOk ? 'Datos parciales — verificar' : 'Parámetros dentro de la norma');
+    const lbl2 = hayExceso ? 'Parámetros FUERA de la norma'
+               : (!todoOk ? 'Datos parciales — verificar' : 'Parámetros dentro de la norma');
 
-    const thStyle = 'padding:4px 8px;text-align:left;font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;border-bottom:1px solid var(--border2);white-space:nowrap';
-    const tdStyle = 'padding:6px 8px;font-size:12px;border-bottom:1px solid var(--border2)';
-
-    const cosExceso = (cosCalc !== null && !isNaN(cosNorm) && cosCalc > cosNorm)
-      ? ` (+${(cosCalc - cosNorm).toFixed(3)})` : '';
-    const cusExceso = (cusCalc !== null && !isNaN(cusNorm) && cusCalc > cusNorm)
-      ? ` (+${(cusCalc - cusNorm).toFixed(3)})` : '';
-    const nivExceso = (niv !== null && !isNaN(nivNorm) && niv > nivNorm)
-      ? ` (+${niv - nivNorm})` : '';
+    const thS = 'padding:4px 8px;text-align:left;font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;border-bottom:1px solid var(--border2);white-space:nowrap';
+    const tdS = 'padding:6px 8px;font-size:12px;vertical-align:top';
+    const tdSb = tdS + ';border-bottom:1px solid var(--border2)';
 
     const filaIcono = ok => ok === null ? '⚠️' : ok ? '✅' : '🚫';
-    const filaLabel = (ok, exceso) => ok === null ? 'Sin norma'
-      : ok ? 'CUMPLE' : `EXCEDIDO${exceso}`;
+    const filaColor = ok => ok === null ? 'var(--text3)' : ok ? 'var(--sem-v-txt)' : 'var(--sem-r-txt)';
+    const filaLabel = (ok, calc, norm) => {
+      if(ok === null) return 'Sin norma';
+      const exceso = calc > norm ? ` (+${(calc-norm).toFixed(3)})` : '';
+      return ok ? 'CUMPLE' : `EXCEDIDO${exceso}`;
+    };
 
-    const filaCOS = cosCalc !== null ? `
+    // Detalle de pb: "Existente: X m² + Nuevo: Y m² = Z m²" o solo "Nueva: Y m²"
+    const detalleIcos = pb_total !== null
+      ? (cos_pb > 0
+          ? `Ex: ${cos_pb} m² + Nvo: ${icos_pb} m² = ${pb_total} m²`
+          : `PB: ${icos_pb} m²`)
+      : '—';
+    const detalleIcus = total_constr !== null
+      ? (cus_tot > 0
+          ? `Ex: ${cus_tot} m² + Nvo: ${icus_tot} m² = ${total_constr} m²`
+          : `Total: ${icus_tot} m²`)
+      : '—';
+
+    const filaIcos = icosCalc !== null ? `
       <tr>
-        <td style="${tdStyle};font-weight:700;color:var(--text1)">${lblCOS}</td>
-        <td style="${tdStyle};color:var(--text2)">${!isNaN(cosNorm) ? cosNorm.toFixed(2) : '—'}</td>
-        <td style="${tdStyle};font-weight:600;color:var(--text1)">${fmtN(cosCalc,3)}</td>
-        <td style="${tdStyle};color:var(--text3)">${pb !== null ? pb + ' m²' : '—'}</td>
-        <td style="${tdStyle};white-space:nowrap">${filaIcono(cosOk)} <span style="font-size:11px;font-weight:600;color:${cosOk===null?'var(--text3)':cosOk?'var(--sem-v-txt)':'var(--sem-r-txt)'}">${filaLabel(cosOk, cosExceso)}</span></td>
+        <td style="${tdSb};font-weight:700;color:var(--text1)">${lblCOS} Total</td>
+        <td style="${tdSb};color:var(--text2)">${!isNaN(cosNorm)?cosNorm.toFixed(2):'—'}</td>
+        <td style="${tdSb};font-weight:600;color:var(--text1)">${icosCalc.toFixed(3)}</td>
+        <td style="${tdSb};color:var(--text3);font-size:11px">${detalleIcos}</td>
+        <td style="${tdSb};white-space:nowrap">${filaIcono(icosOk)} <span style="font-size:11px;font-weight:600;color:${filaColor(icosOk)}">${filaLabel(icosOk,icosCalc,cosNorm)}</span></td>
       </tr>` : '';
 
-    const filaCUS = cusCalc !== null ? `
+    const filaIcus = icusCalc !== null ? `
       <tr>
-        <td style="${tdStyle};font-weight:700;color:var(--text1)">${lblCUS}</td>
-        <td style="${tdStyle};color:var(--text2)">${!isNaN(cusNorm) ? cusNorm.toFixed(2) : '—'}</td>
-        <td style="${tdStyle};font-weight:600;color:var(--text1)">${fmtN(cusCalc,3)}</td>
-        <td style="${tdStyle};color:var(--text3)">${total !== null ? total + ' m²' : '—'}</td>
-        <td style="${tdStyle};white-space:nowrap">${filaIcono(cusOk)} <span style="font-size:11px;font-weight:600;color:${cusOk===null?'var(--text3)':cusOk?'var(--sem-v-txt)':'var(--sem-r-txt)'}">${filaLabel(cusOk, cusExceso)}</span></td>
+        <td style="${tdSb};font-weight:700;color:var(--text1)">${lblCUS} Total</td>
+        <td style="${tdSb};color:var(--text2)">${!isNaN(cusNorm)?cusNorm.toFixed(2):'—'}</td>
+        <td style="${tdSb};font-weight:600;color:var(--text1)">${icusCalc.toFixed(3)}</td>
+        <td style="${tdSb};color:var(--text3);font-size:11px">${detalleIcus}</td>
+        <td style="${tdSb};white-space:nowrap">${filaIcono(icusOk)} <span style="font-size:11px;font-weight:600;color:${filaColor(icusOk)}">${filaLabel(icusOk,icusCalc,cusNorm)}</span></td>
       </tr>` : '';
 
     const filaNiv = niv !== null ? `
       <tr>
-        <td style="${tdStyle.replace('border-bottom:1px solid var(--border2);','')};font-weight:700;color:var(--text1)">Niveles</td>
-        <td style="${tdStyle.replace('border-bottom:1px solid var(--border2);','')};color:var(--text2)">${!isNaN(nivNorm) ? nivNorm : '—'}</td>
-        <td style="${tdStyle.replace('border-bottom:1px solid var(--border2);','')};font-weight:600;color:var(--text1)">${niv}</td>
-        <td style="${tdStyle.replace('border-bottom:1px solid var(--border2);','')}"></td>
-        <td style="${tdStyle.replace('border-bottom:1px solid var(--border2);','')};white-space:nowrap">${filaIcono(nivOk)} <span style="font-size:11px;font-weight:600;color:${nivOk===null?'var(--text3)':nivOk?'var(--sem-v-txt)':'var(--sem-r-txt)'}">${filaLabel(nivOk, nivExceso)}</span></td>
+        <td style="${tdS};font-weight:700;color:var(--text1)">Niveles</td>
+        <td style="${tdS};color:var(--text2)">${!isNaN(nivNorm)?nivNorm:'—'}</td>
+        <td style="${tdS};font-weight:600;color:var(--text1)">${niv}</td>
+        <td style="${tdS}"></td>
+        <td style="${tdS};white-space:nowrap">${filaIcono(nivOk)} <span style="font-size:11px;font-weight:600;color:${filaColor(nivOk)}">${nivOk===null?'Sin norma':nivOk?'CUMPLE':`EXCEDIDO (+${niv-nivNorm})`}</span></td>
       </tr>` : '';
 
     chip2HTML = `
@@ -6889,20 +6916,19 @@ function m10RenderizarVeredicto(r, esReapertura){
         <table style="width:100%;border-collapse:collapse">
           <thead>
             <tr>
-              <th style="${thStyle}">Parámetro</th>
-              <th style="${thStyle}">Norma</th>
-              <th style="${thStyle}">Calculado</th>
-              <th style="${thStyle}">Del plano</th>
-              <th style="${thStyle}">Resultado</th>
+              <th style="${thS}">Parámetro</th>
+              <th style="${thS}">Norma</th>
+              <th style="${thS}">Calculado</th>
+              <th style="${thS}">Del cuadro de áreas</th>
+              <th style="${thS}">Resultado</th>
             </tr>
           </thead>
-          <tbody>${filaCOS}${filaCUS}${filaNiv}</tbody>
+          <tbody>${filaIcos}${filaIcus}${filaNiv}</tbody>
         </table>
       </div>
-      ${r.resumen ? '<div style="font-size:11px;color:var(--text3);line-height:1.5;border-top:1px solid var(--border2);padding-top:8px">' + r.resumen + '</div>' : ''}
+      ${r.resumen?'<div style="font-size:11px;color:var(--text3);line-height:1.5;border-top:1px solid var(--border2);padding-top:8px">'+r.resumen+'</div>':''}
     </div>`;
   } else {
-    // Modo genérico (sin supReal o sin valores de áreas del plano)
     const P2 = {
       cuadra:       {bg:'var(--sem-v-bg)', bd:'#16A34A33', txt:'var(--sem-v-txt)', icon:'✅', label:'Parámetros dentro de la norma'},
       parcialmente: {bg:'var(--sem-am-bg)',bd:'#D9770633', txt:'var(--yellow)',     icon:'⚠️', label:'Parámetros con datos insuficientes o parciales'},
@@ -6910,7 +6936,7 @@ function m10RenderizarVeredicto(r, esReapertura){
     };
     const p = P2[r.resultado] || P2.parcialmente;
     const sugerenciaHTML = !supReal
-      ? '<div style="font-size:11px;color:var(--text3);margin-top:8px;border-top:1px solid var(--border2);padding-top:8px">💡 Ingresa la superficie del terreno (m²) para calcular ' + lblCOS + '/' + lblCUS + ' exacto y compararlo con la norma.</div>'
+      ? `<div style="font-size:11px;color:var(--text3);margin-top:8px;border-top:1px solid var(--border2);padding-top:8px">💡 Ingresa la superficie del terreno (m²) para calcular ${lblCOS} Total / ${lblCUS} Total exacto.</div>`
       : '';
     chip2HTML = `
     <div style="background:${p.bg};border:2px solid ${p.bd};border-radius:12px;padding:16px;margin-bottom:10px">
@@ -6919,7 +6945,7 @@ function m10RenderizarVeredicto(r, esReapertura){
         <span style="font-size:20px;line-height:1">${p.icon}</span>
         <span style="font-size:13px;font-weight:700;color:${p.txt}">${p.label}</span>
       </div>
-      ${r.resumen ? '<div style="font-size:12px;color:var(--text2);line-height:1.6">' + r.resumen + '</div>' : ''}
+      ${r.resumen?'<div style="font-size:12px;color:var(--text2);line-height:1.6">'+r.resumen+'</div>':''}
       ${sugerenciaHTML}
     </div>`;
   }
@@ -6932,14 +6958,13 @@ function m10RenderizarVeredicto(r, esReapertura){
     if(r.superficie_cuadra === 'si'){
       sIcon='✅'; sColor='var(--sem-v-txt)'; sBg='var(--sem-v-bg)'; sBd='#16A34A33';
       sTitulo='Superficie del terreno coincide';
-      sDetalle=`Plano: ${supPlano !== null ? supPlano + ' m²' : 'aprox. coincide'} / Real: ${supReal} m²`;
+      sDetalle = `Plano: ${supPlano!==null?supPlano+' m²':'aprox. coincide'} / Real: ${supReal} m²`;
     } else if(r.superficie_cuadra === 'no'){
       sIcon='🚫'; sColor='var(--sem-r-txt)'; sBg='var(--sem-r-bg)'; sBd='#DC262633';
       sTitulo='Superficie del terreno NO coincide';
-      const dif = supPlano !== null ? Math.abs(supPlano - supReal).toFixed(1) : '?';
-      const dir = supPlano !== null ? (supPlano > supReal ? 'el plano declara más' : 'el plano declara menos') : '';
-      sDetalle = `Plano: ${supPlano !== null ? supPlano + ' m²' : '?'} / Real: ${supReal} m²` +
-        (dif !== '?' ? ` (${dir}: ${dif} m²)` : '');
+      const dif = supPlano!==null ? Math.abs(supPlano-supReal).toFixed(1) : '?';
+      const dir = supPlano!==null ? (supPlano>supReal?'el plano declara más':'el plano declara menos') : '';
+      sDetalle = `Plano: ${supPlano!==null?supPlano+' m²':'?'} / Real: ${supReal} m²`+(dif!=='?'?` (${dir}: ${dif} m²)`:'');
     } else {
       sIcon='⚠️'; sColor='var(--yellow)'; sBg='var(--sem-am-bg)'; sBd='#D9770633';
       sTitulo='No se pudo leer la superficie del terreno en el plano';
@@ -6953,7 +6978,7 @@ function m10RenderizarVeredicto(r, esReapertura){
         <span style="font-size:13px;font-weight:700;color:${sColor}">${sTitulo}</span>
       </div>
       <div style="font-size:12px;color:var(--text2);line-height:1.6">${sDetalle}</div>
-      ${r.nota_superficie ? '<div style="font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5">' + r.nota_superficie + '</div>' : ''}
+      ${r.nota_superficie?'<div style="font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5">'+r.nota_superficie+'</div>':''}
     </div>`;
   }
 
@@ -6977,8 +7002,8 @@ function m10RenderizarVeredicto(r, esReapertura){
     </div>
     ${chip2HTML}
     ${supChipHTML}
-    ${obsHTML ? '<div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Observaciones</div><ul style="margin:0;padding-left:18px">' + obsHTML + '</ul></div>' : ''}
-    <div style="display:flex;gap:8px;margin-top:0">
+    ${obsHTML?'<div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Observaciones</div><ul style="margin:0;padding-left:18px">'+obsHTML+'</ul></div>':''}
+    <div style="display:flex;gap:8px">
       <button onclick="m10ResetUpload()"
               style="flex:1;padding:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer">
         Analizar otro plano
@@ -6994,9 +7019,9 @@ function m10RenderizarVeredicto(r, esReapertura){
 
   const nombrePanel = document.getElementById('m10NombrePanel');
   if(nombrePanel){
-    nombrePanel.style.display = '';
+    nombrePanel.style.display='';
     const inp = document.getElementById('m10InputNombre');
-    if(inp && !esReapertura) inp.value = '';
+    if(inp && !esReapertura) inp.value='';
   }
   if(!esReapertura){
     m10GuardarEnHistorial(r);
@@ -7029,9 +7054,9 @@ function m10ExportarVeredicto(){
   const fecha = new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
 
   const histArr = (()=>{ try{ return JSON.parse(localStorage.getItem('gu_m10_historial')||'[]'); }catch(e){ return []; }})();
-  const nombreGuardado = histArr.length ? histArr[0].nombreProyecto : '';
-  const inputNombre = (document.getElementById('m10InputNombre')||{}).value||'';
-  const nombreProyecto = inputNombre.trim() || nombreGuardado || 'Sin nombre';
+  const nombreGuardado  = histArr.length ? histArr[0].nombreProyecto : '';
+  const inputNombre     = (document.getElementById('m10InputNombre')||{}).value||'';
+  const nombreProyecto  = inputNombre.trim() || nombreGuardado || 'Sin nombre';
   const domicilio = window._ultimaDireccion||zona.domicilio||'';
 
   const esGDL  = municipioActual === 'guadalajara';
@@ -7040,49 +7065,57 @@ function m10ExportarVeredicto(){
 
   const usoLabel = r.uso_permitido && !r.uso_condicionado ? 'PERMITIDO'
                  : r.uso_condicionado ? 'CONDICIONADO' : 'NO PERMITIDO';
-  const parLabel = {cuadra:'CUADRA',parcialmente:'PARCIALMENTE',no_cuadra:'NO CUADRA'}[r.resultado]||r.resultado;
   const obs = (r.observaciones||[]).map((o,i)=>`  ${i+1}. ${o}`).join('\n');
 
-  // Sección de COS/CUS calculado
-  const supReal = r._superficie_real;
-  const pb      = typeof r.superficie_pb_m2 === 'number' ? r.superficie_pb_m2 : null;
-  const total   = typeof r.superficie_total_construida_m2 === 'number' ? r.superficie_total_construida_m2 : null;
-  const niv     = typeof r.niveles_plano === 'number' ? r.niveles_plano : null;
+  const supReal   = r._superficie_real;
+  const cos_pb    = typeof r.cos_pb_m2  === 'number' ? r.cos_pb_m2  : 0;
+  const icos_pb   = typeof r.icos_pb_m2 === 'number' ? r.icos_pb_m2
+                  : (typeof r.superficie_pb_m2 === 'number' ? r.superficie_pb_m2 : null);
+  const cus_tot   = typeof r.cus_total_m2  === 'number' ? r.cus_total_m2  : 0;
+  const icus_tot  = typeof r.icus_total_m2 === 'number' ? r.icus_total_m2
+                  : (typeof r.superficie_total_construida_m2 === 'number' ? r.superficie_total_construida_m2 : null);
+  const niv = typeof r.niveles_plano === 'number' ? r.niveles_plano : null;
+
+  const pb_total     = icos_pb !== null ? cos_pb + icos_pb : null;
+  const total_constr = icus_tot !== null ? cus_tot + icus_tot : null;
   const cosNorm = parseFloat(zona.cos);
   const cusNorm = parseFloat(zona.cus);
 
   let calcLineas = '';
-  if(supReal && (pb !== null || total !== null)){
-    const cosCalc = pb    !== null ? +(pb    / supReal).toFixed(3) : null;
-    const cusCalc = total !== null ? +(total / supReal).toFixed(3) : null;
+  if(supReal && (pb_total !== null || total_constr !== null)){
+    const icosCalc = pb_total     !== null ? +(pb_total     / supReal).toFixed(3) : null;
+    const icusCalc = total_constr !== null ? +(total_constr / supReal).toFixed(3) : null;
     const estado = (calc, norm) => {
-      if(calc === null) return '—';
-      if(isNaN(norm)) return `${calc.toFixed(3)} (sin norma)`;
-      return calc <= norm ? `${calc.toFixed(3)} ✓ CUMPLE (norma ${norm})` : `${calc.toFixed(3)} ✗ EXCEDIDO (norma ${norm}, exceso +${(calc-norm).toFixed(3)})`;
+      if(calc===null) return '—';
+      if(isNaN(norm))  return `${calc.toFixed(3)} (sin norma)`;
+      return calc<=norm ? `${calc.toFixed(3)} ✓ CUMPLE (norma ${norm})` : `${calc.toFixed(3)} ✗ EXCEDIDO (norma ${norm}, +${(calc-norm).toFixed(3)})`;
     };
-    const lines = [
-      '',
-      `2. PARÁMETROS CONSTRUCTIVOS — Terreno real: ${supReal} m²`,
-      `   ${lblCOS}  : ${estado(cosCalc, cosNorm)}${pb!==null?' (PB: '+pb+' m²)':''}`,
-      `   ${lblCUS}  : ${estado(cusCalc, cusNorm)}${total!==null?' (total: '+total+' m²)':''}`,
-      niv !== null ? `   Niveles: ${niv}${!isNaN(parseInt(zona.niveles))?' (norma: '+parseInt(zona.niveles)+')':''}` : '',
-      r.resumen ? `   Detalle: ${r.resumen}` : '',
-    ].filter(x=>x!=='');
-    calcLineas = lines.join('\n');
-  } else {
+    const detalleICOS = pb_total!==null
+      ? (cos_pb>0?`Ex: ${cos_pb} m² + Nvo: ${icos_pb} m² = ${pb_total} m²`:`PB nueva: ${icos_pb} m²`):'';
+    const detalleICUS = total_constr!==null
+      ? (cus_tot>0?`Ex: ${cus_tot} m² + Nvo: ${icus_tot} m² = ${total_constr} m²`:`Total nueva: ${icus_tot} m²`):'';
     calcLineas = [
       '',
-      `2. PARÁMETROS CONSTRUCTIVOS`,
+      `2. PARÁMETROS CONSTRUCTIVOS — Terreno real: ${supReal} m²`,
+      `   ${lblCOS} Total: ${estado(icosCalc,cosNorm)}${detalleICOS?'  ('+detalleICOS+')':''}`,
+      `   ${lblCUS} Total: ${estado(icusCalc,cusNorm)}${detalleICUS?'  ('+detalleICUS+')':''}`,
+      niv!==null?`   Niveles   : ${niv}${!isNaN(parseInt(zona.niveles))?' (norma: '+parseInt(zona.niveles)+')':''}`:null,
+      r.resumen?`   Detalle   : ${r.resumen}`:null,
+    ].filter(x=>x!=null).join('\n');
+  } else {
+    const parLabel = {cuadra:'CUADRA',parcialmente:'PARCIALMENTE',no_cuadra:'NO CUADRA'}[r.resultado]||r.resultado;
+    calcLineas = [
+      '',
+      '2. PARÁMETROS CONSTRUCTIVOS',
       `   Resultado: ${parLabel}`,
       `   Detalle  : ${r.resumen||'Sin datos de parámetros en el plano.'}`,
-      !supReal ? `   Nota     : Ingresa la superficie del terreno para calcular ${lblCOS}/${lblCUS} exacto.` : '',
-    ].filter(x=>x!=='').join('\n');
+      !supReal?`   Nota     : Ingresa la superficie del terreno para calcular ${lblCOS}/${lblCUS} exacto.`:null,
+    ].filter(x=>x!=null).join('\n');
   }
 
-  // Sección de superficie del terreno
   let supLineas = '';
   if(supReal){
-    const supPlano = typeof r.superficie_plano === 'number' ? r.superficie_plano+' m²' : 'no detectada';
+    const supPlano = typeof r.superficie_plano==='number'?r.superficie_plano+' m²':'no detectada';
     const supRes   = {si:'COINCIDE',no:'NO COINCIDE',no_disponible:'NO SE PUDO LEER'}[r.superficie_cuadra]||'';
     supLineas = [
       '',
@@ -7090,43 +7123,36 @@ function m10ExportarVeredicto(){
       `   Real (escrituras/predial) : ${supReal} m²`,
       `   Declarada en el plano     : ${supPlano}`,
       `   Resultado                 : ${supRes}`,
-      r.nota_superficie ? `   Nota: ${r.nota_superficie}` : '',
-    ].filter(x=>x!=='').join('\n');
+      r.nota_superficie?`   Nota: ${r.nota_superficie}`:null,
+    ].filter(x=>x!=null).join('\n');
   }
 
   const sep = '─'.repeat(56);
   const fuenteLinea = r.fuente_usos==='inferido'
-    ? '\n* Usos inferidos por IA (sin lista oficial). Verificar en PDU local.'
-    : '';
+    ? '\n* Usos inferidos por IA (sin lista oficial). Verificar en PDU local.' : '';
 
   const txt = [
-    'GESTOR URBANO JALISCO AMG — PRE-DICTAMEN IA (M10)',
-    sep,
-    `Proyecto  : ${nombreProyecto}`,
-    domicilio ? `Domicilio : ${domicilio}` : '',
-    `Fecha     : ${fecha}`,
-    `Municipio : ${mun}`,
-    `Zona      : ${zona.uso||zona.clave||'—'}`,
-    `COS/iCOS máx: ${zona.cos||'—'}  |  CUS/iCUS máx: ${zona.cus||'—'}  |  Niveles: ${zona.niveles||'—'}`,
-    sep,
-    '',
+    'GESTOR URBANO JALISCO AMG — PRE-DICTAMEN IA (M10)',sep,
+    `Proyecto    : ${nombreProyecto}`,
+    domicilio?`Domicilio   : ${domicilio}`:'',
+    `Fecha       : ${fecha}`,
+    `Municipio   : ${mun}`,
+    `Zona        : ${zona.uso||zona.clave||'—'}`,
+    `Norma COS/iCOS máx: ${zona.cos||'—'}  |  CUS/iCUS máx: ${zona.cus||'—'}  |  Niveles: ${zona.niveles||'—'}`,
+    sep,'',
     '1. USO DEL SUELO',
     `   Resultado  : ${usoLabel}`,
     `   Proyecto   : ${r.uso_identificado||'—'}${r.uso_clave?' ('+r.uso_clave+')':''}`,
     `   Razón      : ${r.razon_uso||'—'}`,
     fuenteLinea,
-    obs ? `\n   Observaciones:\n${obs}` : '',
-    calcLineas,
-    supLineas,
-    '',
-    sep,
+    obs?`\n   Observaciones:\n${obs}`:'',
+    calcLineas, supLineas,'',sep,
     'AVISO: Pre-dictamen orientativo generado por IA.',
     'Para validación oficial consultar la Dirección de',
-    'Ordenamiento del Territorio del municipio correspondiente.',
-    sep,
+    'Ordenamiento del Territorio del municipio correspondiente.',sep,
   ].filter(x=>x!==undefined).join('\n');
 
-  const nombreArchivo = nombreProyecto !== 'Sin nombre'
+  const nombreArchivo = nombreProyecto!=='Sin nombre'
     ? nombreProyecto.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]/g,'').replace(/\s+/g,'_')
     : `PreDictamen_${mun}`;
 

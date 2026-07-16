@@ -6518,7 +6518,16 @@ const M10_MODEL = 'claude-sonnet-4-6';
 
 function m10MostrarUpload(){
   const sec=document.getElementById('seccionPlanoM10');
-  if(sec && datosZona) sec.style.display='block';
+  if(!sec || !datosZona) return;
+  sec.style.display='block';
+  // Limpiar análisis del domicilio anterior
+  m10ResetUpload();
+  const sup = document.getElementById('m10InputSuperficie');
+  if(sup) sup.value='';
+  const nom = document.getElementById('m10InputNombre');
+  if(nom) nom.value='';
+  const msg = document.getElementById('m10NombreGuardadoMsg');
+  if(msg) msg.style.display='none';
 }
 
 function m10DragOver(e){

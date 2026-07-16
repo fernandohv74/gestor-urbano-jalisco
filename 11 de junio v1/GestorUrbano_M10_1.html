@@ -6418,166 +6418,206 @@ function m10FileToBase64(file){
 async function m10LlamarClaude(base64, mimeType, nombre){
   const zona = datosZona;
   const mun = ({guadalajara:'Guadalajara',zapopan:'Zapopan',tlajomulco:'Tlajomulco de Zúñiga',tlaquepaque:'San Pedro Tlaquepaque',tonala:'Tonalá'}[municipioActual])||municipioActual;
-  const cos = zona.cos||'—';
-  const cus = zona.cus||'—';
-  const uso = zona.uso||zona.clave||'—';
-  const lote = zona.lote_min||'—';
-  const niveles = zona.niveles||'—';
+  const cos      = zona.cos       || '—';
+  const cus      = zona.cus       || '—';
+  const uso      = zona.uso       || zona.clave || '—';
+  const ppp      = zona.ppp       || '';
+  const loteMin  = zona.lote_min  || '—';
+  const niveles  = zona.niveles   || '—';
+  const altMax   = zona.altura_max|| '';
+  const retran   = zona.retranqueo|| '';
+  const frenteMin= zona.frente_min|| '';
 
-  const lineasExtra = [
-    zona.altura_max ? `- Altura máxima: ${zona.altura_max} m` : '',
-    zona.retranqueo ? `- Retranqueo: ${zona.retranqueo}` : '',
-    zona.frente_min ? `- Frente mínimo: ${zona.frente_min} m` : '',
-    zona.densidad ? `- Densidad: ${zona.densidad}` : '',
+  // Construir lista de parámetros PDU para el prompt
+  const paramsLines = [
+    `- Zonificación: ${uso}${ppp ? ' / '+ppp : ''}`,
+    `- COS máximo: ${cos}`,
+    `- CUS máximo: ${cus}`,
+    `- Lote mínimo: ${loteMin} m²`,
+    `- Niveles máximos: ${niveles}`,
+    altMax   ? `- Altura máxima: ${altMax} m`        : '',
+    retran   ? `- Retranqueo: ${retran}`              : '',
+    frenteMin? `- Frente mínimo de lote: ${frenteMin} m` : '',
   ].filter(Boolean).join('\n');
 
-  const system = `Eres un arquitecto dictaminador experto en normativa urbana del Área Metropolitana de Guadalajara (AMG), Jalisco, México.
-Tu función es analizar el plano arquitectónico adjunto y emitir un pre-dictamen de viabilidad basado en la normativa del PDU del municipio indicado.
-Responde SIEMPRE con JSON puro (sin bloques de código), con exactamente esta estructura:
+  const system = `Eres un dictaminador experto en normativa urbana del PDU del Área Metropolitana de Guadalajara (AMG), Jalisco, México.
+Tu función es cruzar el plano arquitectónico adjunto contra la normativa del predio e informar el resultado del pre-dictamen.
+
+INSTRUCCIONES:
+PASO 1 — Lee la solapa del plano (cuadro de datos o título). Extrae: propietario, DRO, superficie de terreno, superficie de construcción total, cajones indicados, uso de suelo declarado.
+PASO 2 — Cruza la normativa PDU del predio (COS, CUS, niveles, lote mínimo, retranqueo) contra lo que muestra el plano. Para cada parámetro, busca el dato en el cuadro de áreas, cortes, plantas o solapa. Si no es legible usa "nd".
+PASO 3 — Calcula el COS del proyecto si tienes la superficie de terreno y la superficie de planta baja. Calcula el CUS si tienes la superficie total construida y el terreno.
+PASO 4 — Emite el semáforo: verde = todo cumple o no hay incumplimientos confirmados, amarillo = hay parámetros con atención o no determinados que requieren revisión, rojo = incumple algún parámetro crítico del PDU.
+
+RESPONDE ÚNICAMENTE con JSON puro, sin markdown, sin bloques de código, sin texto antes o después.
+
+Estructura exacta:
 {
   "semaforo": "verde|amarillo|rojo",
-  "resumen": "Frase corta máx 120 chars",
-  "cumplimiento": [
-    {"parametro":"nombre","norma":"valor PDU","proyecto":"valor en plano","status":"cumple|no_cumple|no_identificado"}
+  "resumen": "Una frase corta (máx. 110 caracteres) del resultado",
+  "dictamen": [
+    "Párrafo 1: tipo de plano analizado y datos generales.",
+    "Párrafo 2: datos leídos de la solapa y cuadro de áreas.",
+    "Párrafo 3: conclusión y justificación del semáforo."
   ],
-  "observaciones": ["obs1","obs2"],
-  "restricciones_criticas": ["rest1"]
+  "datos_solapa": {
+    "propietario": "nombre o null",
+    "dro": "nombre y cédula o null",
+    "superficie_terreno": "valor con m² o null",
+    "superficie_construccion": "valor con m² o null",
+    "cajones_indicados": "número o null",
+    "uso_indicado": "uso declarado en plano o null"
+  },
+  "elementos": [
+    {
+      "id": "cos|cus|niveles|lote_min|altura_max|retranqueo|cajones|uso_suelo",
+      "nombre": "nombre del parámetro",
+      "norma": "valor del PDU",
+      "proyecto": "valor leído del plano o 'nd'",
+      "estado": "cumple|atencion|incumple|nd",
+      "observacion": "descripción específica de lo observado"
+    }
+  ]
 }
-verde = viable sin modificaciones; amarillo = viable con ajustes menores; rojo = no viable en diseño actual.
-Si no puedes identificar un valor en el plano, usa "no_identificado" como status y "no legible" como valor del proyecto.`;
+REGLAS:
+- estado "nd" = el parámetro no pudo verificarse porque el dato no es legible en el plano.
+- estado "atencion" = cumple pero con incertidumbre o de forma marginal.
+- estado "incumple" = el valor del proyecto supera el límite normativo con dato legible.
+- dictamen: array de 2-3 strings, texto plano, sin comillas internas.
+- El JSON debe ser válido y parseable. Sin comentarios.`;
 
-  const textoContexto = `Municipio: ${mun}
-Normativa del PDU vigente para este predio:
-- Zonificación: ${uso}
-- COS (coef. ocupación): ${cos}
-- CUS (coef. utilización): ${cus}
-- Lote mínimo: ${lote} m²
-- Niveles máximos: ${niveles}
-${lineasExtra}
+  const userMsg = `Municipio: ${mun}
+Normativa PDU vigente de este predio:
+${paramsLines}
 
-Analiza el plano "${nombre}" y verifica si el proyecto cumple con esta normativa. Incluye en cumplimiento al menos: COS, CUS, niveles y lote mínimo si están legibles en el plano.`;
+Analiza el plano adjunto (${nombre}) y emite el pre-dictamen.`;
 
   const content = [
-    { type:'text', text: textoContexto }
+    { type:'text', text: userMsg }
   ];
-
-  // Agregar imagen o documento PDF
   if(mimeType==='application/pdf'){
     content.push({ type:'document', source:{ type:'base64', media_type:'application/pdf', data:base64 } });
   } else {
     content.push({ type:'image', source:{ type:'base64', media_type:mimeType, data:base64 } });
   }
 
-  const endpoint = ES_LOCALHOST_M10
-    ? 'https://api.anthropic.com/v1/messages'
-    : '/api/claude-proxy';
-
-  const headers = { 'Content-Type':'application/json' };
+  const endpoint = ES_LOCALHOST_M10 ? 'https://api.anthropic.com/v1/messages' : '/api/claude-proxy';
+  const headers  = { 'Content-Type':'application/json' };
   if(ES_LOCALHOST_M10){
-    const k = window.ANTHROPIC_API_KEY || sessionStorage.getItem('m10_api_key') || prompt('API Key Anthropic (solo para pruebas locales):','');
+    const k = window.ANTHROPIC_API_KEY || sessionStorage.getItem('m10_api_key') || prompt('API Key Anthropic:','');
     if(k){ sessionStorage.setItem('m10_api_key',k); headers['x-api-key']=k; }
-    headers['anthropic-version']='2023-06-01';
-    headers['anthropic-beta']='pdfs-2024-09-25';
+    headers['anthropic-version'] = '2023-06-01';
+    headers['anthropic-beta']    = 'pdfs-2024-09-25';
   }
 
   const res = await fetch(endpoint, {
-    method:'POST',
-    headers,
+    method:'POST', headers,
     body: JSON.stringify({
-      model: M10_MODEL,
-      max_tokens: 1500,
-      temperature: 0,
+      model: M10_MODEL, max_tokens: 2000, temperature: 0,
       system,
-      messages:[{role:'user', content}]
+      messages:[{ role:'user', content }]
     })
   });
-
   if(!res.ok){
     const err = await res.text().catch(()=>'');
-    throw new Error(`Error API (${res.status}): ${err.slice(0,120)}`);
+    throw new Error(`Error API (${res.status}): ${err.slice(0,150)}`);
   }
-
   const data = await res.json();
-  const text = data.content?.[0]?.text||'';
-  // Extraer JSON — puede venir con texto alrededor
+  const text = (data.content?.find(b=>b.type==='text')?.text)||'';
   const match = text.match(/\{[\s\S]*\}/);
   if(!match) throw new Error('La IA no devolvió un JSON válido. Intenta de nuevo.');
   try{ return JSON.parse(match[0]); }
-  catch(e){ throw new Error('Error al parsear respuesta IA: '+e.message); }
+  catch(e){ throw new Error('JSON inválido: '+e.message); }
 }
 
 function m10RenderizarVeredicto(r){
-  const status = document.getElementById('m10AnalisisStatus');
-  const veredictoEl = document.getElementById('m10Veredicto');
+  const status     = document.getElementById('m10AnalisisStatus');
+  const veredictoEl= document.getElementById('m10Veredicto');
 
   const C = {
-    verde:   {bg:'var(--sem-v-bg)',  bd:'#16A34A33', txt:'var(--sem-v-txt)',  icon:'✅', label:'VIABLE — Sin modificaciones necesarias'},
-    amarillo:{bg:'var(--sem-am-bg)', bd:'#D9770633', txt:'var(--yellow)',      icon:'⚠️', label:'VIABLE CON AJUSTES'},
-    rojo:    {bg:'var(--sem-r-bg)',  bd:'#DC262633', txt:'var(--sem-r-txt)',  icon:'🚫', label:'NO VIABLE — Requiere rediseño'},
+    verde:   { bg:'var(--sem-v-bg)',  bd:'#16A34A33', txt:'var(--sem-v-txt)', icon:'✅', label:'VIABLE — Sin modificaciones necesarias' },
+    amarillo:{ bg:'var(--sem-am-bg)', bd:'#D9770633', txt:'var(--yellow)',     icon:'⚠️', label:'VIABLE CON AJUSTES — Revisar parámetros marcados' },
+    rojo:    { bg:'var(--sem-r-bg)',  bd:'#DC262633', txt:'var(--sem-r-txt)', icon:'🚫', label:'NO VIABLE — Requiere rediseño' },
   };
-  const c = C[r.semaforo]||C.amarillo;
+  const c = C[r.semaforo] || C.amarillo;
 
-  const cumRows = (r.cumplimiento||[]).map(p=>{
-    const ico = p.status==='cumple'?'✅':p.status==='no_cumple'?'❌':'❓';
-    const clr = p.status==='cumple'?'#16A34A':p.status==='no_cumple'?'#DC2626':'var(--text3)';
+  // Dictamen paragraphs
+  const dictamenHTML = (r.dictamen||[]).map(p =>
+    `<p style="font-size:12px;color:var(--text2);line-height:1.7;margin:0 0 8px">${p}</p>`
+  ).join('');
+
+  // Tabla de elementos PDU
+  const EST_ICO  = { cumple:'✅', atencion:'⚠️', incumple:'❌', nd:'❓' };
+  const EST_CLR  = { cumple:'#16A34A', atencion:'#D97706', incumple:'#DC2626', nd:'var(--text3)' };
+  const elemRows = (r.elementos||[]).map(e => {
+    const ico = EST_ICO[e.estado] || '❓';
+    const clr = EST_CLR[e.estado] || 'var(--text3)';
     return `<tr>
-      <td class="m10-tabla">${p.parametro}</td>
-      <td class="m10-tabla center">${p.norma}</td>
-      <td class="m10-tabla center">${p.proyecto}</td>
-      <td class="m10-tabla center" style="color:${clr}">${ico}</td>
+      <td style="padding:6px 8px;font-size:11px;color:var(--text2);border-bottom:1px solid var(--border)">${e.nombre||e.id}</td>
+      <td style="padding:6px 8px;font-size:11px;font-family:var(--mono);text-align:center;border-bottom:1px solid var(--border)">${e.norma}</td>
+      <td style="padding:6px 8px;font-size:11px;font-family:var(--mono);text-align:center;border-bottom:1px solid var(--border)">${e.proyecto}</td>
+      <td style="padding:6px 8px;font-size:12px;text-align:center;border-bottom:1px solid var(--border);color:${clr}" title="${e.observacion||''}">${ico}</td>
     </tr>`;
   }).join('');
 
-  const obsHTML = (r.observaciones||[]).map(o=>`<li style="font-size:11px;color:var(--text2);margin-bottom:4px;line-height:1.5">${o}</li>`).join('');
-  const restHTML = (r.restricciones_criticas||[]).map(o=>`<li style="font-size:11px;color:var(--sem-r-txt);margin-bottom:4px;line-height:1.5;font-weight:500">${o}</li>`).join('');
+  // Datos de la solapa (si se leyó algo)
+  const sol = r.datos_solapa || {};
+  const solapaItems = [
+    sol.propietario          ? `<span><strong>Propietario:</strong> ${sol.propietario}</span>` : '',
+    sol.dro                  ? `<span><strong>DRO:</strong> ${sol.dro}</span>` : '',
+    sol.superficie_terreno   ? `<span><strong>Sup. terreno:</strong> ${sol.superficie_terreno}</span>` : '',
+    sol.superficie_construccion ? `<span><strong>Sup. construcción:</strong> ${sol.superficie_construccion}</span>` : '',
+    sol.cajones_indicados    ? `<span><strong>Cajones:</strong> ${sol.cajones_indicados}</span>` : '',
+    sol.uso_indicado         ? `<span><strong>Uso declarado:</strong> ${sol.uso_indicado}</span>` : '',
+  ].filter(Boolean);
 
-  status.style.display='none';
-  veredictoEl.style.display='block';
-  veredictoEl.innerHTML=`
+  status.style.display = 'none';
+  veredictoEl.style.display = 'block';
+  veredictoEl.innerHTML = `
     <!-- Semáforo -->
     <div style="background:${c.bg};border:1.5px solid ${c.bd};border-radius:10px;padding:14px 16px;margin-bottom:12px">
       <div style="display:flex;align-items:flex-start;gap:12px">
-        <span style="font-size:26px;flex-shrink:0;line-height:1">${c.icon}</span>
-        <div>
-          <div style="font-size:13px;font-weight:700;color:${c.txt};margin-bottom:4px">${c.label}</div>
-          <div style="font-size:12px;color:var(--text2);line-height:1.5">${r.resumen||''}</div>
+        <span style="font-size:26px;flex-shrink:0;line-height:1.1">${c.icon}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;color:${c.txt};margin-bottom:5px">${c.label}</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">${r.resumen||''}</div>
         </div>
       </div>
     </div>
 
-    ${cumRows ? `
-    <!-- Tabla de cumplimiento -->
+    ${dictamenHTML ? `
+    <div style="margin-bottom:14px">
+      <div style="font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Dictamen</div>
+      ${dictamenHTML}
+    </div>` : ''}
+
+    ${elemRows ? `
     <div style="margin-bottom:12px">
-      <div style="font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">
-        Tabla de cumplimiento normativo
-      </div>
+      <div style="font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Cruce normativo PDU</div>
       <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--border)">
-        <table class="m10-tabla">
+        <table style="width:100%;border-collapse:collapse">
           <thead>
-            <tr>
-              <th>Parámetro</th>
-              <th style="text-align:center">Norma PDU</th>
-              <th style="text-align:center">Proyecto</th>
-              <th style="text-align:center">✓</th>
+            <tr style="background:var(--bg3)">
+              <th style="padding:7px 8px;font-size:10px;color:var(--text3);text-align:left;font-weight:600;border-bottom:1px solid var(--border)">Parámetro PDU</th>
+              <th style="padding:7px 8px;font-size:10px;color:var(--text3);text-align:center;font-weight:600;border-bottom:1px solid var(--border)">Norma</th>
+              <th style="padding:7px 8px;font-size:10px;color:var(--text3);text-align:center;font-weight:600;border-bottom:1px solid var(--border)">Proyecto</th>
+              <th style="padding:7px 8px;font-size:10px;color:var(--text3);text-align:center;font-weight:600;border-bottom:1px solid var(--border)">✓</th>
             </tr>
           </thead>
-          <tbody>${cumRows}</tbody>
+          <tbody>${elemRows}</tbody>
         </table>
       </div>
-    </div>` : ''}
-
-    ${obsHTML ? `
-    <div style="margin-bottom:10px">
-      <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Observaciones</div>
-      <ul style="margin:0;padding-left:16px">${obsHTML}</ul>
-    </div>` : ''}
-
-    ${restHTML ? `
-    <div style="background:var(--sem-r-bg);border:1px solid #DC262633;border-radius:8px;padding:10px 12px;margin-bottom:10px">
-      <div style="font-size:10px;color:var(--sem-r-txt);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">
-        ⚠️ Restricciones críticas
+      <div style="font-size:10px;color:var(--text3);margin-top:5px">
+        ✅ cumple &nbsp;⚠️ atención &nbsp;❌ incumple &nbsp;❓ no determinado (nd)
       </div>
-      <ul style="margin:0;padding-left:16px">${restHTML}</ul>
+    </div>` : ''}
+
+    ${solapaItems.length ? `
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px">
+      <div style="font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px">Datos de la solapa</div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--text2)">
+        ${solapaItems.join('')}
+      </div>
     </div>` : ''}
 
     <div style="display:flex;gap:8px;margin-top:4px">
@@ -6589,7 +6629,6 @@ function m10RenderizarVeredicto(r){
       </button>
     </div>
   `;
-  // Guardar para exportar
   window._m10UltimoVeredicto = r;
 }
 
@@ -6613,31 +6652,43 @@ function m10ExportarVeredicto(){
   const zona = datosZona||{};
   const mun = ({guadalajara:'Guadalajara',zapopan:'Zapopan',tlajomulco:'Tlajomulco de Zúñiga',tlaquepaque:'San Pedro Tlaquepaque',tonala:'Tonalá'}[municipioActual])||municipioActual;
   const fecha = new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
-  const em = {verde:'✅ VIABLE',amarillo:'⚠️ VIABLE CON AJUSTES',rojo:'🚫 NO VIABLE'}[r.semaforo]||r.semaforo;
-  const cumTabla = (r.cumplimiento||[]).map(p=>`${p.parametro} | Norma: ${p.norma} | Proyecto: ${p.proyecto} | ${p.status==='cumple'?'✅':p.status==='no_cumple'?'❌':'❓'}`).join('\n');
-  const obs = (r.observaciones||[]).map((o,i)=>`${i+1}. ${o}`).join('\n');
-  const rest = (r.restricciones_criticas||[]).map((o,i)=>`${i+1}. ${o}`).join('\n');
+  const em = {verde:'VIABLE',amarillo:'VIABLE CON AJUSTES',rojo:'NO VIABLE'}[r.semaforo]||r.semaforo;
+  const dictamenTxt = (r.dictamen||[]).join('\n\n');
+  const elemTxt = (r.elementos||[]).map(e=>{
+    const est = {cumple:'OK',atencion:'ATENCION',incumple:'INCUMPLE',nd:'ND'}[e.estado]||e.estado;
+    return `  ${e.nombre||e.id}: Norma=${e.norma} | Proyecto=${e.proyecto} | ${est} — ${e.observacion||''}`;
+  }).join('\n');
+  const sol = r.datos_solapa||{};
+  const solTxt = [
+    sol.propietario          ? `  Propietario: ${sol.propietario}` : '',
+    sol.dro                  ? `  DRO: ${sol.dro}` : '',
+    sol.superficie_terreno   ? `  Sup. terreno: ${sol.superficie_terreno}` : '',
+    sol.superficie_construccion ? `  Sup. construcción: ${sol.superficie_construccion}` : '',
+    sol.cajones_indicados    ? `  Cajones: ${sol.cajones_indicados}` : '',
+    sol.uso_indicado         ? `  Uso declarado: ${sol.uso_indicado}` : '',
+  ].filter(Boolean).join('\n');
+
   const txt = [
-    'GESTOR URBANO JALISCO AMG — PRE-DICTAMEN IA',
+    'GESTOR URBANO JALISCO AMG — PRE-DICTAMEN IA (M10)',
     `Fecha: ${fecha}`,
     `Municipio: ${mun}`,
-    `Zonificación: ${zona.uso||zona.clave||'—'} | COS: ${zona.cos||'—'} | CUS: ${zona.cus||'—'}`,
+    `Predio: Zonificación ${zona.uso||zona.clave||'—'} | COS ${zona.cos||'—'} | CUS ${zona.cus||'—'}`,
     '',
     `VEREDICTO: ${em}`,
-    `${r.resumen||''}`,
+    r.resumen||'',
     '',
-    'TABLA DE CUMPLIMIENTO:',
-    cumTabla,
+    'DICTAMEN:',
+    dictamenTxt,
     '',
-    obs?'OBSERVACIONES:\n'+obs:'',
-    rest?'\nRESTRICCIONES CRÍTICAS:\n'+rest:'',
+    elemTxt ? 'CRUCE NORMATIVO PDU:\n'+elemTxt : '',
+    solTxt  ? '\nDATOS DE LA SOLAPA:\n'+solTxt : '',
     '',
     'NOTA: Este pre-dictamen es orientativo. Para validación oficial, consultar la Dirección de Ordenamiento del Territorio del municipio correspondiente.',
   ].join('\n');
 
   const blob = new Blob([txt],{type:'text/plain;charset=utf-8'});
   const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
+  a.href = URL.createObjectURL(blob);
   a.download = `PreDictamen_${mun}_${fecha.replace(/ /g,'_')}.txt`;
   a.click();
 }

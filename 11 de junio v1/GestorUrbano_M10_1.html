@@ -375,6 +375,20 @@ input[type=range]::-webkit-slider-thumb{
 .anp-src{font-size:10px;color:var(--text3);padding:7px 12px;background:var(--bg3);border-top:0.5px solid var(--border);transition:background var(--t),color var(--t),border-color var(--t)}
 
 /* ── M10 overrides ─────────────────────────────────────── */
+/* Historial M10 */
+.m10-hist-header{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;transition:background .15s;margin-bottom:0}
+.m10-hist-header:hover{background:var(--bg2)}
+.m10-hist-header-count{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--brand);color:#fff;font-size:10px;font-weight:700}
+.m10-hist-body{padding:8px 0 2px}
+.m10-hist-chevron{margin-left:auto;font-size:11px;color:var(--text3);transition:transform .2s}
+.m10-hist-chevron.open{transform:rotate(180deg)}
+.m10-hist-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;border:1px solid var(--border2);margin-bottom:6px;background:var(--bg3);transition:background .15s}
+.m10-hist-item:hover{background:var(--bg2)}
+.m10-hist-info{flex:1;cursor:pointer;min-width:0}
+.m10-hist-nombre{font-size:12px;font-weight:600;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m10-hist-meta{font-size:10px;color:var(--text3);margin-top:2px}
+.m10-hist-btn{padding:4px 10px;font-size:11px;border:1px solid var(--border2);border-radius:6px;background:var(--bg2);color:var(--text2);cursor:pointer;white-space:nowrap;font-family:var(--sans)}
+.m10-hist-btn:hover{background:var(--bg3)}
 #historialPanel,
 #simPanel { display: none !important; }
 
@@ -695,6 +709,34 @@ input[type=range]::-webkit-slider-thumb{
 
         <!-- Veredicto IA -->
         <div id="m10Veredicto" style="display:none"></div>
+
+        <!-- Guardar en historial (aparece tras el análisis) -->
+        <div id="m10NombrePanel" style="display:none;margin-top:12px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px">
+          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px">🏷️ Guardar en el historial</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="m10InputNombre"
+                   placeholder="Ej: Bodega Vigil 2787 — v1"
+                   style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:7px;background:var(--bg2);color:var(--text1);font-family:var(--sans);font-size:12px;outline:none">
+            <button onclick="m10GuardarNombreHistorial()"
+                    style="padding:8px 14px;font-size:12px;font-weight:500;background:var(--brand);color:#fff;border:none;border-radius:7px;cursor:pointer;white-space:nowrap;font-family:var(--sans)">
+              Guardar
+            </button>
+          </div>
+          <div id="m10NombreGuardadoMsg" style="display:none;font-size:10px;color:var(--sem-v-txt);margin-top:5px">✅ Guardado en el historial.</div>
+        </div>
+
+        <!-- Historial M10 -->
+        <div id="m10HistPanel" style="display:none;margin-top:10px">
+          <div class="m10-hist-header" onclick="m10ToggleHistorial()">
+            <span style="font-size:14px">🕐</span>
+            <span style="font-size:12px;font-weight:600;color:var(--text1)">Análisis guardados</span>
+            <span class="m10-hist-header-count" id="m10HistCount">0</span>
+            <span class="m10-hist-chevron" id="m10HistChevron">▼</span>
+          </div>
+          <div id="m10HistBody" style="display:none;padding-top:8px">
+            <div id="m10HistLista"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div><!-- /panel-right -->
@@ -6363,6 +6405,113 @@ function guToggleTheme(){
 
 // ══════════════════════════════════════════════════════════════════════
 // M10 · PreDictamen IA
+
+// ══════════════════════════════════════════════════════════════════════
+// M10 HISTORIAL
+// ══════════════════════════════════════════════════════════════════════
+const M10_HIST_KEY = 'gu_m10_historial';
+const M10_HIST_MAX = 20;
+const M10_MUN_NOMBRE = {
+  guadalajara:'Guadalajara', zapopan:'Zapopan',
+  tlajomulco:'Tlajomulco', tlaquepaque:'Tlaquepaque', tonala:'Tonalá'
+};
+
+function m10CargarHistorial(){
+  try{ return JSON.parse(localStorage.getItem(M10_HIST_KEY)||'[]'); }
+  catch(e){ return []; }
+}
+
+function m10GuardarEnHistorial(r){
+  try{
+    const zona = datosZona||{};
+    const hist = m10CargarHistorial();
+    const entrada = {
+      id:    Date.now(),
+      ts:    Date.now(),
+      nombreProyecto: 'Sin nombre',
+      municipio:      municipioActual||'',
+      zona:           zona.uso||zona.clave||'—',
+      domicilio:      window._ultimaDireccion||'',
+      uso_identificado: r.uso_identificado||'',
+      uso_permitido:  r.uso_permitido,
+      resultado:      r.resultado||'',
+      superficie_cuadra: r.superficie_cuadra||'no_disponible',
+      r_completo:     r,
+      zona_guardada:  zona,
+    };
+    hist.unshift(entrada);
+    localStorage.setItem(M10_HIST_KEY, JSON.stringify(hist.slice(0, M10_HIST_MAX)));
+  }catch(e){}
+}
+
+function m10RenderHistorial(){
+  const hist  = m10CargarHistorial();
+  const panel = document.getElementById('m10HistPanel');
+  const lista = document.getElementById('m10HistLista');
+  const count = document.getElementById('m10HistCount');
+  if(!panel) return;
+  if(!hist.length){ panel.style.display='none'; return; }
+  panel.style.display='';
+  if(count) count.textContent = hist.length;
+
+  const icoUso  = v => v===true?'✅':v===false?'🚫':'⚠️';
+  const icoRes  = v => ({cuadra:'✅',parcialmente:'⚠️',no_cuadra:'🚫'}[v]||'⚠️');
+  const icoSup  = v => ({si:'✅',no:'🚫',no_disponible:'—'}[v]||'—');
+
+  lista.innerHTML = hist.map((h,i)=>{
+    const fecha = new Date(h.ts).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+    const mun   = M10_MUN_NOMBRE[h.municipio]||h.municipio||'';
+    return `<div class="m10-hist-item">
+      <div class="m10-hist-info" onclick="m10ReabrirHistEntry(${i})" title="Clic para ver el resultado">
+        <div class="m10-hist-nombre">${h.nombreProyecto}</div>
+        <div class="m10-hist-meta">${fecha} · ${mun} · ${h.zona} · Uso ${icoUso(h.uso_permitido)} · Params ${icoRes(h.resultado)} · Sup ${icoSup(h.superficie_cuadra)}</div>
+      </div>
+      <button class="m10-hist-btn" onclick="m10BorrarHistEntry(${i})" title="Eliminar">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function m10ToggleHistorial(){
+  const body    = document.getElementById('m10HistBody');
+  const chevron = document.getElementById('m10HistChevron');
+  if(!body) return;
+  const open = body.style.display==='none'||!body.style.display;
+  body.style.display = open ? 'block' : 'none';
+  if(chevron) chevron.classList.toggle('open', open);
+}
+
+function m10BorrarHistEntry(idx){
+  try{
+    const hist = m10CargarHistorial();
+    hist.splice(idx,1);
+    localStorage.setItem(M10_HIST_KEY, JSON.stringify(hist));
+    m10RenderHistorial();
+  }catch(e){}
+}
+
+function m10ReabrirHistEntry(idx){
+  const hist  = m10CargarHistorial();
+  const entry = hist[idx];
+  if(!entry || !entry.r_completo) return;
+  // Restaurar contexto mínimo para que m10RenderizarVeredicto funcione
+  if(entry.zona_guardada) window._m10ZonaGuardada = entry.zona_guardada;
+  m10RenderizarVeredicto(entry.r_completo, true); // true = no re-guardar
+}
+
+function m10GuardarNombreHistorial(){
+  try{
+    const input = document.getElementById('m10InputNombre');
+    const nombre = (input?.value||'').trim() || 'Sin nombre';
+    const hist = m10CargarHistorial();
+    if(!hist.length) return;
+    hist[0].nombreProyecto = nombre;
+    localStorage.setItem(M10_HIST_KEY, JSON.stringify(hist));
+    m10RenderHistorial();
+    const msg = document.getElementById('m10NombreGuardadoMsg');
+    if(msg){ msg.style.display=''; setTimeout(()=>msg.style.display='none', 3000); }
+  }catch(e){}
+}
+
 // ══════════════════════════════════════════════════════════════════════
 const ES_LOCALHOST_M10 = location.hostname==='localhost'||location.hostname==='127.0.0.1';
 const M10_MODEL = 'claude-sonnet-4-6';
@@ -6615,7 +6764,7 @@ superficie_cuadra="no_disponible" si no se ingreso superficie real o no puedes l
   catch(e){ throw new Error('Respuesta no parseable: '+e.message); }
 }
 
-function m10RenderizarVeredicto(r){
+function m10RenderizarVeredicto(r, esReapertura){
   const status      = document.getElementById('m10AnalisisStatus');
   const veredictoEl = document.getElementById('m10Veredicto');
 
@@ -6635,7 +6784,7 @@ function m10RenderizarVeredicto(r){
     ? `<span style="display:inline-block;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--text1);margin:0 4px">${r.uso_clave}</span>`
     : '';
   const inferidoHTML = r.fuente_usos === 'inferido'
-    ? `<div style="margin-top:8px;padding:6px 10px;background:var(--bg3);border-radius:6px;border-left:3px solid var(--yellow);font-size:11px;color:var(--text3);line-height:1.5">⚠️ Sin lista oficial de usos — resultado inferido por IA. Verifica en el PDU local.</div>`
+    ? `<div style="margin-top:8px;padding:6px 10px;background:var(--bg3);border-radius:6px;border-left:3px solid var(--yellow);font-size:11px;color:var(--text3);line-height:1.5">⚠️ Sin lista oficial — resultado inferido por IA. Verifica en el PDU local.</div>`
     : '';
 
   // ── Chip 2: PARÁMETROS ───────────────────────────────────────────
@@ -6646,7 +6795,7 @@ function m10RenderizarVeredicto(r){
   };
   const p = P[r.resultado] || P.parcialmente;
 
-  // ── Chip 3: SUPERFICIE (solo si hay superficie real ingresada) ───
+  // ── Chip 3: SUPERFICIE ───────────────────────────────────────────
   const supReal  = r._superficie_real;
   const supPlano = typeof r.superficie_plano === 'number' ? r.superficie_plano : null;
   let supChipHTML = '';
@@ -6660,16 +6809,13 @@ function m10RenderizarVeredicto(r){
       sIcon='🚫'; sColor='var(--sem-r-txt)'; sBg='var(--sem-r-bg)'; sBd='#DC262633';
       sTitulo='Superficie NO coincide';
       const dif = supPlano !== null ? Math.abs(supPlano - supReal).toFixed(1) : '?';
-      const dir  = supPlano !== null ? (supPlano > supReal ? 'el plano declara más' : 'el plano declara menos') : '';
+      const dir = supPlano !== null ? (supPlano > supReal ? 'el plano declara más' : 'el plano declara menos') : '';
       sDetalle=`Plano: ${supPlano!==null?supPlano+' m²':'?'} / Real: ${supReal} m²${dif!=='?'?' ('+dir+': '+dif+' m²)':''}`;
     } else {
       sIcon='⚠️'; sColor='var(--yellow)'; sBg='var(--sem-am-bg)'; sBd='#D9770633';
       sTitulo='No se pudo leer la superficie del plano';
-      sDetalle=`Superficie real: ${supReal} m² — verifica manualmente en el plano`;
+      sDetalle=`Superficie real: ${supReal} m² — verifica manualmente`;
     }
-    const sNota = r.nota_superficie
-      ? `<div style="font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5">${r.nota_superficie}</div>`
-      : '';
     supChipHTML = `
     <div style="background:${sBg};border:2px solid ${sBd};border-radius:12px;padding:14px 16px;margin-bottom:10px">
       <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Superficie del terreno</div>
@@ -6678,7 +6824,7 @@ function m10RenderizarVeredicto(r){
         <span style="font-size:13px;font-weight:700;color:${sColor}">${sTitulo}</span>
       </div>
       <div style="font-size:12px;color:var(--text2);line-height:1.6">${sDetalle}</div>
-      ${sNota}
+      ${r.nota_superficie?'<div style="font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5">'+r.nota_superficie+'</div>':''}
     </div>`;
   }
 
@@ -6689,7 +6835,6 @@ function m10RenderizarVeredicto(r){
   status.style.display  = 'none';
   veredictoEl.style.display = 'block';
   veredictoEl.innerHTML = `
-    <!-- CHIP 1: USO -->
     <div style="background:${usoBg};border:2px solid ${usoBd};border-radius:12px;padding:16px;margin-bottom:10px">
       <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Uso del suelo</div>
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:7px">
@@ -6701,32 +6846,40 @@ function m10RenderizarVeredicto(r){
       <div style="font-size:12px;color:var(--text2);line-height:1.6">${r.razon_uso||''}</div>
       ${inferidoHTML}
     </div>
-
-    <!-- CHIP 2: PARÁMETROS -->
     <div style="background:${p.bg};border:2px solid ${p.bd};border-radius:12px;padding:16px;margin-bottom:10px">
       <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Parámetros constructivos (COS / CUS / Niveles)</div>
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:${r.resumen?'7':'0'}px">
         <span style="font-size:20px;line-height:1">${p.icon}</span>
         <span style="font-size:13px;font-weight:700;color:${p.txt}">${p.label}</span>
       </div>
-      ${r.resumen ? '<div style="font-size:12px;color:var(--text2);line-height:1.6">'+r.resumen+'</div>' : ''}
+      ${r.resumen?'<div style="font-size:12px;color:var(--text2);line-height:1.6">'+r.resumen+'</div>':''}
     </div>
-
-    <!-- CHIP 3: SUPERFICIE (condicional) -->
     ${supChipHTML}
-
-    ${obsHTML ? '<div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Observaciones</div><ul style="margin:0;padding-left:18px">'+obsHTML+'</ul></div>' : ''}
-
+    ${obsHTML?'<div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Observaciones</div><ul style="margin:0;padding-left:18px">'+obsHTML+'</ul></div>':''}
     <button onclick="m10ResetUpload()" style="width:100%;padding:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer">
       Analizar otro plano
     </button>
   `;
   window._m10UltimoVeredicto = r;
+
+  // Mostrar panel de nombre y guardar en historial (solo en análisis nuevo, no en reapertura)
+  const nombrePanel = document.getElementById('m10NombrePanel');
+  if(nombrePanel){
+    nombrePanel.style.display = '';
+    const inp = document.getElementById('m10InputNombre');
+    if(inp && !esReapertura) inp.value = '';
+  }
+  if(!esReapertura){
+    m10GuardarEnHistorial(r);
+    m10RenderHistorial();
+  }
 }
 
 function m10ResetUpload(){
   document.getElementById('m10Veredicto').style.display='none';
   document.getElementById('m10AnalisisStatus').style.display='none';
+  const np = document.getElementById('m10NombrePanel');
+  if(np) np.style.display='none';
   const z = document.getElementById('m10UploadZone');
   z.style.pointerEvents='';
   z.onclick = ()=>document.getElementById('m10InputPlano').click();
@@ -6769,6 +6922,12 @@ function m10ExportarVeredicto(){
   a.click();
 }
 
+// Inicializar historial M10 al cargar
+if(document.readyState=="loading"){
+  document.addEventListener("DOMContentLoaded", m10RenderHistorial);
+}else{
+  m10RenderHistorial();
+}
 </script>
 </body>
 </html>

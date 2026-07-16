@@ -6480,21 +6480,28 @@ function m10FileToBase64(file){
 
 async function m10LlamarClaude(base64, mimeType, nombre){
   const zona = datosZona;
-  const mun  = ({
+  const MUN_NOMBRES = {
     guadalajara:'Guadalajara', zapopan:'Zapopan',
     tlajomulco:'Tlajomulco de Zúñiga', tlaquepaque:'San Pedro Tlaquepaque', tonala:'Tonalá'
-  }[municipioActual]) || municipioActual;
+  };
+  const mun = MUN_NOMBRES[municipioActual] || municipioActual;
 
-  // Procesar lista de usos desde zona.uso_per / zona.uso_con (mismo formato que M01)
-  const _splitUsos = s => (s||'').split(/[|··\-]/)
-    .map(u=>u.trim().replace(/\(condicionados?\)/gi,'').trim()).filter(Boolean);
-
+  // Parsear lista de usos desde uso_per / uso_con (GDL y Zapopan)
+  const _splitUsos = s => {
+    if(!s) return [];
+    return s.split(/[|·\xB7⋅\-]/)
+      .map(u => u.trim().replace(/\(condicionados?\)/gi,'').trim())
+      .filter(Boolean);
+  };
   const usosP = _splitUsos(zona.uso_per);
   const usosC = _splitUsos(zona.uso_con);
+  const tieneListaOficial = usosP.length > 0;
 
   // Parámetros normativos
   const normaLineas = [
+    `- Municipio: ${mun}`,
     `- Zonificación del predio: ${zona.uso||zona.clave||'—'}`,
+    zona.uso_descripcion ? `- Descripción: ${zona.uso_descripcion}` : '',
     `- COS máximo: ${zona.cos||'—'}`,
     `- CUS máximo: ${zona.cus||'—'}`,
     `- Niveles máximos: ${zona.niveles||'—'}`,
@@ -6504,48 +6511,46 @@ async function m10LlamarClaude(base64, mimeType, nombre){
     zona.frente_min ? `- Frente mínimo: ${zona.frente_min} m` : '',
   ].filter(Boolean).join('\n');
 
-  const usosLinea = usosP.length
-    ? `\n- Usos PERMITIDOS en esta zona: ${usosP.join(', ')}`
-    : '';
-  const condLinea = usosC.length
-    ? `\n- Usos CONDICIONADOS (requieren dictamen): ${usosC.join(', ')}`
-    : '';
+  // Sección de usos: lista oficial (GDL/Zapopan) o inferencia por clave (VUJ)
+  let usosContexto;
+  if(tieneListaOficial){
+    usosContexto = `\nUsos PERMITIDOS en esta zona: ${usosP.join(', ')}`;
+    if(usosC.length) usosContexto += `\nUsos CONDICIONADOS (requieren dictamen): ${usosC.join(', ')}`;
+    usosContexto += '\n(Lista oficial del PDU — cruce exacto posible)';
+  } else {
+    usosContexto = `\nNota: No hay lista de usos disponible para esta zona de ${mun}.`
+      + `\nUsa tu conocimiento del PDU de ${mun} para la clave "${zona.uso||zona.clave||'—'}" `
+      + `e indica si el uso del proyecto es generalmente compatible. Marca fuente_usos="inferido".`;
+  }
 
   const system = `Eres un dictaminador de normativa urbana del AMG (Jalisco, México).
-Analiza el plano adjunto y responde DOS preguntas en orden:
+Analiza el plano adjunto y responde DOS preguntas:
 
 PREGUNTA 1 — USO DEL SUELO:
-¿Qué tipo de construcción/proyecto muestra el plano? (bodega, vivienda, oficina, local comercial, etc.)
-¿Ese uso está PERMITIDO en la zonificación del predio?
-Usa la lista de usos permitidos proporcionada. Si el proyecto no encaja exactamente en ninguna clave, elige la más cercana y explica por qué.
+¿Qué tipo de construcción/proyecto muestra el plano? Identifica: bodega, vivienda, oficina, local comercial, etc.
+Con base en la lista de usos o en la clave de zonificación, ¿ese uso es PERMITIDO, CONDICIONADO o NO PERMITIDO?
+Si hay lista oficial: busca la clave más cercana al uso del proyecto.
+Si no hay lista (fuente inferida): usa tu conocimiento del PDU del municipio para la clave indicada.
 
-PREGUNTA 2 — PARÁMETROS (solo si puedes leer datos del plano):
-¿Los parámetros constructivos (COS, CUS, niveles) cuadran con la normativa?
-Busca en la solapa o cuadro de áreas: superficie de terreno, superficie construida.
-Calcula COS = planta baja / terreno y CUS = superficie total / terreno si tienes datos.
+PREGUNTA 2 — PARÁMETROS CONSTRUCTIVOS:
+Busca en la solapa o cuadro de áreas del plano: superficie de terreno, superficie construida total.
+Calcula COS = sup.planta baja / terreno y CUS = sup.total / terreno.
+¿Los parámetros cuadran con la normativa?
 
-Responde ÚNICAMENTE con JSON puro, sin markdown, sin texto adicional:
+Responde ÚNICAMENTE con JSON puro, sin markdown:
 {
-  "uso_identificado": "descripción breve del proyecto (ej: Bodega de almacenamiento)",
-  "uso_clave": "clave del uso de suelo aplicable (ej: I1, CS2, H2) o null si no puedes determinar",
+  "uso_identificado": "descripción breve del proyecto",
+  "uso_clave": "clave PDU aplicable o null",
   "uso_permitido": true,
   "uso_condicionado": false,
-  "razon_uso": "frase directa: por qué está o no está permitido (máx 120 chars)",
+  "razon_uso": "frase directa máx 120 chars — por qué sí o no está permitido",
+  "fuente_usos": "lista_oficial|inferido",
   "resultado": "cuadra|parcialmente|no_cuadra",
-  "resumen": "frase directa sobre COS/CUS/niveles (máx 100 chars) o 'No se pudieron leer parámetros'",
-  "observaciones": ["obs 1 sobre parámetros o datos no legibles"]
-}
-resultado = cuadra si COS/CUS/niveles están dentro de la norma o no se pueden calcular sin datos claros.
-resultado = no_cuadra si hay incumplimiento CLARO y VISIBLE en el plano.
-resultado = parcialmente si hay datos contradictorios o no todos son legibles.`;
+  "resumen": "frase sobre COS/CUS/niveles (máx 100 chars) o 'No se pudieron leer parámetros'",
+  "observaciones": ["obs 1", "obs 2"]
+}`;
 
-  const userMsg = `Municipio: ${mun}
-Normativa PDU del predio:
-${normaLineas}${usosLinea}${condLinea}
-
-Analiza el plano "${nombre}":
-1. ¿Qué se construye? ¿Está ese uso PERMITIDO en esta zona?
-2. ¿Los parámetros del proyecto cuadran con la normativa?`;
+  const userMsg = `Normativa del predio:\n${normaLineas}${usosContexto}\n\nAnaliza el plano "${nombre}":\n1. ¿Qué se construye? ¿Está el uso PERMITIDO en esta zona?\n2. ¿Los parámetros constructivos cuadran con la norma?`;
 
   const content = [
     { type:'text', text: userMsg },
@@ -6601,8 +6606,14 @@ function m10RenderizarVeredicto(r){
   const usoClaveHTML = r.uso_clave
     ? `<span style="display:inline-block;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--text1);margin:0 4px">${r.uso_clave}</span>`
     : '';
+  // Aviso de fuente inferida (VUJ — sin lista oficial)
+  const inferidoHTML = r.fuente_usos === 'inferido'
+    ? `<div style="margin-top:8px;padding:6px 10px;background:var(--bg3);border-radius:6px;border-left:3px solid var(--yellow);font-size:11px;color:var(--text3);line-height:1.5">
+        ⚠️ Lista de usos no disponible para este municipio. Resultado inferido por IA — verifica en el PDU local.
+       </div>`
+    : '';
 
-  // ── Chip 2: PARÁMETROS (COS / CUS / niveles) ─────────────────────
+  // ── Chip 2: PARÁMETROS ───────────────────────────────────────────
   const P = {
     cuadra:       { bg:'var(--sem-v-bg)',  bd:'#16A34A33', txt:'var(--sem-v-txt)', icon:'✅', label:'Parámetros dentro de la norma' },
     parcialmente: { bg:'var(--sem-am-bg)', bd:'#D9770633', txt:'var(--yellow)',     icon:'⚠️', label:'Parámetros con datos insuficientes o parciales' },
@@ -6625,10 +6636,9 @@ function m10RenderizarVeredicto(r){
         <span style="font-size:13px;font-weight:700;color:${usoColor}">${usoTitulo}</span>
         ${usoClaveHTML}
       </div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:5px">
-        <strong style="color:var(--text1)">${r.uso_identificado||'Proyecto identificado'}</strong>
-      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--text1);margin-bottom:4px">${r.uso_identificado||''}</div>
       <div style="font-size:12px;color:var(--text2);line-height:1.6">${r.razon_uso||''}</div>
+      ${inferidoHTML}
     </div>
 
     <!-- CHIP 2: PARÁMETROS -->

@@ -6856,9 +6856,17 @@ function m10RenderizarVeredicto(r, esReapertura){
     </div>
     ${supChipHTML}
     ${obsHTML?'<div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Observaciones</div><ul style="margin:0;padding-left:18px">'+obsHTML+'</ul></div>':''}
-    <button onclick="m10ResetUpload()" style="width:100%;padding:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer">
-      Analizar otro plano
-    </button>
+    <div style="display:flex;gap:8px;margin-top:0">
+      <button onclick="m10ResetUpload()"
+              style="flex:1;padding:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer">
+        Analizar otro plano
+      </button>
+      <button onclick="m10ExportarVeredicto()"
+              title="Descarga el resumen como archivo .txt"
+              style="flex:1;padding:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer">
+        ⬇ Descargar resumen
+      </button>
+    </div>
   `;
   window._m10UltimoVeredicto = r;
 
@@ -6893,32 +6901,86 @@ function m10ResetUpload(){
 
 function m10ExportarVeredicto(){
   const r = window._m10UltimoVeredicto;
-  if(!r){ alert('Sin dictamen para exportar.'); return; }
-  const zona  = datosZona||{};
-  const mun   = ({guadalajara:'Guadalajara',zapopan:'Zapopan',tlajomulco:'Tlajomulco de Zúñiga',tlaquepaque:'San Pedro Tlaquepaque',tonala:'Tonalá'}[municipioActual])||municipioActual;
+  if(!r){ alert('Sin análisis que exportar.'); return; }
+  const zona = datosZona||{};
+  const mun  = ({guadalajara:'Guadalajara',zapopan:'Zapopan',tlajomulco:'Tlajomulco de Zúñiga',
+                 tlaquepaque:'San Pedro Tlaquepaque',tonala:'Tonalá'}[municipioActual])||municipioActual;
   const fecha = new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
-  const usoLabel = r.uso_permitido && !r.uso_condicionado ? 'PERMITIDO' : r.uso_condicionado ? 'CONDICIONADO' : 'NO PERMITIDO';
+
+  // Nombre del proyecto (del historial si ya fue guardado, o del campo de texto)
+  const histArr = (()=>{ try{ return JSON.parse(localStorage.getItem('gu_m10_historial')||'[]'); }catch(e){ return []; } })();
+  const nombreGuardado = histArr.length ? histArr[0].nombreProyecto : '';
+  const inputNombre = (document.getElementById('m10InputNombre')||{}).value||'';
+  const nombreProyecto = inputNombre.trim() || nombreGuardado || 'Sin nombre';
+
+  // Domicilio (si está disponible)
+  const domicilio = window._ultimaDireccion||zona.domicilio||'';
+
+  // Etiquetas legibles
+  const usoLabel = r.uso_permitido && !r.uso_condicionado ? 'PERMITIDO'
+                  : r.uso_condicionado ? 'CONDICIONADO' : 'NO PERMITIDO';
   const parLabel = {cuadra:'CUADRA',parcialmente:'PARCIALMENTE',no_cuadra:'NO CUADRA'}[r.resultado]||r.resultado;
   const obs = (r.observaciones||[]).map((o,i)=>`  ${i+1}. ${o}`).join('\n');
+
+  // Sección de superficie
+  let supLineas = '';
+  if(r._superficie_real){
+    const supPlano = typeof r.superficie_plano==='number' ? r.superficie_plano+' m²' : 'no detectada';
+    const supRes   = {si:'COINCIDE',no:'NO COINCIDE',no_disponible:'NO DISPONIBLE'}[r.superficie_cuadra]||'';
+    supLineas = [
+      '',
+      'SUPERFICIE DEL TERRENO',
+      `  Real (escrituras/predial): ${r._superficie_real} m²`,
+      `  Declarada en el plano    : ${supPlano}`,
+      `  Resultado                : ${supRes}`,
+      r.nota_superficie ? `  Nota: ${r.nota_superficie}` : '',
+    ].filter(x=>x!==undefined).join('\n');
+  }
+
+  // Fuente de usos
+  const fuenteLinea = r.fuente_usos==='inferido'
+    ? '\n* Usos inferidos por IA (sin lista oficial para este municipio). Verificar en PDU local.'
+    : '';
+
+  const sep = '─'.repeat(56);
   const txt = [
     'GESTOR URBANO JALISCO AMG — PRE-DICTAMEN IA (M10)',
-    `Fecha: ${fecha} | Municipio: ${mun}`,
-    `Zona: ${zona.uso||zona.clave||'—'} | COS ${zona.cos||'—'} | CUS ${zona.cus||'—'}`,
+    sep,
+    `Proyecto  : ${nombreProyecto}`,
+    domicilio ? `Domicilio : ${domicilio}` : '',
+    `Fecha     : ${fecha}`,
+    `Municipio : ${mun}`,
+    `Zona      : ${zona.uso||zona.clave||'—'}`,
+    `COS       : ${zona.cos||'—'}  |  CUS: ${zona.cus||'—'}  |  Niveles: ${zona.niveles||'—'}`,
+    sep,
     '',
-    `USO DEL SUELO: ${usoLabel}`,
-    `Proyecto: ${r.uso_identificado||'—'}${r.uso_clave?' ('+r.uso_clave+')':''}`,
-    r.razon_uso||'',
+    '1. USO DEL SUELO',
+    `   Resultado  : ${usoLabel}`,
+    `   Proyecto   : ${r.uso_identificado||'—'}${r.uso_clave?' ('+r.uso_clave+')':''}`,
+    `   Razón      : ${r.razon_uso||'—'}`,
+    fuenteLinea,
     '',
-    `PARÁMETROS: ${parLabel}`,
-    r.resumen||'',
-    obs ? '\nObservaciones:\n'+obs : '',
+    '2. PARÁMETROS CONSTRUCTIVOS (COS / CUS / Niveles)',
+    `   Resultado  : ${parLabel}`,
+    `   Detalle    : ${r.resumen||'Sin datos de parámetros en el plano.'}`,
+    obs ? `\n   Observaciones:\n${obs}` : '',
+    supLineas,
     '',
-    'NOTA: Pre-dictamen orientativo. Para validación oficial consultar la Dirección de Ordenamiento del Territorio.',
-  ].join('\n');
+    sep,
+    'AVISO: Pre-dictamen orientativo generado por IA.',
+    'Para validación oficial consultar la Dirección de',
+    'Ordenamiento del Territorio del municipio correspondiente.',
+    sep,
+  ].filter(x=>x!==undefined).join('\n');
+
+  const nombreArchivo = nombreProyecto !== 'Sin nombre'
+    ? nombreProyecto.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]/g,'').replace(/\s+/g,'_')
+    : `PreDictamen_${mun}`;
+
   const blob = new Blob([txt],{type:'text/plain;charset=utf-8'});
   const a    = document.createElement('a');
   a.href     = URL.createObjectURL(blob);
-  a.download = `PreDictamen_${mun}_${fecha.replace(/ /g,'_')}.txt`;
+  a.download = `${nombreArchivo}_${fecha.replace(/ /g,'_')}.txt`;
   a.click();
 }
 

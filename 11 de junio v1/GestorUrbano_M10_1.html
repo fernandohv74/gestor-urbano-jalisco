@@ -6485,8 +6485,16 @@ async function m10LlamarClaude(base64, mimeType, nombre){
     tlajomulco:'Tlajomulco de Zúñiga', tlaquepaque:'San Pedro Tlaquepaque', tonala:'Tonalá'
   }[municipioActual]) || municipioActual;
 
-  const lineas = [
-    `- Zonificación: ${zona.uso||zona.clave||'—'}${zona.ppp?' / '+zona.ppp:''}`,
+  // Procesar lista de usos desde zona.uso_per / zona.uso_con (mismo formato que M01)
+  const _splitUsos = s => (s||'').split(/[|··\-]/)
+    .map(u=>u.trim().replace(/\(condicionados?\)/gi,'').trim()).filter(Boolean);
+
+  const usosP = _splitUsos(zona.uso_per);
+  const usosC = _splitUsos(zona.uso_con);
+
+  // Parámetros normativos
+  const normaLineas = [
+    `- Zonificación del predio: ${zona.uso||zona.clave||'—'}`,
     `- COS máximo: ${zona.cos||'—'}`,
     `- CUS máximo: ${zona.cus||'—'}`,
     `- Niveles máximos: ${zona.niveles||'—'}`,
@@ -6496,29 +6504,49 @@ async function m10LlamarClaude(base64, mimeType, nombre){
     zona.frente_min ? `- Frente mínimo: ${zona.frente_min} m` : '',
   ].filter(Boolean).join('\n');
 
+  const usosLinea = usosP.length
+    ? `\n- Usos PERMITIDOS en esta zona: ${usosP.join(', ')}`
+    : '';
+  const condLinea = usosC.length
+    ? `\n- Usos CONDICIONADOS (requieren dictamen): ${usosC.join(', ')}`
+    : '';
+
   const system = `Eres un dictaminador de normativa urbana del AMG (Jalisco, México).
-Tu tarea: revisar el plano adjunto y decir si el proyecto cuadra con la normativa del predio.
-Solo verifica COS, CUS, número de niveles y uso de suelo. No analices reglamentos de construcción.
-Si no puedes leer un dato del plano, dilo en observaciones.
-Responde ÚNICAMENTE con JSON puro, sin markdown:
+Analiza el plano adjunto y responde DOS preguntas en orden:
+
+PREGUNTA 1 — USO DEL SUELO:
+¿Qué tipo de construcción/proyecto muestra el plano? (bodega, vivienda, oficina, local comercial, etc.)
+¿Ese uso está PERMITIDO en la zonificación del predio?
+Usa la lista de usos permitidos proporcionada. Si el proyecto no encaja exactamente en ninguna clave, elige la más cercana y explica por qué.
+
+PREGUNTA 2 — PARÁMETROS (solo si puedes leer datos del plano):
+¿Los parámetros constructivos (COS, CUS, niveles) cuadran con la normativa?
+Busca en la solapa o cuadro de áreas: superficie de terreno, superficie construida.
+Calcula COS = planta baja / terreno y CUS = superficie total / terreno si tienes datos.
+
+Responde ÚNICAMENTE con JSON puro, sin markdown, sin texto adicional:
 {
+  "uso_identificado": "descripción breve del proyecto (ej: Bodega de almacenamiento)",
+  "uso_clave": "clave del uso de suelo aplicable (ej: I1, CS2, H2) o null si no puedes determinar",
+  "uso_permitido": true,
+  "uso_condicionado": false,
+  "razon_uso": "frase directa: por qué está o no está permitido (máx 120 chars)",
   "resultado": "cuadra|parcialmente|no_cuadra",
-  "resumen": "frase directa máx 100 caracteres",
-  "observaciones": ["obs 1", "obs 2"]
+  "resumen": "frase directa sobre COS/CUS/niveles (máx 100 chars) o 'No se pudieron leer parámetros'",
+  "observaciones": ["obs 1 sobre parámetros o datos no legibles"]
 }
-cuadra = el proyecto cumple los parámetros PDU.
-parcialmente = hay dudas o datos no legibles sin incumplimientos claros.
-no_cuadra = el plano muestra incumplimientos con la normativa.`;
+resultado = cuadra si COS/CUS/niveles están dentro de la norma o no se pueden calcular sin datos claros.
+resultado = no_cuadra si hay incumplimiento CLARO y VISIBLE en el plano.
+resultado = parcialmente si hay datos contradictorios o no todos son legibles.`;
 
   const userMsg = `Municipio: ${mun}
 Normativa PDU del predio:
-${lineas}
+${normaLineas}${usosLinea}${condLinea}
 
-Busca en la solapa o cuadro de áreas: superficie de terreno, superficie construida total, niveles.
-Calcula COS=sup_planta_baja/terreno y CUS=sup_total/terreno si tienes los datos.
-¿El plano "${nombre}" cuadra con esta normativa?`;
+Analiza el plano "${nombre}":
+1. ¿Qué se construye? ¿Está ese uso PERMITIDO en esta zona?
+2. ¿Los parámetros del proyecto cuadran con la normativa?`;
 
-  // Los PDFs ya llegan rasterizados como image/jpeg desde m10ProcessFile
   const content = [
     { type:'text', text: userMsg },
     { type:'image', source:{ type:'base64', media_type: mimeType||'image/jpeg', data:base64 } }
@@ -6535,7 +6563,7 @@ Calcula COS=sup_planta_baja/terreno y CUS=sup_total/terreno si tienes los datos.
   const res = await fetch(endpoint, {
     method:'POST', headers,
     body: JSON.stringify({
-      model: M10_MODEL, max_tokens: 600, temperature: 0,
+      model: M10_MODEL, max_tokens: 700, temperature: 0,
       system,
       messages: [{ role:'user', content }]
     })
@@ -6558,30 +6586,67 @@ function m10RenderizarVeredicto(r){
   const status      = document.getElementById('m10AnalisisStatus');
   const veredictoEl = document.getElementById('m10Veredicto');
 
-  const C = {
-    cuadra:       { bg:'var(--sem-v-bg)',  bd:'#16A34A44', txt:'var(--sem-v-txt)', icon:'✅', label:'CUADRA con la normativa del PDU' },
-    parcialmente: { bg:'var(--sem-am-bg)', bd:'#D9770644', txt:'var(--yellow)',     icon:'⚠️', label:'CUADRA PARCIALMENTE — revisar' },
-    no_cuadra:    { bg:'var(--sem-r-bg)',  bd:'#DC262644', txt:'var(--sem-r-txt)', icon:'🚫', label:'NO CUADRA con la normativa' },
+  // ── Chip 1: USO DEL SUELO ────────────────────────────────────────
+  let usoIcon, usoColor, usoBg, usoBd, usoTitulo;
+  if(r.uso_permitido === true && !r.uso_condicionado){
+    usoIcon = '✅'; usoColor = 'var(--sem-v-txt)'; usoBg = 'var(--sem-v-bg)'; usoBd = '#16A34A44';
+    usoTitulo = 'Uso PERMITIDO en esta zona';
+  } else if(r.uso_condicionado){
+    usoIcon = '⚠️'; usoColor = 'var(--yellow)'; usoBg = 'var(--sem-am-bg)'; usoBd = '#D9770644';
+    usoTitulo = 'Uso CONDICIONADO — requiere dictamen adicional';
+  } else {
+    usoIcon = '🚫'; usoColor = 'var(--sem-r-txt)'; usoBg = 'var(--sem-r-bg)'; usoBd = '#DC262644';
+    usoTitulo = 'Uso NO PERMITIDO en esta zona';
+  }
+  const usoClaveHTML = r.uso_clave
+    ? `<span style="display:inline-block;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--text1);margin:0 4px">${r.uso_clave}</span>`
+    : '';
+
+  // ── Chip 2: PARÁMETROS (COS / CUS / niveles) ─────────────────────
+  const P = {
+    cuadra:       { bg:'var(--sem-v-bg)',  bd:'#16A34A33', txt:'var(--sem-v-txt)', icon:'✅', label:'Parámetros dentro de la norma' },
+    parcialmente: { bg:'var(--sem-am-bg)', bd:'#D9770633', txt:'var(--yellow)',     icon:'⚠️', label:'Parámetros con datos insuficientes o parciales' },
+    no_cuadra:    { bg:'var(--sem-r-bg)',  bd:'#DC262633', txt:'var(--sem-r-txt)', icon:'🚫', label:'Parámetros FUERA de la norma' },
   };
-  const c = C[r.resultado] || C.parcialmente;
+  const p = P[r.resultado] || P.parcialmente;
 
   const obsHTML = (r.observaciones||[]).map(o =>
-    `<li style="font-size:12px;color:var(--text2);margin-bottom:6px;line-height:1.6">${o}</li>`
+    `<li style="font-size:12px;color:var(--text2);margin-bottom:5px;line-height:1.6">${o}</li>`
   ).join('');
 
   status.style.display  = 'none';
   veredictoEl.style.display = 'block';
   veredictoEl.innerHTML = `
-    <div style="background:${c.bg};border:2px solid ${c.bd};border-radius:12px;padding:18px 16px;margin-bottom:${obsHTML?'12':'4'}px;text-align:center">
-      <div style="font-size:38px;margin-bottom:8px;line-height:1">${c.icon}</div>
-      <div style="font-size:14px;font-weight:700;color:${c.txt};margin-bottom:7px">${c.label}</div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.6">${r.resumen||''}</div>
+    <!-- CHIP 1: USO -->
+    <div style="background:${usoBg};border:2px solid ${usoBd};border-radius:12px;padding:16px;margin-bottom:10px">
+      <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Uso del suelo</div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:7px">
+        <span style="font-size:22px;line-height:1">${usoIcon}</span>
+        <span style="font-size:13px;font-weight:700;color:${usoColor}">${usoTitulo}</span>
+        ${usoClaveHTML}
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:5px">
+        <strong style="color:var(--text1)">${r.uso_identificado||'Proyecto identificado'}</strong>
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6">${r.razon_uso||''}</div>
     </div>
+
+    <!-- CHIP 2: PARÁMETROS -->
+    <div style="background:${p.bg};border:2px solid ${p.bd};border-radius:12px;padding:16px;margin-bottom:${obsHTML?'10':'4'}px">
+      <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Parámetros constructivos (COS / CUS / Niveles)</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:${r.resumen?'7':'0'}px">
+        <span style="font-size:20px;line-height:1">${p.icon}</span>
+        <span style="font-size:13px;font-weight:700;color:${p.txt}">${p.label}</span>
+      </div>
+      ${r.resumen ? `<div style="font-size:12px;color:var(--text2);line-height:1.6">${r.resumen}</div>` : ''}
+    </div>
+
     ${obsHTML ? `
-    <div style="margin-bottom:12px">
-      <div style="font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px">Observaciones</div>
+    <div style="margin-bottom:10px">
+      <div style="font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Observaciones</div>
       <ul style="margin:0;padding-left:18px">${obsHTML}</ul>
     </div>` : ''}
+
     <button onclick="m10ResetUpload()" style="width:100%;padding:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer">
       📋 Analizar otro plano
     </button>
@@ -6609,16 +6674,21 @@ function m10ExportarVeredicto(){
   const zona  = datosZona||{};
   const mun   = ({guadalajara:'Guadalajara',zapopan:'Zapopan',tlajomulco:'Tlajomulco de Zúñiga',tlaquepaque:'San Pedro Tlaquepaque',tonala:'Tonalá'}[municipioActual])||municipioActual;
   const fecha = new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
-  const em    = {cuadra:'CUADRA',parcialmente:'CUADRA PARCIALMENTE',no_cuadra:'NO CUADRA'}[r.resultado]||r.resultado;
-  const obs   = (r.observaciones||[]).map((o,i)=>`  ${i+1}. ${o}`).join('\n');
-  const txt   = [
+  const usoLabel = r.uso_permitido && !r.uso_condicionado ? 'PERMITIDO' : r.uso_condicionado ? 'CONDICIONADO' : 'NO PERMITIDO';
+  const parLabel = {cuadra:'CUADRA',parcialmente:'PARCIALMENTE',no_cuadra:'NO CUADRA'}[r.resultado]||r.resultado;
+  const obs = (r.observaciones||[]).map((o,i)=>`  ${i+1}. ${o}`).join('\n');
+  const txt = [
     'GESTOR URBANO JALISCO AMG — PRE-DICTAMEN IA (M10)',
     `Fecha: ${fecha} | Municipio: ${mun}`,
-    `Predio: ${zona.uso||zona.clave||'—'} | COS ${zona.cos||'—'} | CUS ${zona.cus||'—'}`,
+    `Zona: ${zona.uso||zona.clave||'—'} | COS ${zona.cos||'—'} | CUS ${zona.cus||'—'}`,
     '',
-    `RESULTADO: ${em}`,
+    `USO DEL SUELO: ${usoLabel}`,
+    `Proyecto: ${r.uso_identificado||'—'}${r.uso_clave?' ('+r.uso_clave+')':''}`,
+    r.razon_uso||'',
+    '',
+    `PARÁMETROS: ${parLabel}`,
     r.resumen||'',
-    obs ? '\nOBSERVACIONES:\n'+obs : '',
+    obs ? '\nObservaciones:\n'+obs : '',
     '',
     'NOTA: Pre-dictamen orientativo. Para validación oficial consultar la Dirección de Ordenamiento del Territorio.',
   ].join('\n');

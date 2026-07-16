@@ -6,6 +6,7 @@
 <title>Gestor Urbano Jalisco — PreDictamen IA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="gu-design-system.css">
 <script>
 (function(){
@@ -14,10 +15,10 @@
 })();
 </script>
 <style>
-/* ── M10 PreDictamen IA ── */
+/* ── M10 PreDictamen IA v2 ── */
 .main{max-width:960px;margin:0 auto;padding:20px;display:flex;flex-direction:column;gap:14px}
 
-/* Barra de pasos */
+/* Paso bar */
 .paso-bar{display:flex;background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:background var(--t),border-color var(--t)}
 .paso{flex:1;display:flex;align-items:center;gap:10px;padding:11px 16px;position:relative;cursor:pointer;transition:background var(--t-fast)}
 .paso:not(:last-child)::after{content:'';position:absolute;right:-1px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:10px solid var(--border2);z-index:2;transition:border-left-color var(--t)}
@@ -29,15 +30,14 @@
 .paso.active .paso-label,.paso.done .paso-label{color:var(--text)}
 .paso-sub{font-size:10px;color:var(--text3);transition:color var(--t)}
 
-/* Paneles */
-.panel{display:none}
-.panel.visible{display:block}
+/* Panel */
+.panel{display:none}.panel.visible{display:block}
 
-/* Card base */
+/* Card */
 .m10-card{background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:18px 20px;transition:background var(--t),border-color var(--t)}
 .m10-card h2{font-size:14px;font-weight:600;color:var(--text);margin:0 0 14px;display:flex;align-items:center;gap:8px;transition:color var(--t)}
 
-/* Formulario */
+/* Form */
 .f-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 .f-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
 .f-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
@@ -46,24 +46,17 @@
 .f-group label{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;transition:color var(--t)}
 .f-group input,.f-group select{background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:8px 11px;color:var(--text);font-size:13px;font-family:var(--sans);outline:none;transition:border-color var(--t-fast),background var(--t)}
 .f-group input:focus,.f-group select:focus{border-color:var(--brand)}
-.f-group input.detectado{border-color:var(--brand-light);background:var(--brand-pale)}
+.f-group input.auto-fill{border-color:var(--brand-light);background:var(--brand-pale)}
 .f-note{font-size:10px;color:var(--text3);margin-top:3px;transition:color var(--t)}
 .auto-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;background:var(--brand-pale);border:0.5px solid var(--brand-light);color:var(--brand);border-radius:4px;padding:1px 7px}
 
-/* Mapa canvas */
-.mapa-wrap{position:relative;border-radius:var(--r-lg);overflow:hidden;border:0.5px solid var(--border2);background:var(--bg3);margin-bottom:10px}
-.mapa-canvas{display:block;width:100%}
-.mapa-ov{position:absolute;font-size:10px;font-family:var(--mono);padding:3px 9px;border-radius:4px;backdrop-filter:blur(4px);background:rgba(0,0,0,.55);color:#fff;pointer-events:none}
-.mapa-ov.tl{top:8px;left:8px}
-.mapa-ov.tr{top:8px;right:8px}
-.mapa-ov.br{bottom:8px;right:8px;font-size:9px;color:#94a3b8}
-.mapa-badge-gs{position:absolute;bottom:8px;left:8px;background:var(--brand);color:#fff;font-size:10px;font-weight:600;padding:4px 11px;border-radius:6px;display:none}
-.mapa-badge-gs.visible{display:block}
-.mapa-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
-.mapa-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);transition:color var(--t)}
-.mapa-leg-dot{width:12px;height:12px;border-radius:2px;flex-shrink:0}
+/* Mapa Leaflet */
+#mapa-leaflet{height:300px;border-radius:var(--r-lg);overflow:hidden;border:0.5px solid var(--border2);margin-bottom:12px;z-index:0}
+.leaflet-container{font-family:var(--sans)}
+.gs-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;background:var(--brand);color:#fff;border-radius:6px;padding:3px 10px;margin-bottom:10px;display:none}
+.gs-badge.visible{display:inline-flex}
 
-/* Params auto */
+/* Params chips */
 .params-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}
 .param-chip{background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:8px 10px;transition:all var(--t-fast)}
 .param-chip.detectado{border-color:var(--brand-light);background:var(--brand-pale)}
@@ -74,27 +67,26 @@
 .pc-val.peligro{color:var(--sem-r-txt)}
 .pc-sub{font-size:10px;color:var(--text2);margin-top:1px;transition:color var(--t)}
 
-/* Botón geocodificar */
-.btn-geocod{background:var(--brand);color:#fff;border:none;border-radius:var(--r-md);padding:9px 18px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:opacity var(--t-fast);white-space:nowrap}
-.btn-geocod:hover:not(:disabled){opacity:.88}
-.btn-geocod:disabled{opacity:.4;cursor:not-allowed}
-
-/* Upload */
-.upload-zone{border:1.5px dashed var(--border2);border-radius:var(--r-lg);padding:24px 20px;text-align:center;cursor:pointer;transition:border-color var(--t-fast),background var(--t-fast)}
-.upload-zone:hover,.upload-zone.drag-over{border-color:var(--brand);background:var(--brand-pale)}
-.upload-zone.loaded{border-style:solid;border-color:var(--brand-light);background:var(--brand-pale);cursor:default}
-.upload-icon{font-size:30px;margin-bottom:8px}
-.file-chips-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;justify-content:center}
-.file-chip{display:inline-flex;align-items:center;gap:7px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:5px 10px;font-size:12px;color:var(--text);transition:background var(--t)}
-.file-chip .chip-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:0 0 0 4px;line-height:1}
-.file-chip .chip-del:hover{color:var(--sem-r-txt)}
-
-/* Btns principales */
+/* Botones */
 .btn-primary{width:100%;background:var(--brand);color:#fff;border:none;border-radius:var(--r-md);padding:13px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;transition:opacity var(--t-fast)}
 .btn-primary:hover:not(:disabled){opacity:.88}
 .btn-primary:disabled{opacity:.4;cursor:not-allowed}
 .btn-sec{background:var(--bg3);border:0.5px solid var(--border2);color:var(--text2);border-radius:var(--r-md);padding:10px 18px;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:all var(--t-fast)}
 .btn-sec:hover{border-color:var(--brand);color:var(--brand)}
+.btn-geocod{background:var(--brand);color:#fff;border:none;border-radius:var(--r-md);padding:9px 18px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:opacity var(--t-fast);white-space:nowrap}
+.btn-geocod:hover:not(:disabled){opacity:.88}
+.btn-geocod:disabled{opacity:.4;cursor:not-allowed}
+
+/* Upload */
+.upload-zone{border:1.5px dashed var(--border2);border-radius:var(--r-lg);padding:32px 20px;text-align:center;cursor:pointer;transition:border-color var(--t-fast),background var(--t-fast)}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--brand);background:var(--brand-pale)}
+.upload-zone.loaded{border-style:solid;border-color:var(--brand-light);background:var(--brand-pale);cursor:default}
+.upload-icon{font-size:36px;margin-bottom:10px}
+.file-chips-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;justify-content:center}
+.file-chip{display:inline-flex;align-items:center;gap:7px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:5px 10px;font-size:12px;color:var(--text);transition:background var(--t)}
+.file-chip .chip-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:0 0 0 4px;line-height:1}
+.file-chip .chip-del:hover{color:var(--sem-r-txt)}
+.auto-label{font-size:11px;color:var(--brand);font-weight:500;margin-top:8px}
 
 /* Loading */
 .loading-panel{background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:32px 24px;text-align:center;transition:background var(--t),border-color var(--t)}
@@ -110,7 +102,7 @@
 .error-card{background:var(--sem-r-bg);border:0.5px solid var(--sem-r-brd);border-radius:var(--r-lg);padding:14px 16px;font-size:13px;color:var(--sem-r-txt);margin-bottom:12px;display:none;transition:all var(--t)}
 .error-card.visible{display:block}
 
-/* ── RESULTADO ── */
+/* Resultado */
 .sem-header{border-radius:var(--r-lg);padding:18px 20px;margin-bottom:12px;display:flex;align-items:flex-start;gap:14px;transition:all var(--t)}
 .sem-header.rojo{background:var(--sem-r-bg);border:0.5px solid var(--sem-r-brd)}
 .sem-header.amarillo{background:var(--sem-am-bg);border:0.5px solid var(--sem-am-brd)}
@@ -126,23 +118,15 @@
 .blk-chip.rojo{background:var(--sem-r-bg);border-color:var(--sem-r-brd);color:var(--sem-r-txt)}
 .blk-chip.amarillo{background:var(--sem-am-bg);border-color:var(--sem-am-brd);color:var(--sem-am-txt)}
 .blk-chip.verde{background:var(--uso-p-bg);border-color:var(--uso-p-brd);color:var(--uso-p-txt)}
-
-/* Cols resultado */
 .result-cols{display:grid;grid-template-columns:1fr 1.6fr;gap:12px}
 @media(max-width:660px){.result-cols,.f-grid-2,.f-grid-3,.f-grid-4,.params-grid{grid-template-columns:1fr}}
-
-/* Datos detectados */
 .datos-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .dato-item{background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:8px 10px;transition:all var(--t)}
 .dato-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
 .dato-val{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text);margin-top:2px;transition:color var(--t)}
 .dato-val.peligro{color:var(--sem-r-txt)}
 .dato-src{font-size:9px;color:var(--brand);margin-top:1px}
-
-/* Mapa mini resultado */
-.mapa-mini{border-radius:var(--r-md);overflow:hidden;border:0.5px solid var(--border2);margin-bottom:8px}
-
-/* Tabla verificación */
+#mapa-mini-leaflet{height:160px;border-radius:var(--r-md);overflow:hidden;border:0.5px solid var(--border2);margin-bottom:8px;z-index:0}
 .vtable{width:100%;border-collapse:collapse}
 .vtable th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding:6px 10px;text-align:left;border-bottom:0.5px solid var(--border2);transition:all var(--t)}
 .vtable td{padding:8px 10px;border-bottom:0.5px solid var(--border);font-size:12px;vertical-align:middle;transition:border-color var(--t)}
@@ -156,33 +140,23 @@
 .badge.fail{background:var(--sem-r-bg);border-color:var(--sem-r-brd);color:var(--sem-r-txt)}
 .badge.warn{background:var(--sem-am-bg);border-color:var(--sem-am-brd);color:var(--sem-am-txt)}
 .badge.nd{background:var(--bg3);border-color:var(--border2);color:var(--text3)}
-
-/* Max cabe */
 .max-cabe{background:var(--brand-pale);border:0.5px solid var(--brand-light);border-radius:var(--r-md);padding:10px 13px;margin-top:10px}
 .max-cabe-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--brand);margin-bottom:7px}
 .max-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:2px 0;color:var(--text2);transition:color var(--t)}
 .max-val{font-family:var(--mono);font-weight:600;color:var(--brand)}
 .max-val.peligro{color:var(--sem-r-txt)}
-
-/* Opciones */
 .op-list{list-style:none;padding:0;margin:0}
 .op-item{display:flex;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border);align-items:flex-start;transition:border-color var(--t)}
 .op-item:last-child{border-bottom:none}
 .op-num{width:22px;height:22px;border-radius:50%;background:var(--brand-pale);border:0.5px solid var(--brand-light);color:var(--brand);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
 .op-txt{font-size:12px;color:var(--text2);line-height:1.5;transition:color var(--t)}
 .op-txt strong{color:var(--text);display:block;margin-bottom:2px;font-size:12px;transition:color var(--t)}
-
-/* Actions */
 .action-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 .action-btn{flex:1;min-width:130px;padding:9px 14px;border-radius:var(--r-md);font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--border2);background:var(--card-bg);color:var(--text2);font-family:var(--sans);transition:all var(--t-fast);text-align:center}
 .action-btn:hover{border-color:var(--brand);color:var(--brand)}
 .action-btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
 .action-btn.primary:hover{opacity:.88}
-
-/* Disclaimer */
 .disclaimer{font-size:10px;color:var(--text3);background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);padding:10px 13px;line-height:1.6;margin-top:10px;transition:all var(--t)}
-
-/* API key */
 .apikey-panel{display:flex;align-items:flex-start;gap:14px;background:var(--card-bg);border:0.5px solid var(--border2);border-radius:var(--r-lg);padding:14px 16px;flex-wrap:wrap;transition:all var(--t)}
 .apikey-panel.ok{border-color:var(--uso-p-dot)}
 .apikey-row{display:flex;gap:6px;margin-top:6px;width:100%}
@@ -192,6 +166,8 @@
 .btn-save-key{background:var(--brand);color:#fff;border:none;border-radius:var(--r-md);padding:8px 16px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;transition:opacity var(--t-fast)}
 .btn-save-key:hover{opacity:.88}
 .apikey-status{font-size:11px;color:var(--text3);margin-top:4px;font-family:var(--mono);width:100%;transition:color var(--t)}
+/* Hint de drag en mapa */
+.mapa-hint{font-size:10px;color:var(--text3);margin-bottom:10px;text-align:center;transition:color var(--t)}
 </style>
 </head>
 <body>
@@ -223,7 +199,7 @@
 
 <div class="main">
 
-  <!-- API Key (solo visible en localhost) -->
+  <!-- API Key (solo localhost) -->
   <div class="apikey-panel" id="apikey-panel" style="display:none">
     <div style="font-size:18px;flex-shrink:0">🔑</div>
     <div style="flex:1">
@@ -253,8 +229,8 @@
     <div class="paso" id="paso-2" onclick="irAPaso(2)">
       <div class="paso-num" id="pnum-2">2</div>
       <div>
-        <div class="paso-label">Proyecto</div>
-        <div class="paso-sub">Plano PDF o imagen</div>
+        <div class="paso-label">Plano</div>
+        <div class="paso-sub">PDF o imagen — análisis auto</div>
       </div>
     </div>
     <div class="paso" id="paso-3">
@@ -268,50 +244,40 @@
 
   <!-- ─────────────────── PASO 1: PREDIO ─────────────────── -->
   <div class="panel visible" id="panel-predio">
-
     <div class="m10-card">
       <h2>📍 Datos del predio</h2>
 
-      <div class="f-single">
-        <div class="f-group">
+      <!-- Dirección + municipio + buscar -->
+      <div class="f-grid-2" style="margin-bottom:10px;align-items:flex-end">
+        <div class="f-group" style="grid-column:1/3">
           <label>Dirección completa</label>
           <div style="display:flex;gap:8px">
-            <input type="text" id="inp-dir" placeholder="Calle, número, colonia, municipio, Jalisco"
-              style="flex:1" onkeydown="if(event.key==='Enter')geocodificarDir()">
-            <button class="btn-geocod" id="btn-geocod" onclick="geocodificarDir()">Buscar en mapa</button>
+            <input type="text" id="inp-dir"
+              placeholder="Calle número, colonia, municipio, Jalisco"
+              style="flex:1"
+              onkeydown="if(event.key==='Enter')geocodificarDir()">
+            <button class="btn-geocod" id="btn-geocod" onclick="geocodificarDir()">Buscar →</button>
           </div>
-          <div class="f-note" id="geocod-status">Escribe la dirección y presiona "Buscar en mapa" para auto-detectar municipio y zonificación</div>
+          <div class="f-note" id="geocod-status">Escribe la dirección y pulsa Buscar — el mapa se centrará y consultará GeoServer automáticamente</div>
         </div>
       </div>
 
-      <!-- Mapa canvas -->
-      <div class="mapa-wrap" id="mapa-wrap" style="height:220px">
-        <canvas id="mapa-canvas" class="mapa-canvas" height="220"></canvas>
-        <div class="mapa-ov tl" id="mapa-zona-label">— sin ubicación —</div>
-        <div class="mapa-ov tr" id="mapa-mun-label"></div>
-        <div class="mapa-ov br">Mapa esquemático · no cartográfico</div>
-        <div class="mapa-badge-gs" id="mapa-badge-gs">✦ Zonificación de GeoServer</div>
-      </div>
+      <!-- Mapa Leaflet -->
+      <div id="mapa-leaflet"></div>
+      <div class="mapa-hint" id="mapa-hint">📌 Mueve el pin para ajustar la ubicación exacta</div>
 
-      <div class="mapa-legend">
-        <div class="mapa-leg-item"><div class="mapa-leg-dot" style="background:rgba(59,130,246,.8)"></div>Polígono del predio</div>
-        <div class="mapa-leg-item"><div class="mapa-leg-dot" style="background:rgba(239,68,68,.45)"></div>Restricción RI-VL (si aplica)</div>
-        <div class="mapa-leg-item"><div class="mapa-leg-dot" style="background:rgba(34,197,94,.6)"></div>Área potencialmente edificable</div>
-        <div class="mapa-leg-item"><div class="mapa-leg-dot" style="background:#f59e0b;border-radius:50%"></div>Pin de ubicación</div>
-      </div>
-
-      <!-- Datos del predio -->
-      <div style="margin-top:14px;margin-bottom:8px;display:flex;align-items:center;gap:10px">
-        <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text3)">Datos del predio</span>
-        <span class="auto-badge" id="badge-auto" style="display:none">✦ Auto-detectado de GeoServer</span>
+      <!-- Badge GeoServer -->
+      <div style="margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span class="gs-badge" id="gs-badge">✦ Zonificación de GeoServer</span>
         <span style="font-size:10px;color:var(--text3)" id="fuente-ppdu"></span>
       </div>
 
+      <!-- Municipio + Zonificación -->
       <div class="f-grid-2">
         <div class="f-group">
           <label>Municipio</label>
-          <select id="sel-mun">
-            <option value="">— Selecciona —</option>
+          <select id="sel-mun" onchange="onMunicipioChange()">
+            <option value="">— Selecciona o busca dirección —</option>
             <option value="GDL">Guadalajara (GDL)</option>
             <option value="ZPN">Zapopan (ZPN)</option>
             <option value="TLQ">Tlaquepaque (TLQ)</option>
@@ -320,54 +286,55 @@
           </select>
         </div>
         <div class="f-group">
-          <label>Zonificación detectada</label>
-          <input type="text" id="inp-zona" placeholder="ej. H3, MR-APD, I1 — o escribe manualmente" class="detectado">
+          <label>Zonificación <span style="font-weight:400;text-transform:none;letter-spacing:0">(auto-detectada, editable)</span></label>
+          <input type="text" id="inp-zona" class="auto-fill" placeholder="Se detecta al buscar — o escribe manualmente">
         </div>
       </div>
 
+      <!-- Superficie + Frente + RI-VL -->
       <div class="f-grid-3">
         <div class="f-group">
           <label>Superficie del predio (m²)</label>
-          <input type="number" id="inp-sup" placeholder="ej. 574.56" min="1" step="0.01" oninput="actualizarParams()">
+          <input type="number" id="inp-sup" placeholder="ej. 574.56" min="1" step="0.01" oninput="actualizarChips()">
         </div>
         <div class="f-group">
           <label>Frente del predio (m)</label>
-          <input type="number" id="inp-frente" placeholder="ej. 15.00" min="1" step="0.01" oninput="actualizarParams()">
-          <div class="f-note">Necesario para calcular RI-VL</div>
+          <input type="number" id="inp-frente" placeholder="ej. 15.00" min="1" step="0.01" oninput="actualizarChips()">
+          <div class="f-note">Para calcular RI-VL</div>
         </div>
         <div class="f-group">
-          <label>RI-VL (m de restricción vial)</label>
-          <input type="number" id="inp-rivl" placeholder="ej. 22 — 0 si no aplica" min="0" step="0.5" oninput="actualizarParams()">
+          <label>RI-VL — restricción vial (m)</label>
+          <input type="number" id="inp-rivl" placeholder="ej. 22 — 0 si no aplica" min="0" step="0.5" oninput="actualizarChips()">
           <div class="f-note">Periférico, López Mateos, etc.</div>
         </div>
       </div>
 
+      <!-- Parámetros PPDU (auto-fill GeoServer, editables) -->
       <div style="margin-bottom:8px;display:flex;align-items:center;gap:10px">
-        <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text3)">Parámetros normativos del PPDU</span>
-        <span class="auto-badge" id="badge-auto-ppdu" style="display:none">✦ GeoServer</span>
-        <span style="font-size:10px;color:var(--text3)">— edita si GeoServer no los cargó o para sobreescribir</span>
+        <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text3)">Parámetros PPDU</span>
+        <span class="auto-badge" id="badge-ppdu" style="display:none">✦ GeoServer</span>
+        <span style="font-size:10px;color:var(--text3)">— editables si GeoServer no los cargó</span>
       </div>
-
       <div class="f-grid-4">
         <div class="f-group">
           <label>Lote mínimo (m²)</label>
-          <input type="number" id="inp-lote-min" placeholder="ej. 1500" min="0" step="1" oninput="actualizarParams()">
+          <input type="number" id="inp-lote-min" placeholder="ej. 1500" min="0" step="1" oninput="actualizarChips()">
         </div>
         <div class="f-group">
           <label>COS máximo</label>
-          <input type="number" id="inp-cos" placeholder="ej. 0.80" min="0" max="1" step="0.01" oninput="actualizarParams()">
+          <input type="number" id="inp-cos" placeholder="ej. 0.80" min="0" max="1" step="0.01" oninput="actualizarChips()">
         </div>
         <div class="f-group">
           <label>CUS máximo</label>
-          <input type="number" id="inp-cus" placeholder="ej. 2.40" min="0" step="0.01" oninput="actualizarParams()">
+          <input type="number" id="inp-cus" placeholder="ej. 2.40" min="0" step="0.01" oninput="actualizarChips()">
         </div>
         <div class="f-group">
           <label>Restricción frontal (m)</label>
-          <input type="number" id="inp-rest-front" placeholder="ej. 5" min="0" step="0.5" oninput="actualizarParams()">
+          <input type="number" id="inp-rest-front" placeholder="ej. 5" min="0" step="0.5" oninput="actualizarChips()">
         </div>
       </div>
 
-      <!-- Chips de resumen calculado -->
+      <!-- Chips calculados -->
       <div class="params-grid" id="params-resumen">
         <div class="param-chip" id="chip-area-libre">
           <div class="pc-label">Área libre tras RI-VL</div>
@@ -392,40 +359,37 @@
       </div>
     </div>
 
-    <button class="btn-primary" onclick="irAPaso(2)">Siguiente → Subir plano del proyecto</button>
+    <button class="btn-primary" id="btn-siguiente" onclick="irAPaso(2)">Siguiente → Subir plano del proyecto</button>
   </div>
 
-  <!-- ─────────────────── PASO 2: PROYECTO ─────────────────── -->
+  <!-- ─────────────────── PASO 2: PLANO ─────────────────── -->
   <div class="panel" id="panel-plano">
-
     <div class="m10-card">
       <h2>📐 Plano del proyecto</h2>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">
-        Sube el plano arquitectónico o estructural. Acepta <strong>PDF, JPG, PNG</strong>.<br>
-        Claude leerá automáticamente: cuadro de áreas, huella, número de niveles y altura total.
+      <div style="font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.6">
+        Arrastra o selecciona el plano arquitectónico. Acepta <strong>PDF, JPG, PNG</strong>.<br>
+        El análisis inicia <strong>automáticamente</strong> al cargar: Claude lee el cuadro de áreas y cruza los datos con la zonificación del predio.
       </div>
 
       <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
-        <input type="file" id="file-input" accept="image/*,application/pdf" multiple style="display:none" onchange="agregarArchivos(Array.from(this.files));this.value=''">
+        <input type="file" id="file-input" accept="image/*,application/pdf" multiple style="display:none"
+          onchange="agregarArchivos(Array.from(this.files));this.value=''">
         <div class="upload-icon">📄</div>
-        <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px">Arrastra los planos aquí o haz clic para seleccionar</div>
-        <div style="font-size:11px;color:var(--text3);margin-bottom:12px">PDF, JPG, PNG · Máximo 10 láminas · 20 MB c/u</div>
+        <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px">Arrastra los planos aquí o haz clic</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:12px">PDF, JPG, PNG · Máx. 10 láminas · 20 MB c/u</div>
         <button class="btn-geocod" onclick="event.stopPropagation();document.getElementById('file-input').click()">Seleccionar archivos</button>
         <div class="file-chips-wrap" id="file-chips" onclick="event.stopPropagation()"></div>
+        <div class="auto-label" id="auto-label" style="display:none">⚡ Análisis iniciando automáticamente...</div>
       </div>
 
       <div style="margin-top:12px">
         <div class="f-group">
           <label>Uso propuesto <span style="color:var(--text3);font-weight:400;text-transform:none;font-size:11px">(opcional — Claude lo detecta del plano)</span></label>
-          <input type="text" id="inp-uso" placeholder="ej. Vivienda unifamiliar, Bodega I1, Consultorio, Comercio">
+          <input type="text" id="inp-uso" placeholder="ej. Vivienda unifamiliar, Bodega I1, Consultorio">
         </div>
       </div>
     </div>
-
-    <button class="btn-primary" id="btn-analizar" onclick="analizar()" disabled>
-      <span>🤖</span> Analizar viabilidad con IA
-    </button>
-    <button class="btn-sec" style="width:100%;margin-top:8px" onclick="irAPaso(1)">← Regresar al predio</button>
+    <button class="btn-sec" style="width:100%;margin-top:10px" onclick="irAPaso(1)">← Regresar al predio</button>
   </div>
 
   <!-- ─────────────────── LOADING ─────────────────── -->
@@ -433,7 +397,7 @@
     <div class="loading-panel">
       <div class="loading-spinner"></div>
       <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">Analizando tu proyecto...</div>
-      <div style="font-size:12px;color:var(--text3)">Claude lee el plano y cruza los datos con la normativa del predio</div>
+      <div style="font-size:12px;color:var(--text3)">Claude lee el plano y cruza con la normativa del predio</div>
       <ul class="load-steps" id="load-steps">
         <li id="ls-1">◦ Preparando datos del predio</li>
         <li id="ls-2">◦ Enviando plano a Claude IA</li>
@@ -447,7 +411,6 @@
   <!-- ─────────────────── RESULTADO ─────────────────── -->
   <div class="panel" id="panel-resultado">
 
-    <!-- Semáforo principal -->
     <div class="sem-header" id="sem-header">
       <div class="sem-ico" id="sem-ico">⬛</div>
       <div>
@@ -458,25 +421,17 @@
     </div>
 
     <div class="result-cols">
-
-      <!-- Columna izquierda: mapa mini + datos detectados -->
+      <!-- Columna izquierda -->
       <div>
-        <!-- Mapa mini -->
         <div class="m10-card" style="padding:12px;margin-bottom:12px">
           <h2 style="font-size:12px;margin-bottom:8px">🗺️ Ubicación verificada</h2>
-          <div class="mapa-mini" style="height:150px">
-            <canvas id="mapa-mini-canvas" style="display:block;width:100%;height:150px"></canvas>
-          </div>
+          <div id="mapa-mini-leaflet"></div>
           <div style="font-size:10px;color:var(--text3);margin-top:6px" id="mapa-mini-info">—</div>
         </div>
-
-        <!-- Datos del predio -->
         <div class="m10-card" style="margin-bottom:12px">
           <h2 style="font-size:12px;margin-bottom:10px">🗺️ Predio <span class="auto-badge" style="margin-left:4px">GeoServer / manual</span></h2>
           <div class="datos-grid" id="datos-predio"></div>
         </div>
-
-        <!-- Datos del proyecto -->
         <div class="m10-card">
           <h2 style="font-size:12px;margin-bottom:10px">📐 Proyecto <span class="auto-badge" style="margin-left:4px">Claude IA</span></h2>
           <div class="datos-grid" id="datos-proyecto"></div>
@@ -484,27 +439,18 @@
         </div>
       </div>
 
-      <!-- Columna derecha: tabla + max cabe + opciones -->
+      <!-- Columna derecha -->
       <div>
-        <!-- Tabla de verificación -->
         <div class="m10-card" style="margin-bottom:12px">
           <h2 style="font-size:12px;margin-bottom:10px">☑️ Verificación normativa</h2>
           <div style="overflow-x:auto">
             <table class="vtable">
-              <thead>
-                <tr>
-                  <th>Parámetro</th>
-                  <th>Permitido</th>
-                  <th>Proyecto</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
+              <thead><tr><th>Parámetro</th><th>Permitido</th><th>Proyecto</th><th>Estado</th></tr></thead>
               <tbody id="vtable-body"></tbody>
             </table>
           </div>
         </div>
 
-        <!-- Qué sí cabe -->
         <div class="m10-card" id="card-max-cabe" style="margin-bottom:12px;display:none">
           <h2 style="font-size:12px;margin-bottom:6px">📏 ¿Qué sí cabe en este predio?</h2>
           <div style="font-size:12px;color:var(--text2);margin-bottom:6px" id="max-cabe-intro"></div>
@@ -514,77 +460,139 @@
           </div>
         </div>
 
-        <!-- Opciones -->
         <div class="m10-card" id="card-opciones" style="margin-bottom:12px;display:none">
           <h2 style="font-size:12px;margin-bottom:10px">💡 Opciones para hacer viable el proyecto</h2>
           <ul class="op-list" id="op-list"></ul>
         </div>
 
-        <!-- Próximos pasos (si es viable) -->
         <div class="m10-card" id="card-proximos" style="margin-bottom:12px;display:none">
           <h2 style="font-size:12px;margin-bottom:10px">✅ Próximos pasos</h2>
           <ul class="op-list" id="prox-list"></ul>
         </div>
 
-        <!-- Actions -->
         <div class="action-row">
           <div class="action-btn" onclick="irAPaso(1)">✏️ Editar predio</div>
           <div class="action-btn" onclick="irAPaso(2)">📄 Cambiar plano</div>
           <div class="action-btn primary" onclick="exportarReporte()">⬇️ Descargar reporte</div>
         </div>
         <div class="disclaimer">
-          ⚠️ Análisis orientativo generado con IA a partir de los planos subidos y los parámetros del PPDU indicados. No sustituye el DTUD oficial, el dictamen de la DPL ni la intervención de un DRO certificado. Verifica siempre la información con las autoridades competentes antes de iniciar trámites o obra.
+          ⚠️ Análisis orientativo generado con IA a partir de los planos subidos y los parámetros del PPDU indicados. No sustituye el DTUD oficial, el dictamen de la DPL ni la intervención de un DRO certificado. Verifica siempre con las autoridades competentes.
         </div>
       </div>
-
     </div>
   </div>
 
 </div><!-- /main -->
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="gu-freemium.js"></script>
-<!-- ════════════════════════════════════════════════════════════
-     SCRIPT
-════════════════════════════════════════════════════════════ -->
 <script>
 // ── Constantes ──────────────────────────────────────────────
-const ES_LOCALHOST = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const ES_LOCALHOST = (window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1');
 const NOMINATIM   = 'https://nominatim.openstreetmap.org/search';
 const GS_GDL      = 'https://visorgeoserver.guadalajara.gob.mx/geoserver/vu/wfs';
 const GS_JAL      = 'https://api-visorurbano.jalisco.gob.mx/geoserver/ows';
 const MAX_FILES   = 10;
-const MAX_SIZE_MB = 20;
+const MAX_MB      = 20;
+const LAT0 = 20.6597, LNG0 = -103.3496; // Centro GDL
 
-// ── Estado global ────────────────────────────────────────────
+// ── Estado ───────────────────────────────────────────────────
 const ESTADO = {
   paso: 1,
   predio: {
-    direccion: '',
-    municipio: '',
-    zonificacion: '',
-    lat: null,
-    lng: null,
-    sup_m2: null,
-    frente_m: null,
-    rivl_m: 0,
-    lote_min_m2: null,
-    cos_max: null,
-    cus_max: null,
-    rest_frontal_m: null,
-    fuente_zona: 'manual',
-    ppdu: '',
+    direccion:'', municipio:'', zonificacion:'',
+    lat:null, lng:null,
+    sup_m2:null, frente_m:null, rivl_m:0,
+    lote_min_m2:null, cos_max:null, cus_max:null, rest_frontal_m:null,
+    fuente_zona:'manual', ppdu:'',
   },
-  plano: { archivos: [] },
+  plano: { archivos:[] },
   resultado: null,
 };
 
-// ── API Key (solo dev) ───────────────────────────────────────
+// ── Mapa Leaflet ─────────────────────────────────────────────
+let MAP = null, MARKER = null, MAP_MINI = null;
+const TILE_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+const TILE_DARK  = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+let tileLayer = null, tileLayerMini = null;
+
+function tileUrl() {
+  return document.documentElement.getAttribute('data-theme') === 'light' ? TILE_LIGHT : TILE_DARK;
+}
+
+function iniciarMapa() {
+  MAP = L.map('mapa-leaflet', { zoomControl:true, attributionControl:false })
+          .setView([LAT0, LNG0], 13);
+  tileLayer = L.tileLayer(tileUrl(), { maxZoom:19 }).addTo(MAP);
+
+  const icono = L.divIcon({
+    html: '<div style="width:28px;height:28px;border-radius:50% 50% 50% 0;background:#2563eb;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);transform:rotate(-45deg);margin-top:-14px;margin-left:-14px"></div>',
+    iconSize:[28,28], iconAnchor:[14,28], className:''
+  });
+
+  MARKER = L.marker([LAT0, LNG0], { draggable:true, icon:icono }).addTo(MAP);
+  MARKER.on('dragend', function(e) {
+    const ll = e.target.getLatLng();
+    ESTADO.predio.lat = ll.lat;
+    ESTADO.predio.lng = ll.lng;
+    const mun = ESTADO.predio.municipio || detectarMunicipioXY(ll.lat, ll.lng);
+    consultarGeoServer(mun || 'GDL', ll.lat, ll.lng);
+  });
+}
+
+function actualizarTileLayer() {
+  if (!MAP) return;
+  const url = tileUrl();
+  if (tileLayer) { MAP.removeLayer(tileLayer); }
+  tileLayer = L.tileLayer(url, { maxZoom:19 }).addTo(MAP);
+  if (MAP_MINI) {
+    if (tileLayerMini) MAP_MINI.removeLayer(tileLayerMini);
+    tileLayerMini = L.tileLayer(url, { maxZoom:19 }).addTo(MAP_MINI);
+  }
+}
+
+function moverPinMapa(lat, lng, zoom) {
+  if (!MAP || !MARKER) return;
+  MAP.setView([lat, lng], zoom || 16);
+  MARKER.setLatLng([lat, lng]);
+  ESTADO.predio.lat = lat;
+  ESTADO.predio.lng = lng;
+}
+
+function iniciarMapaMini(lat, lng) {
+  if (MAP_MINI) { MAP_MINI.remove(); MAP_MINI = null; }
+  MAP_MINI = L.map('mapa-mini-leaflet', { zoomControl:false, dragging:false, attributionControl:false })
+              .setView([lat||LAT0, lng||LNG0], 15);
+  tileLayerMini = L.tileLayer(tileUrl(), { maxZoom:19 }).addTo(MAP_MINI);
+  const icono = L.divIcon({
+    html: '<div style="width:20px;height:20px;border-radius:50% 50% 50% 0;background:#2563eb;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.4);transform:rotate(-45deg);margin-top:-10px;margin-left:-10px"></div>',
+    iconSize:[20,20], iconAnchor:[10,20], className:''
+  });
+  L.marker([lat||LAT0, lng||LNG0], { icon:icono }).addTo(MAP_MINI);
+}
+
+// ── Tema ─────────────────────────────────────────────────────
+function guToggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') !== 'light';
+  const next = isDark ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('gu_theme', next);
+  document.getElementById('gu-toggle-label').textContent = next === 'dark' ? 'Modo oscuro' : 'Modo claro';
+  actualizarTileLayer();
+}
+(function(){
+  const t = localStorage.getItem('gu_theme') || 'dark';
+  document.getElementById('gu-toggle-label').textContent = t === 'dark' ? 'Modo oscuro' : 'Modo claro';
+})();
+
+// ── API Key ──────────────────────────────────────────────────
 function obtenerKey() { return localStorage.getItem('gu_apikey') || ''; }
 function guardarKey() {
   const v = document.getElementById('apikey-input').value.trim();
   if (!v) return;
   localStorage.setItem('gu_apikey', v);
-  document.getElementById('apikey-status').textContent = '✓ Key guardada en localStorage';
+  document.getElementById('apikey-status').textContent = '✓ Key guardada';
   document.getElementById('apikey-input').classList.add('saved');
   document.getElementById('apikey-panel').classList.add('ok');
 }
@@ -605,912 +613,652 @@ function initKey() {
 }
 initKey();
 
-// ── Tema ─────────────────────────────────────────────────────
-function guToggleTheme() {
-  const html = document.documentElement;
-  const dark = html.getAttribute('data-theme') !== 'light';
-  const next = dark ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('gu_theme', next);
-  document.getElementById('gu-toggle-label').textContent = next === 'dark' ? 'Modo oscuro' : 'Modo claro';
-  dibujarMapa('mapa-canvas', 500, 220, false);
-  dibujarMapa('mapa-mini-canvas', 300, 150, true);
-}
-(function(){
-  const t = localStorage.getItem('gu_theme') || 'dark';
-  document.getElementById('gu-toggle-label').textContent = t === 'dark' ? 'Modo oscuro' : 'Modo claro';
-})();
-
-// ── Errores globales ─────────────────────────────────────────
+// ── Errores ──────────────────────────────────────────────────
 function mostrarError(msg) {
   const el = document.getElementById('error-card');
   el.innerHTML = '⚠️ ' + msg;
   el.classList.add('visible');
-  setTimeout(() => el.classList.remove('visible'), 8000);
+  setTimeout(() => el.classList.remove('visible'), 9000);
 }
-function ocultarError() { document.getElementById('error-card').classList.remove('visible'); }
 
-// ── Navegación de pasos ──────────────────────────────────────
+// ── Navegación ───────────────────────────────────────────────
 function irAPaso(n) {
   ['panel-predio','panel-plano','panel-loading','panel-resultado'].forEach(id => {
     document.getElementById(id)?.classList.remove('visible');
   });
-  const paneles = { 1:'panel-predio', 2:'panel-plano', 3:'panel-resultado' };
+  const paneles = {1:'panel-predio', 2:'panel-plano', 3:'panel-resultado'};
   if (paneles[n]) document.getElementById(paneles[n]).classList.add('visible');
   ESTADO.paso = n;
-  // Actualizar barra de pasos
-  for (let i = 1; i <= 3; i++) {
-    const paso = document.getElementById(`paso-${i}`);
-    const pnum = document.getElementById(`pnum-${i}`);
-    paso.classList.remove('done','active');
-    if (i < n) { paso.classList.add('done'); pnum.textContent = '✓'; }
-    else if (i === n) { paso.classList.add('active'); pnum.textContent = i; }
-    else { pnum.textContent = i; }
+  for (let i=1; i<=3; i++) {
+    const p = document.getElementById(`paso-${i}`);
+    const pn = document.getElementById(`pnum-${i}`);
+    p.classList.remove('done','active');
+    if (i < n) { p.classList.add('done'); pn.textContent='✓'; }
+    else if (i===n) { p.classList.add('active'); pn.textContent=i; }
+    else pn.textContent = i;
   }
-  if (n === 1) setTimeout(() => dibujarMapa('mapa-canvas', obtW('mapa-canvas'), 220, false), 30);
-  if (n === 3) setTimeout(() => dibujarMapa('mapa-mini-canvas', obtW('mapa-mini-canvas'), 150, true), 30);
+  if (n === 1) setTimeout(() => MAP && MAP.invalidateSize(), 100);
+  if (n === 3 && ESTADO.predio.lat) {
+    setTimeout(() => iniciarMapaMini(ESTADO.predio.lat, ESTADO.predio.lng), 100);
+  }
 }
 
-function obtW(id) {
-  const el = document.getElementById(id);
-  return el ? el.parentElement.clientWidth || 500 : 500;
-}
-
-// ── MAPA CANVAS ──────────────────────────────────────────────
-function dibujarMapa(id, W, H, compact) {
-  const canvas = document.getElementById(id);
-  if (!canvas) return;
-  canvas.width  = W;
-  canvas.height = H;
-  const ctx = canvas.getContext('2d');
-  const dark = document.documentElement.getAttribute('data-theme') !== 'light';
-
-  const BG     = dark ? '#1a2535' : '#c8d5b9';
-  const MAN    = dark ? '#1e3040' : '#d0dfc4';
-  const BLDG   = dark ? '#2a3850' : '#c2cdb6';
-  const ROAD_Y = dark ? '#f9c74f' : '#f0e68c';
-  const ROAD_M = dark ? '#253045' : '#beccae';
-
-  ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
-
-  // Manzanas
-  const manzanas = compact
-    ? [[0,0,W*.48,H*.45],[W*.52,0,W,H*.42],[0,H*.5,W*.45,H],[W*.5,H*.47,W,H]]
-    : [[0,0,W*.36,H*.47],[W*.39,0,W,H*.44],[0,H*.5,W*.34,H],[W*.37,H*.48,W,H]];
-  ctx.fillStyle = MAN;
-  manzanas.forEach(m => ctx.fillRect(m[0],m[1],m[2]-m[0],m[3]-m[1]));
-
-  // Edificios dentro de manzanas
-  ctx.fillStyle = BLDG;
-  manzanas.forEach(m => {
-    const mx=m[0]+5,my=m[1]+5,mw=m[2]-m[0]-10,mh=m[3]-m[1]-10;
-    if(mw>15&&mh>15) ctx.fillRect(mx,my,mw,mh);
+function mostrarLoading() {
+  ['panel-predio','panel-plano','panel-resultado'].forEach(id =>
+    document.getElementById(id)?.classList.remove('visible'));
+  document.getElementById('panel-loading').classList.add('visible');
+  ['ls-1','ls-2','ls-3','ls-4','ls-5'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('active','done','error-step');
+    el.textContent = el.textContent.replace(/^[◦●✓✗] /,'◦ ');
   });
-
-  // Vialidad principal (Periférico) — vertical
-  const periX = compact ? W*.5 : W*.37;
-  const periW = compact ? W*.06 : W*.05;
-  ctx.fillStyle = ROAD_Y;
-  ctx.fillRect(periX - periW/2, 0, periW, H);
-
-  // Línea central del Periférico
-  ctx.setLineDash([compact?8:12, compact?4:6]);
-  ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(periX, 0); ctx.lineTo(periX, H); ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Vialidad secundaria — horizontal
-  const crossY = compact ? H*.45 : H*.48;
-  const crossH = compact ? H*.08 : H*.07;
-  ctx.fillStyle = ROAD_M;
-  ctx.fillRect(0, crossY - crossH/2, W, crossH);
-
-  // Etiqueta Periférico
-  ctx.save();
-  ctx.translate(periX + periW, compact ? H*.3 : H*.3);
-  ctx.rotate(-Math.PI/2);
-  ctx.font = `bold ${compact?8:9}px 'Outfit',system-ui`;
-  ctx.fillStyle = dark ? '#f9c74f' : '#7a6200';
-  ctx.textAlign = 'center';
-  ctx.fillText('PERIFÉRICO', 0, -4);
-  ctx.restore();
-
-  // RI-VL (franja roja al lado del Periférico)
-  const rivlM = parseFloat(document.getElementById('inp-rivl')?.value) || 0;
-  const px0 = periX + periW/2 + 2;
-  const py0 = compact ? H*.1  : H*.12;
-  const pw  = compact ? W*.42 : W*.58;
-  const ph  = compact ? H*.72 : H*.68;
-
-  let rivlPx = 0;
-  if (rivlM > 0) {
-    const frente = parseFloat(document.getElementById('inp-frente')?.value) || 0;
-    const sup    = parseFloat(document.getElementById('inp-sup')?.value) || 0;
-    // Estimar píxeles de RI-VL proporcional a la anchura del predio canvas
-    rivlPx = Math.min(pw * 0.42, pw * (rivlM / (sup > 0 && frente > 0 ? (sup/frente) : 30)));
-
-    // Franja RI-VL
-    ctx.fillStyle = 'rgba(239,68,68,0.32)';
-    ctx.fillRect(px0, py0, rivlPx, ph);
-
-    // Límite RI-VL
-    ctx.setLineDash([4,3]);
-    ctx.strokeStyle = 'rgba(239,68,68,0.85)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(px0 + rivlPx, py0); ctx.lineTo(px0 + rivlPx, py0 + ph);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Etiqueta RI-VL
-    ctx.font = `bold ${compact?7:8}px 'Outfit',system-ui`;
-    ctx.fillStyle = 'rgba(239,68,68,.9)';
-    ctx.textAlign = 'center';
-    ctx.fillText('RI-VL', px0 + rivlPx/2, py0 + ph + (compact?11:14));
-  }
-
-  // Área edificable (verde)
-  if (rivlPx < pw) {
-    ctx.fillStyle = 'rgba(34,197,94,0.2)';
-    ctx.fillRect(px0 + rivlPx, py0, pw - rivlPx, ph);
-  }
-
-  // Polígono predio (azul)
-  ctx.fillStyle = 'rgba(59,130,246,0.22)';
-  ctx.fillRect(px0, py0, pw, ph);
-  ctx.strokeStyle = '#3b82f6';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(px0, py0, pw, ph);
-
-  // Etiqueta predio
-  const sup = parseFloat(document.getElementById('inp-sup')?.value);
-  ctx.font = `${compact?8:9}px 'Outfit',system-ui`;
-  ctx.fillStyle = '#3b82f6';
-  ctx.textAlign = 'center';
-  ctx.fillText(sup ? `${sup.toLocaleString('es')} m²` : 'Predio', px0 + pw/2, py0 + ph/2 + 3);
-
-  // PIN
-  if (ESTADO.predio.lat) {
-    const pinX = px0 + pw/2;
-    const pinY = py0 - (compact ? 13 : 18);
-    const r    = compact ? 7 : 10;
-    ctx.fillStyle = '#f59e0b';
-    ctx.beginPath(); ctx.arc(pinX, pinY, r, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.arc(pinX, pinY, r*.4, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(pinX - r*.4, pinY + r*.8);
-    ctx.lineTo(pinX + r*.4, pinY + r*.8);
-    ctx.lineTo(pinX, pinY + r*1.7);
-    ctx.closePath();
-    ctx.fillStyle = '#f59e0b'; ctx.fill();
-  }
 }
 
-// Inicializar mapa al cargar
-window.addEventListener('load', () => {
-  dibujarMapa('mapa-canvas', obtW('mapa-canvas'), 220, false);
-});
-window.addEventListener('resize', () => {
-  dibujarMapa('mapa-canvas', obtW('mapa-canvas'), 220, false);
-  if (ESTADO.paso === 3) dibujarMapa('mapa-mini-canvas', obtW('mapa-mini-canvas'), 150, true);
-});
-const _themeObs = new MutationObserver(() => {
-  dibujarMapa('mapa-canvas', obtW('mapa-canvas'), 220, false);
-  if (ESTADO.paso === 3) dibujarMapa('mapa-mini-canvas', obtW('mapa-mini-canvas'), 150, true);
-});
-_themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+function actualizarPasoLoad(idx, estado, txt) {
+  const el = document.getElementById(`ls-${idx}`);
+  if (!el) return;
+  el.classList.remove('active','done','error-step');
+  if (estado==='active') { el.classList.add('active'); el.textContent = '● ' + txt; }
+  else if (estado==='done') { el.classList.add('done'); el.textContent = '✓ ' + txt; }
+  else if (estado==='error') { el.classList.add('error-step'); el.textContent = '✗ ' + txt; }
+}
 
-// ── GEOCODIFICACIÓN (Nominatim) ──────────────────────────────
+// ── Municipio auto ───────────────────────────────────────────
+function detectarMunicipioXY(lat, lng) {
+  if (lat>=20.55&&lat<=20.75&&lng>=-103.5&&lng<=-103.15) return 'GDL';
+  return '';
+}
+
+function onMunicipioChange() {
+  const mun = document.getElementById('sel-mun').value;
+  ESTADO.predio.municipio = mun;
+  if (ESTADO.predio.lat && mun) consultarGeoServer(mun, ESTADO.predio.lat, ESTADO.predio.lng);
+}
+
+// ── Geocodificación Nominatim ────────────────────────────────
 async function geocodificarDir() {
   const dir = document.getElementById('inp-dir').value.trim();
-  if (!dir) { mostrarError('Escribe una dirección primero.'); return; }
-
+  if (!dir) { mostrarError('Escribe una dirección primero'); return; }
   const btn = document.getElementById('btn-geocod');
   btn.disabled = true; btn.textContent = 'Buscando...';
-  document.getElementById('geocod-status').textContent = 'Buscando dirección en Nominatim…';
-
+  document.getElementById('geocod-status').textContent = 'Geocodificando...';
   try {
-    const q   = encodeURIComponent(dir + ' Jalisco México');
-    const url = `${NOMINATIM}?q=${q}&format=json&limit=3&countrycodes=mx&addressdetails=1`;
-    const r   = await fetch(url, { headers: { 'Accept-Language': 'es' } });
-    if (!r.ok) throw new Error('Nominatim no respondió');
-    const rs  = await r.json();
-    if (!rs.length) throw new Error('No se encontró la dirección');
-
-    const best = rs[0];
-    ESTADO.predio.lat = parseFloat(best.lat);
-    ESTADO.predio.lng = parseFloat(best.lon);
+    const url = `${NOMINATIM}?q=${encodeURIComponent(dir+', Jalisco, México')}&format=json&limit=5&countrycodes=mx`;
+    const res = await fetch(url, { headers:{'Accept-Language':'es'} });
+    const data = await res.json();
+    if (!data.length) throw new Error('Dirección no encontrada — intenta con más detalle');
+    const r = data[0];
+    const lat = parseFloat(r.lat), lng = parseFloat(r.lon);
+    const display = r.display_name;
+    ESTADO.predio.lat = lat;
+    ESTADO.predio.lng = lng;
     ESTADO.predio.direccion = dir;
-
-    // Auto-detectar municipio
-    const addr = best.address || {};
-    const city = (addr.city || addr.town || addr.county || '').toLowerCase();
+    document.getElementById('geocod-status').textContent = '📍 ' + display;
+    moverPinMapa(lat, lng, 17);
+    // Auto-detect municipio
+    const addr = r.address || {};
+    const ciudad = (addr.city||addr.town||addr.village||addr.municipality||'').toLowerCase();
     let mun = '';
-    if (city.includes('guadalajara'))     mun = 'GDL';
-    else if (city.includes('zapopan'))    mun = 'ZPN';
-    else if (city.includes('tlaquepaque')) mun = 'TLQ';
-    else if (city.includes('tlajomulco')) mun = 'TLA';
-    else if (city.includes('tonalá') || city.includes('tonala')) mun = 'TON';
-
+    if (ciudad.includes('guadalajara')) mun = 'GDL';
+    else if (ciudad.includes('zapopan')) mun = 'ZPN';
+    else if (ciudad.includes('tlaquepaque')) mun = 'TLQ';
+    else if (ciudad.includes('tlajomulco')) mun = 'TLA';
+    else if (ciudad.includes('tonal')) mun = 'TON';
     if (mun) {
-      document.getElementById('sel-mun').value = mun;
       ESTADO.predio.municipio = mun;
+      document.getElementById('sel-mun').value = mun;
     }
-
-    document.getElementById('geocod-status').textContent =
-      `📍 Ubicado: ${best.display_name.split(',').slice(0,3).join(', ')}`;
-    document.getElementById('mapa-zona-label').textContent =
-      mun ? `${mun} · ${ESTADO.predio.zonificacion || 'consultando zonificación…'}` : best.display_name.split(',')[0];
-    document.getElementById('mapa-mun-label').textContent = mun || '';
-
-    dibujarMapa('mapa-canvas', obtW('mapa-canvas'), 220, false);
-
-    // Intentar consultar GeoServer para zonificación
-    if (mun) await consultarGeoServer(mun, ESTADO.predio.lat, ESTADO.predio.lng);
-
+    await consultarGeoServer(mun || 'GDL', lat, lng);
   } catch(e) {
-    document.getElementById('geocod-status').textContent = '⚠️ ' + e.message + ' — puedes llenar los datos manualmente.';
+    mostrarError(e.message || 'Error al geocodificar');
+    document.getElementById('geocod-status').textContent = 'No se pudo ubicar — revisa la dirección';
   } finally {
-    btn.disabled = false; btn.textContent = 'Buscar en mapa';
+    btn.disabled = false; btn.textContent = 'Buscar →';
   }
 }
 
-// ── CONSULTA GEOSERVER (simplificada, solo para obtener zonificación) ──
+// ── GeoServer WFS ────────────────────────────────────────────
 async function consultarGeoServer(mun, lat, lng) {
-  document.getElementById('geocod-status').textContent = 'Consultando GeoServer para zonificación…';
-  try {
-    let url, typeName, propZona, propCOS, propCUS;
-    if (mun === 'GDL') {
-      typeName = 'vu:GDL_E1_Zonificacion_Secundaria';
-      propZona = 'zona_sec';  propCOS = 'cos_max'; propCUS = 'cus_max';
-      url = `${GS_GDL}?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&typeName=${typeName}` +
-        `&outputFormat=application/json&maxFeatures=1` +
-        `&CQL_FILTER=INTERSECTS(geom,POINT(${lng}%20${lat}))`;
-    } else {
-      // ZPN, TLQ, TLA, TON — Visor Jalisco
-      const layerMap = { ZPN:'vu_zpn:ZPN_ZonificacionSecundaria', TLQ:'vu_tlq:TLQ_Zonificacion', TLA:'vu_tla:TLA_Zonificacion', TON:'vu_ton:TON_Zonificacion' };
-      typeName = layerMap[mun] || '';
-      if (!typeName) throw new Error('municipio no soportado en GeoServer');
-      propZona = 'zona'; propCOS = 'cos'; propCUS = 'cus';
-      url = `${GS_JAL}?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&typeName=${typeName}` +
-        `&outputFormat=application/json&count=1` +
-        `&CQL_FILTER=INTERSECTS(the_geom,POINT(${lng}%20${lat}))`;
-    }
+  document.getElementById('geocod-status').textContent = '⏳ Consultando GeoServer para zonificación...';
+  const isGDL = (mun === 'GDL');
+  const base  = isGDL ? GS_GDL : GS_JAL;
+  const cqlPt = `INTERSECTS(geom,POINT(${lng} ${lat}))`;
 
-    const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    if (!r.ok) throw new Error('GeoServer no respondió');
-    const gj = await r.json();
-    const feat = gj.features?.[0];
-    if (!feat) throw new Error('Sin datos de zonificación en este punto');
+  const capas = isGDL
+    ? [{ name:'vu:PPDU_GDL_Zonificacion', props:['ZONIFICACION','COS','CUS','LOTE_MINIMO','REST_FRONT'] }]
+    : [
+        { name:'vu:ZPN_Zonificacion', props:['CLAVE_ZONA','COS','CUS','LOTE_MINIMO'] },
+        { name:'vu:TLQ_Zonificacion', props:['CLAVE_ZONA','COS','CUS','LOTE_MINIMO'] },
+        { name:'vu:TLA_Zonificacion', props:['CLAVE_ZONA','COS','CUS','LOTE_MINIMO'] },
+        { name:'vu:TON_Zonificacion', props:['CLAVE_ZONA','COS','CUS','LOTE_MINIMO'] },
+      ];
 
-    const props = feat.properties || {};
-    const zona  = props[propZona] || props['clave_zona'] || props['ZONA'] || '';
-    const cos   = parseFloat(props[propCOS] || props['COS'] || props['coef_ocup']) || null;
-    const cus   = parseFloat(props[propCUS] || props['CUS'] || props['coef_util']) || null;
-
-    if (zona) {
-      document.getElementById('inp-zona').value = zona;
-      ESTADO.predio.zonificacion = zona;
-      ESTADO.predio.fuente_zona = 'geoserver';
-      document.getElementById('mapa-zona-label').textContent = `${mun} · ${zona}`;
-      document.getElementById('badge-auto').style.display = 'inline-flex';
-      document.getElementById('badge-auto-ppdu').style.display = 'inline-flex';
-      document.getElementById('mapa-badge-gs').classList.add('visible');
-    }
-    if (cos) { document.getElementById('inp-cos').value = cos; ESTADO.predio.cos_max = cos; }
-    if (cus) { document.getElementById('inp-cus').value = cus; ESTADO.predio.cus_max = cus; }
-    if (props.lote_min || props.lote_minimo) {
-      const lm = parseFloat(props.lote_min || props.lote_minimo);
-      document.getElementById('inp-lote-min').value = lm;
-      ESTADO.predio.lote_min_m2 = lm;
-    }
-    actualizarParams();
-    document.getElementById('geocod-status').textContent = `✓ Zonificación obtenida de GeoServer: ${zona}`;
-    document.getElementById('fuente-ppdu').textContent = 'PPDU ' + mun;
-
-  } catch(e) {
-    document.getElementById('geocod-status').textContent =
-      `📍 Ubicado. GeoServer no disponible (${e.message}) — llena los parámetros del PPDU manualmente.`;
+  for (const capa of capas) {
+    try {
+      const params = new URLSearchParams({
+        service:'WFS', version:'2.0.0', request:'GetFeature',
+        typeName:capa.name, outputFormat:'application/json',
+        CQL_FILTER:cqlPt, count:1,
+      });
+      const res = await fetch(`${base}?${params}`, { signal: AbortSignal.timeout(8000) });
+      if (!res.ok) continue;
+      const json = await res.json();
+      if (!json.features || !json.features.length) continue;
+      const p = json.features[0].properties;
+      const zona  = p.ZONIFICACION || p.CLAVE_ZONA || '';
+      const cos   = parseFloat(p.COS)   || null;
+      const cus   = parseFloat(p.CUS)   || null;
+      const lmin  = parseFloat(p.LOTE_MINIMO) || null;
+      const rfront= parseFloat(p.REST_FRONT)  || null;
+      llenarParametros(zona, cos, cus, lmin, rfront, capa.name);
+      document.getElementById('geocod-status').textContent = `✦ Zonificación detectada: ${zona || '—'} (${capa.name})`;
+      document.getElementById('gs-badge').classList.add('visible');
+      document.getElementById('badge-ppdu').style.display = 'inline-flex';
+      document.getElementById('fuente-ppdu').textContent = capa.name;
+      return;
+    } catch(_) { /* continuar con siguiente capa */ }
   }
+  document.getElementById('geocod-status').textContent = 'GeoServer no respondió — completa los parámetros manualmente';
 }
 
-// ── Calcular y actualizar chips de parámetros ────────────────
-function actualizarParams() {
-  const sup    = parseFloat(document.getElementById('inp-sup').value)       || 0;
-  const frente = parseFloat(document.getElementById('inp-frente').value)    || 0;
-  const rivl   = parseFloat(document.getElementById('inp-rivl').value)      || 0;
-  const cos    = parseFloat(document.getElementById('inp-cos').value)       || 0;
-  const cus    = parseFloat(document.getElementById('inp-cus').value)       || 0;
-  const loteMin= parseFloat(document.getElementById('inp-lote-min').value)  || 0;
+function llenarParametros(zona, cos, cus, lmin, rfront, fuente) {
+  ESTADO.predio.zonificacion = zona;
+  ESTADO.predio.cos_max = cos;
+  ESTADO.predio.cus_max = cus;
+  ESTADO.predio.lote_min_m2 = lmin;
+  ESTADO.predio.rest_frontal_m = rfront;
+  ESTADO.predio.fuente_zona = fuente ? 'geoserver' : 'manual';
+  if (zona) { document.getElementById('inp-zona').value = zona; document.getElementById('inp-zona').classList.add('auto-fill'); }
+  if (cos !== null) { document.getElementById('inp-cos').value = cos; document.getElementById('inp-cos').classList.add('auto-fill'); }
+  if (cus !== null) { document.getElementById('inp-cus').value = cus; document.getElementById('inp-cus').classList.add('auto-fill'); }
+  if (lmin !== null) { document.getElementById('inp-lote-min').value = lmin; document.getElementById('inp-lote-min').classList.add('auto-fill'); }
+  if (rfront !== null) { document.getElementById('inp-rest-front').value = rfront; document.getElementById('inp-rest-front').classList.add('auto-fill'); }
+  actualizarChips();
+}
 
-  ESTADO.predio.sup_m2       = sup    || null;
-  ESTADO.predio.frente_m     = frente || null;
-  ESTADO.predio.rivl_m       = rivl;
-  ESTADO.predio.cos_max      = cos    || null;
-  ESTADO.predio.cus_max      = cus    || null;
-  ESTADO.predio.lote_min_m2  = loteMin|| null;
-  ESTADO.predio.rest_frontal_m = parseFloat(document.getElementById('inp-rest-front').value) || null;
-  ESTADO.predio.municipio    = document.getElementById('sel-mun').value;
-  ESTADO.predio.zonificacion = document.getElementById('inp-zona').value;
+// ── Chips calculados ─────────────────────────────────────────
+function actualizarChips() {
+  const sup    = parseFloat(document.getElementById('inp-sup').value)     || null;
+  const frente = parseFloat(document.getElementById('inp-frente').value)  || null;
+  const rivl   = parseFloat(document.getElementById('inp-rivl').value)    || 0;
+  const cos    = parseFloat(document.getElementById('inp-cos').value)     || null;
+  const cus    = parseFloat(document.getElementById('inp-cus').value)     || null;
+  const lmin   = parseFloat(document.getElementById('inp-lote-min').value)|| null;
 
-  // Área libre tras RI-VL
+  ESTADO.predio.sup_m2 = sup;
+  ESTADO.predio.frente_m = frente;
+  ESTADO.predio.rivl_m = rivl;
+  ESTADO.predio.cos_max = cos || ESTADO.predio.cos_max;
+  ESTADO.predio.cus_max = cus || ESTADO.predio.cus_max;
+  ESTADO.predio.lote_min_m2 = lmin || ESTADO.predio.lote_min_m2;
+
   let areaLibre = sup;
-  if (rivl > 0 && frente > 0) areaLibre = Math.max(0, sup - rivl * frente);
-  else if (rivl > 0 && sup > 0) areaLibre = Math.max(0, sup * (1 - rivl / Math.sqrt(sup)));
+  if (sup && frente && rivl > 0) areaLibre = Math.max(0, sup - rivl * frente);
 
-  const huellaMax = cos > 0 ? areaLibre * cos : null;
-  const supMax    = cus > 0 && sup > 0 ? sup * cus : null;
+  const huellaMax = (areaLibre && cos) ? areaLibre * cos : null;
+  const supMax    = (sup && cus) ? sup * cus : null;
 
-  const setChip = (id, valId, subId, val, sub, cls) => {
-    const chip = document.getElementById(id);
-    const vel  = document.getElementById(valId);
-    const sel  = document.getElementById(subId);
-    vel.textContent  = val;
-    if (sub !== null && sel) sel.textContent = sub;
-    chip.className   = 'param-chip' + (cls ? ' ' + cls : '');
-    vel.className    = 'pc-val' + (cls === 'alerta' ? ' alerta' : cls === 'peligro' ? ' peligro' : '');
-  };
+  const v = (id, val) => { document.getElementById(id).textContent = val !== null ? (+val).toLocaleString('es-MX',{maximumFractionDigits:1}) : '—'; };
+  v('val-area-libre', areaLibre);
+  v('val-huella-max', huellaMax);
+  v('val-sup-max', supMax);
 
-  setChip('chip-area-libre','val-area-libre',null,
-    rivl > 0 ? (areaLibre > 0 ? areaLibre.toFixed(0) + ' m²' : '0 m²') : (sup > 0 ? sup.toFixed(0) + ' m²' : '—'),
-    null, rivl > 0 && areaLibre < 150 ? 'peligro' : rivl > 0 ? 'detectado' : '');
-
-  setChip('chip-huella-max','val-huella-max',null,
-    huellaMax ? huellaMax.toFixed(0) + ' m²' : '—',
-    null, huellaMax && huellaMax < 100 ? 'alerta' : '');
-
-  setChip('chip-sup-max','val-sup-max',null,
-    supMax ? supMax.toFixed(0) + ' m²' : '—',
-    null, '');
-
-  // Estado del lote
-  if (sup > 0 && loteMin > 0) {
-    if (sup >= loteMin) {
-      setChip('chip-lote-status','val-lote-status','sub-lote-status','✓ Normal','cumple lote mín.','detectado');
-    } else {
-      setChip('chip-lote-status','val-lote-status','sub-lote-status','✗ Subnormal',`mín. ${loteMin.toLocaleString('es')} m²`,'alerta');
-    }
+  if (sup && lmin) {
+    const ok = sup >= lmin;
+    document.getElementById('val-lote-status').textContent = ok ? 'Normal' : 'Subnormal';
+    document.getElementById('val-lote-status').className = 'pc-val' + (ok ? '' : ' peligro');
+    document.getElementById('sub-lote-status').textContent = ok ? `≥ ${lmin} m²` : `< ${lmin} m² mín.`;
+    document.getElementById('chip-lote-status').classList.toggle('alerta', !ok);
   } else {
-    setChip('chip-lote-status','val-lote-status','sub-lote-status','—','ingresa superficie + lote mín.','');
+    document.getElementById('val-lote-status').textContent = '—';
+    document.getElementById('sub-lote-status').textContent = 'ingresa superficie';
   }
-
-  dibujarMapa('mapa-canvas', obtW('mapa-canvas'), 220, false);
 }
 
-// ── MANEJO DE ARCHIVOS ───────────────────────────────────────
-const uploadZone = document.getElementById('upload-zone');
-uploadZone.addEventListener('dragover',  e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
-uploadZone.addEventListener('dragleave', ()=> { uploadZone.classList.remove('drag-over'); });
-uploadZone.addEventListener('drop', e => {
-  e.preventDefault(); uploadZone.classList.remove('drag-over');
-  const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/') || f.type === 'application/pdf');
-  if (files.length) agregarArchivos(files);
-});
+// ── Drag & Drop upload ────────────────────────────────────────
+(function setupDrop() {
+  const zone = document.getElementById('upload-zone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag-over');
+    agregarArchivos(Array.from(e.dataTransfer.files));
+  });
+})();
 
 function agregarArchivos(files) {
-  const disp = MAX_FILES - ESTADO.plano.archivos.length;
-  if (disp <= 0) { mostrarError(`Máximo ${MAX_FILES} láminas. Elimina alguna antes.`); return; }
-  const aLeer = files.slice(0, disp);
-  let pending = aLeer.length;
-  if (!pending) return;
-
-  aLeer.forEach(file => {
-    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-      mostrarError(`"${file.name}" excede ${MAX_SIZE_MB} MB. Comprime el PDF antes de subir.`);
-      pending--; if (!pending) renderChips();
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = e => {
-      const raw  = e.target.result;
-      const base64 = raw.split(',')[1];
-      const mime   = file.type || (file.name.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
-      ESTADO.plano.archivos.push({ nombre: file.name, base64, mime, size: file.size });
-      pending--;
-      if (!pending) renderChips();
-    };
-    reader.readAsDataURL(file);
+  const validos = files.filter(f => {
+    if (f.size > MAX_MB*1024*1024) { mostrarError(`${f.name} supera ${MAX_MB} MB`); return false; }
+    return true;
   });
+  ESTADO.plano.archivos = [...ESTADO.plano.archivos, ...validos]
+    .filter((f,i,a) => a.findIndex(x=>x.name===f.name)===i)
+    .slice(0, MAX_FILES);
+  renderChips();
+  if (ESTADO.plano.archivos.length > 0) {
+    document.getElementById('upload-zone').classList.add('loaded');
+    document.getElementById('auto-label').style.display = 'block';
+    // Análisis automático con pequeño delay visual
+    setTimeout(() => analizar(), 600);
+  }
 }
 
 function renderChips() {
   const wrap = document.getElementById('file-chips');
-  wrap.innerHTML = '';
-  ESTADO.plano.archivos.forEach((a, i) => {
-    const div = document.createElement('div');
-    div.className = 'file-chip';
-    div.innerHTML = `<span>${a.mime === 'application/pdf' ? '📄' : '🖼️'}</span>
-      <span style="font-weight:500">${a.nombre}</span>
-      <span style="color:var(--text3)">· ${(a.size/1024/1024).toFixed(1)} MB</span>
-      <button class="chip-del" onclick="eliminarArchivo(${i})">✕</button>`;
-    wrap.appendChild(div);
-  });
-  const tieneArchivos = ESTADO.plano.archivos.length > 0;
-  uploadZone.classList.toggle('loaded', tieneArchivos);
-  document.getElementById('btn-analizar').disabled = !tieneArchivos;
+  wrap.innerHTML = ESTADO.plano.archivos.map((f,i) =>
+    `<div class="file-chip">
+      <span>${f.type==='application/pdf'?'📄':'🖼️'} ${f.name}</span>
+      <button class="chip-del" onclick="quitarArchivo(${i});event.stopPropagation()">✕</button>
+    </div>`
+  ).join('');
 }
 
-function eliminarArchivo(i) {
-  ESTADO.plano.archivos.splice(i, 1);
+function quitarArchivo(i) {
+  ESTADO.plano.archivos.splice(i,1);
   renderChips();
+  if (!ESTADO.plano.archivos.length) {
+    document.getElementById('upload-zone').classList.remove('loaded');
+    document.getElementById('auto-label').style.display = 'none';
+  }
 }
 
-// ── SISTEMA_PROMPT M10 ───────────────────────────────────────
-const SYSTEM_PROMPT_M10 = `Eres un asistente especializado en lectura de planos arquitectónicos y estructurales. Tu función es extraer datos cuantitativos clave de los planos presentados para su posterior verificación normativa. Eres preciso, conservador y nunca inventas datos que no puedes leer claramente.
+// ── Claude API ───────────────────────────────────────────────
+const SYSTEM_PROMPT_M10 = `Eres un asistente especializado en lectura de planos arquitectónicos y memorias descriptivas para análisis de viabilidad normativa urbana en México.
+
+Tu ÚNICA tarea es extraer datos cuantitativos del plano. NO hagas juicios normativos.
+
+DATOS A EXTRAER:
+- uso_detectado: uso principal del proyecto (string)
+- huella_pb_m2: área de la planta baja / huella del edificio (número)
+- sup_total_m2: superficie total construida en todos los niveles (número)
+- niveles: número de pisos/niveles (entero)
+- altura_total_m: altura total del edificio en metros (número)
+- frente_edificio_m: dimensión de frente del edificio (número)
+- fondo_edificio_m: dimensión de fondo del edificio (número)
+- sistema_estructural: sistema estructural detectado (string, puede ser null)
+- confianza: "alta" | "media" | "baja"
+- fuentes_consultadas: array de strings (qué parte del plano usaste)
+- notas: observaciones importantes (string, puede ser null)
 
 PRINCIPIOS:
-- Prioriza el cuadro de áreas oficial del plano sobre cotas individuales.
-- Si hay cuadros por nivel, suma para obtener el total construido.
-- Si un dato no es legible con certeza, usa null — nunca estimes ni interpolables.
-- Cruza la información entre planta, corte y solapa del plano.
-- No inventes datos que no estén visibles en el plano.
+1. Prioriza el cuadro de áreas si existe
+2. Si un dato no es legible → usa null, no inventes
+3. No hagas cálculos normativos, solo extrae lo que ves
 
-FORMATO DE SALIDA:
-- Responde ÚNICAMENTE con JSON válido, sin texto antes ni después.
-- No uses markdown, no uses bloques de código, no uses comentarios.
-- El JSON debe ser parseable directamente con JSON.parse().`;
+FORMATO: ÚNICAMENTE JSON válido, sin markdown ni texto adicional.`;
 
-function buildPromptM10() {
-  const usoPropuesto = document.getElementById('inp-uso').value.trim();
-  return `Analiza el plano o planos adjuntos del proyecto.
-
-Tu tarea: SOLO extraer datos cuantitativos del proyecto — NO verificar normativa.
-
-${usoPropuesto ? `El usuario indica que el uso propuesto es: "${usoPropuesto}"` : 'El usuario no indicó un uso previo — detéctalo del plano.'}
-
-Extrae con la mayor precisión posible:
-1. Uso del inmueble (ej: "Vivienda unifamiliar", "Bodega industrial I1", "Oficinas", "Comercio al por menor")
-2. Superficie de la huella en planta baja en m² (solo la huella PB)
-3. Superficie total construida en m² (todos los niveles sumados)
-4. Número de niveles incluyendo PB
-5. Altura total del edificio en metros (del desplante al punto más alto)
-6. Dimensión de frente del edificio en metros (si es legible)
-7. Dimensión de fondo del edificio en metros (si es legible)
-8. Sistema estructural principal
-
-Responde ÚNICAMENTE con este JSON (usa null si el dato no es legible):
-{
-  "uso_detectado": "...",
-  "huella_pb_m2": número_o_null,
-  "sup_total_m2": número_o_null,
-  "niveles": número_o_null,
-  "altura_total_m": número_o_null,
-  "frente_edificio_m": número_o_null,
-  "fondo_edificio_m": número_o_null,
-  "sistema_estructural": "...",
-  "confianza": "alta|media|baja",
-  "fuentes_consultadas": "descripción breve de qué láminas leíste",
-  "notas": "observaciones importantes o discrepancias encontradas"
-}`;
+function buildPrompt() {
+  const p = ESTADO.predio;
+  const uso = document.getElementById('inp-uso').value.trim();
+  return `Analiza este plano arquitectónico para un proyecto en: ${p.direccion || 'dirección no especificada'}.
+Municipio: ${p.municipio || 'No especificado'}. Zonificación: ${p.zonificacion || 'No especificada'}.
+${uso ? `Uso declarado por el propietario: ${uso}.` : ''}
+Extrae únicamente los datos cuantitativos del plano según el formato JSON indicado.`;
 }
 
-// ── LLAMAR API (mismo patrón que M04) ────────────────────────
 async function llamarAPIM10() {
-  const prompt = buildPromptM10();
-  const contentFinal = [
-    { type: 'text', text: SYSTEM_PROMPT_M10 }
-  ];
+  const archivos = ESTADO.plano.archivos;
+  const content = [{ type:'text', text: SYSTEM_PROMPT_M10 }];
 
-  ESTADO.plano.archivos.forEach((a, i) => {
-    contentFinal.push({ type: 'text', text: `--- LÁMINA ${i+1}: ${a.nombre} ---` });
-    contentFinal.push({
-      type: a.mime === 'application/pdf' ? 'document' : 'image',
-      source: { type: 'base64', media_type: a.mime, data: a.base64 }
-    });
-  });
-  contentFinal.push({ type: 'text', text: prompt });
+  for (let i=0; i<archivos.length; i++) {
+    const f = archivos[i];
+    const b64 = await fileToBase64(f);
+    const isPDF = f.type === 'application/pdf';
+    if (isPDF) {
+      content.push({ type:'text', text:`Lámina ${i+1}: ${f.name}` });
+      content.push({ type:'document', source:{ type:'base64', media_type:'application/pdf', data:b64 } });
+    } else {
+      content.push({ type:'text', text:`Imagen ${i+1}: ${f.name}` });
+      content.push({ type:'image', source:{ type:'base64', media_type:f.type, data:b64 } });
+    }
+  }
+  content.push({ type:'text', text: buildPrompt() });
 
   const body = {
     model: 'claude-sonnet-4-6',
     max_tokens: 1500,
     temperature: 0,
-    messages: [{ role: 'user', content: contentFinal }]
+    messages: [{ role:'user', content }],
   };
 
-  const resp = ES_LOCALHOST
-    ? await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': obtenerKey(),
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify(body)
-      })
-    : await fetch('/api/claude-proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-
+  let resp;
+  if (ES_LOCALHOST) {
+    const key = obtenerKey();
+    if (!key) throw new Error('Configura tu API Key de Anthropic para usar en localhost');
+    resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{
+        'x-api-key': key,
+        'anthropic-version':'2023-06-01',
+        'content-type':'application/json',
+        'anthropic-dangerous-direct-browser-access':'true',
+      },
+      body: JSON.stringify(body),
+    });
+  } else {
+    resp = await fetch('/api/claude-proxy', {
+      method:'POST',
+      headers:{'content-type':'application/json'},
+      body: JSON.stringify(body),
+    });
+  }
   if (!resp.ok) {
-    const err = await resp.json().catch(() => ({}));
-    const msg = err.error?.message || '';
-    if (msg.includes('credit') || msg.includes('billing')) throw new Error('__CREDITOS_AGOTADOS__');
-    if (msg.includes('x-api-key') || resp.status === 401) throw new Error('__API_KEY_INVALIDA__');
-    if (resp.status === 429) throw new Error('__LIMITE_RATE__');
-    throw new Error(msg || `Error API ${resp.status}`);
+    const err = await resp.json().catch(()=>({}));
+    throw new Error(err.error?.message || `Error ${resp.status}`);
   }
-
   const data = await resp.json();
-  const rawText = data.content?.find(b => b.type === 'text')?.text || '';
-
-  // Parser robusto
-  let txt = rawText.replace(/^```json\s*/gm,'').replace(/^```\s*/gm,'').replace(/```$/gm,'').trim();
-  const f = txt.indexOf('{'); const l = txt.lastIndexOf('}');
-  if (f !== -1 && l !== -1) txt = txt.slice(f, l+1);
-  return JSON.parse(txt);
+  const txt = data.content?.[0]?.text || '';
+  // Parseo robusto
+  let raw = txt.trim();
+  if (raw.startsWith('```')) raw = raw.replace(/^```[a-z]*\n?/,'').replace(/```$/,'').trim();
+  const m = raw.match(/\{[\s\S]*\}/);
+  if (!m) throw new Error('La IA no devolvió JSON válido');
+  return JSON.parse(m[0]);
 }
 
-// ── FUNCIÓN DE ANÁLISIS PRINCIPAL ────────────────────────────
-async function analizar() {
-  ocultarError();
-  if (!ESTADO.plano.archivos.length) { mostrarError('Sube al menos un plano.'); return; }
-
-  // Verificar límite freemium (solo en producción)
-  if (!ES_LOCALHOST && typeof guVerificarLimite === 'function') {
-    const lim = guVerificarLimite('gu_m10_usos_mes');
-    if (!lim.permitido) {
-      guMostrarModalLimite('M10 PreDictamen IA', lim.usados, lim.limite);
-      return;
-    }
-  }
-
-  // Mostrar loading
-  ['panel-predio','panel-plano','panel-resultado'].forEach(id => document.getElementById(id)?.classList.remove('visible'));
-  document.getElementById('panel-loading').classList.add('visible');
-
-  const setLS = (id, cls, txt) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.className = cls;
-    el.textContent = txt;
-  };
-
-  setLS('ls-1','done','✓ Datos del predio listos');
-  setLS('ls-2','active','⟳ Enviando plano a Claude IA…');
-
-  try {
-    await new Promise(r => setTimeout(r, 300));
-    setLS('ls-2','done','✓ Plano enviado');
-    setLS('ls-3','active','⟳ Extrayendo cuadro de áreas y dimensiones…');
-
-    const datosPlan = await llamarAPIM10();
-    ESTADO.resultado = { plano: datosPlan };
-
-    // Registrar uso freemium
-    if (!ES_LOCALHOST && typeof guRegistrarUso === 'function') {
-      guRegistrarUso('gu_m10_usos_mes');
-    }
-
-    setLS('ls-3','done','✓ Datos del plano extraídos');
-    setLS('ls-4','active','⟳ Verificando COS, CUS, lote mínimo, RI-VL…');
-    await new Promise(r => setTimeout(r, 200));
-
-    const verif = verificarViabilidad(datosPlan, ESTADO.predio);
-    ESTADO.resultado.verif = verif;
-
-    setLS('ls-4','done','✓ Verificación normativa completada');
-    setLS('ls-5','active','⟳ Generando veredicto…');
-    await new Promise(r => setTimeout(r, 200));
-    setLS('ls-5','done','✓ Veredicto generado');
-
-    await new Promise(r => setTimeout(r, 400));
-    document.getElementById('panel-loading').classList.remove('visible');
-    renderizarResultado(datosPlan, ESTADO.predio, verif);
-    irAPaso(3);
-
-  } catch(e) {
-    document.getElementById('panel-loading').classList.remove('visible');
-    setLS('ls-5','error-step','✗ Error en el análisis');
-    irAPaso(2);
-
-    if (e.message === '__API_KEY_INVALIDA__') mostrarError('API Key inválida. Verifica la clave en el panel superior.');
-    else if (e.message === '__CREDITOS_AGOTADOS__') mostrarError('Créditos de Anthropic agotados. Recarga tu cuenta en console.anthropic.com.');
-    else if (e.message === '__LIMITE_RATE__') mostrarError('Demasiadas peticiones. Espera un momento e intenta de nuevo.');
-    else mostrarError('Error al analizar: ' + e.message);
-  }
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
 }
 
-// ── VERIFICACIÓN NORMATIVA ───────────────────────────────────
+// ── Verificación normativa (JS puro) ─────────────────────────
 function verificarViabilidad(plano, predio) {
-  const rows     = [];
-  const bloq     = [];   // bloqueantes
-  const advert   = [];   // advertencias
+  const rows = [];
+  const bloqueantes = [], advertencias = [];
 
-  const sup    = predio.sup_m2;
-  const frente = predio.frente_m;
-  const rivl   = predio.rivl_m || 0;
-  const cos    = predio.cos_max;
-  const cus    = predio.cus_max;
-  const loteMin= predio.lote_min_m2;
-  const restF  = predio.rest_frontal_m;
-  const huellaP= plano.huella_pb_m2;
-  const supT   = plano.sup_total_m2;
-  const niveles= plano.niveles;
-  const alturaP= plano.altura_total_m;
+  const areaLibre = (predio.sup_m2 && predio.frente_m && predio.rivl_m > 0)
+    ? Math.max(0, predio.sup_m2 - predio.rivl_m * predio.frente_m)
+    : predio.sup_m2;
 
-  // Área libre tras RI-VL
-  let areaLibre = sup;
-  if (rivl > 0 && frente) areaLibre = Math.max(0, sup - rivl * frente);
-  else if (rivl > 0 && sup) areaLibre = Math.max(0, sup * (1 - rivl / Math.sqrt(sup)));
-
-  // 1. Uso de suelo
+  // Uso de suelo
   rows.push({
-    param: 'Uso de suelo', sub: predio.zonificacion || 'pendiente consultar PPDU',
+    param:'Uso de suelo', sub: predio.zonificacion || '—',
     permitido: predio.zonificacion || '—',
-    proyecto: plano.uso_detectado || '—',
-    estado: predio.zonificacion ? 'warn' : 'nd',
-    nota: predio.zonificacion ? 'Verificar si el uso específico está permitido o condicionado en el PPDU' : null
+    proyecto: plano.uso_detectado || 'No detectado',
+    estado: (plano.uso_detectado && predio.zonificacion) ? 'warn' : 'nd',
+    msg: (plano.uso_detectado && predio.zonificacion) ? 'Verificar compatibilidad con DPL' : null,
   });
-  if (predio.zonificacion) advert.push('Uso de suelo (verificar con PPDU)');
+  if ((plano.uso_detectado && predio.zonificacion)) advertencias.push('Verificar compatibilidad de uso con DPL');
 
-  // 2. Lote mínimo
-  if (sup && loteMin) {
-    const ok = sup >= loteMin;
+  // Lote mínimo
+  if (predio.lote_min_m2 && predio.sup_m2) {
+    const ok = predio.sup_m2 >= predio.lote_min_m2;
     rows.push({
-      param: 'Tamaño de lote', sub: `mín. ${loteMin.toLocaleString('es')} m²`,
-      permitido: `${loteMin.toLocaleString('es')} m²`,
-      proyecto: `${sup.toLocaleString('es')} m²`,
+      param:'Lote mínimo', sub:'',
+      permitido:`≥ ${predio.lote_min_m2} m²`,
+      proyecto: `${predio.sup_m2} m²`,
       estado: ok ? 'ok' : 'fail',
-      fail: !ok
+      bloqueante: !ok,
     });
-    if (!ok) bloq.push('Lote subnormal');
+    if (!ok) bloqueantes.push(`Lote subnormal: ${predio.sup_m2} m² < ${predio.lote_min_m2} m² mín.`);
   } else {
-    rows.push({ param: 'Tamaño de lote', sub: 'requiere lote mín. y superficie', permitido: '—', proyecto: sup ? `${sup.toLocaleString('es')} m²` : '—', estado: 'nd' });
+    rows.push({ param:'Lote mínimo', sub:'', permitido:'—', proyecto:'—', estado:'nd' });
   }
 
-  // 3. RI-VL
-  if (rivl > 0) {
-    const areaLibreStr = areaLibre.toFixed(0);
-    const ok = huellaP ? huellaP <= areaLibre : null;
+  // RI-VL
+  if (predio.rivl_m > 0 && predio.frente_m && predio.sup_m2) {
+    const rivlArea = predio.rivl_m * predio.frente_m;
+    const ok = (areaLibre || 0) > 0;
     rows.push({
-      param: 'Área libre tras RI-VL', sub: `predio − ${rivl} m × frente`,
-      permitido: areaLibre.toFixed(0) + ' m²',
-      proyecto: huellaP ? `${huellaP} m² huella` : '—',
-      estado: ok === null ? 'nd' : ok ? 'ok' : 'fail',
-      fail: ok === false
+      param:'Restricción RI-VL', sub:`${predio.rivl_m}m × ${predio.frente_m}m frente`,
+      permitido: `Área libre: ${(areaLibre||0).toFixed(1)} m²`,
+      proyecto: `Huella: ${plano.huella_pb_m2 ? plano.huella_pb_m2+' m²' : 'N/D'}`,
+      estado: ok ? 'ok' : 'fail',
+      bloqueante: !ok,
     });
-    if (ok === false) bloq.push('Restricción RI-VL');
+    if (!ok) bloqueantes.push('Restricción RI-VL elimina toda el área edificable');
   }
 
-  // 4. COS sobre área libre
-  if (cos && huellaP && areaLibre > 0) {
-    const cosReal = huellaP / areaLibre;
-    const ok = cosReal <= cos;
+  // COS
+  if (predio.cos_max && plano.huella_pb_m2 && areaLibre) {
+    const maxHuella = areaLibre * predio.cos_max;
+    const ok = plano.huella_pb_m2 <= maxHuella * 1.02;
     rows.push({
-      param: 'COS (huella / área libre)', sub: `máx. ${cos}`,
-      permitido: cos.toFixed(2),
-      proyecto: cosReal.toFixed(2),
+      param:'COS (huella PB)', sub:`COS max ${predio.cos_max}`,
+      permitido:`≤ ${maxHuella.toFixed(1)} m²`,
+      proyecto: `${plano.huella_pb_m2} m²`,
       estado: ok ? 'ok' : 'fail',
-      fail: !ok
+      bloqueante: !ok,
     });
-    if (!ok && !bloq.includes('Restricción RI-VL')) bloq.push('COS excedido');
-  } else if (cos && huellaP && sup) {
-    // Sin RI-VL
-    const cosReal = huellaP / sup;
-    const ok = cosReal <= cos;
-    rows.push({
-      param: 'COS (huella / predio)', sub: `máx. ${cos}`,
-      permitido: cos.toFixed(2),
-      proyecto: cosReal.toFixed(2),
-      estado: ok ? 'ok' : 'fail',
-      fail: !ok
-    });
-    if (!ok) bloq.push('COS excedido');
+    if (!ok) bloqueantes.push(`COS excedido: huella ${plano.huella_pb_m2} m² > máx. ${maxHuella.toFixed(1)} m²`);
   } else {
-    rows.push({ param: 'COS', sub: cos ? `máx. ${cos}` : 'ingresa COS', permitido: cos ? cos.toFixed(2) : '—', proyecto: huellaP ? huellaP + ' m²' : '—', estado: 'nd' });
+    rows.push({ param:'COS (huella PB)', sub:'', permitido:`COS ${predio.cos_max||'—'}`, proyecto: plano.huella_pb_m2?`${plano.huella_pb_m2} m²`:'N/D', estado:'nd' });
   }
 
-  // 5. CUS / Superficie total
-  if (cus && supT && sup) {
-    const supMaxCUS = sup * cus;
-    const ok = supT <= supMaxCUS;
+  // CUS
+  if (predio.cus_max && plano.sup_total_m2 && predio.sup_m2) {
+    const maxSup = predio.sup_m2 * predio.cus_max;
+    const ok = plano.sup_total_m2 <= maxSup * 1.02;
     rows.push({
-      param: 'CUS (sup. total / predio)', sub: `máx. ${cus}`,
-      permitido: supMaxCUS.toFixed(0) + ' m²',
-      proyecto: supT + ' m²',
+      param:'CUS (sup. total)', sub:`CUS max ${predio.cus_max}`,
+      permitido:`≤ ${maxSup.toFixed(1)} m²`,
+      proyecto: `${plano.sup_total_m2} m²`,
       estado: ok ? 'ok' : 'fail',
-      fail: !ok
+      bloqueante: !ok,
     });
-    if (!ok) bloq.push('CUS excedido');
+    if (!ok) bloqueantes.push(`CUS excedido: sup. total ${plano.sup_total_m2} m² > máx. ${maxSup.toFixed(1)} m²`);
   } else {
-    rows.push({ param: 'CUS / Sup. total', sub: cus ? `máx. ${cus}` : 'ingresa CUS', permitido: cus && sup ? (sup*cus).toFixed(0)+' m²' : '—', proyecto: supT ? supT+' m²' : '—', estado: 'nd' });
+    rows.push({ param:'CUS (sup. total)', sub:'', permitido:`CUS ${predio.cus_max||'—'}`, proyecto: plano.sup_total_m2?`${plano.sup_total_m2} m²`:'N/D', estado:'nd' });
   }
 
-  // 6. Restricción frontal
-  rows.push({
-    param: 'Restricción frontal', sub: restF ? `no construir en ${restF} m` : 'consultar PPDU',
-    permitido: restF ? restF + ' m' : '—',
-    proyecto: '(no legible en plano)',
-    estado: restF ? 'warn' : 'nd'
-  });
-  if (restF) advert.push(`Verificar restricción frontal ${restF} m`);
-
-  // 7. Niveles / elevador
-  if (niveles) {
-    const elevOblig = niveles > 4;
+  // Restricción frontal
+  if (predio.rest_frontal_m) {
     rows.push({
-      param: 'Niveles' + (elevOblig ? ' / Elevador' : ''), sub: elevOblig ? 'obligatorio con >4 niveles' : null,
-      permitido: '—',
-      proyecto: niveles + ' nivel' + (niveles !== 1 ? 'es' : ''),
-      estado: elevOblig ? 'warn' : 'nd'
+      param:'Restricción frontal', sub:'',
+      permitido:`${predio.rest_frontal_m} m libre`,
+      proyecto: 'Verificar en plano',
+      estado:'warn',
     });
-    if (elevOblig) advert.push('Elevador obligatorio (>4 niveles)');
+    advertencias.push(`Verificar restricción frontal de ${predio.rest_frontal_m} m`);
   }
 
-  // Semáforo
-  let semaforo = 'verde';
-  if (bloq.length > 0) semaforo = 'rojo';
-  else if (advert.length > 0) semaforo = 'amarillo';
+  // Niveles / elevador
+  if (plano.niveles && plano.niveles >= 5) {
+    rows.push({
+      param:'Elevador', sub:'≥ 5 niveles requieren elevador',
+      permitido:'Reglamento GDL Art. 96',
+      proyecto:`${plano.niveles} niveles`,
+      estado:'warn',
+    });
+    advertencias.push('Con 5+ niveles se requiere elevador (verificar norma municipal)');
+  }
 
-  return { semaforo, bloqueantes: bloq, advertencias: advert, rows, areaLibre };
+  const semaforo = bloqueantes.length > 0 ? 'rojo' : advertencias.length > 0 ? 'amarillo' : 'verde';
+  return { semaforo, bloqueantes, advertencias, rows, areaLibre };
 }
 
-// ── RENDERIZAR RESULTADO ─────────────────────────────────────
+// ── Renderizado del resultado ─────────────────────────────────
 function renderizarResultado(plano, predio, verif) {
   // Semáforo
-  const sem    = verif.semaforo;
-  const iconos = { rojo:'🔴', amarillo:'🟡', verde:'🟢' };
-  const titulos = {
-    rojo: `NO VIABLE — ${verif.bloqueantes.length} bloqueante${verif.bloqueantes.length>1?'s':''}`,
-    amarillo: `VIABLE CON ADVERTENCIAS — ${verif.advertencias.length} punto${verif.advertencias.length>1?'s':''} a verificar`,
-    verde: 'VIABLE — el proyecto cumple los parámetros del PPDU'
-  };
-  const subtxts = {
-    rojo: 'El proyecto no puede autorizarse en este predio tal como está diseñado. Los bloqueantes son normativos.',
-    amarillo: 'El proyecto puede ser viable, pero hay puntos que deben verificarse con el PPDU y el DRO antes de tramitar.',
-    verde: 'Los parámetros del plano son compatibles con la zonificación del predio. Inicia el trámite de licencia.'
-  };
-
-  document.getElementById('sem-header').className = 'sem-header ' + sem;
-  document.getElementById('sem-ico').textContent   = iconos[sem];
-  document.getElementById('sem-titulo').textContent= titulos[sem];
-  document.getElementById('sem-titulo').className  = 'sem-titulo ' + sem;
-  document.getElementById('sem-subtxt').textContent= subtxts[sem];
-
-  // Chips de bloqueantes / advertencias
+  const S = document.getElementById('sem-header');
+  S.className = `sem-header ${verif.semaforo}`;
+  document.getElementById('sem-ico').textContent =
+    verif.semaforo==='verde' ? '🟢' : verif.semaforo==='amarillo' ? '🟡' : '🔴';
+  const tit = document.getElementById('sem-titulo');
+  tit.className = `sem-titulo ${verif.semaforo}`;
+  tit.textContent =
+    verif.semaforo==='verde' ? 'Proyecto viable' :
+    verif.semaforo==='amarillo' ? 'Viable con observaciones' : 'Proyecto no viable';
+  document.getElementById('sem-subtxt').textContent =
+    verif.semaforo==='verde'
+      ? 'El proyecto cumple los parámetros normativos del PPDU para este predio.'
+      : verif.semaforo==='amarillo'
+      ? 'Cumple los parámetros principales pero tiene observaciones que debes verificar.'
+      : `Existen ${verif.bloqueantes.length} bloqueante(s) que impiden la viabilidad actual.`;
   const chips = document.getElementById('blk-chips');
-  chips.innerHTML = '';
-  verif.bloqueantes.forEach(b => { const s=document.createElement('span'); s.className='blk-chip rojo'; s.textContent='❌ '+b; chips.appendChild(s); });
-  verif.advertencias.forEach(a => { const s=document.createElement('span'); s.className='blk-chip amarillo'; s.textContent='⚠️ '+a; chips.appendChild(s); });
+  chips.innerHTML = [
+    ...verif.bloqueantes.map(b=>`<span class="blk-chip rojo">✗ ${b}</span>`),
+    ...verif.advertencias.map(a=>`<span class="blk-chip amarillo">⚠ ${a}</span>`),
+  ].join('');
 
-  // Mapa mini
-  setTimeout(() => dibujarMapa('mapa-mini-canvas', obtW('mapa-mini-canvas'), 150, true), 50);
+  // Mini info
   document.getElementById('mapa-mini-info').textContent =
-    `${predio.municipio || ''} · ${predio.zonificacion || '—'} · ${predio.sup_m2 ? predio.sup_m2.toLocaleString('es')+' m²' : '—'}`;
+    `${predio.direccion || '—'} · ${predio.municipio || '—'} · ${predio.zonificacion || '—'}`;
 
   // Datos del predio
   const dp = document.getElementById('datos-predio');
-  dp.innerHTML = dato('Municipio', predio.municipio || '—', 'PPDU') +
-    dato('Sup. predio', predio.sup_m2 ? predio.sup_m2.toLocaleString('es')+' m²' : '—', 'catastro') +
-    dato('Zonificación', predio.zonificacion || '—', predio.fuente_zona || 'manual') +
-    dato('COS máx.', predio.cos_max ?? '—', 'PPDU') +
-    dato('CUS máx.', predio.cus_max ?? '—', 'PPDU') +
-    dato('Lote mín.', predio.lote_min_m2 ? predio.lote_min_m2.toLocaleString('es')+' m²' : '—', 'PPDU') +
-    dato('RI-VL', predio.rivl_m ? predio.rivl_m+' m' : 'sin restricción', 'GeoServer', predio.rivl_m > 0 ? 'peligro' : '') +
-    dato('Área libre', verif.areaLibre ? verif.areaLibre.toFixed(0)+' m²' : '—', 'calculado', verif.areaLibre < 150 ? 'peligro' : '');
+  dp.innerHTML = datoItem('Municipio', predio.municipio||'—')
+    + datoItem('Zonificación', predio.zonificacion||'—')
+    + datoItem('Superficie', predio.sup_m2 ? predio.sup_m2+' m²':'—')
+    + datoItem('Frente', predio.frente_m ? predio.frente_m+' m':'—')
+    + datoItem('RI-VL', predio.rivl_m ? predio.rivl_m+' m':'No aplica')
+    + datoItem('Área libre', verif.areaLibre ? verif.areaLibre.toFixed(1)+' m²':'—')
+    + datoItem('Lote mínimo', predio.lote_min_m2 ? predio.lote_min_m2+' m²':'—')
+    + datoItem('COS / CUS', (predio.cos_max||'—')+' / '+(predio.cus_max||'—'));
 
   // Datos del proyecto
   const dpr = document.getElementById('datos-proyecto');
-  dpr.innerHTML = dato('Uso detectado', plano.uso_detectado || '—', plano.fuentes_consultadas || 'plano') +
-    dato('Huella PB', plano.huella_pb_m2 ? plano.huella_pb_m2+' m²' : '—', 'cuadro áreas') +
-    dato('Sup. total', plano.sup_total_m2 ? plano.sup_total_m2+' m²' : '—', 'cuadro áreas') +
-    dato('Niveles', plano.niveles ?? '—', 'cortes') +
-    dato('Altura', plano.altura_total_m ? plano.altura_total_m+' m' : '—', 'cortes') +
-    dato('Frente edif.', plano.frente_edificio_m ? plano.frente_edificio_m+' m' : '—', 'plantas') +
-    dato('Fondo edif.', plano.fondo_edificio_m ? plano.fondo_edificio_m+' m' : '—', 'plantas') +
-    dato('Estructura', plano.sistema_estructural || '—', 'notas');
+  dpr.innerHTML = datoItem('Uso detectado', plano.uso_detectado||'N/D')
+    + datoItem('Huella PB', plano.huella_pb_m2!=null ? plano.huella_pb_m2+' m²':'N/D')
+    + datoItem('Sup. total', plano.sup_total_m2!=null ? plano.sup_total_m2+' m²':'N/D')
+    + datoItem('Niveles', plano.niveles!=null ? plano.niveles:'N/D')
+    + datoItem('Altura total', plano.altura_total_m!=null ? plano.altura_total_m+' m':'N/D')
+    + datoItem('Frente edif.', plano.frente_edificio_m!=null ? plano.frente_edificio_m+' m':'N/D')
+    + datoItem('Confianza IA', plano.confianza||'—')
+    + datoItem('Sistema estructural', plano.sistema_estructural||'N/D');
+  if (plano.notas) document.getElementById('ia-notas').textContent = '💬 ' + plano.notas;
 
-  const conf = { alta:'✓ Alta', media:'⚠ Media', baja:'⚠ Baja' };
-  document.getElementById('ia-notas').textContent =
-    (conf[plano.confianza] ? 'Confianza IA: ' + conf[plano.confianza] + ' — ' : '') +
-    (plano.notas || '');
-
-  // Tabla de verificación
+  // Tabla
   const tbody = document.getElementById('vtable-body');
-  tbody.innerHTML = verif.rows.map(r => `
-    <tr class="${r.fail ? 'fail-row' : ''}">
-      <td><div class="vt-param">${r.param}</div>${r.sub ? `<div class="vt-sub">${r.sub}</div>` : ''}</td>
-      <td style="font-family:var(--mono);font-size:12px;color:var(--text2)">${r.permitido}</td>
-      <td style="font-family:var(--mono);font-size:12px${r.fail?' ;font-weight:600;color:var(--sem-r-txt)':''}">${r.proyecto}</td>
-      <td>${badgeHtml(r.estado)}</td>
-    </tr>`).join('');
+  tbody.innerHTML = verif.rows.map(r => {
+    const cls = r.bloqueante ? 'fail-row' : '';
+    return `<tr class="${cls}">
+      <td><div class="vt-param">${r.param}</div>${r.sub?`<div class="vt-sub">${r.sub}</div>`:''}  </td>
+      <td>${r.permitido}</td>
+      <td>${r.proyecto}</td>
+      <td><span class="badge ${r.estado}">${
+        r.estado==='ok'?'✓ OK':r.estado==='fail'?'✗ Falla':r.estado==='warn'?'⚠ Revisar':'N/D'
+      }</span></td>
+    </tr>`;
+  }).join('');
 
-  // Qué cabe (solo si hay bloqueantes)
-  if (sem === 'rojo' || sem === 'amarillo') {
-    const cos = predio.cos_max || 0.8;
-    const cus = predio.cus_max || 1.6;
-    const al  = verif.areaLibre || 0;
-    const hMax = (al * cos).toFixed(0);
-    const sMax = predio.sup_m2 ? (predio.sup_m2 * cus).toFixed(0) : null;
-    const card = document.getElementById('card-max-cabe');
-    card.style.display = 'block';
+  // Max cabe
+  if (verif.areaLibre && (predio.cos_max || predio.cus_max)) {
+    const mc = document.getElementById('card-max-cabe');
+    mc.style.display = 'block';
     document.getElementById('max-cabe-intro').textContent =
-      `Con ${al.toFixed(0)} m² de área libre y COS ${cos}:`;
-    let rows = `
-      <div class="max-row"><span>Huella máxima PB</span><span class="max-val">${hMax} m²</span></div>
-      ${sMax ? `<div class="max-row"><span>Sup. máx. total (CUS ${cus})</span><span class="max-val">${sMax} m²</span></div>` : ''}`;
-    if (plano.sup_total_m2) {
-      const deficit = plano.sup_total_m2 - (sMax ? parseInt(sMax) : al * cus);
-      rows += `<div class="max-row" style="border-top:0.5px solid var(--brand-light);margin-top:6px;padding-top:5px">
-        <span>Proyecto necesita</span><span class="max-val peligro">${plano.sup_total_m2} m²</span></div>
-        <div class="max-row"><span>Déficit</span><span class="max-val peligro">${Math.max(0,deficit).toFixed(0)} m²</span></div>`;
-    }
-    document.getElementById('max-cabe-rows').innerHTML = rows;
+      verif.semaforo==='verde'
+        ? 'El proyecto está dentro de los límites. Referencia de capacidad máxima:'
+        : 'El proyecto supera los límites. Capacidad máxima permitida:';
+    const rows = [];
+    if (predio.cos_max && verif.areaLibre)
+      rows.push(`<div class="max-row"><span>Huella máx. (COS ${predio.cos_max})</span><span class="max-val">${(verif.areaLibre*predio.cos_max).toFixed(1)} m²</span></div>`);
+    if (predio.cus_max && predio.sup_m2)
+      rows.push(`<div class="max-row"><span>Sup. total máx. (CUS ${predio.cus_max})</span><span class="max-val">${(predio.sup_m2*predio.cus_max).toFixed(1)} m²</span></div>`);
+    document.getElementById('max-cabe-rows').innerHTML = rows.join('');
   }
 
-  // Opciones (si no es viable) / Próximos pasos (si es viable)
-  if (sem === 'rojo') {
+  // Opciones
+  const ops = generarOpciones(verif, plano, predio);
+  if (ops.length) {
     document.getElementById('card-opciones').style.display = 'block';
-    const ops = generarOpciones(verif, plano, predio);
-    document.getElementById('op-list').innerHTML = ops.map((o,i) => `
-      <li class="op-item">
-        <div class="op-num">${i+1}</div>
-        <div class="op-txt"><strong>${o.titulo}</strong>${o.desc}</div>
-      </li>`).join('');
-  } else if (sem === 'verde') {
+    document.getElementById('op-list').innerHTML = ops.map((o,i) =>
+      `<li class="op-item"><div class="op-num">${i+1}</div><div class="op-txt"><strong>${o.titulo}</strong>${o.detalle}</div></li>`
+    ).join('');
+  }
+
+  // Próximos pasos si es viable
+  if (verif.semaforo !== 'rojo') {
     document.getElementById('card-proximos').style.display = 'block';
     document.getElementById('prox-list').innerHTML = [
-      { titulo:'Solicitar DTUD', desc:`Acude a la dependencia de ${predio.municipio||'tu municipio'} con los planos para obtener el Dictamen de Trazo, Usos y Destinos.` },
-      { titulo:'Contratar DRO', desc:'El Director Responsable de Obra (DRO) certificado firmará los planos y acompañará el trámite de licencia de construcción.' },
-      { titulo:'Revisor de planos (M04)', desc:'Usa el módulo M04 para verificar los elementos arquitectónicos: escaleras, pasillos, cajones, accesibilidad.' },
-    ].map((o,i) => `<li class="op-item"><div class="op-num">${i+1}</div><div class="op-txt"><strong>${o.titulo}</strong>${o.desc}</div></li>`).join('');
-  } else {
-    document.getElementById('card-opciones').style.display = 'block';
-    document.getElementById('op-list').innerHTML = verif.advertencias.map((a,i) => `
-      <li class="op-item">
-        <div class="op-num">${i+1}</div>
-        <div class="op-txt"><strong>Verificar: ${a}</strong>Consulta el PPDU vigente y al DRO para confirmar este punto antes de tramitar.</div>
-      </li>`).join('');
+      { titulo:'Consultar DTUD', detalle:'Solicitar la Determinación de Territorio, Uso y Destino en la ventanilla de la DPL.' },
+      { titulo:'Contratar DRO', detalle:'El Director Responsable de Obra firmará el proyecto ejecutivo.' },
+      { titulo:'Trámite de licencia', detalle:'Con el DTUD y proyecto ejecutivo, iniciar el trámite de licencia de construcción.' },
+    ].map((o,i) =>
+      `<li class="op-item"><div class="op-num">${i+1}</div><div class="op-txt"><strong>${o.titulo}</strong>${o.detalle}</div></li>`
+    ).join('');
   }
 }
 
-function dato(lbl, val, src, cls='') {
-  return `<div class="dato-item">
-    <div class="dato-label">${lbl}</div>
-    <div class="dato-val${cls?' '+cls:''}">${val}</div>
-    <div class="dato-src">${src}</div>
-  </div>`;
-}
-
-function badgeHtml(estado) {
-  const cfg = {
-    ok:   ['ok',   '✓ Cumple'],
-    fail: ['fail', '❌ Bloqueante'],
-    warn: ['warn', '⚠ Verificar'],
-    nd:   ['nd',   '— N/D'],
-  };
-  const [cls, lbl] = cfg[estado] || ['nd','—'];
-  return `<span class="badge ${cls}">${lbl}</span>`;
+function datoItem(label, val) {
+  return `<div class="dato-item"><div class="dato-label">${label}</div><div class="dato-val">${val}</div></div>`;
 }
 
 function generarOpciones(verif, plano, predio) {
   const ops = [];
-  if (verif.bloqueantes.includes('Lote subnormal')) {
-    const faltante = predio.lote_min_m2 && predio.sup_m2
-      ? Math.ceil(predio.lote_min_m2 - predio.sup_m2).toLocaleString('es') : '?';
-    ops.push({ titulo: 'Fusionar predios colindantes', desc: `Reunir al menos ${faltante} m² adicionales libres de RI-VL. Requiere fusión ante el Registro Público de la Propiedad del municipio.` });
+  const bl = verif.bloqueantes.map(b=>b.toLowerCase());
+  if (bl.some(b=>b.includes('subnormal')))
+    ops.push({ titulo:'Fusión de predios', detalle:` — Adquirir el predio colindante para alcanzar el lote mínimo de ${predio.lote_min_m2} m².` });
+  if (bl.some(b=>b.includes('cos excedido')||b.includes('ri-vl'))) {
+    const aL = verif.areaLibre || 0;
+    const hMax = predio.cos_max ? (aL*predio.cos_max).toFixed(1) : '—';
+    ops.push({ titulo:'Rediseñar huella', detalle:` — La huella máxima en planta baja sobre área libre es ${hMax} m². Reduce la huella del proyecto.` });
   }
-  if (verif.bloqueantes.includes('Restricción RI-VL') || verif.bloqueantes.includes('COS excedido')) {
-    const cos = predio.cos_max || 0.8;
-    const al  = verif.areaLibre || 0;
-    ops.push({ titulo: 'Rediseñar el proyecto', desc: `Reducir huella a ≤ ${(al*cos).toFixed(0)} m² PB y superficie total a ≤ ${predio.sup_m2 && predio.cus_max ? (predio.sup_m2*predio.cus_max).toFixed(0) : '?'} m² para cumplir COS y CUS con el área disponible.` });
+  if (bl.some(b=>b.includes('cus excedido'))) {
+    const sMax = predio.sup_m2 && predio.cus_max ? (predio.sup_m2*predio.cus_max).toFixed(1) : '—';
+    ops.push({ titulo:'Reducir niveles', detalle:` — La superficie total máxima permitida es ${sMax} m². Elimina niveles para cumplir el CUS.` });
   }
-  if (verif.bloqueantes.includes('CUS excedido')) {
-    ops.push({ titulo: 'Reducir niveles', desc: `Con CUS ${predio.cus_max} y ${predio.sup_m2 ? predio.sup_m2.toLocaleString('es') : '?'} m² de predio, la superficie total máxima es ${predio.cus_max && predio.sup_m2 ? (predio.cus_max*predio.sup_m2).toFixed(0) : '?'} m².` });
-  }
-  ops.push({ titulo: 'Buscar otro predio', desc: 'Zona con uso compatible, superficie mínima requerida y sin afectaciones viales. El proyecto actual no necesita modificaciones si el predio es el correcto.' });
+  ops.push({ titulo:'Buscar otro predio', detalle:' — Identificar un predio con zonificación y dimensiones compatibles con el proyecto en M01 → Uso de suelo.' });
   return ops;
 }
 
-// ── EXPORTAR REPORTE (placeholder) ──────────────────────────
-function exportarReporte() {
-  mostrarError('Exportación de reporte disponible próximamente — integración con M04 en desarrollo.');
+// ── Flujo principal de análisis ──────────────────────────────
+async function analizar() {
+  if (!ESTADO.plano.archivos.length) { mostrarError('Sube al menos un plano'); return; }
+
+  // Freemium check
+  if (!ES_LOCALHOST && typeof guVerificarLimite === 'function') {
+    const lim = guVerificarLimite('gu_m10_usos_mes');
+    if (!lim.permitido) { guMostrarModalLimite('M10 PreDictamen IA', lim.usados, lim.limite); return; }
+  }
+
+  // Leer campos del predio al momento de analizar
+  ESTADO.predio.sup_m2        = parseFloat(document.getElementById('inp-sup').value) || null;
+  ESTADO.predio.frente_m      = parseFloat(document.getElementById('inp-frente').value) || null;
+  ESTADO.predio.rivl_m        = parseFloat(document.getElementById('inp-rivl').value) || 0;
+  ESTADO.predio.cos_max       = parseFloat(document.getElementById('inp-cos').value) || ESTADO.predio.cos_max;
+  ESTADO.predio.cus_max       = parseFloat(document.getElementById('inp-cus').value) || ESTADO.predio.cus_max;
+  ESTADO.predio.lote_min_m2   = parseFloat(document.getElementById('inp-lote-min').value) || ESTADO.predio.lote_min_m2;
+  ESTADO.predio.rest_frontal_m= parseFloat(document.getElementById('inp-rest-front').value) || ESTADO.predio.rest_frontal_m;
+  ESTADO.predio.zonificacion  = document.getElementById('inp-zona').value.trim() || ESTADO.predio.zonificacion;
+  ESTADO.predio.municipio     = document.getElementById('sel-mun').value || ESTADO.predio.municipio;
+
+  mostrarLoading();
+  try {
+    actualizarPasoLoad(1,'active','Preparando datos del predio');
+    await sleep(300);
+    actualizarPasoLoad(1,'done','Datos del predio listos');
+    actualizarPasoLoad(2,'active','Enviando plano a Claude IA');
+    const datosPlan = await llamarAPIM10();
+    actualizarPasoLoad(2,'done','Plano recibido y analizado');
+    actualizarPasoLoad(3,'active','Extrayendo cuadro de áreas');
+    await sleep(200);
+    actualizarPasoLoad(3,'done','Datos extraídos del plano');
+    actualizarPasoLoad(4,'active','Verificando COS, CUS, lote, RI-VL');
+    const verif = verificarViabilidad(datosPlan, ESTADO.predio);
+    actualizarPasoLoad(4,'done','Verificación normativa completa');
+    actualizarPasoLoad(5,'active','Generando veredicto');
+    await sleep(200);
+    actualizarPasoLoad(5,'done','Veredicto listo');
+    ESTADO.resultado = { plano:datosPlan, predio:ESTADO.predio, verif };
+    if (!ES_LOCALHOST && typeof guRegistrarUso === 'function') guRegistrarUso('gu_m10_usos_mes');
+    renderizarResultado(datosPlan, ESTADO.predio, verif);
+    irAPaso(3);
+  } catch(e) {
+    document.getElementById('panel-loading').classList.remove('visible');
+    irAPaso(2);
+    document.getElementById('auto-label').style.display = 'none';
+    document.getElementById('upload-zone').classList.remove('loaded');
+    ESTADO.plano.archivos = [];
+    renderChips();
+    mostrarError('Error al analizar: ' + (e.message || e));
+  }
 }
+
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+
+function exportarReporte() {
+  mostrarError('Exportación a PDF/Word en desarrollo — disponible próximamente');
+}
+
+// ── Init ─────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  iniciarMapa();
+});
 </script>
 </body>
 </html>

@@ -659,6 +659,20 @@ input[type=range]::-webkit-slider-thumb{
       <div class="gu-mapa-card">
         <div class="gu-rcard-hdr">📋 Plano del proyecto — análisis IA</div>
 
+        <!-- Superficie del terreno (opcional) -->
+        <div id="m10CampoSuperficie" style="margin-bottom:14px">
+          <label style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:5px">
+            Superficie del terreno (m²) <span style="font-weight:400;text-transform:none">— opcional</span>
+          </label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input type="number" id="m10InputSuperficie"
+                   min="1" step="0.01" placeholder="Ej: 200.5"
+                   style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:7px;background:var(--bg3);color:var(--text1);font-family:var(--sans);font-size:13px;outline:none;-moz-appearance:textfield">
+            <span style="font-size:12px;color:var(--text3);white-space:nowrap">m²</span>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">Según escrituras o recibo predial — para cruzar con el plano</div>
+        </div>
+
         <!-- Zona de carga -->
         <div id="m10UploadZone"
              onclick="document.getElementById('m10InputPlano').click()"
@@ -6482,20 +6496,24 @@ async function m10LlamarClaude(base64, mimeType, nombre){
   const zona = datosZona;
   const MUN_NOMBRES = {
     guadalajara:'Guadalajara', zapopan:'Zapopan',
-    tlajomulco:'Tlajomulco de Zúñiga', tlaquepaque:'San Pedro Tlaquepaque', tonala:'Tonalá'
+    tlajomulco:'Tlajomulco de Zuñiga', tlaquepaque:'San Pedro Tlaquepaque', tonala:'Tonala'
   };
   const mun = MUN_NOMBRES[municipioActual] || municipioActual;
 
-  // Parsear lista de usos desde uso_per / uso_con (GDL y Zapopan)
+  // Parsear lista de usos
   const _splitUsos = s => {
     if(!s) return [];
-    return s.split(/[|·\xB7⋅\-]/)
+    return s.split(/[|·\xB7\-]/)
       .map(u => u.trim().replace(/\(condicionados?\)/gi,'').trim())
       .filter(Boolean);
   };
   const usosP = _splitUsos(zona.uso_per);
   const usosC = _splitUsos(zona.uso_con);
   const tieneListaOficial = usosP.length > 0;
+
+  // Superficie ingresada por el usuario (opcional)
+  const supInput = document.getElementById('m10InputSuperficie');
+  const supReal = supInput && supInput.value ? parseFloat(supInput.value) : null;
 
   // Parámetros normativos
   const normaLineas = [
@@ -6509,48 +6527,53 @@ async function m10LlamarClaude(base64, mimeType, nombre){
     zona.altura_max ? `- Altura máxima: ${zona.altura_max} m` : '',
     zona.retranqueo ? `- Retranqueo: ${zona.retranqueo}`      : '',
     zona.frente_min ? `- Frente mínimo: ${zona.frente_min} m` : '',
+    supReal         ? `- Superficie REAL del terreno (según usuario): ${supReal} m²` : '',
   ].filter(Boolean).join('\n');
 
-  // Sección de usos: lista oficial (GDL/Zapopan) o inferencia por clave (VUJ)
+  // Contexto de usos
   let usosContexto;
   if(tieneListaOficial){
     usosContexto = `\nUsos PERMITIDOS en esta zona: ${usosP.join(', ')}`;
-    if(usosC.length) usosContexto += `\nUsos CONDICIONADOS (requieren dictamen): ${usosC.join(', ')}`;
-    usosContexto += '\n(Lista oficial del PDU — cruce exacto posible)';
+    if(usosC.length) usosContexto += `\nUsos CONDICIONADOS: ${usosC.join(', ')}`;
+    usosContexto += '\n(Lista oficial PDU)';
   } else {
-    usosContexto = `\nNota: No hay lista de usos disponible para esta zona de ${mun}.`
-      + `\nUsa tu conocimiento del PDU de ${mun} para la clave "${zona.uso||zona.clave||'—'}" `
-      + `e indica si el uso del proyecto es generalmente compatible. Marca fuente_usos="inferido".`;
+    usosContexto = `\nNo hay lista de usos disponible para ${mun} — infiere por la clave "${zona.uso||zona.clave||'—'}" y marca fuente_usos="inferido".`;
   }
 
-  const system = `Eres un dictaminador de normativa urbana del AMG (Jalisco, México).
-Analiza el plano adjunto y responde DOS preguntas:
+  // Instrucción de superficie
+  const supInstruccion = supReal
+    ? `\n\nVERIFICACIÓN DE SUPERFICIE:
+El usuario indica que el terreno real mide ${supReal} m².
+Busca en la solapa o cuadro de áreas del plano la superficie total del TERRENO (no la construida).
+Compara y reporta en superficie_plano (número o null) y superficie_cuadra ("si"/"no"/"no_disponible").
+Si no cuadra, indica la diferencia en nota_superficie.`
+    : '\n(Sin superficie ingresada — omite la verificación de m² del terreno)';
 
-PREGUNTA 1 — USO DEL SUELO:
-¿Qué tipo de construcción/proyecto muestra el plano? Identifica: bodega, vivienda, oficina, local comercial, etc.
-Con base en la lista de usos o en la clave de zonificación, ¿ese uso es PERMITIDO, CONDICIONADO o NO PERMITIDO?
-Si hay lista oficial: busca la clave más cercana al uso del proyecto.
-Si no hay lista (fuente inferida): usa tu conocimiento del PDU del municipio para la clave indicada.
+  const system = `Eres un dictaminador de normativa urbana del AMG (Jalisco, Mexico).
+Analiza el plano adjunto y responde TRES verificaciones:
 
-PREGUNTA 2 — PARÁMETROS CONSTRUCTIVOS:
-Busca en la solapa o cuadro de áreas del plano: superficie de terreno, superficie construida total.
-Calcula COS = sup.planta baja / terreno y CUS = sup.total / terreno.
-¿Los parámetros cuadran con la normativa?
+1. USO DEL SUELO: ¿Que tipo de proyecto es? ¿Está permitido en la zona?
+2. PARAMETROS: ¿COS, CUS, niveles cuadran con la normativa?
+3. SUPERFICIE: (solo si se indicó superficie real) ¿La superficie del terreno en el plano coincide con la real?
 
-Responde ÚNICAMENTE con JSON puro, sin markdown:
+Responde UNICAMENTE con JSON puro, sin markdown:
 {
-  "uso_identificado": "descripción breve del proyecto",
-  "uso_clave": "clave PDU aplicable o null",
+  "uso_identificado": "descripcion breve",
+  "uso_clave": "clave PDU o null",
   "uso_permitido": true,
   "uso_condicionado": false,
-  "razon_uso": "frase directa máx 120 chars — por qué sí o no está permitido",
+  "razon_uso": "frase max 120 chars",
   "fuente_usos": "lista_oficial|inferido",
   "resultado": "cuadra|parcialmente|no_cuadra",
-  "resumen": "frase sobre COS/CUS/niveles (máx 100 chars) o 'No se pudieron leer parámetros'",
-  "observaciones": ["obs 1", "obs 2"]
-}`;
+  "resumen": "frase sobre COS/CUS/niveles max 100 chars",
+  "observaciones": ["obs 1"],
+  "superficie_plano": null,
+  "superficie_cuadra": "si|no|no_disponible",
+  "nota_superficie": ""
+}
+superficie_cuadra="no_disponible" si no se ingreso superficie real o no puedes leerla del plano.`;
 
-  const userMsg = `Normativa del predio:\n${normaLineas}${usosContexto}\n\nAnaliza el plano "${nombre}":\n1. ¿Qué se construye? ¿Está el uso PERMITIDO en esta zona?\n2. ¿Los parámetros constructivos cuadran con la norma?`;
+  const userMsg = `Normativa:\n${normaLineas}${usosContexto}${supInstruccion}\n\nAnaliza el plano "${nombre}".`;
 
   const content = [
     { type:'text', text: userMsg },
@@ -6568,7 +6591,7 @@ Responde ÚNICAMENTE con JSON puro, sin markdown:
   const res = await fetch(endpoint, {
     method:'POST', headers,
     body: JSON.stringify({
-      model: M10_MODEL, max_tokens: 700, temperature: 0,
+      model: M10_MODEL, max_tokens: 800, temperature: 0,
       system,
       messages: [{ role:'user', content }]
     })
@@ -6582,8 +6605,13 @@ Responde ÚNICAMENTE con JSON puro, sin markdown:
   const data  = await res.json();
   const text  = (data.content?.find(b=>b.type==='text')?.text) || '';
   const match = text.match(/\{[\s\S]*\}/);
-  if(!match) throw new Error('La IA no respondió en formato JSON. Intenta de nuevo.');
-  try{ return JSON.parse(match[0]); }
+  if(!match) throw new Error('La IA no respondio en formato JSON. Intenta de nuevo.');
+  try{
+    const parsed = JSON.parse(match[0]);
+    // Guardar superficie real en el resultado para la UI
+    parsed._superficie_real = supReal;
+    return parsed;
+  }
   catch(e){ throw new Error('Respuesta no parseable: '+e.message); }
 }
 
@@ -6594,23 +6622,20 @@ function m10RenderizarVeredicto(r){
   // ── Chip 1: USO DEL SUELO ────────────────────────────────────────
   let usoIcon, usoColor, usoBg, usoBd, usoTitulo;
   if(r.uso_permitido === true && !r.uso_condicionado){
-    usoIcon = '✅'; usoColor = 'var(--sem-v-txt)'; usoBg = 'var(--sem-v-bg)'; usoBd = '#16A34A44';
-    usoTitulo = 'Uso PERMITIDO en esta zona';
+    usoIcon='✅'; usoColor='var(--sem-v-txt)'; usoBg='var(--sem-v-bg)'; usoBd='#16A34A44';
+    usoTitulo='Uso PERMITIDO en esta zona';
   } else if(r.uso_condicionado){
-    usoIcon = '⚠️'; usoColor = 'var(--yellow)'; usoBg = 'var(--sem-am-bg)'; usoBd = '#D9770644';
-    usoTitulo = 'Uso CONDICIONADO — requiere dictamen adicional';
+    usoIcon='⚠️'; usoColor='var(--yellow)'; usoBg='var(--sem-am-bg)'; usoBd='#D9770644';
+    usoTitulo='Uso CONDICIONADO — requiere dictamen adicional';
   } else {
-    usoIcon = '🚫'; usoColor = 'var(--sem-r-txt)'; usoBg = 'var(--sem-r-bg)'; usoBd = '#DC262644';
-    usoTitulo = 'Uso NO PERMITIDO en esta zona';
+    usoIcon='🚫'; usoColor='var(--sem-r-txt)'; usoBg='var(--sem-r-bg)'; usoBd='#DC262644';
+    usoTitulo='Uso NO PERMITIDO en esta zona';
   }
   const usoClaveHTML = r.uso_clave
     ? `<span style="display:inline-block;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--text1);margin:0 4px">${r.uso_clave}</span>`
     : '';
-  // Aviso de fuente inferida (VUJ — sin lista oficial)
   const inferidoHTML = r.fuente_usos === 'inferido'
-    ? `<div style="margin-top:8px;padding:6px 10px;background:var(--bg3);border-radius:6px;border-left:3px solid var(--yellow);font-size:11px;color:var(--text3);line-height:1.5">
-        ⚠️ Lista de usos no disponible para este municipio. Resultado inferido por IA — verifica en el PDU local.
-       </div>`
+    ? `<div style="margin-top:8px;padding:6px 10px;background:var(--bg3);border-radius:6px;border-left:3px solid var(--yellow);font-size:11px;color:var(--text3);line-height:1.5">⚠️ Sin lista oficial de usos — resultado inferido por IA. Verifica en el PDU local.</div>`
     : '';
 
   // ── Chip 2: PARÁMETROS ───────────────────────────────────────────
@@ -6620,6 +6645,42 @@ function m10RenderizarVeredicto(r){
     no_cuadra:    { bg:'var(--sem-r-bg)',  bd:'#DC262633', txt:'var(--sem-r-txt)', icon:'🚫', label:'Parámetros FUERA de la norma' },
   };
   const p = P[r.resultado] || P.parcialmente;
+
+  // ── Chip 3: SUPERFICIE (solo si hay superficie real ingresada) ───
+  const supReal  = r._superficie_real;
+  const supPlano = typeof r.superficie_plano === 'number' ? r.superficie_plano : null;
+  let supChipHTML = '';
+  if(supReal){
+    let sIcon, sColor, sBg, sBd, sTitulo, sDetalle;
+    if(r.superficie_cuadra === 'si'){
+      sIcon='✅'; sColor='var(--sem-v-txt)'; sBg='var(--sem-v-bg)'; sBd='#16A34A33';
+      sTitulo='Superficie coincide';
+      sDetalle=`Plano: ${supPlano!==null?supPlano+' m²':'coincide'} / Real: ${supReal} m²`;
+    } else if(r.superficie_cuadra === 'no'){
+      sIcon='🚫'; sColor='var(--sem-r-txt)'; sBg='var(--sem-r-bg)'; sBd='#DC262633';
+      sTitulo='Superficie NO coincide';
+      const dif = supPlano !== null ? Math.abs(supPlano - supReal).toFixed(1) : '?';
+      const dir  = supPlano !== null ? (supPlano > supReal ? 'el plano declara más' : 'el plano declara menos') : '';
+      sDetalle=`Plano: ${supPlano!==null?supPlano+' m²':'?'} / Real: ${supReal} m²${dif!=='?'?' ('+dir+': '+dif+' m²)':''}`;
+    } else {
+      sIcon='⚠️'; sColor='var(--yellow)'; sBg='var(--sem-am-bg)'; sBd='#D9770633';
+      sTitulo='No se pudo leer la superficie del plano';
+      sDetalle=`Superficie real: ${supReal} m² — verifica manualmente en el plano`;
+    }
+    const sNota = r.nota_superficie
+      ? `<div style="font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5">${r.nota_superficie}</div>`
+      : '';
+    supChipHTML = `
+    <div style="background:${sBg};border:2px solid ${sBd};border-radius:12px;padding:14px 16px;margin-bottom:10px">
+      <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Superficie del terreno</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+        <span style="font-size:20px;line-height:1">${sIcon}</span>
+        <span style="font-size:13px;font-weight:700;color:${sColor}">${sTitulo}</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6">${sDetalle}</div>
+      ${sNota}
+    </div>`;
+  }
 
   const obsHTML = (r.observaciones||[]).map(o =>
     `<li style="font-size:12px;color:var(--text2);margin-bottom:5px;line-height:1.6">${o}</li>`
@@ -6642,23 +6703,22 @@ function m10RenderizarVeredicto(r){
     </div>
 
     <!-- CHIP 2: PARÁMETROS -->
-    <div style="background:${p.bg};border:2px solid ${p.bd};border-radius:12px;padding:16px;margin-bottom:${obsHTML?'10':'4'}px">
+    <div style="background:${p.bg};border:2px solid ${p.bd};border-radius:12px;padding:16px;margin-bottom:10px">
       <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Parámetros constructivos (COS / CUS / Niveles)</div>
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:${r.resumen?'7':'0'}px">
         <span style="font-size:20px;line-height:1">${p.icon}</span>
         <span style="font-size:13px;font-weight:700;color:${p.txt}">${p.label}</span>
       </div>
-      ${r.resumen ? `<div style="font-size:12px;color:var(--text2);line-height:1.6">${r.resumen}</div>` : ''}
+      ${r.resumen ? '<div style="font-size:12px;color:var(--text2);line-height:1.6">'+r.resumen+'</div>' : ''}
     </div>
 
-    ${obsHTML ? `
-    <div style="margin-bottom:10px">
-      <div style="font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Observaciones</div>
-      <ul style="margin:0;padding-left:18px">${obsHTML}</ul>
-    </div>` : ''}
+    <!-- CHIP 3: SUPERFICIE (condicional) -->
+    ${supChipHTML}
+
+    ${obsHTML ? '<div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Observaciones</div><ul style="margin:0;padding-left:18px">'+obsHTML+'</ul></div>' : ''}
 
     <button onclick="m10ResetUpload()" style="width:100%;padding:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer">
-      📋 Analizar otro plano
+      Analizar otro plano
     </button>
   `;
   window._m10UltimoVeredicto = r;

@@ -8,6 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- pdf.js — rasteriza PDFs a JPEG antes de enviar a Claude (igual que M04) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+<script>if(window.pdfjsLib)pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';</script>
 <link rel="stylesheet" href="gu-design-system.css">
 <!-- Anti-flash tema -->
 <script>
@@ -6369,20 +6372,51 @@ function m10Drop(e){
   if(file) m10ProcessFile(file);
 }
 
+
+// ── Rasterización PDF → JPEG para M10 (mismo enfoque que M04) ──────
+function m10ComprimirImagen(imgEl){
+  const LADO=1920, Q1=0.7, Q2=0.5, LIMITE=1*1024*1024;
+  let w=imgEl.naturalWidth||imgEl.width, h=imgEl.naturalHeight||imgEl.height;
+  if(w>LADO){h=Math.round(h*LADO/w);w=LADO;}else if(h>LADO){w=Math.round(w*LADO/h);h=LADO;}
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  c.getContext('2d').drawImage(imgEl,0,0,w,h);
+  let b64=c.toDataURL('image/jpeg',Q1).split(',')[1]||'';
+  if(b64.length>LIMITE) b64=c.toDataURL('image/jpeg',Q2).split(',')[1]||'';
+  return b64;
+}
+function m10ImgDesdeDataUrl(dataUrl){
+  return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=dataUrl;});
+}
+async function m10PdfARasterizado(file){
+  if(!window.pdfjsLib) throw new Error('El lector de PDF no cargó — recarga la página e intenta de nuevo.');
+  const buf=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+  const nombre=file.name.replace(/\.pdf$/i,'');
+  const numPags=Math.min(pdf.numPages,2);
+  const paginas=[];
+  for(let i=1;i<=numPags;i++){
+    const page=await pdf.getPage(i);
+    const vp=page.getViewport({scale:2});
+    const canvas=document.createElement('canvas'); canvas.width=vp.width; canvas.height=vp.height;
+    await page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;
+    const img=await m10ImgDesdeDataUrl(canvas.toDataURL('image/jpeg',0.7));
+    const b64=m10ComprimirImagen(img);
+    paginas.push({base64:b64,mime:'image/jpeg',nombre:nombre+(pdf.numPages>1?` (pág.${i}/${pdf.numPages})`:'')});
+  }
+  return paginas;
+}
 async function m10ProcessFile(file){
   if(!file) return;
 
-  // Freemium check
   if(typeof guVerificarLimite==='function' && !guVerificarLimite('gu_m10_usos_mes')){
     if(typeof guMostrarModalLimite==='function') guMostrarModalLimite('PreDictamen IA');
     return;
   }
 
-  const upZone    = document.getElementById('m10UploadZone');
-  const status    = document.getElementById('m10AnalisisStatus');
+  const upZone      = document.getElementById('m10UploadZone');
+  const status      = document.getElementById('m10AnalisisStatus');
   const veredictoEl = document.getElementById('m10Veredicto');
 
-  // Mostrar estado de carga
   upZone.style.pointerEvents = 'none';
   upZone.innerHTML = `
     <div style="font-size:22px;margin-bottom:7px">📄</div>
@@ -6390,19 +6424,36 @@ async function m10ProcessFile(file){
     <div style="font-size:11px;color:var(--text3);margin-top:4px">Analizando con IA...</div>
   `;
   status.style.display = 'block';
-  status.innerHTML = '<div class="gu-loading"><div class="gu-spinner"></div>Leyendo plano y cruzando con normativa...</div>';
+  status.innerHTML = '<div class="gu-loading"><div class="gu-spinner"></div>Procesando plano...</div>';
   veredictoEl.style.display = 'none';
 
   try{
     if(!file.type.startsWith('image/') && file.type!=='application/pdf'){
       throw new Error('Formato no compatible. Usa PDF, JPG o PNG.');
     }
-    const base64  = await m10FileToBase64(file);
-    const resultado = await m10LlamarClaude(base64, file.type, file.name);
+    if(file.size > 30*1024*1024){
+      throw new Error('Archivo muy grande ('+Math.round(file.size/1024/1024)+' MB). Máx 30 MB — reduce resolución o usa JPG.');
+    }
+
+    let base64, mimeType;
+    if(file.type === 'application/pdf'){
+      // Rasterizar con pdf.js — mismo enfoque que M04
+      status.innerHTML = '<div class="gu-loading"><div class="gu-spinner"></div>Convirtiendo PDF a imagen...</div>';
+      const paginas = await m10PdfARasterizado(file);
+      // Usar la primera página (donde está la solapa con datos del proyecto)
+      base64   = paginas[0].base64;
+      mimeType = paginas[0].mime;
+    } else {
+      base64   = await m10FileToBase64(file);
+      mimeType = file.type;
+    }
+
+    status.innerHTML = '<div class="gu-loading"><div class="gu-spinner"></div>Cruzando con normativa PDU...</div>';
+    const resultado = await m10LlamarClaude(base64, mimeType, file.name);
     m10RenderizarVeredicto(resultado);
     if(typeof guRegistrarUso==='function') guRegistrarUso('gu_m10_usos_mes');
+
   }catch(e){
-    // NO llamar m10ResetUpload() — eso oculta el error inmediatamente
     upZone.style.pointerEvents = '';
     upZone.innerHTML = `
       <div style="font-size:22px;margin-bottom:6px">⚠️</div>
@@ -6434,53 +6485,51 @@ async function m10LlamarClaude(base64, mimeType, nombre){
     tlajomulco:'Tlajomulco de Zúñiga', tlaquepaque:'San Pedro Tlaquepaque', tonala:'Tonalá'
   }[municipioActual]) || municipioActual;
 
-  // Normativa del predio (de datosZona, igual que M01)
   const lineas = [
     `- Zonificación: ${zona.uso||zona.clave||'—'}${zona.ppp?' / '+zona.ppp:''}`,
-    `- COS máximo (ocupación del suelo): ${zona.cos||'—'}`,
-    `- CUS máximo (utilización del suelo): ${zona.cus||'—'}`,
+    `- COS máximo: ${zona.cos||'—'}`,
+    `- CUS máximo: ${zona.cus||'—'}`,
     `- Niveles máximos: ${zona.niveles||'—'}`,
-    zona.lote_min   ? `- Lote mínimo: ${zona.lote_min} m²`     : '',
-    zona.altura_max ? `- Altura máxima: ${zona.altura_max} m`   : '',
-    zona.retranqueo ? `- Retranqueo: ${zona.retranqueo}`        : '',
-    zona.frente_min ? `- Frente mínimo: ${zona.frente_min} m`   : '',
+    zona.lote_min   ? `- Lote mínimo: ${zona.lote_min} m²`   : '',
+    zona.altura_max ? `- Altura máxima: ${zona.altura_max} m` : '',
+    zona.retranqueo ? `- Retranqueo: ${zona.retranqueo}`      : '',
+    zona.frente_min ? `- Frente mínimo: ${zona.frente_min} m` : '',
   ].filter(Boolean).join('\n');
 
   const system = `Eres un dictaminador de normativa urbana del AMG (Jalisco, México).
-Tu tarea es muy específica: revisar el plano adjunto y decir si el proyecto cuadra con la normativa del predio.
-Solo verifica COS, CUS, número de niveles y uso de suelo. No analices reglamentos de construcción, escaleras, pasillos ni accesibilidad.
+Tu tarea: revisar el plano adjunto y decir si el proyecto cuadra con la normativa del predio.
+Solo verifica COS, CUS, número de niveles y uso de suelo. No analices reglamentos de construcción.
 Si no puedes leer un dato del plano, dilo en observaciones.
-Responde ÚNICAMENTE con JSON puro, sin markdown, sin texto adicional:
+Responde ÚNICAMENTE con JSON puro, sin markdown:
 {
   "resultado": "cuadra|parcialmente|no_cuadra",
-  "resumen": "frase directa de máx 100 caracteres",
-  "observaciones": ["observacion 1", "observacion 2"]
+  "resumen": "frase directa máx 100 caracteres",
+  "observaciones": ["obs 1", "obs 2"]
 }
-cuadra = el proyecto cumple con los parámetros PDU visibles en el plano.
-parcialmente = hay parámetros con dudas o no legibles; no hay incumplimientos claros.
-no_cuadra = el plano muestra claramente que algún parámetro supera el límite normativo.`;
+cuadra = el proyecto cumple los parámetros PDU.
+parcialmente = hay dudas o datos no legibles sin incumplimientos claros.
+no_cuadra = el plano muestra incumplimientos con la normativa.`;
 
   const userMsg = `Municipio: ${mun}
-Normativa PDU de este predio:
+Normativa PDU del predio:
 ${lineas}
 
-Revisa el plano "${nombre}" y dime: ¿cuadra con esta normativa?
-Busca en la solapa o cuadro de áreas: superficie de terreno, superficie construida total, número de niveles. Calcula COS=sup_planta_baja/terreno y CUS=sup_total/terreno si tienes los datos.`;
+Busca en la solapa o cuadro de áreas: superficie de terreno, superficie construida total, niveles.
+Calcula COS=sup_planta_baja/terreno y CUS=sup_total/terreno si tienes los datos.
+¿El plano "${nombre}" cuadra con esta normativa?`;
 
-  const content = [{ type:'text', text: userMsg }];
-  if(mimeType === 'application/pdf'){
-    content.push({ type:'document', source:{ type:'base64', media_type:'application/pdf', data:base64 } });
-  } else {
-    content.push({ type:'image', source:{ type:'base64', media_type:mimeType, data:base64 } });
-  }
+  // Los PDFs ya llegan rasterizados como image/jpeg desde m10ProcessFile
+  const content = [
+    { type:'text', text: userMsg },
+    { type:'image', source:{ type:'base64', media_type: mimeType||'image/jpeg', data:base64 } }
+  ];
 
   const endpoint = ES_LOCALHOST_M10 ? 'https://api.anthropic.com/v1/messages' : '/api/claude-proxy';
   const headers  = { 'Content-Type':'application/json' };
   if(ES_LOCALHOST_M10){
-    const k = window.ANTHROPIC_API_KEY || sessionStorage.getItem('m10_api_key') || prompt('API Key Anthropic:','');
+    const k = window.ANTHROPIC_API_KEY || sessionStorage.getItem('m10_api_key') || prompt('API Key:','');
     if(k){ sessionStorage.setItem('m10_api_key',k); headers['x-api-key']=k; }
     headers['anthropic-version'] = '2023-06-01';
-    headers['anthropic-beta']    = 'pdfs-2024-09-25';
   }
 
   const res = await fetch(endpoint, {
@@ -6502,7 +6551,7 @@ Busca en la solapa o cuadro de áreas: superficie de terreno, superficie constru
   const match = text.match(/\{[\s\S]*\}/);
   if(!match) throw new Error('La IA no respondió en formato JSON. Intenta de nuevo.');
   try{ return JSON.parse(match[0]); }
-  catch(e){ throw new Error('Respuesta IA no parseable: '+e.message); }
+  catch(e){ throw new Error('Respuesta no parseable: '+e.message); }
 }
 
 function m10RenderizarVeredicto(r){

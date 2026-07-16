@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestor Urbano Jalisco — PreDictamen IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="gu-design-system.css">
+<script>
+(function(){
+  var t=localStorage.getItem('gu_theme');
+  if(t) document.documentElement.setAttribute('data-theme',t);
+})();
+</script>
+<style>
+/* ── M10 PreDictamen IA ── */
+.main{max-width:960px;margin:0 auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+
+/* Barra de pasos */
+.paso-bar{display:flex;background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:background var(--t),border-color var(--t)}
+.paso{flex:1;display:flex;align-items:center;gap:10px;padding:11px 16px;position:relative;cursor:pointer;transition:background var(--t-fast)}
+.paso:not(:last-child)::after{content:'';position:absolute;right:-1px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:10px solid var(--border2);z-index:2;transition:border-left-color var(--t)}
+.paso.done::after{border-left-color:var(--brand-light)}
+.paso-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;border:1.5px solid var(--border2);color:var(--text3);background:var(--card-bg);transition:all var(--t-fast)}
+.paso.done .paso-num{background:var(--brand);border-color:var(--brand);color:#fff}
+.paso.active .paso-num{background:var(--brand-pale);border-color:var(--brand);color:var(--brand)}
+.paso-label{font-size:12px;font-weight:500;color:var(--text2);transition:color var(--t)}
+.paso.active .paso-label,.paso.done .paso-label{color:var(--text)}
+.paso-sub{font-size:10px;color:var(--text3);transition:color var(--t)}
+
+/* Paneles */
+.panel{display:none}
+.panel.visible{display:block}
+
+/* Card base */
+.m10-card{background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:18px 20px;transition:background var(--t),border-color var(--t)}
+.m10-card h2{font-size:14px;font-weight:600;color:var(--text);margin:0 0 14px;display:flex;align-items:center;gap:8px;transition:color var(--t)}
+
+/* Formulario */
+.f-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.f-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.f-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.f-single{margin-bottom:10px}
+.f-group{display:flex;flex-direction:column;gap:5px}
+.f-group label{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;transition:color var(--t)}
+.f-group input,.f-group select{background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:8px 11px;color:var(--text);font-size:13px;font-family:var(--sans);outline:none;transition:border-color var(--t-fast),background var(--t)}
+.f-group input:focus,.f-group select:focus{border-color:var(--brand)}
+.f-group input.detectado{border-color:var(--brand-light);background:var(--brand-pale)}
+.f-note{font-size:10px;color:var(--text3);margin-top:3px;transition:color var(--t)}
+.auto-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;background:var(--brand-pale);border:0.5px solid var(--brand-light);color:var(--brand);border-radius:4px;padding:1px 7px}
+
+/* Mapa canvas */
+.mapa-wrap{position:relative;border-radius:var(--r-lg);overflow:hidden;border:0.5px solid var(--border2);background:var(--bg3);margin-bottom:10px}
+.mapa-canvas{display:block;width:100%}
+.mapa-ov{position:absolute;font-size:10px;font-family:var(--mono);padding:3px 9px;border-radius:4px;backdrop-filter:blur(4px);background:rgba(0,0,0,.55);color:#fff;pointer-events:none}
+.mapa-ov.tl{top:8px;left:8px}
+.mapa-ov.tr{top:8px;right:8px}
+.mapa-ov.br{bottom:8px;right:8px;font-size:9px;color:#94a3b8}
+.mapa-badge-gs{position:absolute;bottom:8px;left:8px;background:var(--brand);color:#fff;font-size:10px;font-weight:600;padding:4px 11px;border-radius:6px;display:none}
+.mapa-badge-gs.visible{display:block}
+.mapa-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.mapa-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);transition:color var(--t)}
+.mapa-leg-dot{width:12px;height:12px;border-radius:2px;flex-shrink:0}
+
+/* Params auto */
+.params-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}
+.param-chip{background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:8px 10px;transition:all var(--t-fast)}
+.param-chip.detectado{border-color:var(--brand-light);background:var(--brand-pale)}
+.param-chip.alerta{border-color:var(--sem-am-brd);background:var(--sem-am-bg)}
+.pc-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;transition:color var(--t)}
+.pc-val{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--text);margin-top:2px;transition:color var(--t)}
+.pc-val.alerta{color:var(--sem-am-txt)}
+.pc-val.peligro{color:var(--sem-r-txt)}
+.pc-sub{font-size:10px;color:var(--text2);margin-top:1px;transition:color var(--t)}
+
+/* Botón geocodificar */
+.btn-geocod{background:var(--brand);color:#fff;border:none;border-radius:var(--r-md);padding:9px 18px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:opacity var(--t-fast);white-space:nowrap}
+.btn-geocod:hover:not(:disabled){opacity:.88}
+.btn-geocod:disabled{opacity:.4;cursor:not-allowed}
+
+/* Upload */
+.upload-zone{border:1.5px dashed var(--border2);border-radius:var(--r-lg);padding:24px 20px;text-align:center;cursor:pointer;transition:border-color var(--t-fast),background var(--t-fast)}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--brand);background:var(--brand-pale)}
+.upload-zone.loaded{border-style:solid;border-color:var(--brand-light);background:var(--brand-pale);cursor:default}
+.upload-icon{font-size:30px;margin-bottom:8px}
+.file-chips-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;justify-content:center}
+.file-chip{display:inline-flex;align-items:center;gap:7px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:5px 10px;font-size:12px;color:var(--text);transition:background var(--t)}
+.file-chip .chip-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:0 0 0 4px;line-height:1}
+.file-chip .chip-del:hover{color:var(--sem-r-txt)}
+
+/* Btns principales */
+.btn-primary{width:100%;background:var(--brand);color:#fff;border:none;border-radius:var(--r-md);padding:13px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;transition:opacity var(--t-fast)}
+.btn-primary:hover:not(:disabled){opacity:.88}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-sec{background:var(--bg3);border:0.5px solid var(--border2);color:var(--text2);border-radius:var(--r-md);padding:10px 18px;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:all var(--t-fast)}
+.btn-sec:hover{border-color:var(--brand);color:var(--brand)}
+
+/* Loading */
+.loading-panel{background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:32px 24px;text-align:center;transition:background var(--t),border-color var(--t)}
+.loading-spinner{width:36px;height:36px;border:3px solid var(--border2);border-top-color:var(--brand);border-radius:50%;animation:gu-spin .7s linear infinite;margin:0 auto 16px}
+@keyframes gu-spin{to{transform:rotate(360deg)}}
+.load-steps{list-style:none;padding:0;margin:14px 0 0;text-align:left;display:inline-block}
+.load-steps li{font-size:12px;color:var(--text3);padding:3px 0;transition:color var(--t)}
+.load-steps li.active{color:var(--brand);font-weight:500}
+.load-steps li.done{color:var(--uso-p-txt)}
+.load-steps li.error-step{color:var(--sem-r-txt)}
+
+/* Error */
+.error-card{background:var(--sem-r-bg);border:0.5px solid var(--sem-r-brd);border-radius:var(--r-lg);padding:14px 16px;font-size:13px;color:var(--sem-r-txt);margin-bottom:12px;display:none;transition:all var(--t)}
+.error-card.visible{display:block}
+
+/* ── RESULTADO ── */
+.sem-header{border-radius:var(--r-lg);padding:18px 20px;margin-bottom:12px;display:flex;align-items:flex-start;gap:14px;transition:all var(--t)}
+.sem-header.rojo{background:var(--sem-r-bg);border:0.5px solid var(--sem-r-brd)}
+.sem-header.amarillo{background:var(--sem-am-bg);border:0.5px solid var(--sem-am-brd)}
+.sem-header.verde{background:var(--uso-p-bg);border:0.5px solid var(--uso-p-brd)}
+.sem-ico{font-size:44px;line-height:1;flex-shrink:0}
+.sem-titulo{font-size:20px;font-weight:600;margin-bottom:4px}
+.sem-titulo.rojo{color:var(--sem-r-txt)}
+.sem-titulo.amarillo{color:var(--sem-am-txt)}
+.sem-titulo.verde{color:var(--uso-p-txt)}
+.sem-subtxt{font-size:12px;color:var(--text2);line-height:1.5;transition:color var(--t)}
+.blk-chips{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.blk-chip{font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;border:0.5px solid}
+.blk-chip.rojo{background:var(--sem-r-bg);border-color:var(--sem-r-brd);color:var(--sem-r-txt)}
+.blk-chip.amarillo{background:var(--sem-am-bg);border-color:var(--sem-am-brd);color:var(--sem-am-txt)}
+.blk-chip.verde{background:var(--uso-p-bg);border-color:var(--uso-p-brd);color:var(--uso-p-txt)}
+
+/* Cols resultado */
+.result-cols{display:grid;grid-template-columns:1fr 1.6fr;gap:12px}
+@media(max-width:660px){.result-cols,.f-grid-2,.f-grid-3,.f-grid-4,.params-grid{grid-template-columns:1fr}}
+
+/* Datos detectados */
+.datos-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.dato-item{background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:8px 10px;transition:all var(--t)}
+.dato-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
+.dato-val{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text);margin-top:2px;transition:color var(--t)}
+.dato-val.peligro{color:var(--sem-r-txt)}
+.dato-src{font-size:9px;color:var(--brand);margin-top:1px}
+
+/* Mapa mini resultado */
+.mapa-mini{border-radius:var(--r-md);overflow:hidden;border:0.5px solid var(--border2);margin-bottom:8px}
+
+/* Tabla verificación */
+.vtable{width:100%;border-collapse:collapse}
+.vtable th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding:6px 10px;text-align:left;border-bottom:0.5px solid var(--border2);transition:all var(--t)}
+.vtable td{padding:8px 10px;border-bottom:0.5px solid var(--border);font-size:12px;vertical-align:middle;transition:border-color var(--t)}
+.vtable tr:last-child td{border-bottom:none}
+.vtable tr:hover td{background:var(--bg3)}
+.vtable tr.fail-row td{background:var(--sem-r-bg)}
+.vt-param{font-weight:500;color:var(--text);transition:color var(--t)}
+.vt-sub{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:1px;transition:color var(--t)}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;white-space:nowrap;border:0.5px solid}
+.badge.ok{background:var(--uso-p-bg);border-color:var(--uso-p-brd);color:var(--uso-p-txt)}
+.badge.fail{background:var(--sem-r-bg);border-color:var(--sem-r-brd);color:var(--sem-r-txt)}
+.badge.warn{background:var(--sem-am-bg);border-color:var(--sem-am-brd);color:var(--sem-am-txt)}
+.badge.nd{background:var(--bg3);border-color:var(--border2);color:var(--text3)}
+
+/* Max cabe */
+.max-cabe{background:var(--brand-pale);border:0.5px solid var(--brand-light);border-radius:var(--r-md);padding:10px 13px;margin-top:10px}
+.max-cabe-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--brand);margin-bottom:7px}
+.max-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:2px 0;color:var(--text2);transition:color var(--t)}
+.max-val{font-family:var(--mono);font-weight:600;color:var(--brand)}
+.max-val.peligro{color:var(--sem-r-txt)}
+
+/* Opciones */
+.op-list{list-style:none;padding:0;margin:0}
+.op-item{display:flex;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border);align-items:flex-start;transition:border-color var(--t)}
+.op-item:last-child{border-bottom:none}
+.op-num{width:22px;height:22px;border-radius:50%;background:var(--brand-pale);border:0.5px solid var(--brand-light);color:var(--brand);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.op-txt{font-size:12px;color:var(--text2);line-height:1.5;transition:color var(--t)}
+.op-txt strong{color:var(--text);display:block;margin-bottom:2px;font-size:12px;transition:color var(--t)}
+
+/* Actions */
+.action-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.action-btn{flex:1;min-width:130px;padding:9px 14px;border-radius:var(--r-md);font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--border2);background:var(--card-bg);color:var(--text2);font-family:var(--sans);transition:all var(--t-fast);text-align:center}
+.action-btn:hover{border-color:var(--brand);color:var(--brand)}
+.action-btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.action-btn.primary:hover{opacity:.88}
+
+/* Disclaimer */
+.disclaimer{font-size:10px;color:var(--text3);background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);padding:10px 13px;line-height:1.6;margin-top:10px;transition:all var(--t)}
+
+/* API key */
+.apikey-panel{display:flex;align-items:flex-start;gap:14px;background:var(--card-bg);border:0.5px solid var(--border2);border-radius:var(--r-lg);padding:14px 16px;flex-wrap:wrap;transition:all var(--t)}
+.apikey-panel.ok{border-color:var(--uso-p-dot)}
+.apikey-row{display:flex;gap:6px;margin-top:6px;width:100%}
+.apikey-input{flex:1;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:8px 12px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;transition:border-color var(--t-fast)}
+.apikey-input:focus{border-color:var(--brand)}
+.apikey-input.saved{border-color:var(--uso-p-dot)}
+.btn-save-key{background:var(--brand);color:#fff;border:none;border-radius:var(--r-md);padding:8px 16px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;transition:opacity var(--t-fast)}
+.btn-save-key:hover{opacity:.88}
+.apikey-status{font-size:11px;color:var(--text3);margin-top:4px;font-family:var(--mono);width:100%;transition:color var(--t)}
+</style>
+</head>
+<body>
+
+<nav class="gu-nav">
+  <div class="gu-nav-logo">
+    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 1L1 5v9h5v-4h4v4h5V5L8 1z"/></svg>
+  </div>
+  <span class="gu-nav-name">Gestor Urbano Jalisco</span>
+  <span class="gu-nav-sep">/</span>
+  <span class="gu-nav-mod">M10 · PreDictamen IA</span>
+  <a href="index.html" class="gu-nav-back">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    Menú
+  </a>
+  <a href="GestorUrbano_M01_3.html" class="gu-nav-back" style="margin-left:4px">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    M01 · Uso de suelo
+  </a>
+  <a href="GestorUrbano_M04_3.html" class="gu-nav-back" style="margin-left:4px">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    M04 · Revisor planos
+  </a>
+  <button class="gu-toggle" onclick="guToggleTheme()" aria-label="Cambiar tema" style="margin-left:8px">
+    <div class="gu-toggle-track"><div class="gu-toggle-thumb"></div></div>
+    <span id="gu-toggle-label">Modo oscuro</span>
+  </button>
+</nav>
+
+<div class="main">
+
+  <!-- API Key (solo visible en localhost) -->
+  <div class="apikey-panel" id="apikey-panel" style="display:none">
+    <div style="font-size:18px;flex-shrink:0">🔑</div>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">API Key de Anthropic</div>
+      <div style="font-size:11px;color:var(--text3)">Solo se usa en desarrollo local. En producción la petición va al proxy seguro.</div>
+      <div class="apikey-row">
+        <input type="password" class="apikey-input" id="apikey-input" placeholder="sk-ant-api03-..." autocomplete="off">
+        <button class="btn-save-key" onclick="guardarKey()">Guardar</button>
+        <button class="btn-save-key" style="background:var(--bg3);color:var(--text2);border:0.5px solid var(--border2)" onclick="toggleVerKey()">Ver</button>
+      </div>
+      <div class="apikey-status" id="apikey-status"></div>
+    </div>
+  </div>
+
+  <!-- Error global -->
+  <div class="error-card" id="error-card"></div>
+
+  <!-- Barra de pasos -->
+  <div class="paso-bar">
+    <div class="paso active" id="paso-1" onclick="irAPaso(1)">
+      <div class="paso-num" id="pnum-1">1</div>
+      <div>
+        <div class="paso-label">Predio</div>
+        <div class="paso-sub">Dirección + zonificación</div>
+      </div>
+    </div>
+    <div class="paso" id="paso-2" onclick="irAPaso(2)">
+      <div class="paso-num" id="pnum-2">2</div>
+      <div>
+        <div class="paso-label">Proyecto</div>
+        <div class="paso-sub">Plano PDF o imagen</div>
+      </div>
+    </div>
+    <div class="paso" id="paso-3">
+      <div class="paso-num" id="pnum-3">3</div>
+      <div>
+        <div class="paso-label">Veredicto</div>
+        <div class="paso-sub">Análisis de viabilidad</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────── PASO 1: PREDIO ─────────────────── -->
+  <div class="panel visible" id="panel-predio">
+
+    <div class="m10-card">
+      <h2>📍 Datos del predio</h2>
+
+      <div class="f-single">
+        <div class="f-group">
+          <label>Dirección completa</label>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="inp-dir" placeholder="Calle, número, colonia, municipio, Jalisco"
+              style="flex:1" onkeydown="if(event.key==='Enter')geocodificarDir()">
+            <button class="btn-geocod" id="btn-geocod" onclick="geocodificarDir()">Buscar en mapa</button>
+          </div>
+          <div class="f-note" id="geocod-status">Escribe la dirección y presiona "Buscar en mapa" para auto-detectar municipio y zonificación</div>
+        </div>
+      </div>
+
+      <!-- Mapa canvas -->
+      <div class="mapa-wrap" id="mapa-wrap" style="height:220px">
+        <canvas id="mapa-canvas" class="mapa-canvas" height="220"></canvas>
+        <div class="mapa-ov tl" id="mapa-zona-label">— sin ubicación —</div>
+        <div class="mapa-ov tr" id="mapa-mun-label"></div>
+        <div class="mapa-ov br">Mapa esquemático · no cartográfico</div>
+        <div class="mapa-badge-gs" id="mapa-badge-gs">✦ Zonificación de GeoServer</div>
+      </div>
+
+      <div class="mapa-legend">
+        <div class="mapa-leg-item"><div class="mapa-leg-dot" style="background:rgba(59,130,246,.8)"></div>Polígono del predio</div>
+        <div class="mapa-leg-item"><div class="mapa-leg-dot" style="background:rgba(239,68,68,.45)"></div>Restricción RI-VL (si aplica)</div>
+        <div class="mapa-leg-item"><div class="mapa-leg-dot" style="background:rgba(34,197,94,.6)"></div>Área potencialmente edificable</div>
+        <div class="mapa-leg-item"><div class="mapa-leg-dot" style="background:#f59e0b;border-radius:50%"></div>Pin de ubicación</div>
+      </div>
+
+      <!-- Datos del predio -->
+      <div style="margin-top:14px;margin-bottom:8px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text3)">Datos del predio</span>
+        <span class="auto-badge" id="badge-auto" style="display:none">✦ Auto-detectado de GeoServer</span>
+        <span style="font-size:10px;color:var(--text3)" id="fuente-ppdu"></span>
+      </div>
+
+      <div class="f-grid-2">
+        <div class="f-group">
+          <label>Municipio</label>
+          <select id="sel-mun">
+            <option value="">— Selecciona —</option>
+            <option value="GDL">Guadalajara (GDL)</option>
+            <option value="ZPN">Zapopan (ZPN)</option>
+            <option value="TLQ">Tlaquepaque (TLQ)</option>
+            <option value="TLA">Tlajomulco de Zúñiga (TLA)</option>
+            <option value="TON">Tonalá (TON)</option>
+          </select>
+        </div>
+        <div class="f-group">
+          <label>Zonificación detectada</label>
+          <input type="text" id="inp-zona" placeholder="ej. H3, MR-APD, I1 — o escribe manualmente" class="detectado">
+        </div>
+      </div>
+
+      <div class="f-grid-3">
+        <div class="f-group">
+          <label>Superficie del predio (m²)</label>
+          <input type="number" id="inp-sup" placeholder="ej. 574.56" min="1" step="0.01" oninput="actualizarParams()">
+        </div>
+        <div class="f-group">
+          <label>Frente del predio (m)</label>
+          <input type="number" id="inp-frente" placeholder="ej. 15.00" min="1" step="0.01" oninput="actualizarParams()">
+          <div class="f-note">Necesario para calcular RI-VL</div>
+        </div>
+        <div class="f-group">
+          <label>RI-VL (m de restricción vial)</label>
+          <input type="number" id="inp-rivl" placeholder="ej. 22 — 0 si no aplica" min="0" step="0.5" oninput="actualizarParams()">
+          <div class="f-note">Periférico, López Mateos, etc.</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:8px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text3)">Parámetros normativos del PPDU</span>
+        <span class="auto-badge" id="badge-auto-ppdu" style="display:none">✦ GeoServer</span>
+        <span style="font-size:10px;color:var(--text3)">— edita si GeoServer no los cargó o para sobreescribir</span>
+      </div>
+
+      <div class="f-grid-4">
+        <div class="f-group">
+          <label>Lote mínimo (m²)</label>
+          <input type="number" id="inp-lote-min" placeholder="ej. 1500" min="0" step="1" oninput="actualizarParams()">
+        </div>
+        <div class="f-group">
+          <label>COS máximo</label>
+          <input type="number" id="inp-cos" placeholder="ej. 0.80" min="0" max="1" step="0.01" oninput="actualizarParams()">
+        </div>
+        <div class="f-group">
+          <label>CUS máximo</label>
+          <input type="number" id="inp-cus" placeholder="ej. 2.40" min="0" step="0.01" oninput="actualizarParams()">
+        </div>
+        <div class="f-group">
+          <label>Restricción frontal (m)</label>
+          <input type="number" id="inp-rest-front" placeholder="ej. 5" min="0" step="0.5" oninput="actualizarParams()">
+        </div>
+      </div>
+
+      <!-- Chips de resumen calculado -->
+      <div class="params-grid" id="params-resumen">
+        <div class="param-chip" id="chip-area-libre">
+          <div class="pc-label">Área libre tras RI-VL</div>
+          <div class="pc-val" id="val-area-libre">—</div>
+          <div class="pc-sub">m² disponibles</div>
+        </div>
+        <div class="param-chip" id="chip-huella-max">
+          <div class="pc-label">Huella máx. (COS)</div>
+          <div class="pc-val" id="val-huella-max">—</div>
+          <div class="pc-sub">m² en PB</div>
+        </div>
+        <div class="param-chip" id="chip-sup-max">
+          <div class="pc-label">Sup. total máx. (CUS)</div>
+          <div class="pc-val" id="val-sup-max">—</div>
+          <div class="pc-sub">m² totales</div>
+        </div>
+        <div class="param-chip" id="chip-lote-status">
+          <div class="pc-label">Estado del lote</div>
+          <div class="pc-val" id="val-lote-status">—</div>
+          <div class="pc-sub" id="sub-lote-status">ingresa superficie</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="irAPaso(2)">Siguiente → Subir plano del proyecto</button>
+  </div>
+
+  <!-- ─────────────────── PASO 2: PROYECTO ─────────────────── -->
+  <div class="panel" id="panel-plano">
+
+    <div class="m10-card">
+      <h2>📐 Plano del proyecto</h2>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">
+        Sube el plano arquitectónico o estructural. Acepta <strong>PDF, JPG, PNG</strong>.<br>
+        Claude leerá automáticamente: cuadro de áreas, huella, número de niveles y altura total.
+      </div>
+
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+        <input type="file" id="file-input" accept="image/*,application/pdf" multiple style="display:none" onchange="agregarArchivos(Array.from(this.files));this.value=''">
+        <div class="upload-icon">📄</div>
+        <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px">Arrastra los planos aquí o haz clic para seleccionar</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:12px">PDF, JPG, PNG · Máximo 10 láminas · 20 MB c/u</div>
+        <button class="btn-geocod" onclick="event.stopPropagation();document.getElementById('file-input').click()">Seleccionar archivos</button>
+        <div class="file-chips-wrap" id="file-chips" onclick="event.stopPropagation()"></div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="f-group">
+          <label>Uso propuesto <span style="color:var(--text3);font-weight:400;text-transform:none;font-size:11px">(opcional — Claude lo detecta del plano)</span></label>
+          <input type="text" id="inp-uso" placeholder="ej. Vivienda unifamiliar, Bodega I1, Consultorio, Comercio">
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btn-analizar" onclick="analizar()" disabled>
+      <span>🤖</span> Analizar viabilidad con IA
+    </button>
+    <button class="btn-sec" style="width:100%;margin-top:8px" onclick="irAPaso(1)">← Regresar al predio</button>
+  </div>
+
+  <!-- ─────────────────── LOADING ─────────────────── -->
+  <div class="panel" id="panel-loading">
+    <div class="loading-panel">
+      <div class="loading-spinner"></div>
+      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">Analizando tu proyecto...</div>
+      <div style="font-size:12px;color:var(--text3)">Claude lee el plano y cruza los datos con la normativa del predio</div>
+      <ul class="load-steps" id="load-steps">
+        <li id="ls-1">◦ Preparando datos del predio</li>
+        <li id="ls-2">◦ Enviando plano a Claude IA</li>
+        <li id="ls-3">◦ Extrayendo cuadro de áreas y dimensiones</li>
+        <li id="ls-4">◦ Verificando COS, CUS, lote mínimo, RI-VL</li>
+        <li id="ls-5">◦ Generando veredicto y recomendaciones</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ─────────────────── RESULTADO ─────────────────── -->
+  <div class="panel" id="panel-resultado">
+
+    <!-- Semáforo principal -->
+    <div class="sem-header" id="sem-header">
+      <div class="sem-ico" id="sem-ico">⬛</div>
+      <div>
+        <div class="sem-titulo" id="sem-titulo">—</div>
+        <div class="sem-subtxt" id="sem-subtxt">—</div>
+        <div class="blk-chips" id="blk-chips"></div>
+      </div>
+    </div>
+
+    <div class="result-cols">
+
+      <!-- Columna izquierda: mapa mini + datos detectados -->
+      <div>
+        <!-- Mapa mini -->
+        <div class="m10-card" style="padding:12px;margin-bottom:12px">
+          <h2 style="font-size:12px;margin-bottom:8px">🗺️ Ubicación verificada</h2>
+          <div class="mapa-mini" style="height:150px">
+            <canvas id="mapa-mini-canvas" style="display:block;width:100%;height:150px"></canvas>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:6px" id="mapa-mini-info">—</div>
+        </div>
+
+        <!-- Datos del predio -->
+        <div class="m10-card" style="margin-bottom:12px">
+          <h2 style="font-size:12px;margin-bottom:10px">🗺️ Predio <span class="auto-badge" style="margin-left:4px">GeoServer / manual</span></h2>
+          <div class="datos-grid" id="datos-predio"></div>
+        </div>
+
+        <!-- Datos del proyecto -->
+        <div class="m10-card">
+          <h2 style="font-size:12px;margin-bottom:10px">📐 Proyecto <span class="auto-badge" style="margin-left:4px">Claude IA</span></h2>
+          <div class="datos-grid" id="datos-proyecto"></div>
+          <div style="font-size:10px;color:var(--text3);margin-top:8px;font-family:var(--mono)" id="ia-notas"></div>
+        </div>
+      </div>
+
+      <!-- Columna derecha: tabla + max cabe + opciones -->
+      <div>
+        <!-- Tabla de verificación -->
+        <div class="m10-card" style="margin-bottom:12px">
+          <h2 style="font-size:12px;margin-bottom:10px">☑️ Verificación normativa</h2>
+          <div style="overflow-x:auto">
+            <table class="vtable">
+              <thead>
+                <tr>
+                  <th>Parámetro</th>
+                  <th>Permitido</th>
+                  <th>Proyecto</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="vtable-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Qué sí cabe -->
+        <div class="m10-card" id="card-max-cabe" style="margin-bottom:12px;display:none">
+          <h2 style="font-size:12px;margin-bottom:6px">📏 ¿Qué sí cabe en este predio?</h2>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:6px" id="max-cabe-intro"></div>
+          <div class="max-cabe">
+            <div class="max-cabe-title">Superficie máxima construible</div>
+            <div id="max-cabe-rows"></div>
+          </div>
+        </div>
+
+        <!-- Opciones -->
+        <div class="m10-card" id="card-opciones" style="margin-bottom:12px;display:none">
+          <h2 style="font-size:12px;margin-bottom:10px">💡 Opciones para hacer viable el proyecto</h2>
+          <ul class="op-list" id="op-list"></ul>
+        </div>
+
+        <!-- Próximos pasos (si es viable) -->
+        <div class="m10-card" id="card-proximos" style="margin-bottom:12px;display:none">
+          <h2 style="font-size:12px;margin-bottom:10px">✅ Próximos pasos</h2>
+          <ul class="op-list" id="prox-list"></ul>
+        </div>
+
+        <!-- Actions -->
+        <div class="action-row">
+          <div class="action-btn" onclick="irAPaso(1)">✏️ Editar predio</div>
+          <div class="action-btn" onclick="irAPaso(2)">📄 Cambiar plano</div>
+          <div class="action-btn primary" onclick="exportarReporte()">⬇️ Descargar reporte</div>
+        </div>
+        <div class="disclaimer">
+          ⚠️ Análisis orientativo generado con IA a partir de los planos subidos y los parámetros del PPDU indicados. No sustituye el DTUD oficial, el dictamen de la DPL ni la intervención de un DRO certificado. Verifica siempre la información con las autoridades competentes antes de iniciar trámites o obra.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script src="gu-freemium.js"></script>
+<!-- ════════════════════════════════════════════════════════════
+     SCRIPT
+════════════════════════════════════════════════════════════ -->
+<script>
+// ── Constantes ──────────────────────────────────────────────
+const ES_LOCALHOST = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const NOMINATIM   = 'https://nominatim.openstreetmap.org/search';
+const GS_GDL      = 'https://visorgeoserver.guadalajara.gob.mx/geoserver/vu/wfs';
+const GS_JAL      = 'https://api-visorurbano.jalisco.gob.mx/geoserver/ows';
+const MAX_FILES   = 10;
+const MAX_SIZE_MB = 20;
+
+// ── Estado global ────────────────────────────────────────────
+const ESTADO = {
+  paso: 1,
+  predio: {
+    direccion: '',
+    municipio: '',
+    zonificacion: '',
+    lat: null,
+    lng: null,
+    sup_m2: null,
+    frente_m: null,
+    rivl_m: 0,
+    lote_min_m2: null,
+    cos_max: null,
+    cus_max: null,
+    rest_frontal_m: null,
+    fuente_zona: 'manual',
+    ppdu: '',
+  },
+  plano: { archivos: [] },
+  resultado: null,
+};
+
+// ── API Key (solo dev) ───────────────────────────────────────
+function obtenerKey() { return localStorage.getItem('gu_apikey') || ''; }
+function guardarKey() {
+  const v = document.getElementById('apikey-input').value.trim();
+  if (!v) return;
+  localStorage.setItem('gu_apikey', v);
+  document.getElementById('apikey-status').textContent = '✓ Key guardada en localStorage';
+  document.getElementById('apikey-input').classList.add('saved');
+  document.getElementById('apikey-panel').classList.add('ok');
+}
+function toggleVerKey() {
+  const inp = document.getElementById('apikey-input');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+function initKey() {
+  if (!ES_LOCALHOST) return;
+  document.getElementById('apikey-panel').style.display = 'flex';
+  const k = obtenerKey();
+  if (k) {
+    document.getElementById('apikey-input').value = k;
+    document.getElementById('apikey-input').classList.add('saved');
+    document.getElementById('apikey-panel').classList.add('ok');
+    document.getElementById('apikey-status').textContent = '✓ Key cargada';
+  }
+}
+initKey();
+
+// ── Tema ─────────────────────────────────────────────────────
+function guToggleTheme() {
+  const html = document.documentElement;
+  const dark = html.getAttribute('data-theme') !== 'light';
+  const next = dark ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('gu_theme', next);
+  document.getElementById('gu-toggle-label').textContent = next === 'dark' ? 'Modo oscuro' : 'Modo claro';
+  dibujarMapa('mapa-canvas', 500, 220, false);
+  dibujarMapa('mapa-mini-canvas', 300, 150, true);
+}
+(function(){
+  const t = localStorage.getItem('gu_theme') || 'dark';
+  document.getElementById('gu-toggle-label').textContent = t === 'dark' ? 'Modo oscuro' : 'Modo claro';
+})();
+
+// ── Errores globales ─────────────────────────────────────────
+function mostrarError(msg) {
+  const el = document.getElementById('error-card');
+  el.innerHTML = '⚠️ ' + msg;
+  el.classList.add('visible');
+  setTimeout(() => el.classList.remove('visible'), 8000);
+}
+function ocultarError() { document.getElementById('error-card').classList.remove('visible'); }
+
+// ── Navegación de pasos ──────────────────────────────────────
+function irAPaso(n) {
+  ['panel-predio','panel-plano','panel-loading','panel-resultado'].forEach(id => {
+    document.getElementById(id)?.classList.remove('visible');
+  });
+  const paneles = { 1:'panel-predio', 2:'panel-plano', 3:'panel-resultado' };
+  if (paneles[n]) document.getElementById(paneles[n]).classList.add('visible');
+  ESTADO.paso = n;
+  // Actualizar barra de pasos
+  for (let i = 1; i <= 3; i++) {
+    const paso = document.getElementById(`paso-${i}`);
+    const pnum = document.getElementById(`pnum-${i}`);
+    paso.classList.remove('done','active');
+    if (i < n) { paso.classList.add('done'); pnum.textContent = '✓'; }
+    else if (i === n) { paso.classList.add('active'); pnum.textContent = i; }
+    else { pnum.textContent = i; }
+  }
+  if (n === 1) setTimeout(() => dibujarMapa('mapa-canvas', obtW('mapa-canvas'), 220, false), 30);
+  if (n === 3) setTimeout(() => dibujarMapa('mapa-mini-canvas', obtW('mapa-mini-canvas'), 150, true), 30);
+}
+
+function obtW(id) {
+  const el = document.getElementById(id);
+  return el ? el.parentElement.clientWidth || 500 : 500;
+}
+
+// ── MAPA CANVAS ──────────────────────────────────────────────
+function dibujarMapa(id, W, H, compact) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const dark = document.documentElement.getAttribute('data-theme') !== 'light';
+
+  const BG     = dark ? '#1a2535' : '#c8d5b9';
+  const MAN    = dark ? '#1e3040' : '#d0dfc4';
+  const BLDG   = dark ? '#2a3850' : '#c2cdb6';
+  const ROAD_Y = dark ? '#f9c74f' : '#f0e68c';
+  const ROAD_M = dark ? '#253045' : '#beccae';
+
+  ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+
+  // Manzanas
+  const manzanas = compact
+    ? [[0,0,W*.48,H*.45],[W*.52,0,W,H*.42],[0,H*.5,W*.45,H],[W*.5,H*.47,W,H]]
+    : [[0,0,W*.36,H*.47],[W*.39,0,W,H*.44],[0,H*.5,W*.34,H],[W*.37,H*.48,W,H]];
+  ctx.fillStyle = MAN;
+  manzanas.forEach(m => ctx.fillRect(m[0],m[1],m[2]-m[0],m[3]-m[1]));
+
+  // Edificios dentro de manzanas
+  ctx.fillStyle = BLDG;
+  manzanas.forEach(m => {
+    const mx=m[0]+5,my=m[1]+5,mw=m[2]-m[0]-10,mh=m[3]-m[1]-10;
+    if(mw>15&&mh>15) ctx.fillRect(mx,my,mw,mh);
+  });
+
+  // Vialidad principal (Periférico) — vertical
+  const periX = compact ? W*.5 : W*.37;
+  const periW = compact ? W*.06 : W*.05;
+  ctx.fillStyle = ROAD_Y;
+  ctx.fillRect(periX - periW/2, 0, periW, H);
+
+  // Línea central del Periférico
+  ctx.setLineDash([compact?8:12, compact?4:6]);
+  ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(periX, 0); ctx.lineTo(periX, H); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Vialidad secundaria — horizontal
+  const crossY = compact ? H*.45 : H*.48;
+  const crossH = compact ? H*.08 : H*.07;
+  ctx.fillStyle = ROAD_M;
+  ctx.fillRect(0, crossY - crossH/2, W, crossH);
+
+  // Etiqueta Periférico
+  ctx.save();
+  ctx.translate(periX + periW, compact ? H*.3 : H*.3);
+  ctx.rotate(-Math.PI/2);
+  ctx.font = `bold ${compact?8:9}px 'Outfit',system-ui`;
+  ctx.fillStyle = dark ? '#f9c74f' : '#7a6200';
+  ctx.textAlign = 'center';
+  ctx.fillText('PERIFÉRICO', 0, -4);
+  ctx.restore();
+
+  // RI-VL (franja roja al lado del Periférico)
+  const rivlM = parseFloat(document.getElementById('inp-rivl')?.value) || 0;
+  const px0 = periX + periW/2 + 2;
+  const py0 = compact ? H*.1  : H*.12;
+  const pw  = compact ? W*.42 : W*.58;
+  const ph  = compact ? H*.72 : H*.68;
+
+  let rivlPx = 0;
+  if (rivlM > 0) {
+    const frente = parseFloat(document.getElementById('inp-frente')?.value) || 0;
+    const sup    = parseFloat(document.getElementById('inp-sup')?.value) || 0;
+    // Estimar píxeles de RI-VL proporcional a la anchura del predio canvas
+    rivlPx = Math.min(pw * 0.42, pw * (rivlM / (sup > 0 && frente > 0 ? (sup/frente) : 30)));
+
+    // Franja RI-VL
+    ctx.fillStyle = 'rgba(239,68,68,0.32)';
+    ctx.fillRect(px0, py0, rivlPx, ph);
+
+    // Límite RI-VL
+    ctx.setLineDash([4,3]);
+    ctx.strokeStyle = 'rgba(239,68,68,0.85)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(px0 + rivlPx, py0); ctx.lineTo(px0 + rivlPx, py0 + ph);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Etiqueta RI-VL
+    ctx.font = `bold ${compact?7:8}px 'Outfit',system-ui`;
+    ctx.fillStyle = 'rgba(239,68,68,.9)';
+    ctx.textAlign = 'center';
+    ctx.fillText('RI-VL', px0 + rivlPx/2, py0 + ph + (compact?11:14));
+  }
+
+  // Área edificable (verde)
+  if (rivlPx < pw) {
+    ctx.fillStyle = 'rgba(34,197,94,0.2)';
+    ctx.fillRect(px0 + rivlPx, py0, pw - rivlPx, ph);
+  }
+
+  // Polígono predio (azul)
+  ctx.fillStyle = 'rgba(59,130,246,0.22)';
+  ctx.fillRect(px0, py0, pw, ph);
+  ctx.strokeStyle = '#3b82f6';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(px0, py0, pw, ph);
+
+  // Etiqueta predio
+  const sup = parseFloat(document.getElementById('inp-sup')?.value);
+  ctx.font = `${compact?8:9}px 'Outfit',system-ui`;
+  ctx.fillStyle = '#3b82f6';
+  ctx.textAlign = 'center';
+  ctx.fillText(sup ? `${sup.toLocaleString('es')} m²` : 'Predio', px0 + pw/2, py0 + ph/2 + 3);
+
+  // PIN
+  if (ESTADO.predio.lat) {
+    const pinX = px0 + pw/2;
+    const pinY = py0 - (compact ? 13 : 18);
+    const r    = compact ? 7 : 10;
+    ctx.fillStyle = '#f59e0b';
+    ctx.beginPath(); ctx.arc(pinX, pinY, r, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(pinX, pinY, r*.4, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(pinX - r*.4, pinY + r*.8);
+    ctx.lineTo(pinX + r*.4, pinY + r*.8);
+    ctx.lineTo(pinX, pinY + r*1.7);
+    ctx.closePath();
+    ctx.fillStyle = '#f59e0b'; ctx.fill();
+  }
+}
+
+// Inicializar mapa al cargar
+window.addEventListener('load', () => {
+  dibujarMapa('mapa-canvas', obtW('mapa-canvas'), 220, false);
+});
+window.addEventListener('resize', () => {
+  dibujarMapa('mapa-canvas', obtW('mapa-canvas'), 220, false);
+  if (ESTADO.paso === 3) dibujarMapa('mapa-mini-canvas', obtW('mapa-mini-canvas'), 150, true);
+});
+const _themeObs = new MutationObserver(() => {
+  dibujarMapa('mapa-canvas', obtW('mapa-canvas'), 220, false);
+  if (ESTADO.paso === 3) dibujarMapa('mapa-mini-canvas', obtW('mapa-mini-canvas'), 150, true);
+});
+_themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+// ── GEOCODIFICACIÓN (Nominatim) ──────────────────────────────
+async function geocodificarDir() {
+  const dir = document.getElementById('inp-dir').value.trim();
+  if (!dir) { mostrarError('Escribe una dirección primero.'); return; }
+
+  const btn = document.getElementById('btn-geocod');
+  btn.disabled = true; btn.textContent = 'Buscando...';
+  document.getElementById('geocod-status').textContent = 'Buscando dirección en Nominatim…';
+
+  try {
+    const q   = encodeURIComponent(dir + ' Jalisco México');
+    const url = `${NOMINATIM}?q=${q}&format=json&limit=3&countrycodes=mx&addressdetails=1`;
+    const r   = await fetch(url, { headers: { 'Accept-Language': 'es' } });
+    if (!r.ok) throw new Error('Nominatim no respondió');
+    const rs  = await r.json();
+    if (!rs.length) throw new Error('No se encontró la dirección');
+
+    const best = rs[0];
+    ESTADO.predio.lat = parseFloat(best.lat);
+    ESTADO.predio.lng = parseFloat(best.lon);
+    ESTADO.predio.direccion = dir;
+
+    // Auto-detectar municipio
+    const addr = best.address || {};
+    const city = (addr.city || addr.town || addr.county || '').toLowerCase();
+    let mun = '';
+    if (city.includes('guadalajara'))     mun = 'GDL';
+    else if (city.includes('zapopan'))    mun = 'ZPN';
+    else if (city.includes('tlaquepaque')) mun = 'TLQ';
+    else if (city.includes('tlajomulco')) mun = 'TLA';
+    else if (city.includes('tonalá') || city.includes('tonala')) mun = 'TON';
+
+    if (mun) {
+      document.getElementById('sel-mun').value = mun;
+      ESTADO.predio.municipio = mun;
+    }
+
+    document.getElementById('geocod-status').textContent =
+      `📍 Ubicado: ${best.display_name.split(',').slice(0,3).join(', ')}`;
+    document.getElementById('mapa-zona-label').textContent =
+      mun ? `${mun} · ${ESTADO.predio.zonificacion || 'consultando zonificación…'}` : best.display_name.split(',')[0];
+    document.getElementById('mapa-mun-label').textContent = mun || '';
+
+    dibujarMapa('mapa-canvas', obtW('mapa-canvas'), 220, false);
+
+    // Intentar consultar GeoServer para zonificación
+    if (mun) await consultarGeoServer(mun, ESTADO.predio.lat, ESTADO.predio.lng);
+
+  } catch(e) {
+    document.getElementById('geocod-status').textContent = '⚠️ ' + e.message + ' — puedes llenar los datos manualmente.';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Buscar en mapa';
+  }
+}
+
+// ── CONSULTA GEOSERVER (simplificada, solo para obtener zonificación) ──
+async function consultarGeoServer(mun, lat, lng) {
+  document.getElementById('geocod-status').textContent = 'Consultando GeoServer para zonificación…';
+  try {
+    let url, typeName, propZona, propCOS, propCUS;
+    if (mun === 'GDL') {
+      typeName = 'vu:GDL_E1_Zonificacion_Secundaria';
+      propZona = 'zona_sec';  propCOS = 'cos_max'; propCUS = 'cus_max';
+      url = `${GS_GDL}?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&typeName=${typeName}` +
+        `&outputFormat=application/json&maxFeatures=1` +
+        `&CQL_FILTER=INTERSECTS(geom,POINT(${lng}%20${lat}))`;
+    } else {
+      // ZPN, TLQ, TLA, TON — Visor Jalisco
+      const layerMap = { ZPN:'vu_zpn:ZPN_ZonificacionSecundaria', TLQ:'vu_tlq:TLQ_Zonificacion', TLA:'vu_tla:TLA_Zonificacion', TON:'vu_ton:TON_Zonificacion' };
+      typeName = layerMap[mun] || '';
+      if (!typeName) throw new Error('municipio no soportado en GeoServer');
+      propZona = 'zona'; propCOS = 'cos'; propCUS = 'cus';
+      url = `${GS_JAL}?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&typeName=${typeName}` +
+        `&outputFormat=application/json&count=1` +
+        `&CQL_FILTER=INTERSECTS(the_geom,POINT(${lng}%20${lat}))`;
+    }
+
+    const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    if (!r.ok) throw new Error('GeoServer no respondió');
+    const gj = await r.json();
+    const feat = gj.features?.[0];
+    if (!feat) throw new Error('Sin datos de zonificación en este punto');
+
+    const props = feat.properties || {};
+    const zona  = props[propZona] || props['clave_zona'] || props['ZONA'] || '';
+    const cos   = parseFloat(props[propCOS] || props['COS'] || props['coef_ocup']) || null;
+    const cus   = parseFloat(props[propCUS] || props['CUS'] || props['coef_util']) || null;
+
+    if (zona) {
+      document.getElementById('inp-zona').value = zona;
+      ESTADO.predio.zonificacion = zona;
+      ESTADO.predio.fuente_zona = 'geoserver';
+      document.getElementById('mapa-zona-label').textContent = `${mun} · ${zona}`;
+      document.getElementById('badge-auto').style.display = 'inline-flex';
+      document.getElementById('badge-auto-ppdu').style.display = 'inline-flex';
+      document.getElementById('mapa-badge-gs').classList.add('visible');
+    }
+    if (cos) { document.getElementById('inp-cos').value = cos; ESTADO.predio.cos_max = cos; }
+    if (cus) { document.getElementById('inp-cus').value = cus; ESTADO.predio.cus_max = cus; }
+    if (props.lote_min || props.lote_minimo) {
+      const lm = parseFloat(props.lote_min || props.lote_minimo);
+      document.getElementById('inp-lote-min').value = lm;
+      ESTADO.predio.lote_min_m2 = lm;
+    }
+    actualizarParams();
+    document.getElementById('geocod-status').textContent = `✓ Zonificación obtenida de GeoServer: ${zona}`;
+    document.getElementById('fuente-ppdu').textContent = 'PPDU ' + mun;
+
+  } catch(e) {
+    document.getElementById('geocod-status').textContent =
+      `📍 Ubicado. GeoServer no disponible (${e.message}) — llena los parámetros del PPDU manualmente.`;
+  }
+}
+
+// ── Calcular y actualizar chips de parámetros ────────────────
+function actualizarParams() {
+  const sup    = parseFloat(document.getElementById('inp-sup').value)       || 0;
+  const frente = parseFloat(document.getElementById('inp-frente').value)    || 0;
+  const rivl   = parseFloat(document.getElementById('inp-rivl').value)      || 0;
+  const cos    = parseFloat(document.getElementById('inp-cos').value)       || 0;
+  const cus    = parseFloat(document.getElementById('inp-cus').value)       || 0;
+  const loteMin= parseFloat(document.getElementById('inp-lote-min').value)  || 0;
+
+  ESTADO.predio.sup_m2       = sup    || null;
+  ESTADO.predio.frente_m     = frente || null;
+  ESTADO.predio.rivl_m       = rivl;
+  ESTADO.predio.cos_max      = cos    || null;
+  ESTADO.predio.cus_max      = cus    || null;
+  ESTADO.predio.lote_min_m2  = loteMin|| null;
+  ESTADO.predio.rest_frontal_m = parseFloat(document.getElementById('inp-rest-front').value) || null;
+  ESTADO.predio.municipio    = document.getElementById('sel-mun').value;
+  ESTADO.predio.zonificacion = document.getElementById('inp-zona').value;
+
+  // Área libre tras RI-VL
+  let areaLibre = sup;
+  if (rivl > 0 && frente > 0) areaLibre = Math.max(0, sup - rivl * frente);
+  else if (rivl > 0 && sup > 0) areaLibre = Math.max(0, sup * (1 - rivl / Math.sqrt(sup)));
+
+  const huellaMax = cos > 0 ? areaLibre * cos : null;
+  const supMax    = cus > 0 && sup > 0 ? sup * cus : null;
+
+  const setChip = (id, valId, subId, val, sub, cls) => {
+    const chip = document.getElementById(id);
+    const vel  = document.getElementById(valId);
+    const sel  = document.getElementById(subId);
+    vel.textContent  = val;
+    if (sub !== null && sel) sel.textContent = sub;
+    chip.className   = 'param-chip' + (cls ? ' ' + cls : '');
+    vel.className    = 'pc-val' + (cls === 'alerta' ? ' alerta' : cls === 'peligro' ? ' peligro' : '');
+  };
+
+  setChip('chip-area-libre','val-area-libre',null,
+    rivl > 0 ? (areaLibre > 0 ? areaLibre.toFixed(0) + ' m²' : '0 m²') : (sup > 0 ? sup.toFixed(0) + ' m²' : '—'),
+    null, rivl > 0 && areaLibre < 150 ? 'peligro' : rivl > 0 ? 'detectado' : '');
+
+  setChip('chip-huella-max','val-huella-max',null,
+    huellaMax ? huellaMax.toFixed(0) + ' m²' : '—',
+    null, huellaMax && huellaMax < 100 ? 'alerta' : '');
+
+  setChip('chip-sup-max','val-sup-max',null,
+    supMax ? supMax.toFixed(0) + ' m²' : '—',
+    null, '');
+
+  // Estado del lote
+  if (sup > 0 && loteMin > 0) {
+    if (sup >= loteMin) {
+      setChip('chip-lote-status','val-lote-status','sub-lote-status','✓ Normal','cumple lote mín.','detectado');
+    } else {
+      setChip('chip-lote-status','val-lote-status','sub-lote-status','✗ Subnormal',`mín. ${loteMin.toLocaleString('es')} m²`,'alerta');
+    }
+  } else {
+    setChip('chip-lote-status','val-lote-status','sub-lote-status','—','ingresa superficie + lote mín.','');
+  }
+
+  dibujarMapa('mapa-canvas', obtW('mapa-canvas'), 220, false);
+}
+
+// ── MANEJO DE ARCHIVOS ───────────────────────────────────────
+const uploadZone = document.getElementById('upload-zone');
+uploadZone.addEventListener('dragover',  e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', ()=> { uploadZone.classList.remove('drag-over'); });
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault(); uploadZone.classList.remove('drag-over');
+  const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/') || f.type === 'application/pdf');
+  if (files.length) agregarArchivos(files);
+});
+
+function agregarArchivos(files) {
+  const disp = MAX_FILES - ESTADO.plano.archivos.length;
+  if (disp <= 0) { mostrarError(`Máximo ${MAX_FILES} láminas. Elimina alguna antes.`); return; }
+  const aLeer = files.slice(0, disp);
+  let pending = aLeer.length;
+  if (!pending) return;
+
+  aLeer.forEach(file => {
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      mostrarError(`"${file.name}" excede ${MAX_SIZE_MB} MB. Comprime el PDF antes de subir.`);
+      pending--; if (!pending) renderChips();
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+      const raw  = e.target.result;
+      const base64 = raw.split(',')[1];
+      const mime   = file.type || (file.name.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
+      ESTADO.plano.archivos.push({ nombre: file.name, base64, mime, size: file.size });
+      pending--;
+      if (!pending) renderChips();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderChips() {
+  const wrap = document.getElementById('file-chips');
+  wrap.innerHTML = '';
+  ESTADO.plano.archivos.forEach((a, i) => {
+    const div = document.createElement('div');
+    div.className = 'file-chip';
+    div.innerHTML = `<span>${a.mime === 'application/pdf' ? '📄' : '🖼️'}</span>
+      <span style="font-weight:500">${a.nombre}</span>
+      <span style="color:var(--text3)">· ${(a.size/1024/1024).toFixed(1)} MB</span>
+      <button class="chip-del" onclick="eliminarArchivo(${i})">✕</button>`;
+    wrap.appendChild(div);
+  });
+  const tieneArchivos = ESTADO.plano.archivos.length > 0;
+  uploadZone.classList.toggle('loaded', tieneArchivos);
+  document.getElementById('btn-analizar').disabled = !tieneArchivos;
+}
+
+function eliminarArchivo(i) {
+  ESTADO.plano.archivos.splice(i, 1);
+  renderChips();
+}
+
+// ── SISTEMA_PROMPT M10 ───────────────────────────────────────
+const SYSTEM_PROMPT_M10 = `Eres un asistente especializado en lectura de planos arquitectónicos y estructurales. Tu función es extraer datos cuantitativos clave de los planos presentados para su posterior verificación normativa. Eres preciso, conservador y nunca inventas datos que no puedes leer claramente.
+
+PRINCIPIOS:
+- Prioriza el cuadro de áreas oficial del plano sobre cotas individuales.
+- Si hay cuadros por nivel, suma para obtener el total construido.
+- Si un dato no es legible con certeza, usa null — nunca estimes ni interpolables.
+- Cruza la información entre planta, corte y solapa del plano.
+- No inventes datos que no estén visibles en el plano.
+
+FORMATO DE SALIDA:
+- Responde ÚNICAMENTE con JSON válido, sin texto antes ni después.
+- No uses markdown, no uses bloques de código, no uses comentarios.
+- El JSON debe ser parseable directamente con JSON.parse().`;
+
+function buildPromptM10() {
+  const usoPropuesto = document.getElementById('inp-uso').value.trim();
+  return `Analiza el plano o planos adjuntos del proyecto.
+
+Tu tarea: SOLO extraer datos cuantitativos del proyecto — NO verificar normativa.
+
+${usoPropuesto ? `El usuario indica que el uso propuesto es: "${usoPropuesto}"` : 'El usuario no indicó un uso previo — detéctalo del plano.'}
+
+Extrae con la mayor precisión posible:
+1. Uso del inmueble (ej: "Vivienda unifamiliar", "Bodega industrial I1", "Oficinas", "Comercio al por menor")
+2. Superficie de la huella en planta baja en m² (solo la huella PB)
+3. Superficie total construida en m² (todos los niveles sumados)
+4. Número de niveles incluyendo PB
+5. Altura total del edificio en metros (del desplante al punto más alto)
+6. Dimensión de frente del edificio en metros (si es legible)
+7. Dimensión de fondo del edificio en metros (si es legible)
+8. Sistema estructural principal
+
+Responde ÚNICAMENTE con este JSON (usa null si el dato no es legible):
+{
+  "uso_detectado": "...",
+  "huella_pb_m2": número_o_null,
+  "sup_total_m2": número_o_null,
+  "niveles": número_o_null,
+  "altura_total_m": número_o_null,
+  "frente_edificio_m": número_o_null,
+  "fondo_edificio_m": número_o_null,
+  "sistema_estructural": "...",
+  "confianza": "alta|media|baja",
+  "fuentes_consultadas": "descripción breve de qué láminas leíste",
+  "notas": "observaciones importantes o discrepancias encontradas"
+}`;
+}
+
+// ── LLAMAR API (mismo patrón que M04) ────────────────────────
+async function llamarAPIM10() {
+  const prompt = buildPromptM10();
+  const contentFinal = [
+    { type: 'text', text: SYSTEM_PROMPT_M10 }
+  ];
+
+  ESTADO.plano.archivos.forEach((a, i) => {
+    contentFinal.push({ type: 'text', text: `--- LÁMINA ${i+1}: ${a.nombre} ---` });
+    contentFinal.push({
+      type: a.mime === 'application/pdf' ? 'document' : 'image',
+      source: { type: 'base64', media_type: a.mime, data: a.base64 }
+    });
+  });
+  contentFinal.push({ type: 'text', text: prompt });
+
+  const body = {
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1500,
+    temperature: 0,
+    messages: [{ role: 'user', content: contentFinal }]
+  };
+
+  const resp = ES_LOCALHOST
+    ? await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': obtenerKey(),
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify(body)
+      })
+    : await fetch('/api/claude-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    const msg = err.error?.message || '';
+    if (msg.includes('credit') || msg.includes('billing')) throw new Error('__CREDITOS_AGOTADOS__');
+    if (msg.includes('x-api-key') || resp.status === 401) throw new Error('__API_KEY_INVALIDA__');
+    if (resp.status === 429) throw new Error('__LIMITE_RATE__');
+    throw new Error(msg || `Error API ${resp.status}`);
+  }
+
+  const data = await resp.json();
+  const rawText = data.content?.find(b => b.type === 'text')?.text || '';
+
+  // Parser robusto
+  let txt = rawText.replace(/^```json\s*/gm,'').replace(/^```\s*/gm,'').replace(/```$/gm,'').trim();
+  const f = txt.indexOf('{'); const l = txt.lastIndexOf('}');
+  if (f !== -1 && l !== -1) txt = txt.slice(f, l+1);
+  return JSON.parse(txt);
+}
+
+// ── FUNCIÓN DE ANÁLISIS PRINCIPAL ────────────────────────────
+async function analizar() {
+  ocultarError();
+  if (!ESTADO.plano.archivos.length) { mostrarError('Sube al menos un plano.'); return; }
+
+  // Verificar límite freemium (solo en producción)
+  if (!ES_LOCALHOST && typeof guVerificarLimite === 'function') {
+    const lim = guVerificarLimite('gu_m10_usos_mes');
+    if (!lim.permitido) {
+      guMostrarModalLimite('M10 PreDictamen IA', lim.usados, lim.limite);
+      return;
+    }
+  }
+
+  // Mostrar loading
+  ['panel-predio','panel-plano','panel-resultado'].forEach(id => document.getElementById(id)?.classList.remove('visible'));
+  document.getElementById('panel-loading').classList.add('visible');
+
+  const setLS = (id, cls, txt) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = cls;
+    el.textContent = txt;
+  };
+
+  setLS('ls-1','done','✓ Datos del predio listos');
+  setLS('ls-2','active','⟳ Enviando plano a Claude IA…');
+
+  try {
+    await new Promise(r => setTimeout(r, 300));
+    setLS('ls-2','done','✓ Plano enviado');
+    setLS('ls-3','active','⟳ Extrayendo cuadro de áreas y dimensiones…');
+
+    const datosPlan = await llamarAPIM10();
+    ESTADO.resultado = { plano: datosPlan };
+
+    // Registrar uso freemium
+    if (!ES_LOCALHOST && typeof guRegistrarUso === 'function') {
+      guRegistrarUso('gu_m10_usos_mes');
+    }
+
+    setLS('ls-3','done','✓ Datos del plano extraídos');
+    setLS('ls-4','active','⟳ Verificando COS, CUS, lote mínimo, RI-VL…');
+    await new Promise(r => setTimeout(r, 200));
+
+    const verif = verificarViabilidad(datosPlan, ESTADO.predio);
+    ESTADO.resultado.verif = verif;
+
+    setLS('ls-4','done','✓ Verificación normativa completada');
+    setLS('ls-5','active','⟳ Generando veredicto…');
+    await new Promise(r => setTimeout(r, 200));
+    setLS('ls-5','done','✓ Veredicto generado');
+
+    await new Promise(r => setTimeout(r, 400));
+    document.getElementById('panel-loading').classList.remove('visible');
+    renderizarResultado(datosPlan, ESTADO.predio, verif);
+    irAPaso(3);
+
+  } catch(e) {
+    document.getElementById('panel-loading').classList.remove('visible');
+    setLS('ls-5','error-step','✗ Error en el análisis');
+    irAPaso(2);
+
+    if (e.message === '__API_KEY_INVALIDA__') mostrarError('API Key inválida. Verifica la clave en el panel superior.');
+    else if (e.message === '__CREDITOS_AGOTADOS__') mostrarError('Créditos de Anthropic agotados. Recarga tu cuenta en console.anthropic.com.');
+    else if (e.message === '__LIMITE_RATE__') mostrarError('Demasiadas peticiones. Espera un momento e intenta de nuevo.');
+    else mostrarError('Error al analizar: ' + e.message);
+  }
+}
+
+// ── VERIFICACIÓN NORMATIVA ───────────────────────────────────
+function verificarViabilidad(plano, predio) {
+  const rows     = [];
+  const bloq     = [];   // bloqueantes
+  const advert   = [];   // advertencias
+
+  const sup    = predio.sup_m2;
+  const frente = predio.frente_m;
+  const rivl   = predio.rivl_m || 0;
+  const cos    = predio.cos_max;
+  const cus    = predio.cus_max;
+  const loteMin= predio.lote_min_m2;
+  const restF  = predio.rest_frontal_m;
+  const huellaP= plano.huella_pb_m2;
+  const supT   = plano.sup_total_m2;
+  const niveles= plano.niveles;
+  const alturaP= plano.altura_total_m;
+
+  // Área libre tras RI-VL
+  let areaLibre = sup;
+  if (rivl > 0 && frente) areaLibre = Math.max(0, sup - rivl * frente);
+  else if (rivl > 0 && sup) areaLibre = Math.max(0, sup * (1 - rivl / Math.sqrt(sup)));
+
+  // 1. Uso de suelo
+  rows.push({
+    param: 'Uso de suelo', sub: predio.zonificacion || 'pendiente consultar PPDU',
+    permitido: predio.zonificacion || '—',
+    proyecto: plano.uso_detectado || '—',
+    estado: predio.zonificacion ? 'warn' : 'nd',
+    nota: predio.zonificacion ? 'Verificar si el uso específico está permitido o condicionado en el PPDU' : null
+  });
+  if (predio.zonificacion) advert.push('Uso de suelo (verificar con PPDU)');
+
+  // 2. Lote mínimo
+  if (sup && loteMin) {
+    const ok = sup >= loteMin;
+    rows.push({
+      param: 'Tamaño de lote', sub: `mín. ${loteMin.toLocaleString('es')} m²`,
+      permitido: `${loteMin.toLocaleString('es')} m²`,
+      proyecto: `${sup.toLocaleString('es')} m²`,
+      estado: ok ? 'ok' : 'fail',
+      fail: !ok
+    });
+    if (!ok) bloq.push('Lote subnormal');
+  } else {
+    rows.push({ param: 'Tamaño de lote', sub: 'requiere lote mín. y superficie', permitido: '—', proyecto: sup ? `${sup.toLocaleString('es')} m²` : '—', estado: 'nd' });
+  }
+
+  // 3. RI-VL
+  if (rivl > 0) {
+    const areaLibreStr = areaLibre.toFixed(0);
+    const ok = huellaP ? huellaP <= areaLibre : null;
+    rows.push({
+      param: 'Área libre tras RI-VL', sub: `predio − ${rivl} m × frente`,
+      permitido: areaLibre.toFixed(0) + ' m²',
+      proyecto: huellaP ? `${huellaP} m² huella` : '—',
+      estado: ok === null ? 'nd' : ok ? 'ok' : 'fail',
+      fail: ok === false
+    });
+    if (ok === false) bloq.push('Restricción RI-VL');
+  }
+
+  // 4. COS sobre área libre
+  if (cos && huellaP && areaLibre > 0) {
+    const cosReal = huellaP / areaLibre;
+    const ok = cosReal <= cos;
+    rows.push({
+      param: 'COS (huella / área libre)', sub: `máx. ${cos}`,
+      permitido: cos.toFixed(2),
+      proyecto: cosReal.toFixed(2),
+      estado: ok ? 'ok' : 'fail',
+      fail: !ok
+    });
+    if (!ok && !bloq.includes('Restricción RI-VL')) bloq.push('COS excedido');
+  } else if (cos && huellaP && sup) {
+    // Sin RI-VL
+    const cosReal = huellaP / sup;
+    const ok = cosReal <= cos;
+    rows.push({
+      param: 'COS (huella / predio)', sub: `máx. ${cos}`,
+      permitido: cos.toFixed(2),
+      proyecto: cosReal.toFixed(2),
+      estado: ok ? 'ok' : 'fail',
+      fail: !ok
+    });
+    if (!ok) bloq.push('COS excedido');
+  } else {
+    rows.push({ param: 'COS', sub: cos ? `máx. ${cos}` : 'ingresa COS', permitido: cos ? cos.toFixed(2) : '—', proyecto: huellaP ? huellaP + ' m²' : '—', estado: 'nd' });
+  }
+
+  // 5. CUS / Superficie total
+  if (cus && supT && sup) {
+    const supMaxCUS = sup * cus;
+    const ok = supT <= supMaxCUS;
+    rows.push({
+      param: 'CUS (sup. total / predio)', sub: `máx. ${cus}`,
+      permitido: supMaxCUS.toFixed(0) + ' m²',
+      proyecto: supT + ' m²',
+      estado: ok ? 'ok' : 'fail',
+      fail: !ok
+    });
+    if (!ok) bloq.push('CUS excedido');
+  } else {
+    rows.push({ param: 'CUS / Sup. total', sub: cus ? `máx. ${cus}` : 'ingresa CUS', permitido: cus && sup ? (sup*cus).toFixed(0)+' m²' : '—', proyecto: supT ? supT+' m²' : '—', estado: 'nd' });
+  }
+
+  // 6. Restricción frontal
+  rows.push({
+    param: 'Restricción frontal', sub: restF ? `no construir en ${restF} m` : 'consultar PPDU',
+    permitido: restF ? restF + ' m' : '—',
+    proyecto: '(no legible en plano)',
+    estado: restF ? 'warn' : 'nd'
+  });
+  if (restF) advert.push(`Verificar restricción frontal ${restF} m`);
+
+  // 7. Niveles / elevador
+  if (niveles) {
+    const elevOblig = niveles > 4;
+    rows.push({
+      param: 'Niveles' + (elevOblig ? ' / Elevador' : ''), sub: elevOblig ? 'obligatorio con >4 niveles' : null,
+      permitido: '—',
+      proyecto: niveles + ' nivel' + (niveles !== 1 ? 'es' : ''),
+      estado: elevOblig ? 'warn' : 'nd'
+    });
+    if (elevOblig) advert.push('Elevador obligatorio (>4 niveles)');
+  }
+
+  // Semáforo
+  let semaforo = 'verde';
+  if (bloq.length > 0) semaforo = 'rojo';
+  else if (advert.length > 0) semaforo = 'amarillo';
+
+  return { semaforo, bloqueantes: bloq, advertencias: advert, rows, areaLibre };
+}
+
+// ── RENDERIZAR RESULTADO ─────────────────────────────────────
+function renderizarResultado(plano, predio, verif) {
+  // Semáforo
+  const sem    = verif.semaforo;
+  const iconos = { rojo:'🔴', amarillo:'🟡', verde:'🟢' };
+  const titulos = {
+    rojo: `NO VIABLE — ${verif.bloqueantes.length} bloqueante${verif.bloqueantes.length>1?'s':''}`,
+    amarillo: `VIABLE CON ADVERTENCIAS — ${verif.advertencias.length} punto${verif.advertencias.length>1?'s':''} a verificar`,
+    verde: 'VIABLE — el proyecto cumple los parámetros del PPDU'
+  };
+  const subtxts = {
+    rojo: 'El proyecto no puede autorizarse en este predio tal como está diseñado. Los bloqueantes son normativos.',
+    amarillo: 'El proyecto puede ser viable, pero hay puntos que deben verificarse con el PPDU y el DRO antes de tramitar.',
+    verde: 'Los parámetros del plano son compatibles con la zonificación del predio. Inicia el trámite de licencia.'
+  };
+
+  document.getElementById('sem-header').className = 'sem-header ' + sem;
+  document.getElementById('sem-ico').textContent   = iconos[sem];
+  document.getElementById('sem-titulo').textContent= titulos[sem];
+  document.getElementById('sem-titulo').className  = 'sem-titulo ' + sem;
+  document.getElementById('sem-subtxt').textContent= subtxts[sem];
+
+  // Chips de bloqueantes / advertencias
+  const chips = document.getElementById('blk-chips');
+  chips.innerHTML = '';
+  verif.bloqueantes.forEach(b => { const s=document.createElement('span'); s.className='blk-chip rojo'; s.textContent='❌ '+b; chips.appendChild(s); });
+  verif.advertencias.forEach(a => { const s=document.createElement('span'); s.className='blk-chip amarillo'; s.textContent='⚠️ '+a; chips.appendChild(s); });
+
+  // Mapa mini
+  setTimeout(() => dibujarMapa('mapa-mini-canvas', obtW('mapa-mini-canvas'), 150, true), 50);
+  document.getElementById('mapa-mini-info').textContent =
+    `${predio.municipio || ''} · ${predio.zonificacion || '—'} · ${predio.sup_m2 ? predio.sup_m2.toLocaleString('es')+' m²' : '—'}`;
+
+  // Datos del predio
+  const dp = document.getElementById('datos-predio');
+  dp.innerHTML = dato('Municipio', predio.municipio || '—', 'PPDU') +
+    dato('Sup. predio', predio.sup_m2 ? predio.sup_m2.toLocaleString('es')+' m²' : '—', 'catastro') +
+    dato('Zonificación', predio.zonificacion || '—', predio.fuente_zona || 'manual') +
+    dato('COS máx.', predio.cos_max ?? '—', 'PPDU') +
+    dato('CUS máx.', predio.cus_max ?? '—', 'PPDU') +
+    dato('Lote mín.', predio.lote_min_m2 ? predio.lote_min_m2.toLocaleString('es')+' m²' : '—', 'PPDU') +
+    dato('RI-VL', predio.rivl_m ? predio.rivl_m+' m' : 'sin restricción', 'GeoServer', predio.rivl_m > 0 ? 'peligro' : '') +
+    dato('Área libre', verif.areaLibre ? verif.areaLibre.toFixed(0)+' m²' : '—', 'calculado', verif.areaLibre < 150 ? 'peligro' : '');
+
+  // Datos del proyecto
+  const dpr = document.getElementById('datos-proyecto');
+  dpr.innerHTML = dato('Uso detectado', plano.uso_detectado || '—', plano.fuentes_consultadas || 'plano') +
+    dato('Huella PB', plano.huella_pb_m2 ? plano.huella_pb_m2+' m²' : '—', 'cuadro áreas') +
+    dato('Sup. total', plano.sup_total_m2 ? plano.sup_total_m2+' m²' : '—', 'cuadro áreas') +
+    dato('Niveles', plano.niveles ?? '—', 'cortes') +
+    dato('Altura', plano.altura_total_m ? plano.altura_total_m+' m' : '—', 'cortes') +
+    dato('Frente edif.', plano.frente_edificio_m ? plano.frente_edificio_m+' m' : '—', 'plantas') +
+    dato('Fondo edif.', plano.fondo_edificio_m ? plano.fondo_edificio_m+' m' : '—', 'plantas') +
+    dato('Estructura', plano.sistema_estructural || '—', 'notas');
+
+  const conf = { alta:'✓ Alta', media:'⚠ Media', baja:'⚠ Baja' };
+  document.getElementById('ia-notas').textContent =
+    (conf[plano.confianza] ? 'Confianza IA: ' + conf[plano.confianza] + ' — ' : '') +
+    (plano.notas || '');
+
+  // Tabla de verificación
+  const tbody = document.getElementById('vtable-body');
+  tbody.innerHTML = verif.rows.map(r => `
+    <tr class="${r.fail ? 'fail-row' : ''}">
+      <td><div class="vt-param">${r.param}</div>${r.sub ? `<div class="vt-sub">${r.sub}</div>` : ''}</td>
+      <td style="font-family:var(--mono);font-size:12px;color:var(--text2)">${r.permitido}</td>
+      <td style="font-family:var(--mono);font-size:12px${r.fail?' ;font-weight:600;color:var(--sem-r-txt)':''}">${r.proyecto}</td>
+      <td>${badgeHtml(r.estado)}</td>
+    </tr>`).join('');
+
+  // Qué cabe (solo si hay bloqueantes)
+  if (sem === 'rojo' || sem === 'amarillo') {
+    const cos = predio.cos_max || 0.8;
+    const cus = predio.cus_max || 1.6;
+    const al  = verif.areaLibre || 0;
+    const hMax = (al * cos).toFixed(0);
+    const sMax = predio.sup_m2 ? (predio.sup_m2 * cus).toFixed(0) : null;
+    const card = document.getElementById('card-max-cabe');
+    card.style.display = 'block';
+    document.getElementById('max-cabe-intro').textContent =
+      `Con ${al.toFixed(0)} m² de área libre y COS ${cos}:`;
+    let rows = `
+      <div class="max-row"><span>Huella máxima PB</span><span class="max-val">${hMax} m²</span></div>
+      ${sMax ? `<div class="max-row"><span>Sup. máx. total (CUS ${cus})</span><span class="max-val">${sMax} m²</span></div>` : ''}`;
+    if (plano.sup_total_m2) {
+      const deficit = plano.sup_total_m2 - (sMax ? parseInt(sMax) : al * cus);
+      rows += `<div class="max-row" style="border-top:0.5px solid var(--brand-light);margin-top:6px;padding-top:5px">
+        <span>Proyecto necesita</span><span class="max-val peligro">${plano.sup_total_m2} m²</span></div>
+        <div class="max-row"><span>Déficit</span><span class="max-val peligro">${Math.max(0,deficit).toFixed(0)} m²</span></div>`;
+    }
+    document.getElementById('max-cabe-rows').innerHTML = rows;
+  }
+
+  // Opciones (si no es viable) / Próximos pasos (si es viable)
+  if (sem === 'rojo') {
+    document.getElementById('card-opciones').style.display = 'block';
+    const ops = generarOpciones(verif, plano, predio);
+    document.getElementById('op-list').innerHTML = ops.map((o,i) => `
+      <li class="op-item">
+        <div class="op-num">${i+1}</div>
+        <div class="op-txt"><strong>${o.titulo}</strong>${o.desc}</div>
+      </li>`).join('');
+  } else if (sem === 'verde') {
+    document.getElementById('card-proximos').style.display = 'block';
+    document.getElementById('prox-list').innerHTML = [
+      { titulo:'Solicitar DTUD', desc:`Acude a la dependencia de ${predio.municipio||'tu municipio'} con los planos para obtener el Dictamen de Trazo, Usos y Destinos.` },
+      { titulo:'Contratar DRO', desc:'El Director Responsable de Obra (DRO) certificado firmará los planos y acompañará el trámite de licencia de construcción.' },
+      { titulo:'Revisor de planos (M04)', desc:'Usa el módulo M04 para verificar los elementos arquitectónicos: escaleras, pasillos, cajones, accesibilidad.' },
+    ].map((o,i) => `<li class="op-item"><div class="op-num">${i+1}</div><div class="op-txt"><strong>${o.titulo}</strong>${o.desc}</div></li>`).join('');
+  } else {
+    document.getElementById('card-opciones').style.display = 'block';
+    document.getElementById('op-list').innerHTML = verif.advertencias.map((a,i) => `
+      <li class="op-item">
+        <div class="op-num">${i+1}</div>
+        <div class="op-txt"><strong>Verificar: ${a}</strong>Consulta el PPDU vigente y al DRO para confirmar este punto antes de tramitar.</div>
+      </li>`).join('');
+  }
+}
+
+function dato(lbl, val, src, cls='') {
+  return `<div class="dato-item">
+    <div class="dato-label">${lbl}</div>
+    <div class="dato-val${cls?' '+cls:''}">${val}</div>
+    <div class="dato-src">${src}</div>
+  </div>`;
+}
+
+function badgeHtml(estado) {
+  const cfg = {
+    ok:   ['ok',   '✓ Cumple'],
+    fail: ['fail', '❌ Bloqueante'],
+    warn: ['warn', '⚠ Verificar'],
+    nd:   ['nd',   '— N/D'],
+  };
+  const [cls, lbl] = cfg[estado] || ['nd','—'];
+  return `<span class="badge ${cls}">${lbl}</span>`;
+}
+
+function generarOpciones(verif, plano, predio) {
+  const ops = [];
+  if (verif.bloqueantes.includes('Lote subnormal')) {
+    const faltante = predio.lote_min_m2 && predio.sup_m2
+      ? Math.ceil(predio.lote_min_m2 - predio.sup_m2).toLocaleString('es') : '?';
+    ops.push({ titulo: 'Fusionar predios colindantes', desc: `Reunir al menos ${faltante} m² adicionales libres de RI-VL. Requiere fusión ante el Registro Público de la Propiedad del municipio.` });
+  }
+  if (verif.bloqueantes.includes('Restricción RI-VL') || verif.bloqueantes.includes('COS excedido')) {
+    const cos = predio.cos_max || 0.8;
+    const al  = verif.areaLibre || 0;
+    ops.push({ titulo: 'Rediseñar el proyecto', desc: `Reducir huella a ≤ ${(al*cos).toFixed(0)} m² PB y superficie total a ≤ ${predio.sup_m2 && predio.cus_max ? (predio.sup_m2*predio.cus_max).toFixed(0) : '?'} m² para cumplir COS y CUS con el área disponible.` });
+  }
+  if (verif.bloqueantes.includes('CUS excedido')) {
+    ops.push({ titulo: 'Reducir niveles', desc: `Con CUS ${predio.cus_max} y ${predio.sup_m2 ? predio.sup_m2.toLocaleString('es') : '?'} m² de predio, la superficie total máxima es ${predio.cus_max && predio.sup_m2 ? (predio.cus_max*predio.sup_m2).toFixed(0) : '?'} m².` });
+  }
+  ops.push({ titulo: 'Buscar otro predio', desc: 'Zona con uso compatible, superficie mínima requerida y sin afectaciones viales. El proyecto actual no necesita modificaciones si el predio es el correcto.' });
+  return ops;
+}
+
+// ── EXPORTAR REPORTE (placeholder) ──────────────────────────
+function exportarReporte() {
+  mostrarError('Exportación de reporte disponible próximamente — integración con M04 en desarrollo.');
+}
+</script>
+</body>
+</html>

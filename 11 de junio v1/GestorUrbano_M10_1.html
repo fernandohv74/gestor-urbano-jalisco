@@ -6695,27 +6695,18 @@ async function m10LlamarClaude(base64, mimeType, nombre){
   }
 
   const supInstruccion = supReal
-    ? `\n\nEXTRACCIÓN DE ÁREAS DEL CUADRO DE ÁREAS Y CÁLCULO DE COS/iCOS · CUS/iCUS:
+    ? `\n\nEXTRACCIÓN DE ÁREAS DEL CUADRO DE ÁREAS:
 El usuario indica que el terreno REAL mide ${supReal} m².
+Los coeficientes normativos COS, iCOS, CUS, iCUS ya están en el sistema — NO los busques en el plano.
 
-En el cuadro de áreas (solapa o tabla de superficies) del plano localiza y extrae:
+En el cuadro de áreas (solapa o tabla de superficies) del plano localiza y extrae ÚNICAMENTE:
   a) Superficie total del TERRENO declarada en el plano → "superficie_plano"
-  b) COS: Área en Planta Baja EXISTENTE (lo que ya está construido, a conservar)
-     Si es proyecto 100% nuevo, este valor es 0 → "cos_pb_m2"
-  c) iCOS: Área en Planta Baja NUEVA (lo que se va a construir en este proyecto) → "icos_pb_m2"
-  d) CUS: Superficie total EXISTENTE en todos los niveles (a conservar)
-     Si es proyecto 100% nuevo, este valor es 0 → "cus_total_m2"
-  e) iCUS: Superficie total NUEVA en todos los niveles de este proyecto → "icus_total_m2"
-  f) Número de niveles indicados → "niveles_plano"
+  b) Área de DESPLANTE (Planta Baja, primer nivel) en m² → "desplante_pb_m2"
+     (puede llamarse "área desplante", "planta baja", "PB", "área primer nivel" o similar)
+  c) TOTAL de m² construidos en TODOS los niveles → "total_construido_m2"
+     (puede llamarse "área total construcción", "total construido", "suma de niveles" o similar)
+  d) Número de niveles indicados → "niveles_plano"
 
-La norma se verifica así:
-  iCOS Total = cos_pb_m2 + icos_pb_m2 (planta baja total)
-  iCUS Total = cus_total_m2 + icus_total_m2 (construcción total)
-  Con el terreno REAL de ${supReal} m²:
-    iCOS Total / ${supReal} ≤ ${zona.cos||'—'} (norma)
-    iCUS Total / ${supReal} ≤ ${zona.cus||'—'} (norma)
-
-Si el cuadro de áreas no distingue entre existente y nuevo, coloca todo en los campos "nuevo" (icos_pb_m2 e icus_total_m2) y deja los "existente" en 0.
 Si no puedes leer un valor, devuélvelo como null (no inventes números).`
     : '\n(Sin superficie real — omite campos de áreas; solo describe si el plano tiene cuadro de áreas legible)';
 
@@ -6738,10 +6729,8 @@ Responde ÚNICAMENTE con JSON puro, sin markdown ni texto adicional:
   "resumen": "frase sobre los parámetros máx 120 chars",
   "observaciones": ["obs 1", "obs 2"],
   "superficie_plano": null,
-  "cos_pb_m2": 0,
-  "icos_pb_m2": null,
-  "cus_total_m2": 0,
-  "icus_total_m2": null,
+  "desplante_pb_m2": null,
+  "total_construido_m2": null,
   "niveles_plano": null,
   "superficie_cuadra": "si|no|no_disponible",
   "nota_superficie": ""
@@ -6813,39 +6802,29 @@ function m10RenderizarVeredicto(r, esReapertura){
     ? `<div style="margin-top:8px;padding:6px 10px;background:var(--bg3);border-radius:6px;border-left:3px solid var(--yellow);font-size:11px;color:var(--text3);line-height:1.5">⚠️ Sin lista oficial — resultado inferido por IA. Verifica en el PDU local.</div>`
     : '';
 
-  // ── Chip 2: PARÁMETROS CON COS+iCOS / CUS+iCUS ───────────────────
+  // ── Chip 2: PARÁMETROS COS/iCOS/CUS/iCUS ────────────────────────
   const supReal = r._superficie_real;
-  const esGDL   = municipioActual === 'guadalajara';
-  const lblCOS  = esGDL ? 'iCOS' : 'COS';
-  const lblCUS  = esGDL ? 'iCUS' : 'CUS';
-  const cosNorm = parseFloat(zona.cos);
-  const cusNorm = parseFloat(zona.cus);
+  const cos  = parseFloat(zona.cos)  || 0;
+  const icos = parseFloat(zona.icos) || 0;
+  const cus  = parseFloat(zona.cus)  || 0;
+  const icus = parseFloat(zona.icus) || 0;
   const nivNorm = parseInt(zona.niveles);
-
-  // Leer campos nuevos (cos_pb_m2/icos_pb_m2) con fallback a campos anteriores
-  const cos_pb   = typeof r.cos_pb_m2  === 'number' ? r.cos_pb_m2  : 0;
-  const icos_pb  = typeof r.icos_pb_m2 === 'number' ? r.icos_pb_m2
-                 : (typeof r.superficie_pb_m2 === 'number' ? r.superficie_pb_m2 : null);
-  const cus_tot  = typeof r.cus_total_m2  === 'number' ? r.cus_total_m2  : 0;
-  const icus_tot = typeof r.icus_total_m2 === 'number' ? r.icus_total_m2
-                 : (typeof r.superficie_total_construida_m2 === 'number' ? r.superficie_total_construida_m2 : null);
   const niv = typeof r.niveles_plano === 'number' ? r.niveles_plano : null;
 
-  const pb_total    = icos_pb !== null ? cos_pb + icos_pb : null;
-  const total_constr = icus_tot !== null ? cus_tot + icus_tot : null;
+  const pb_plano  = typeof r.desplante_pb_m2     === 'number' ? r.desplante_pb_m2     : null;
+  const tot_plano = typeof r.total_construido_m2  === 'number' ? r.total_construido_m2 : null;
 
   let chip2HTML;
-  if(supReal && (pb_total !== null || total_constr !== null)){
-    const icosCalc = pb_total    !== null ? +(pb_total    / supReal).toFixed(3) : null;
-    const icusCalc = total_constr !== null ? +(total_constr / supReal).toFixed(3) : null;
+  if(supReal && (pb_plano !== null || tot_plano !== null)){
+    const max_pb    = (cos + icos) * supReal;
+    const max_total = (cus + icus) * supReal;
+    const pbOk  = pb_plano  !== null ? pb_plano  <= max_pb    : null;
+    const totOk = tot_plano !== null ? tot_plano <= max_total : null;
+    const nivOk = (niv !== null && !isNaN(nivNorm)) ? niv <= nivNorm : null;
 
-    const icosOk = (icosCalc !== null && !isNaN(cosNorm)) ? icosCalc <= cosNorm : null;
-    const icusOk = (icusCalc !== null && !isNaN(cusNorm)) ? icusCalc <= cusNorm : null;
-    const nivOk  = (niv !== null && !isNaN(nivNorm))     ? niv <= nivNorm      : null;
-
-    const hayExceso = icosOk === false || icusOk === false || nivOk === false;
-    const hayDatos  = icosCalc !== null || icusCalc !== null;
-    const todoOk    = hayDatos && icosOk !== false && icusOk !== false && nivOk !== false;
+    const hayExceso = pbOk === false || totOk === false || nivOk === false;
+    const hayDatos  = pb_plano !== null || tot_plano !== null;
+    const todoOk    = hayDatos && pbOk !== false && totOk !== false && nivOk !== false;
 
     const bg2  = hayExceso ? 'var(--sem-r-bg)'  : (!todoOk ? 'var(--sem-am-bg)' : 'var(--sem-v-bg)');
     const bd2  = hayExceso ? '#DC262633' : (!todoOk ? '#D9770633' : '#16A34A33');
@@ -6854,179 +6833,187 @@ function m10RenderizarVeredicto(r, esReapertura){
     const lbl2 = hayExceso ? 'Parámetros FUERA de la norma'
                : (!todoOk ? 'Datos parciales — verificar' : 'Parámetros dentro de la norma');
 
-    const thS = 'padding:4px 8px;text-align:left;font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;border-bottom:1px solid var(--border2);white-space:nowrap';
-    const tdS = 'padding:6px 8px;font-size:12px;vertical-align:top';
-    const tdSb = tdS + ';border-bottom:1px solid var(--border2)';
+    const fmt = v => v.toLocaleString('es-MX', {maximumFractionDigits:1});
+    const fmtC = v => v.toFixed(2);
 
-    const filaIcono = ok => ok === null ? '⚠️' : ok ? '✅' : '🚫';
-    const filaColor = ok => ok === null ? 'var(--text3)' : ok ? 'var(--sem-v-txt)' : 'var(--sem-r-txt)';
-    const filaLabel = (ok, calc, norm) => {
-      if(ok === null) return 'Sin norma';
-      const exceso = calc > norm ? ` (+${(calc-norm).toFixed(3)})` : '';
-      return ok ? 'CUMPLE' : `EXCEDIDO${exceso}`;
-    };
+    const thS = 'padding:4px 8px;text-align:left;font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;border-bottom:1px solid var(--border2)';
+    const tdS = 'padding:7px 8px;font-size:12px;border-bottom:1px solid var(--border1);vertical-align:middle';
+    const tdTotalS = 'padding:8px 8px;font-size:12px;vertical-align:middle;background:var(--bg2);font-weight:600';
 
-    // Detalle de pb: "Existente: X m² + Nuevo: Y m² = Z m²" o solo "Nueva: Y m²"
-    const detalleIcos = pb_total !== null
-      ? (cos_pb > 0
-          ? `Ex: ${cos_pb} m² + Nvo: ${icos_pb} m² = ${pb_total} m²`
-          : `PB: ${icos_pb} m²`)
-      : '—';
-    const detalleIcus = total_constr !== null
-      ? (cus_tot > 0
-          ? `Ex: ${cus_tot} m² + Nvo: ${icus_tot} m² = ${total_constr} m²`
-          : `Total: ${icus_tot} m²`)
-      : '—';
-
-    const filaIcos = icosCalc !== null ? `
+    // Fila COS
+    const rowCOS = `
       <tr>
-        <td style="${tdSb};font-weight:700;color:var(--text1)">${lblCOS} Total</td>
-        <td style="${tdSb};color:var(--text2)">${!isNaN(cosNorm)?cosNorm.toFixed(2):'—'}</td>
-        <td style="${tdSb};font-weight:600;color:var(--text1)">${icosCalc.toFixed(3)}</td>
-        <td style="${tdSb};color:var(--text3);font-size:11px">${detalleIcos}</td>
-        <td style="${tdSb};white-space:nowrap">${filaIcono(icosOk)} <span style="font-size:11px;font-weight:600;color:${filaColor(icosOk)}">${filaLabel(icosOk,icosCalc,cosNorm)}</span></td>
-      </tr>` : '';
-
-    const filaIcus = icusCalc !== null ? `
+        <td style="${tdS}"><b>COS</b></td>
+        <td style="${tdS}">${fmtC(cos)}</td>
+        <td style="${tdS}">${fmtC(cos)} × ${fmt(supReal)} = <b>${fmt(cos*supReal)} m²</b></td>
+        <td style="${tdS}">—</td>
+        <td style="${tdS}">—</td>
+      </tr>`;
+    // Fila iCOS
+    const rowICOS = `
       <tr>
-        <td style="${tdSb};font-weight:700;color:var(--text1)">${lblCUS} Total</td>
-        <td style="${tdSb};color:var(--text2)">${!isNaN(cusNorm)?cusNorm.toFixed(2):'—'}</td>
-        <td style="${tdSb};font-weight:600;color:var(--text1)">${icusCalc.toFixed(3)}</td>
-        <td style="${tdSb};color:var(--text3);font-size:11px">${detalleIcus}</td>
-        <td style="${tdSb};white-space:nowrap">${filaIcono(icusOk)} <span style="font-size:11px;font-weight:600;color:${filaColor(icusOk)}">${filaLabel(icusOk,icusCalc,cusNorm)}</span></td>
-      </tr>` : '';
-
-    const filaNiv = niv !== null ? `
+        <td style="${tdS}"><b>iCOS</b></td>
+        <td style="${tdS}">${fmtC(icos)}</td>
+        <td style="${tdS}">${fmtC(icos)} × ${fmt(supReal)} = <b>${fmt(icos*supReal)} m²</b></td>
+        <td style="${tdS}">—</td>
+        <td style="${tdS}">—</td>
+      </tr>`;
+    // Fila TOTAL COS+iCOS
+    const pbIcono = pb_plano !== null ? (pbOk ? '✅' : '🚫') : '—';
+    const pbResul = pb_plano !== null
+      ? (pbOk ? `<span style="color:var(--sem-v-txt);font-size:11px">CUMPLE — margen ${fmt(max_pb - pb_plano)} m²</span>`
+              : `<span style="color:var(--sem-r-txt);font-size:11px">EXCEDIDO por ${fmt(pb_plano - max_pb)} m²</span>`)
+      : '<span style="color:var(--text3);font-size:11px">sin dato</span>';
+    const pbPlanoCelda = pb_plano !== null ? `${fmt(pb_plano)} m²` : '—';
+    const rowTotalCOS = `
+      <tr style="border-top:2px solid var(--border2)">
+        <td style="${tdTotalS};border-left:3px solid var(--border2)">COS + iCOS Total<br><span style="font-size:10px;font-weight:400;color:var(--text3)">máx en planta baja</span></td>
+        <td style="${tdTotalS}"><b>${fmtC(cos+icos)}</b></td>
+        <td style="${tdTotalS}"><b>${fmt(max_pb)} m²</b></td>
+        <td style="${tdTotalS};font-weight:500">${pbPlanoCelda}<br><span style="font-size:10px;font-weight:400;color:var(--text3)">desplante PB</span></td>
+        <td style="${tdTotalS}">${pbIcono} ${pbResul}</td>
+      </tr>`;
+    // Fila CUS
+    const rowCUS = `
+      <tr style="border-top:2px solid var(--border2)">
+        <td style="${tdS}"><b>CUS</b></td>
+        <td style="${tdS}">${fmtC(cus)}</td>
+        <td style="${tdS}">${fmtC(cus)} × ${fmt(supReal)} = <b>${fmt(cus*supReal)} m²</b></td>
+        <td style="${tdS}">—</td>
+        <td style="${tdS}">—</td>
+      </tr>`;
+    // Fila iCUS
+    const rowICUS = `
       <tr>
-        <td style="${tdS};font-weight:700;color:var(--text1)">Niveles</td>
-        <td style="${tdS};color:var(--text2)">${!isNaN(nivNorm)?nivNorm:'—'}</td>
-        <td style="${tdS};font-weight:600;color:var(--text1)">${niv}</td>
-        <td style="${tdS}"></td>
-        <td style="${tdS};white-space:nowrap">${filaIcono(nivOk)} <span style="font-size:11px;font-weight:600;color:${filaColor(nivOk)}">${nivOk===null?'Sin norma':nivOk?'CUMPLE':`EXCEDIDO (+${niv-nivNorm})`}</span></td>
-      </tr>` : '';
+        <td style="${tdS}"><b>iCUS</b></td>
+        <td style="${tdS}">${fmtC(icus)}</td>
+        <td style="${tdS}">${fmtC(icus)} × ${fmt(supReal)} = <b>${fmt(icus*supReal)} m²</b></td>
+        <td style="${tdS}">—</td>
+        <td style="${tdS}">—</td>
+      </tr>`;
+    // Fila TOTAL CUS+iCUS
+    const totIcono = tot_plano !== null ? (totOk ? '✅' : '🚫') : '—';
+    const totResul = tot_plano !== null
+      ? (totOk ? `<span style="color:var(--sem-v-txt);font-size:11px">CUMPLE — margen ${fmt(max_total - tot_plano)} m²</span>`
+               : `<span style="color:var(--sem-r-txt);font-size:11px">EXCEDIDO por ${fmt(tot_plano - max_total)} m²</span>`)
+      : '<span style="color:var(--text3);font-size:11px">sin dato</span>';
+    const totPlanoCelda = tot_plano !== null ? `${fmt(tot_plano)} m²` : '—';
+    const rowTotalCUS = `
+      <tr style="border-top:2px solid var(--border2)">
+        <td style="${tdTotalS};border-left:3px solid var(--border2)">CUS + iCUS Total<br><span style="font-size:10px;font-weight:400;color:var(--text3)">máx total construido</span></td>
+        <td style="${tdTotalS}"><b>${fmtC(cus+icus)}</b></td>
+        <td style="${tdTotalS}"><b>${fmt(max_total)} m²</b></td>
+        <td style="${tdTotalS};font-weight:500">${totPlanoCelda}<br><span style="font-size:10px;font-weight:400;color:var(--text3)">total construido</span></td>
+        <td style="${tdTotalS}">${totIcono} ${totResul}</td>
+      </tr>`;
+
+    const nivRow = (niv !== null)
+      ? `<div style="margin-top:8px;font-size:12px;color:var(--text2)">
+           Niveles del plano: <b>${niv}</b>${!isNaN(nivNorm) ? ' / norma: <b>'+nivNorm+'</b> ' + (niv<=nivNorm?'✅':'🚫') : ''}
+         </div>` : '';
 
     chip2HTML = `
-    <div style="background:${bg2};border:2px solid ${bd2};border-radius:12px;padding:16px;margin-bottom:10px">
-      <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Parámetros constructivos · Terreno real: ${supReal} m²</div>
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
-        <span style="font-size:20px;line-height:1">${ico2}</span>
-        <span style="font-size:13px;font-weight:700;color:${txt2}">${lbl2}</span>
+    <div style="margin-top:10px;padding:12px 14px;background:${bg2};border:1.5px solid ${bd2};border-radius:10px">
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px">Parámetros constructivos · Terreno real: ${fmt(supReal)} m²</div>
+      <div style="font-size:13px;font-weight:500;color:${txt2};margin-bottom:10px;display:flex;align-items:center;gap:6px"><span style="font-size:17px">${ico2}</span>${lbl2}</div>
+      <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;min-width:480px">
+        <thead>
+          <tr>
+            <th style="${thS};width:22%">Parámetro</th>
+            <th style="${thS};width:12%">Coefic.</th>
+            <th style="${thS};width:30%">Cálculo (coefic. × terreno)</th>
+            <th style="${thS};width:16%">Del plano</th>
+            <th style="${thS}">Resultado</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowCOS}${rowICOS}${rowTotalCOS}${rowCUS}${rowICUS}${rowTotalCUS}
+        </tbody>
+      </table>
       </div>
-      <div style="overflow-x:auto;margin-bottom:${r.resumen?'8':'0'}px">
-        <table style="width:100%;border-collapse:collapse">
-          <thead>
-            <tr>
-              <th style="${thS}">Parámetro</th>
-              <th style="${thS}">Norma</th>
-              <th style="${thS}">Calculado</th>
-              <th style="${thS}">Del cuadro de áreas</th>
-              <th style="${thS}">Resultado</th>
-            </tr>
-          </thead>
-          <tbody>${filaIcos}${filaIcus}${filaNiv}</tbody>
-        </table>
-      </div>
-      ${r.resumen?'<div style="font-size:11px;color:var(--text3);line-height:1.5;border-top:1px solid var(--border2);padding-top:8px">'+r.resumen+'</div>':''}
+      ${nivRow}
+    </div>`;
+  } else if(!supReal){
+    chip2HTML = `
+    <div style="margin-top:10px;padding:12px 14px;background:var(--sem-am-bg);border:1.5px solid #D9770644;border-radius:10px">
+      <div style="font-size:13px;font-weight:500;color:var(--yellow)">⚠️ Ingresa la superficie del terreno para calcular COS/iCOS/CUS/iCUS</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:6px">${r.resumen||''}</div>
     </div>`;
   } else {
-    const P2 = {
-      cuadra:       {bg:'var(--sem-v-bg)', bd:'#16A34A33', txt:'var(--sem-v-txt)', icon:'✅', label:'Parámetros dentro de la norma'},
-      parcialmente: {bg:'var(--sem-am-bg)',bd:'#D9770633', txt:'var(--yellow)',     icon:'⚠️', label:'Parámetros con datos insuficientes o parciales'},
-      no_cuadra:    {bg:'var(--sem-r-bg)', bd:'#DC262633', txt:'var(--sem-r-txt)', icon:'🚫', label:'Parámetros FUERA de la norma'},
-    };
-    const p = P2[r.resultado] || P2.parcialmente;
-    const sugerenciaHTML = !supReal
-      ? `<div style="font-size:11px;color:var(--text3);margin-top:8px;border-top:1px solid var(--border2);padding-top:8px">💡 Ingresa la superficie del terreno (m²) para calcular ${lblCOS} Total / ${lblCUS} Total exacto.</div>`
-      : '';
+    const parLabel = {cuadra:'CUADRA',parcialmente:'PARCIALMENTE',no_cuadra:'NO CUADRA'}[r.resultado]||r.resultado;
     chip2HTML = `
-    <div style="background:${p.bg};border:2px solid ${p.bd};border-radius:12px;padding:16px;margin-bottom:10px">
-      <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Parámetros constructivos (${lblCOS} / ${lblCUS} / Niveles)</div>
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:${r.resumen?'7':'0'}px">
-        <span style="font-size:20px;line-height:1">${p.icon}</span>
-        <span style="font-size:13px;font-weight:700;color:${p.txt}">${p.label}</span>
-      </div>
-      ${r.resumen?'<div style="font-size:12px;color:var(--text2);line-height:1.6">'+r.resumen+'</div>':''}
-      ${sugerenciaHTML}
+    <div style="margin-top:10px;padding:12px 14px;background:var(--sem-am-bg);border:1.5px solid #D9770644;border-radius:10px">
+      <div style="font-size:13px;font-weight:500;color:var(--yellow)">⚠️ No se detectó cuadro de áreas en el plano — ${parLabel}</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:6px">${r.resumen||''}</div>
     </div>`;
   }
 
-  // ── Chip 3: SUPERFICIE DEL TERRENO ───────────────────────────────
-  const supPlano = typeof r.superficie_plano === 'number' ? r.superficie_plano : null;
-  let supChipHTML = '';
-  if(supReal){
-    let sIcon, sColor, sBg, sBd, sTitulo, sDetalle;
-    if(r.superficie_cuadra === 'si'){
-      sIcon='✅'; sColor='var(--sem-v-txt)'; sBg='var(--sem-v-bg)'; sBd='#16A34A33';
-      sTitulo='Superficie del terreno coincide';
-      sDetalle = `Plano: ${supPlano!==null?supPlano+' m²':'aprox. coincide'} / Real: ${supReal} m²`;
-    } else if(r.superficie_cuadra === 'no'){
-      sIcon='🚫'; sColor='var(--sem-r-txt)'; sBg='var(--sem-r-bg)'; sBd='#DC262633';
-      sTitulo='Superficie del terreno NO coincide';
-      const dif = supPlano!==null ? Math.abs(supPlano-supReal).toFixed(1) : '?';
-      const dir = supPlano!==null ? (supPlano>supReal?'el plano declara más':'el plano declara menos') : '';
-      sDetalle = `Plano: ${supPlano!==null?supPlano+' m²':'?'} / Real: ${supReal} m²`+(dif!=='?'?` (${dir}: ${dif} m²)`:'');
-    } else {
-      sIcon='⚠️'; sColor='var(--yellow)'; sBg='var(--sem-am-bg)'; sBd='#D9770633';
-      sTitulo='No se pudo leer la superficie del terreno en el plano';
-      sDetalle = `Superficie real indicada: ${supReal} m² — verifica manualmente`;
-    }
-    supChipHTML = `
-    <div style="background:${sBg};border:2px solid ${sBd};border-radius:12px;padding:14px 16px;margin-bottom:10px">
-      <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Superficie del terreno</div>
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
-        <span style="font-size:20px;line-height:1">${sIcon}</span>
-        <span style="font-size:13px;font-weight:700;color:${sColor}">${sTitulo}</span>
+  // ── Chip 3: SUPERFICIE ───────────────────────────────────────────
+  let chip3HTML = '';
+  if(r._superficie_real){
+    const supPlano = typeof r.superficie_plano === 'number' ? r.superficie_plano : null;
+    const scRes  = r.superficie_cuadra;
+    const scIco  = scRes==='si' ? '✅' : (scRes==='no' ? '🚫' : '⚠️');
+    const scTxt  = scRes==='si' ? 'COINCIDE con lo declarado en el plano'
+                 : scRes==='no' ? 'NO coincide — verificar escrituras y plano'
+                 : 'No disponible en este plano';
+    const scBg   = scRes==='si' ? 'var(--sem-v-bg)' : (scRes==='no' ? 'var(--sem-r-bg)' : 'var(--sem-am-bg)');
+    const scBd   = scRes==='si' ? '#16A34A44' : (scRes==='no' ? '#DC262644' : '#D9770644');
+    const scClr  = scRes==='si' ? 'var(--sem-v-txt)' : (scRes==='no' ? 'var(--sem-r-txt)' : 'var(--yellow)');
+    chip3HTML = `
+    <div style="margin-top:10px;padding:12px 14px;background:${scBg};border:1.5px solid ${scBd};border-radius:10px">
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px">Superficie del terreno</div>
+      <div style="font-size:13px;font-weight:500;color:${scClr};margin-bottom:6px">${scIco} ${scTxt}</div>
+      <div style="font-size:12px;color:var(--text2)">
+        Real (escrituras/predial): <b>${r._superficie_real} m²</b>
+        ${supPlano !== null ? ' · Plano: <b>'+supPlano+' m²</b>' : ''}
       </div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.6">${sDetalle}</div>
-      ${r.nota_superficie?'<div style="font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5">'+r.nota_superficie+'</div>':''}
+      ${r.nota_superficie ? '<div style="font-size:11px;color:var(--text3);margin-top:4px">'+r.nota_superficie+'</div>' : ''}
     </div>`;
   }
 
-  const obsHTML = (r.observaciones||[]).map(o =>
-    `<li style="font-size:12px;color:var(--text2);margin-bottom:5px;line-height:1.6">${o}</li>`
-  ).join('');
+  // ── Observaciones ────────────────────────────────────────────────
+  let obsHTML = '';
+  if(r.observaciones && r.observaciones.length){
+    const items = r.observaciones.map(o=>`<li style="margin-bottom:4px">${o}</li>`).join('');
+    obsHTML = `<ul style="margin:8px 0 0 16px;font-size:12px;color:var(--text2);line-height:1.6">${items}</ul>`;
+  }
 
-  status.style.display      = 'none';
-  veredictoEl.style.display = 'block';
   veredictoEl.innerHTML = `
-    <div style="background:${usoBg};border:2px solid ${usoBd};border-radius:12px;padding:16px;margin-bottom:10px">
-      <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Uso del suelo</div>
-      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:7px">
-        <span style="font-size:22px;line-height:1">${usoIcon}</span>
-        <span style="font-size:13px;font-weight:700;color:${usoColor}">${usoTitulo}</span>
-        ${usoClaveHTML}
-      </div>
-      <div style="font-size:12px;font-weight:600;color:var(--text1);margin-bottom:4px">${r.uso_identificado||''}</div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.6">${r.razon_uso||''}</div>
-      ${inferidoHTML}
-    </div>
-    ${chip2HTML}
-    ${supChipHTML}
-    ${obsHTML?'<div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Observaciones</div><ul style="margin:0;padding-left:18px">'+obsHTML+'</ul></div>':''}
-    <div style="display:flex;gap:8px">
-      <button onclick="m10ResetUpload()"
-              style="flex:1;padding:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer">
-        Analizar otro plano
-      </button>
-      <button onclick="m10ExportarVeredicto()"
-              title="Descarga el resumen como archivo .txt"
-              style="flex:1;padding:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer">
-        ⬇ Descargar resumen
-      </button>
-    </div>
+  <div style="padding:14px 16px;background:${usoBg};border:1.5px solid ${usoBd};border-radius:10px">
+    <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px">Uso del suelo</div>
+    <div style="font-size:14px;font-weight:600;color:${usoColor};margin-bottom:6px">${usoIcon} ${usoTitulo}</div>
+    <div style="font-size:12px;color:var(--text2)"><b>${r.uso_identificado||'—'}</b>${usoClaveHTML}</div>
+    <div style="font-size:12px;color:var(--text3);margin-top:4px">${r.razon_uso||''}</div>
+    ${inferidoHTML}
+  </div>
+  ${chip2HTML}
+  ${chip3HTML}
+  ${obsHTML}
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button onclick="m10ResetUpload()"
+            style="flex:1;padding:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer">
+      Analizar otro plano
+    </button>
+    <button onclick="m10ExportarVeredicto()"
+            title="Descarga el resumen como archivo .txt"
+            style="flex:1;padding:9px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer">
+      ⬇ Descargar resumen
+    </button>
+  </div>
   `;
-  window._m10UltimoVeredicto = r;
 
-  const nombrePanel = document.getElementById('m10NombrePanel');
-  if(nombrePanel){
-    nombrePanel.style.display='';
-    const inp = document.getElementById('m10InputNombre');
-    if(inp && !esReapertura) inp.value='';
-  }
+  if(status) status.style.display='none';
+  veredictoEl.style.display='block';
+
   if(!esReapertura){
+    const np = document.getElementById('m10NombrePanel');
+    if(np) np.style.display='block';
     m10GuardarEnHistorial(r);
-    m10RenderHistorial();
   }
+
+  window._m10UltimoVeredicto = r;
 }
 
 function m10ResetUpload(){
@@ -7059,48 +7046,44 @@ function m10ExportarVeredicto(){
   const nombreProyecto  = inputNombre.trim() || nombreGuardado || 'Sin nombre';
   const domicilio = window._ultimaDireccion||zona.domicilio||'';
 
-  const esGDL  = municipioActual === 'guadalajara';
-  const lblCOS = esGDL ? 'iCOS' : 'COS';
-  const lblCUS = esGDL ? 'iCUS' : 'CUS';
-
   const usoLabel = r.uso_permitido && !r.uso_condicionado ? 'PERMITIDO'
                  : r.uso_condicionado ? 'CONDICIONADO' : 'NO PERMITIDO';
   const obs = (r.observaciones||[]).map((o,i)=>`  ${i+1}. ${o}`).join('\n');
 
   const supReal   = r._superficie_real;
-  const cos_pb    = typeof r.cos_pb_m2  === 'number' ? r.cos_pb_m2  : 0;
-  const icos_pb   = typeof r.icos_pb_m2 === 'number' ? r.icos_pb_m2
-                  : (typeof r.superficie_pb_m2 === 'number' ? r.superficie_pb_m2 : null);
-  const cus_tot   = typeof r.cus_total_m2  === 'number' ? r.cus_total_m2  : 0;
-  const icus_tot  = typeof r.icus_total_m2 === 'number' ? r.icus_total_m2
-                  : (typeof r.superficie_total_construida_m2 === 'number' ? r.superficie_total_construida_m2 : null);
+  const cos  = parseFloat(zona.cos)  || 0;
+  const icos = parseFloat(zona.icos) || 0;
+  const cus  = parseFloat(zona.cus)  || 0;
+  const icus = parseFloat(zona.icus) || 0;
+  const pb_plano  = typeof r.desplante_pb_m2    === 'number' ? r.desplante_pb_m2    : null;
+  const tot_plano = typeof r.total_construido_m2 === 'number' ? r.total_construido_m2 : null;
   const niv = typeof r.niveles_plano === 'number' ? r.niveles_plano : null;
 
-  const pb_total     = icos_pb !== null ? cos_pb + icos_pb : null;
-  const total_constr = icus_tot !== null ? cus_tot + icus_tot : null;
-  const cosNorm = parseFloat(zona.cos);
-  const cusNorm = parseFloat(zona.cus);
-
   let calcLineas = '';
-  if(supReal && (pb_total !== null || total_constr !== null)){
-    const icosCalc = pb_total     !== null ? +(pb_total     / supReal).toFixed(3) : null;
-    const icusCalc = total_constr !== null ? +(total_constr / supReal).toFixed(3) : null;
-    const estado = (calc, norm) => {
-      if(calc===null) return '—';
-      if(isNaN(norm))  return `${calc.toFixed(3)} (sin norma)`;
-      return calc<=norm ? `${calc.toFixed(3)} ✓ CUMPLE (norma ${norm})` : `${calc.toFixed(3)} ✗ EXCEDIDO (norma ${norm}, +${(calc-norm).toFixed(3)})`;
-    };
-    const detalleICOS = pb_total!==null
-      ? (cos_pb>0?`Ex: ${cos_pb} m² + Nvo: ${icos_pb} m² = ${pb_total} m²`:`PB nueva: ${icos_pb} m²`):'';
-    const detalleICUS = total_constr!==null
-      ? (cus_tot>0?`Ex: ${cus_tot} m² + Nvo: ${icus_tot} m² = ${total_constr} m²`:`Total nueva: ${icus_tot} m²`):'';
+  if(supReal && (pb_plano !== null || tot_plano !== null)){
+    const max_pb    = (cos + icos) * supReal;
+    const max_total = (cus + icus) * supReal;
+    const fmt1 = v => v.toLocaleString('es-MX',{maximumFractionDigits:1});
+    const fmtC = v => v.toFixed(2);
+    const pbOk  = pb_plano  !== null ? pb_plano  <= max_pb    : null;
+    const totOk = tot_plano !== null ? tot_plano <= max_total : null;
+    const nivNorm = parseInt(zona.niveles);
+    const nivOk  = (niv !== null && !isNaN(nivNorm)) ? niv <= nivNorm : null;
+
     calcLineas = [
       '',
       `2. PARÁMETROS CONSTRUCTIVOS — Terreno real: ${supReal} m²`,
-      `   ${lblCOS} Total: ${estado(icosCalc,cosNorm)}${detalleICOS?'  ('+detalleICOS+')':''}`,
-      `   ${lblCUS} Total: ${estado(icusCalc,cusNorm)}${detalleICUS?'  ('+detalleICUS+')':''}`,
-      niv!==null?`   Niveles   : ${niv}${!isNaN(parseInt(zona.niveles))?' (norma: '+parseInt(zona.niveles)+')':''}`:null,
-      r.resumen?`   Detalle   : ${r.resumen}`:null,
+      `   COS  (${fmtC(cos)})  × ${supReal} = ${fmt1(cos*supReal)} m²`,
+      `   iCOS (${fmtC(icos)}) × ${supReal} = ${fmt1(icos*supReal)} m²`,
+      `   COS+iCOS Total: ${fmtC(cos+icos)} → máx ${fmt1(max_pb)} m² | Plano desplante PB: ${pb_plano!==null?fmt1(pb_plano)+' m²':'—'}`,
+      pb_plano!==null ? `   Desplante PB: ${pbOk?'CUMPLE — margen '+fmt1(max_pb-pb_plano)+' m²':'EXCEDIDO por '+fmt1(pb_plano-max_pb)+' m²'}` : null,
+      `   `,
+      `   CUS  (${fmtC(cus)})  × ${supReal} = ${fmt1(cus*supReal)} m²`,
+      `   iCUS (${fmtC(icus)}) × ${supReal} = ${fmt1(icus*supReal)} m²`,
+      `   CUS+iCUS Total: ${fmtC(cus+icus)} → máx ${fmt1(max_total)} m² | Plano total construido: ${tot_plano!==null?fmt1(tot_plano)+' m²':'—'}`,
+      tot_plano!==null ? `   Total construido: ${totOk?'CUMPLE — margen '+fmt1(max_total-tot_plano)+' m²':'EXCEDIDO por '+fmt1(tot_plano-max_total)+' m²'}` : null,
+      niv!==null ? `   Niveles: ${niv}${!isNaN(nivNorm)?' / norma: '+nivNorm+' '+(niv<=nivNorm?'CUMPLE':'EXCEDIDO'):''}` : null,
+      r.resumen ? `   Detalle IA: ${r.resumen}` : null,
     ].filter(x=>x!=null).join('\n');
   } else {
     const parLabel = {cuadra:'CUADRA',parcialmente:'PARCIALMENTE',no_cuadra:'NO CUADRA'}[r.resultado]||r.resultado;
@@ -7109,50 +7092,57 @@ function m10ExportarVeredicto(){
       '2. PARÁMETROS CONSTRUCTIVOS',
       `   Resultado: ${parLabel}`,
       `   Detalle  : ${r.resumen||'Sin datos de parámetros en el plano.'}`,
-      !supReal?`   Nota     : Ingresa la superficie del terreno para calcular ${lblCOS}/${lblCUS} exacto.`:null,
+      !supReal?'   Nota     : Ingresa la superficie del terreno para el cálculo completo.':null,
     ].filter(x=>x!=null).join('\n');
   }
 
   let supLineas = '';
   if(supReal){
-    const supPlano = typeof r.superficie_plano==='number'?r.superficie_plano+' m²':'no detectada';
-    const supRes   = {si:'COINCIDE',no:'NO COINCIDE',no_disponible:'NO SE PUDO LEER'}[r.superficie_cuadra]||'';
+    const supPlano = typeof r.superficie_plano === 'number' ? r.superficie_plano : null;
+    const supRes   = {si:'COINCIDE',no:'NO COINCIDE',no_disponible:'NO DISPONIBLE'}[r.superficie_cuadra]||'';
     supLineas = [
       '',
       '3. SUPERFICIE DEL TERRENO',
-      `   Real (escrituras/predial) : ${supReal} m²`,
-      `   Declarada en el plano     : ${supPlano}`,
-      `   Resultado                 : ${supRes}`,
-      r.nota_superficie?`   Nota: ${r.nota_superficie}`:null,
+      `   Real (escrituras/predial): ${supReal} m²`,
+      supPlano !== null ? `   Declarada en el plano    : ${supPlano} m²` : null,
+      `   Resultado                : ${supRes}`,
+      r.nota_superficie ? `   Nota: ${r.nota_superficie}` : null,
     ].filter(x=>x!=null).join('\n');
   }
 
-  const sep = '─'.repeat(56);
   const fuenteLinea = r.fuente_usos==='inferido'
-    ? '\n* Usos inferidos por IA (sin lista oficial). Verificar en PDU local.' : '';
+    ? '\n* Usos inferidos por IA (sin lista oficial para este municipio). Verificar en PDU local.'
+    : '';
 
+  const sep = '─'.repeat(56);
   const txt = [
-    'GESTOR URBANO JALISCO AMG — PRE-DICTAMEN IA (M10)',sep,
-    `Proyecto    : ${nombreProyecto}`,
-    domicilio?`Domicilio   : ${domicilio}`:'',
-    `Fecha       : ${fecha}`,
-    `Municipio   : ${mun}`,
-    `Zona        : ${zona.uso||zona.clave||'—'}`,
-    `Norma COS/iCOS máx: ${zona.cos||'—'}  |  CUS/iCUS máx: ${zona.cus||'—'}  |  Niveles: ${zona.niveles||'—'}`,
-    sep,'',
+    'GESTOR URBANO JALISCO AMG — PRE-DICTAMEN IA (M10)',
+    sep,
+    `Proyecto  : ${nombreProyecto}`,
+    domicilio ? `Domicilio : ${domicilio}` : null,
+    `Fecha     : ${fecha}`,
+    `Municipio : ${mun}`,
+    `Zona      : ${zona.uso||zona.clave||'—'}`,
+    `COS: ${zona.cos||'—'}  iCOS: ${zona.icos||'—'}  CUS: ${zona.cus||'—'}  iCUS: ${zona.icus||'—'}  Niveles: ${zona.niveles||'—'}`,
+    sep,
+    '',
     '1. USO DEL SUELO',
     `   Resultado  : ${usoLabel}`,
     `   Proyecto   : ${r.uso_identificado||'—'}${r.uso_clave?' ('+r.uso_clave+')':''}`,
     `   Razón      : ${r.razon_uso||'—'}`,
     fuenteLinea,
-    obs?`\n   Observaciones:\n${obs}`:'',
-    calcLineas, supLineas,'',sep,
+    calcLineas,
+    supLineas,
+    obs ? `\n4. OBSERVACIONES:\n${obs}` : null,
+    '',
+    sep,
     'AVISO: Pre-dictamen orientativo generado por IA.',
     'Para validación oficial consultar la Dirección de',
-    'Ordenamiento del Territorio del municipio correspondiente.',sep,
-  ].filter(x=>x!==undefined).join('\n');
+    'Ordenamiento del Territorio del municipio correspondiente.',
+    sep,
+  ].filter(x=>x!=null).join('\n');
 
-  const nombreArchivo = nombreProyecto!=='Sin nombre'
+  const nombreArchivo = nombreProyecto !== 'Sin nombre'
     ? nombreProyecto.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]/g,'').replace(/\s+/g,'_')
     : `PreDictamen_${mun}`;
 

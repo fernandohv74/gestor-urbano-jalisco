@@ -3524,6 +3524,10 @@ function guToggleTheme(){
 
 // Inicializar panel de historial al cargar
 document.addEventListener('DOMContentLoaded', function() {
+  if (!ES_LOCALHOST) {
+    const ap = document.getElementById('apikey-panel');
+    if (ap) ap.style.display = 'none';
+  }
   renderHistorialPanel();
   // Restaurar el último resultado mostrado si el usuario navegó a otro módulo y regresó
   try {

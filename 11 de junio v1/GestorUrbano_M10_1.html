@@ -3889,7 +3889,8 @@ async function cambiarZonaVUJ(idx, badgeEl){
       parseFloat(n.restriccion_frontal||datosZona.rest_f1)||0,
       parseFloat(n.restricciones_laterales||datosZona.rest_l1)||0,
       parseFloat(n.restriccion_posterior||datosZona.rest_p1)||0,
-      null, '#1D4ED8'
+      null, '#1D4ED8',
+      parseFloat(n.icos||datosZona?.icos)||0
     );
     if(typeof actualizar3D === 'function' && window._ventana3D && !window._ventana3D.closed) actualizar3D();
     setStatus(null,'');
@@ -4960,6 +4961,7 @@ function renderizar(zona,todos){
 
     ${(()=>{
       const cos  = parseFloat(zona.cos)||0;
+      const icos = parseFloat(zona.icos)||0;
       const rf   = parseFloat(zona.rest_f1)||0;
       const rl   = parseFloat(zona.rest_l1)||0;
       const rp   = parseFloat(zona.rest_p1)||0;
@@ -4968,9 +4970,9 @@ function renderizar(zona,todos){
       <div class="gu-rcard">
         <div class="gu-rcard-hdr">Vista aérea del predio — Distribución normativa</div>
         <div class="gu-rcard-body" style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
-          <div id="diagramaPredi">${generarSVGPredi(cos,rf,rl,rp)}</div>
+          <div id="diagramaPredi">${generarSVGPredi(cos,rf,rl,rp,undefined,icos)}</div>
           <div id="diagramaLeyenda" style="flex:1;min-width:140px;font-size:11px;color:var(--text2);line-height:1.8">
-            ${generarLeyendaPredi(cos,rf,rl,rp)}
+            ${generarLeyendaPredi(cos,rf,rl,rp,undefined,icos)}
           </div>
         </div>
       </div>`;
@@ -5817,7 +5819,7 @@ function seleccionarUso(event, clave, esCondicionado) {
       const rfU = parseFloat(coefs.rest_f)||parseFloat(datosZona?.rest_f1)||0;
       const rlU = parseFloat(coefs.rest_l)||parseFloat(datosZona?.rest_l1)||0;
       const rpU = parseFloat(coefs.rest_p)||parseFloat(datosZona?.rest_p1)||0;
-      actualizarDiagramaPredi(cosUso, rfU, rlU, rpU, clave, '#F59E0B');
+      actualizarDiagramaPredi(cosUso, rfU, rlU, rpU, clave, '#F59E0B', parseFloat(coefs.icos||datosZona?.icos)||0);
       if(simNota){
         const info = USO_INFO[clave]||{};
         const supD = (sup * cosUso).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -5864,7 +5866,7 @@ function cerrarCoefsUso(){
   set('dynRESTL', z.rest_l1 ? z.rest_l1+' m' : '—');
   set('dynRESTp', z.rest_p1 ? z.rest_p1+' m' : '—');
   // Restaurar diagrama del predio con valores originales de la zona
-  actualizarDiagramaPredi(parseFloat(z.cos)||0, parseFloat(z.rest_f1)||0, parseFloat(z.rest_l1)||0, parseFloat(z.rest_p1)||0, null, '#1D4ED8');
+  actualizarDiagramaPredi(parseFloat(z.cos)||0, parseFloat(z.rest_f1)||0, parseFloat(z.rest_l1)||0, parseFloat(z.rest_p1)||0, null, '#1D4ED8', parseFloat(z.icos)||0);
   if(_ventana3D && !_ventana3D.closed) actualizar3D();
 }
 
@@ -5910,7 +5912,7 @@ function limpiarBusqueda(){
   document.getElementById('inCalle').focus();
   setStatus(null);
 }
-function generarSVGPredi(cos, rf, rl, rp, color){
+function generarSVGPredi(cos, rf, rl, rp, color, icos){
   const W=240, H=200, PAD=36;
   const TW=W, TH=H;
   const escala = Math.min(TH/20, TW/14);
@@ -5920,6 +5922,16 @@ function generarSVGPredi(cos, rf, rl, rp, color){
   const cx=PAD+pxL, cy=PAD+pxF, cw=TW-pxL*2, ch=TH-pxF-pxP;
   const cConst = color||'#1D4ED8';
   const pct = v => v>0&&v<=1 ? Math.round(v*100) : Math.round(v);
+  const icosV    = parseFloat(icos)||0;
+  const cosTotal = +(cos + icosV).toFixed(2);
+  const tieneIcos = icosV > 0;
+  const lblMain  = tieneIcos ? `COS+iCOS ${cosTotal}` : `COS ${cos}`;
+  const pctTotal = pct(cosTotal);
+  const y1 = cy+ch/2 + (tieneIcos ? -14 : -4);
+  const y2 = cy+ch/2 + (tieneIcos ? 4 : 8);
+  const desgloseSVG = tieneIcos
+    ? `<text x="${cx+cw/2}" y="${cy+ch/2+18}" text-anchor="middle" fill="#94A3B8" font-size="9" font-family="monospace">COS ${cos} + iCOS ${icosV}</text>`
+    : '';
   return `<svg width="${TW+PAD*2}" height="${TH+PAD*2}" viewBox="0 0 ${TW+PAD*2} ${TH+PAD*2}" xmlns="http://www.w3.org/2000/svg" style="display:block">
     <rect x="${PAD}" y="${PAD}" width="${TW}" height="${TH}" fill="#1E293B" stroke="#334155" stroke-width="1.5" rx="2"/>
     ${pxF>0?`<rect x="${PAD}" y="${PAD}" width="${TW}" height="${pxF}" fill="#0F172A" opacity="0.7"/>
@@ -5934,20 +5946,35 @@ function generarSVGPredi(cos, rf, rl, rp, color){
     <line x1="${PAD+TW-pxL}" y1="${PAD}" x2="${PAD+TW-pxL}" y2="${PAD+TH}" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4,3"/>
     <text x="${PAD+pxL/2}" y="${PAD+TH/2+4}" text-anchor="middle" fill="#F59E0B" font-size="9" font-family="monospace" transform="rotate(-90,${PAD+pxL/2},${PAD+TH/2})">RL ${rl}m</text>`:''}
     <rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" fill="${cConst}" opacity="0.85" rx="2"/>
-    <text x="${cx+cw/2}" y="${cy+ch/2-8}" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold" font-family="monospace">COS ${cos}</text>
-    <text x="${cx+cw/2}" y="${cy+ch/2+8}" text-anchor="middle" fill="#93C5FD" font-size="10" font-family="monospace">${pct(cos)}% del terreno</text>
+    <text x="${cx+cw/2}" y="${y1}" text-anchor="middle" fill="#fff" font-size="${tieneIcos?10:11}" font-weight="bold" font-family="monospace">${lblMain}</text>
+    <text x="${cx+cw/2}" y="${y2}" text-anchor="middle" fill="#93C5FD" font-size="10" font-family="monospace">${pctTotal}% del terreno</text>
+    ${desgloseSVG}
     <text x="${PAD+TW/2}" y="${PAD-8}" text-anchor="middle" fill="#64748B" font-size="9" font-family="sans-serif" letter-spacing="2">CALLE / FRENTE</text>
     <text x="${PAD+TW+8}" y="${PAD+14}" fill="#64748B" font-size="10" font-family="sans-serif">N↑</text>
   </svg>`;
 }
-function generarLeyendaPredi(cos, rf, rl, rp, clave){
+function generarLeyendaPredi(cos, rf, rl, rp, clave, icos){
   const pct = v => v>0&&v<=1 ? Math.round(v*100) : Math.round(v);
-  const colorBox = clave ? '#F59E0B' : '#1D4ED8';
+  const colorBox  = clave ? '#F59E0B' : '#1D4ED8';
+  const icosV     = parseFloat(icos)||0;
+  const cosTotal  = +(cos + icosV).toFixed(2);
+  const pctTotal  = pct(cosTotal);
+  const tieneIcos = icosV > 0;
+  const lblArea   = tieneIcos ? `COS+iCOS — ${pctTotal}% del terreno` : `${pct(cos)}% del terreno`;
+  const icosRow   = tieneIcos ? `
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+      <div style="width:12px;height:12px;background:#1E40AF;border:2px dashed #93C5FD;border-radius:2px;flex-shrink:0"></div>
+      <span><strong>iCOS ${icosV}</strong> — área libre sin constr. cerrada ${pct(icosV)}%</span>
+    </div>` : '';
+  const cosLinea = tieneIcos
+    ? `<div style="margin-top:4px;padding-top:4px;border-top:1px solid var(--border)">COS <strong>${cos}</strong> + iCOS <strong>${icosV}</strong> = <strong>${cosTotal}</strong> → desplante máx <strong>${pctTotal}%</strong> del terreno</div>`
+    : `<div style="margin-top:4px;padding-top:4px;border-top:1px solid var(--border)">COS <strong>${cos}</strong> = desplante máx ${pct(cos)}% del terreno</div>`;
   return `<div style="margin-bottom:8px">
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
       <div style="width:12px;height:12px;background:${colorBox};border-radius:2px;flex-shrink:0"></div>
-      <span><strong>Área construible${clave?' ('+clave+')':''}</strong> — ${pct(cos)}% del terreno</span>
+      <span><strong>Área construible${clave?' ('+clave+')':''}</strong> — ${lblArea}</span>
     </div>
+    ${icosRow}
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
       <div style="width:12px;height:12px;background:#0F172A;border:1px solid #F59E0B;border-radius:2px;flex-shrink:0"></div>
       <span><strong>Restricciones</strong> — sin construcción cerrada</span>
@@ -5961,15 +5988,15 @@ function generarLeyendaPredi(cos, rf, rl, rp, clave){
     ${rf>0?`<div>↑ Frontal: <strong>${rf} ml</strong></div>`:''}
     ${rp>0?`<div>↓ Posterior: <strong>${rp} ml</strong></div>`:''}
     ${rl>0?`<div>↔ Lateral: <strong>${rl} ml</strong> c/lado</div>`:''}
-    <div style="margin-top:4px;padding-top:4px;border-top:1px solid var(--border)">COS <strong>${cos}</strong> = desplante máx ${pct(cos)}% del terreno</div>
+    ${cosLinea}
   </div>
   <div style="margin-top:8px;font-size:10px;color:var(--text3);line-height:1.5">⚠️ Diagrama esquemático. Las medidas reales dependen de la forma del predio.</div>`;
 }
-function actualizarDiagramaPredi(cos, rf, rl, rp, clave, color){
+function actualizarDiagramaPredi(cos, rf, rl, rp, clave, color, icos){
   const d = document.getElementById('diagramaPredi');
   const l = document.getElementById('diagramaLeyenda');
-  if(d) d.innerHTML = generarSVGPredi(cos, rf, rl, rp, color);
-  if(l) l.innerHTML = generarLeyendaPredi(cos, rf, rl, rp, clave);
+  if(d) d.innerHTML = generarSVGPredi(cos, rf, rl, rp, color, icos);
+  if(l) l.innerHTML = generarLeyendaPredi(cos, rf, rl, rp, clave, icos);
 }
 
 function generarFraseUso(permitidos, condicionados, uso){

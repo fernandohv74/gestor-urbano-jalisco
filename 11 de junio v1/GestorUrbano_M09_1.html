@@ -879,17 +879,17 @@ function renderResumen(){
 
   document.getElementById('resumenLista').innerHTML=`
     <div style="display:flex;flex-direction:column;gap:6px;padding-top:2px">
-      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
-        <span style="color:var(--text2)">🔴 Alertas críticas</span>
-        <span style="font-family:var(--mono);color:${alertasCrit>0?'#fca5a5':'var(--text3)'};font-weight:${alertasCrit>0?'600':'400'}">${alertasCrit}</span>
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;gap:4px">
+        <span style="color:var(--text2);min-width:0">🔴 Alertas críticas</span>
+        <span style="font-family:var(--mono);flex-shrink:0;color:${alertasCrit>0?'#fca5a5':'var(--text3)'};font-weight:${alertasCrit>0?'600':'400'}">${alertasCrit}</span>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
-        <span style="color:var(--text2)">⚠️ Avisos</span>
-        <span style="font-family:var(--mono);color:${alertasWarn>0?'#fcd34d':'var(--text3)'}">${alertasWarn}</span>
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;gap:4px">
+        <span style="color:var(--text2);min-width:0">⚠️ Avisos</span>
+        <span style="font-family:var(--mono);flex-shrink:0;color:${alertasWarn>0?'#fcd34d':'var(--text3)'}">${alertasWarn}</span>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
-        <span style="color:var(--text2)">📅 Inhábiles próx. 30d</span>
-        <span style="font-family:var(--mono);color:var(--brand-light)">${proxInhab}</span>
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;gap:4px">
+        <span style="color:var(--text2);min-width:0">📅 Inhábiles · 30d</span>
+        <span style="font-family:var(--mono);flex-shrink:0;color:var(--brand-light)">${proxInhab}</span>
       </div>
     </div>`;
 }

@@ -6950,6 +6950,24 @@ function m10RenderizarVeredicto(r, esReapertura){
   }
 
   // ── Chip 3: SUPERFICIE ───────────────────────────────────────────
+  const tieneAreaPlano = pb_plano !== null || tot_plano !== null;
+  const recalcHintHTML = tieneAreaPlano
+    ? '<span style="font-size:11px;color:var(--text3)">Sin volver a subir el plano</span>'
+    : '<span style="font-size:11px;color:var(--yellow)">Ingresa la superficie y sube el plano para el cálculo</span>';
+  const recalcHTML = `
+  <div style="margin-top:8px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px">
+    <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:7px">Recalcular con otra superficie de terreno</div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <input id="m10RecalcSup" type="number" min="1" step="1" value="${supReal||''}"
+             placeholder="m² de terreno"
+             style="width:120px;padding:6px 8px;font-size:13px;border-radius:6px;border:1px solid var(--border2);background:var(--bg2);color:var(--text1)">
+      <button onclick="m10RecalcularSuperficie()"
+              style="padding:6px 16px;font-size:12px;font-weight:500;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text2);cursor:pointer">
+        ↻ Recalcular
+      </button>
+      ${recalcHintHTML}
+    </div>
+  </div>`;
   let chip3HTML = '';
   if(r._superficie_real){
     const supPlano = typeof r.superficie_plano === 'number' ? r.superficie_plano : null;
@@ -6989,6 +7007,7 @@ function m10RenderizarVeredicto(r, esReapertura){
     ${inferidoHTML}
   </div>
   ${chip2HTML}
+  ${recalcHTML}
   ${chip3HTML}
   ${obsHTML}
   <div style="display:flex;gap:8px;margin-top:10px">
@@ -7032,125 +7051,212 @@ function m10ResetUpload(){
   `;
 }
 
+function m10RecalcularSuperficie(){
+  const inp = document.getElementById('m10RecalcSup');
+  if(!inp) return;
+  const v = parseFloat(inp.value);
+  if(!v || v <= 0){
+    inp.style.borderColor='#dc2626';
+    setTimeout(()=>{ inp.style.borderColor=''; },1500);
+    return;
+  }
+  const r = window._m10UltimoVeredicto;
+  if(!r) return;
+  r._superficie_real = v;
+  const orig = document.getElementById('m10InputSuperficie');
+  if(orig) orig.value = v;
+  m10RenderizarVeredicto(r, true);
+}
+
 function m10ExportarVeredicto(){
   const r = window._m10UltimoVeredicto;
   if(!r){ alert('Sin análisis que exportar.'); return; }
-  const zona  = datosZona||{};
-  const mun   = ({guadalajara:'Guadalajara',zapopan:'Zapopan',tlajomulco:'Tlajomulco de Zúñiga',
-                  tlaquepaque:'San Pedro Tlaquepaque',tonala:'Tonalá'}[municipioActual])||municipioActual;
+  const zona = datosZona||{};
+  const MUN_NOMBRES = {guadalajara:'Guadalajara',zapopan:'Zapopan',tlajomulco:'Tlajomulco de Zúñiga',tlaquepaque:'San Pedro Tlaquepaque',tonala:'Tonalá'};
+  const mun  = MUN_NOMBRES[municipioActual]||municipioActual;
   const fecha = new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
 
   const histArr = (()=>{ try{ return JSON.parse(localStorage.getItem('gu_m10_historial')||'[]'); }catch(e){ return []; }})();
-  const nombreGuardado  = histArr.length ? histArr[0].nombreProyecto : '';
-  const inputNombre     = (document.getElementById('m10InputNombre')||{}).value||'';
-  const nombreProyecto  = inputNombre.trim() || nombreGuardado || 'Sin nombre';
+  const inputNombre    = (document.getElementById('m10InputNombre')||{}).value||'';
+  const nombreProyecto = inputNombre.trim() || (histArr.length ? histArr[0].nombreProyecto : '') || 'Sin nombre';
   const domicilio = window._ultimaDireccion||zona.domicilio||'';
 
-  const usoLabel = r.uso_permitido && !r.uso_condicionado ? 'PERMITIDO'
-                 : r.uso_condicionado ? 'CONDICIONADO' : 'NO PERMITIDO';
-  const obs = (r.observaciones||[]).map((o,i)=>`  ${i+1}. ${o}`).join('\n');
-
   const supReal   = r._superficie_real;
-  const cos  = parseFloat(zona.cos)  || 0;
-  const icos = parseFloat(zona.icos) || 0;
-  const cus  = parseFloat(zona.cus)  || 0;
-  const icus = parseFloat(zona.icus) || 0;
+  const cos  = parseFloat(zona.cos)||0,  icos = parseFloat(zona.icos)||0;
+  const cus  = parseFloat(zona.cus)||0,  icus = parseFloat(zona.icus)||0;
   const pb_plano  = typeof r.desplante_pb_m2    === 'number' ? r.desplante_pb_m2    : null;
   const tot_plano = typeof r.total_construido_m2 === 'number' ? r.total_construido_m2 : null;
   const niv = typeof r.niveles_plano === 'number' ? r.niveles_plano : null;
+  const nivNorm = parseInt(zona.niveles);
+  const fmt  = v => v.toLocaleString('es-MX',{maximumFractionDigits:1});
+  const fmtC = v => (+v).toFixed(2);
 
-  let calcLineas = '';
-  if(supReal && (pb_plano !== null || tot_plano !== null)){
-    const max_pb    = (cos + icos) * supReal;
-    const max_total = (cus + icus) * supReal;
-    const fmt1 = v => v.toLocaleString('es-MX',{maximumFractionDigits:1});
-    const fmtC = v => v.toFixed(2);
+  // Chip uso
+  const usoClass = r.uso_permitido && !r.uso_condicionado ? 'ok' : (r.uso_condicionado ? 'warn' : 'bad');
+  const usoIcon  = r.uso_permitido && !r.uso_condicionado ? '✅' : (r.uso_condicionado ? '⚠️' : '🚫');
+  const usoTit   = r.uso_permitido && !r.uso_condicionado ? 'Uso PERMITIDO en esta zona'
+                 : (r.uso_condicionado ? 'Uso CONDICIONADO — requiere dictamen adicional' : 'Uso NO PERMITIDO en esta zona');
+
+  // Sección parámetros con tabla
+  let paramSection = '';
+  if(supReal){
+    const max_pb    = (cos+icos)*supReal;
+    const max_total = (cus+icus)*supReal;
     const pbOk  = pb_plano  !== null ? pb_plano  <= max_pb    : null;
     const totOk = tot_plano !== null ? tot_plano <= max_total : null;
-    const nivNorm = parseInt(zona.niveles);
-    const nivOk  = (niv !== null && !isNaN(nivNorm)) ? niv <= nivNorm : null;
+    const nivOk = (niv !== null && !isNaN(nivNorm)) ? niv <= nivNorm : null;
+    const hayExceso = pbOk===false || totOk===false || nivOk===false;
+    const hayDatos  = pb_plano!==null || tot_plano!==null;
+    const todoOk    = hayDatos && !hayExceso;
+    const pClass = hayExceso ? 'bad' : (todoOk ? 'ok' : 'warn');
+    const pIcon  = hayExceso ? '🚫' : (todoOk ? '✅' : '⚠️');
+    const pTit   = hayExceso ? 'Parámetros FUERA de la norma' : (todoOk ? 'Parámetros dentro de la norma' : 'Datos parciales — verificar');
 
-    calcLineas = [
-      '',
-      `2. PARÁMETROS CONSTRUCTIVOS — Terreno real: ${supReal} m²`,
-      `   COS  (${fmtC(cos)})  × ${supReal} = ${fmt1(cos*supReal)} m²`,
-      `   iCOS (${fmtC(icos)}) × ${supReal} = ${fmt1(icos*supReal)} m²`,
-      `   COS+iCOS Total: ${fmtC(cos+icos)} → máx ${fmt1(max_pb)} m² | Plano desplante PB: ${pb_plano!==null?fmt1(pb_plano)+' m²':'—'}`,
-      pb_plano!==null ? `   Desplante PB: ${pbOk?'CUMPLE — margen '+fmt1(max_pb-pb_plano)+' m²':'EXCEDIDO por '+fmt1(pb_plano-max_pb)+' m²'}` : null,
-      `   `,
-      `   CUS  (${fmtC(cus)})  × ${supReal} = ${fmt1(cus*supReal)} m²`,
-      `   iCUS (${fmtC(icus)}) × ${supReal} = ${fmt1(icus*supReal)} m²`,
-      `   CUS+iCUS Total: ${fmtC(cus+icus)} → máx ${fmt1(max_total)} m² | Plano total construido: ${tot_plano!==null?fmt1(tot_plano)+' m²':'—'}`,
-      tot_plano!==null ? `   Total construido: ${totOk?'CUMPLE — margen '+fmt1(max_total-tot_plano)+' m²':'EXCEDIDO por '+fmt1(tot_plano-max_total)+' m²'}` : null,
-      niv!==null ? `   Niveles: ${niv}${!isNaN(nivNorm)?' / norma: '+nivNorm+' '+(niv<=nivNorm?'CUMPLE':'EXCEDIDO'):''}` : null,
-      r.resumen ? `   Detalle IA: ${r.resumen}` : null,
-    ].filter(x=>x!=null).join('\n');
-  } else {
-    const parLabel = {cuadra:'CUADRA',parcialmente:'PARCIALMENTE',no_cuadra:'NO CUADRA'}[r.resultado]||r.resultado;
-    calcLineas = [
-      '',
-      '2. PARÁMETROS CONSTRUCTIVOS',
-      `   Resultado: ${parLabel}`,
-      `   Detalle  : ${r.resumen||'Sin datos de parámetros en el plano.'}`,
-      !supReal?'   Nota     : Ingresa la superficie del terreno para el cálculo completo.':null,
-    ].filter(x=>x!=null).join('\n');
+    const pbResCls  = pbOk===false  ? 'bad-txt' : 'ok-txt';
+    const totResCls = totOk===false ? 'bad-txt' : 'ok-txt';
+    const pbResStr  = pb_plano  !== null ? (pbOk  ? `✅ CUMPLE (margen ${fmt(max_pb-pb_plano)} m²)`  : `🚫 EXCEDIDO ${fmt(pb_plano-max_pb)} m²`)  : '—';
+    const totResStr = tot_plano !== null ? (totOk ? `✅ CUMPLE (margen ${fmt(max_total-tot_plano)} m²)` : `🚫 EXCEDIDO ${fmt(tot_plano-max_total)} m²`) : '—';
+
+    const tdR = (a,b,c,d,e) => `<tr><td>${a}</td><td>${b}</td><td>${c}</td><td>${d}</td><td>${e}</td></tr>`;
+    const tdT = (a,b,c,d,e) => `<tr class="tr-total"><td>${a}</td><td>${b}</td><td>${c}</td><td>${d}</td><td>${e}</td></tr>`;
+    const sepRow = '<tr class="sep-row"><td colspan="5"></td></tr>';
+
+    const rows = [
+      tdR('COS',  fmtC(cos),  `${fmtC(cos)} × ${fmt(supReal)} = ${fmt(cos*supReal)} m²`,  '—', '—'),
+      tdR('iCOS', fmtC(icos), `${fmtC(icos)} × ${fmt(supReal)} = ${fmt(icos*supReal)} m²`, '—', '—'),
+      sepRow,
+      tdT('COS+iCOS Total', fmtC(cos+icos),
+          `${fmtC(cos+icos)} × ${fmt(supReal)} = <b>${fmt(max_pb)} m²</b>`,
+          pb_plano!==null ? fmt(pb_plano)+' m²' : '—',
+          `<span class="${pbResCls}">${pbResStr}</span>`),
+      tdR('CUS',  fmtC(cus),  `${fmtC(cus)} × ${fmt(supReal)} = ${fmt(cus*supReal)} m²`,  '—', '—'),
+      tdR('iCUS', fmtC(icus), `${fmtC(icus)} × ${fmt(supReal)} = ${fmt(icus*supReal)} m²`, '—', '—'),
+      sepRow,
+      tdT('CUS+iCUS Total', fmtC(cus+icus),
+          `${fmtC(cus+icus)} × ${fmt(supReal)} = <b>${fmt(max_total)} m²</b>`,
+          tot_plano!==null ? fmt(tot_plano)+' m²' : '—',
+          `<span class="${totResCls}">${totResStr}</span>`),
+    ].join('');
+
+    const nivLine = (niv!==null)
+      ? `<p style="margin-top:6px;font-size:9.5pt">Niveles del plano: <b>${niv}</b>${!isNaN(nivNorm)?' / norma: <b>'+nivNorm+'</b> '+(niv<=nivNorm?'<span class="ok-txt">✅ CUMPLE</span>':'<span class="bad-txt">🚫 EXCEDIDO</span>'):''}</p>`
+      : '';
+
+    paramSection = `
+    <h2>2. Parámetros constructivos &middot; Terreno real: ${fmt(supReal)} m²</h2>
+    <div class="chip chip-${pClass}">
+      <div class="chip-title ${pClass}">${pIcon} ${pTit}</div>
+      <table>
+        <thead><tr>
+          <th style="width:21%">Parámetro</th><th style="width:11%">Coefic.</th>
+          <th style="width:31%">Cálculo (coefic. × terreno)</th>
+          <th style="width:15%">Del plano</th><th>Resultado</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      ${nivLine}
+    </div>`;
   }
 
-  let supLineas = '';
-  if(supReal){
-    const supPlano = typeof r.superficie_plano === 'number' ? r.superficie_plano : null;
-    const supRes   = {si:'COINCIDE',no:'NO COINCIDE',no_disponible:'NO DISPONIBLE'}[r.superficie_cuadra]||'';
-    supLineas = [
-      '',
-      '3. SUPERFICIE DEL TERRENO',
-      `   Real (escrituras/predial): ${supReal} m²`,
-      supPlano !== null ? `   Declarada en el plano    : ${supPlano} m²` : null,
-      `   Resultado                : ${supRes}`,
-      r.nota_superficie ? `   Nota: ${r.nota_superficie}` : null,
-    ].filter(x=>x!=null).join('\n');
+  // Sección superficie
+  let supSection = '';
+  if(supReal && r.superficie_cuadra){
+    const sp = typeof r.superficie_plano==='number' ? r.superficie_plano : null;
+    const scClass = r.superficie_cuadra==='si' ? 'ok' : (r.superficie_cuadra==='no' ? 'bad' : 'warn');
+    const scIcon  = r.superficie_cuadra==='si' ? '✅' : (r.superficie_cuadra==='no' ? '🚫' : '⚠️');
+    const scTxt   = r.superficie_cuadra==='si' ? 'COINCIDE con el plano'
+                  : r.superficie_cuadra==='no' ? 'NO COINCIDE — verificar escrituras y plano'
+                  : 'No disponible en este plano';
+    supSection = `
+    <h2>3. Superficie del terreno</h2>
+    <div class="chip chip-${scClass}">
+      <div class="chip-title ${scClass}">${scIcon} ${scTxt}</div>
+      <p style="margin-top:4px;font-size:10pt">Real: <b>${fmt(supReal)} m²</b>${sp!==null?' &middot; Plano: <b>'+fmt(sp)+' m²</b>':''}</p>
+      ${r.nota_superficie?'<p style="font-size:9pt;color:#666;margin-top:3px">'+r.nota_superficie+'</p>':''}
+    </div>`;
   }
 
-  const fuenteLinea = r.fuente_usos==='inferido'
-    ? '\n* Usos inferidos por IA (sin lista oficial para este municipio). Verificar en PDU local.'
-    : '';
+  // Observaciones
+  let obsSection = '';
+  if(r.observaciones && r.observaciones.length){
+    const secN = supReal ? '4' : '3';
+    obsSection = `<h2>${secN}. Observaciones</h2><ul style="margin:4px 0 4px 18px;font-size:9.5pt;line-height:1.7">${r.observaciones.map(o=>`<li>${o}</li>`).join('')}</ul>`;
+  }
 
-  const sep = '─'.repeat(56);
-  const txt = [
-    'GESTOR URBANO JALISCO AMG — PRE-DICTAMEN IA (M10)',
-    sep,
-    `Proyecto  : ${nombreProyecto}`,
-    domicilio ? `Domicilio : ${domicilio}` : null,
-    `Fecha     : ${fecha}`,
-    `Municipio : ${mun}`,
-    `Zona      : ${zona.uso||zona.clave||'—'}`,
-    `COS: ${zona.cos||'—'}  iCOS: ${zona.icos||'—'}  CUS: ${zona.cus||'—'}  iCUS: ${zona.icus||'—'}  Niveles: ${zona.niveles||'—'}`,
-    sep,
-    '',
-    '1. USO DEL SUELO',
-    `   Resultado  : ${usoLabel}`,
-    `   Proyecto   : ${r.uso_identificado||'—'}${r.uso_clave?' ('+r.uso_clave+')':''}`,
-    `   Razón      : ${r.razon_uso||'—'}`,
-    fuenteLinea,
-    calcLineas,
-    supLineas,
-    obs ? `\n4. OBSERVACIONES:\n${obs}` : null,
-    '',
-    sep,
-    'AVISO: Pre-dictamen orientativo generado por IA.',
-    'Para validación oficial consultar la Dirección de',
-    'Ordenamiento del Territorio del municipio correspondiente.',
-    sep,
-  ].filter(x=>x!=null).join('\n');
+  const domicilioRow = domicilio
+    ? `<span class="ml">Domicilio</span><span>${domicilio}</span>`
+    : '<span></span><span></span>';
 
-  const nombreArchivo = nombreProyecto !== 'Sin nombre'
-    ? nombreProyecto.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]/g,'').replace(/\s+/g,'_')
-    : `PreDictamen_${mun}`;
+  const htmlPDF = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Pre-Dictamen IA — ${nombreProyecto}</title>
+<style>
+@page{size:A4;margin:2cm 2.5cm}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;font-size:10.5pt;color:#222;line-height:1.5}
+.hdr{border-bottom:2.5px solid #1a3a5c;padding-bottom:10px;margin-bottom:14px}
+.hdr h1{font-size:14pt;color:#1a3a5c;margin-bottom:2px}
+.hdr .sub{font-size:9pt;color:#666}
+.meta{display:grid;grid-template-columns:110px 1fr 110px 1fr;gap:3px 12px;margin:10px 0;font-size:9.5pt;border:1px solid #e0e0e0;padding:10px 12px;border-radius:4px;background:#fafafa}
+.ml{color:#666;font-weight:700}
+hr{border:none;border-top:1px solid #ddd;margin:10px 0}
+h2{font-size:9pt;font-weight:700;color:#1a3a5c;margin:12px 0 5px;text-transform:uppercase;letter-spacing:.05em}
+.chip{padding:8px 12px;border-radius:5px;margin:4px 0;page-break-inside:avoid}
+.chip-ok{background:#f0fdf4;border-left:4px solid #16a34a}
+.chip-bad{background:#fef2f2;border-left:4px solid #dc2626}
+.chip-warn{background:#fffbeb;border-left:4px solid #d97706}
+.chip-title{font-size:11pt;font-weight:700;margin-bottom:3px}
+.ok{color:#15803d}.bad{color:#dc2626}.warn{color:#b45309}
+.ok-txt{color:#15803d}.bad-txt{color:#dc2626}
+table{width:100%;border-collapse:collapse;margin:6px 0;font-size:9.5pt;page-break-inside:avoid}
+th{background:#f0f4f8;text-align:left;padding:5px 7px;border:1px solid #ccc;font-size:8.5pt;font-weight:700;color:#444;text-transform:uppercase}
+td{padding:5px 7px;border:1px solid #ddd;vertical-align:middle}
+.tr-total{background:#f0f4f8;font-weight:700}
+.tr-total td:first-child{border-left:3px solid #1a3a5c;padding-left:9px}
+.sep-row td{padding:2px 0;background:#e8edf2;border-color:#bbb}
+.footer{margin-top:20px;padding-top:8px;border-top:1px solid #ccc;font-size:8pt;color:#888}
+@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <h1>Gestor Urbano Jalisco AMG — Pre-Dictamen IA</h1>
+  <div class="sub">Módulo M10 &middot; Análisis de planos arquitectónicos</div>
+</div>
+<div class="meta">
+  <span class="ml">Proyecto</span><span>${nombreProyecto}</span>
+  <span class="ml">Municipio</span><span>${mun}</span>
+  ${domicilioRow}
+  <span class="ml">Zona</span><span>${zona.uso||zona.clave||'—'}</span>
+  <span class="ml">Fecha</span><span>${fecha}</span>
+  <span class="ml">Coeficientes</span><span>COS ${zona.cos||'—'} &middot; iCOS ${zona.icos||'—'} &middot; CUS ${zona.cus||'—'} &middot; iCUS ${zona.icus||'—'} &middot; Niveles ${zona.niveles||'—'}</span>
+</div>
+<h2>1. Uso del suelo</h2>
+<div class="chip chip-${usoClass}">
+  <div class="chip-title ${usoClass}">${usoIcon} ${usoTit}</div>
+  <p style="margin-top:4px;font-size:10pt"><b>${r.uso_identificado||'—'}</b>${r.uso_clave?' &middot; clave: '+r.uso_clave:''}</p>
+  <p style="font-size:9pt;color:#555;margin-top:2px">${r.razon_uso||''}</p>
+  ${r.fuente_usos==='inferido'?'<p style="font-size:8.5pt;color:#b45309;margin-top:4px;border-top:1px solid #fcd34d;padding-top:4px">⚠️ Usos inferidos por IA. Verificar en PDU local.</p>':''}
+</div>
+${paramSection}
+${supSection}
+${obsSection}
+<div class="footer">
+  Aviso: Pre-dictamen orientativo generado por inteligencia artificial (Gestor Urbano Jalisco AMG, M10).
+  Para validación oficial, consultar la Dirección de Ordenamiento del Territorio del municipio correspondiente. &mdash; ${fecha}
+</div>
+</body>
+</html>`;
 
-  const blob = new Blob([txt],{type:'text/plain;charset=utf-8'});
-  const a    = document.createElement('a');
-  a.href     = URL.createObjectURL(blob);
-  a.download = `${nombreArchivo}_${fecha.replace(/ /g,'_')}.txt`;
-  a.click();
+  const win = window.open('','_blank','width=900,height=720,resizable=yes,scrollbars=yes');
+  if(!win){ alert('Permite ventanas emergentes para generar el PDF.'); return; }
+  win.document.open();
+  win.document.write(htmlPDF);
+  win.document.close();
+  win.focus();
+  setTimeout(()=>win.print(), 500);
 }
 
 // Inicializar historial M10 al cargar

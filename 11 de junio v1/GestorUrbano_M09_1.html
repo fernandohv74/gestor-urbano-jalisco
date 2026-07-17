@@ -190,7 +190,7 @@
     <div class="gu-rcard">
       <div class="gu-rcard-hdr">Fuentes consultadas</div>
       <div class="gu-rcard-body" style="font-size:10px;color:var(--text3);line-height:1.9">
-        <strong style="color:var(--text2)">Con IA (al verificar):</strong><br>
+        <strong style="color:var(--text2)">Verificación automática:</strong><br>
         · LFT Art. 74 — días inhábiles federales<br>
         · Ley Serv. Púb. Jalisco Art. 38 — estatales<br>
         · TJAJAL — acuerdos de vacaciones<br>
@@ -541,7 +541,7 @@ function m09CargarExtras(){
         if(info.length){
           panel.style.display = 'block';
           panel.innerHTML = `<div style="padding:6px 8px;background:var(--sem-v-bg);border:0.5px solid var(--sem-v-brd);border-radius:var(--r-md);font-size:9.5px;color:var(--sem-v-txt)">
-            ✅ IA verificó el ${ts}: ${info.join(' · ')}
+            ✅ Verificado el ${ts}: ${info.join(' · ')}
             <button onclick="m09LimpiarExtras()" style="margin-left:6px;background:none;border:none;color:var(--text3);font-size:9px;cursor:pointer">↩ revertir</button>
           </div>`;
         }
@@ -668,7 +668,7 @@ function renderCalendario(){
     const esNuevoAnio=anio!=='2026';
     html+=`<div class="cal-mes" id="cal-mes-${anio}-${mesIdx}">
       <div class="cal-mes-hdr${esActual?' mes-activo':''}" onclick="toggleMes(this)">
-        <span class="cal-mes-nombre">${meses[mesIdx]} ${anio}${esNuevoAnio?' <span style="font-size:9px;background:var(--sem-v-bg);color:var(--sem-v-txt);border-radius:3px;padding:1px 5px;margin-left:4px">IA</span>':''}</span>
+        <span class="cal-mes-nombre">${meses[mesIdx]} ${anio}${esNuevoAnio?' <span style="font-size:9px;background:var(--sem-v-bg);color:var(--sem-v-txt);border-radius:3px;padding:1px 5px;margin-left:4px">Auto</span>':''}</span>
         <div style="display:flex;gap:5px;align-items:center">
           ${esActual?'<span class="cal-mes-hoy">Mes actual</span>':''}
           <span class="cal-mes-badge">${items.length} día${items.length!==1?'s':''}</span>
@@ -1014,7 +1014,7 @@ function mostrarSec(id,btn){
 async function verificarAhora(){
   const btn=document.querySelector('.btn-refresh');
   if(!btn) return;
-  btn.innerHTML='<svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="animation:spin 1s linear infinite"><path d="M13.5 2.5A7 7 0 102.5 13.5M13.5 2.5V6.5M13.5 2.5H9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Verificando con IA…';
+  btn.innerHTML='<svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="animation:spin 1s linear infinite"><path d="M13.5 2.5A7 7 0 102.5 13.5M13.5 2.5V6.5M13.5 2.5H9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Verificando…';
   btn.disabled=true;
   m09MostrarVerifPanel('loading');
   try{
@@ -1105,7 +1105,7 @@ function m09MostrarVerifPanel(estado, res, extras, errorMsg){
   if(!panel) return;
   panel.style.display='block';
   if(estado==='loading'){
-    panel.innerHTML=`<div style="padding:7px 9px;background:var(--brand-pale);border:0.5px solid var(--brand-light);border-radius:var(--r-md);font-size:10px;color:var(--brand)">⏳ Consultando con IA…</div>`;
+    panel.innerHTML=`<div style="padding:7px 9px;background:var(--brand-pale);border:0.5px solid var(--brand-light);border-radius:var(--r-md);font-size:10px;color:var(--brand)">⏳ Verificando…</div>`;
     return;
   }
   if(estado==='error'){
@@ -1121,7 +1121,7 @@ function m09MostrarVerifPanel(estado, res, extras, errorMsg){
   if(alertaN) items.push(`${alertaN} alerta(s) nueva(s)`);
   if(extras.uma&&Object.keys(extras.uma).length) items.push(`UMA ${anioSig} cargada`);
   let html=`<div style="padding:8px 10px;background:var(--sem-v-bg);border:0.5px solid var(--sem-v-brd);border-radius:var(--r-md)">
-    <div style="font-size:10px;font-weight:600;color:var(--sem-v-txt);margin-bottom:3px">✅ Verificación IA completada</div>
+    <div style="font-size:10px;font-weight:600;color:var(--sem-v-txt);margin-bottom:3px">✅ Verificación completada</div>
     <div style="font-size:10px;color:var(--text2);margin-bottom:3px">${extras.resumen||''}</div>`;
   items.forEach(i=>{ html+=`<div style="font-size:9.5px;color:var(--text3)">· ${i}</div>`; });
   obs.forEach(o=>{ html+=`<div style="font-size:9.5px;color:var(--text3)">· ${o}</div>`; });

@@ -428,6 +428,19 @@ input[type=range]::-webkit-slider-thumb{
 }
 .m10-tabla td.center { text-align: center; font-family: var(--mono); }
 
+
+/* ── Historial búsqueda M10 ───────────────────────────────────────── */
+.m10-hist-hdr{display:flex;align-items:center;justify-content:space-between;margin-top:12px;margin-bottom:5px;font-size:10.5px;font-weight:600;color:var(--text3);letter-spacing:.03em;text-transform:uppercase}
+.m10-hist-clear{background:none;border:none;color:var(--text3);font-size:10px;cursor:pointer;padding:0;transition:color var(--t-fast)}
+.m10-hist-clear:hover{color:var(--danger,#dc2626)}
+.m10-hist-list{display:flex;flex-direction:column;gap:3px}
+.m10-hist-item{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:5px;padding:5px 7px;border-radius:var(--r-sm,5px);background:var(--bg3);border:0.5px solid var(--border2);cursor:pointer;transition:background var(--t-fast),border-color var(--t-fast);min-width:0}
+.m10-hist-item:hover{background:var(--brand-10,rgba(14,165,233,.1));border-color:var(--brand)}
+.m10-hist-mun{font-size:9.5px;font-weight:700;color:var(--brand);font-family:var(--mono);white-space:nowrap}
+.m10-hist-dir{font-size:10.5px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.m10-hist-fecha{font-size:9.5px;color:var(--text3);white-space:nowrap;font-family:var(--mono)}
+.m10-hist-del{background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0;transition:color var(--t-fast)}
+.m10-hist-del:hover{color:var(--danger,#dc2626)}
 </style>
 </head>
 
@@ -523,6 +536,9 @@ input[type=range]::-webkit-slider-thumb{
           <div id="zonaSelectorBtns" class="gu-sel-btns" style="margin-bottom:6px"></div>
           <div style="font-size:10px;color:var(--text3)">Cada zona puede tener distintos usos y coeficientes. Selecciona la que aplica a tu proyecto.</div>
         </div>
+
+        <!-- Historial de búsqueda de direcciones -->
+        <div id="m10HistBusq"></div>
       </div>
 
       <!-- Tab: Predial -->
@@ -4404,6 +4420,7 @@ async function buscar(){
                       : fuente==='nominatim-preciso'? '✅ Nominatim con colonia/CP'
                       : '⚠️ Precisión aproximada — verifica en pestaña Coordenadas';
     setStatus('loading',`📍 ${lat.toFixed(5)}, ${lng.toFixed(5)} · ${fuenteLabel}`);
+    m10GuardarBusqueda(dir, colonia, cp, munSeleccionado);
     await procesarCoordenadas(lat,lng);
   }catch(e){
     setStatus('error','❌ '+e.message);
@@ -5905,6 +5922,76 @@ function detectarYActualizarMunicipio(lat, lng){
   }
   return municipioActual;
 }
+function m10GuardarBusqueda(calle, colonia, cp, municipio){
+  if(!calle) return;
+  try{
+    const KEY = 'gu_m10_busq_hist';
+    const MAX = 10;
+    let hist = JSON.parse(localStorage.getItem(KEY)||'[]');
+    const entrada = { calle, colonia: colonia||'', cp: cp||'', municipio: municipio||'guadalajara', ts: Date.now() };
+    // Eliminar duplicado exacto (misma calle+colonia+cp+municipio)
+    hist = hist.filter(e => !(e.calle===calle && e.colonia===(colonia||'') && e.cp===(cp||'') && e.municipio===municipio));
+    hist.unshift(entrada);
+    localStorage.setItem(KEY, JSON.stringify(hist.slice(0, MAX)));
+    m10RenderHistBusqueda();
+  }catch(e){ console.warn('historial busqueda error', e); }
+}
+function m10RenderHistBusqueda(){
+  const cont = document.getElementById('m10HistBusq');
+  if(!cont) return;
+  try{
+    const KEY = 'gu_m10_busq_hist';
+    const hist = JSON.parse(localStorage.getItem(KEY)||'[]');
+    if(!hist.length){ cont.innerHTML=''; return; }
+    const munNombres = { guadalajara:'GDL', zapopan:'ZPN', tlaquepaque:'TLQ', tlajomulco:'TLA', tonala:'TON' };
+    const filas = hist.map((e,i) => {
+      const lbl = [e.calle, e.colonia, e.cp].filter(Boolean).join(', ');
+      const mun = munNombres[e.municipio] || e.municipio;
+      const fecha = new Date(e.ts).toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit'});
+      return `<div class="m10-hist-item" onclick="m10RestaurarBusqueda(${i})" title="${lbl.replace(/"/g,'&quot;')}">
+  <span class="m10-hist-mun">${mun}</span>
+  <span class="m10-hist-dir">${lbl}</span>
+  <span class="m10-hist-fecha">${fecha}</span>
+  <button class="m10-hist-del" onclick="event.stopPropagation();m10EliminarBusqueda(${i})" title="Eliminar">✕</button>
+</div>`;
+    }).join('');
+    cont.innerHTML = `<div class="m10-hist-hdr">
+  <span>Búsquedas recientes</span>
+  <button class="m10-hist-clear" onclick="m10LimpiarHistBusqueda()">Limpiar todo</button>
+</div>
+<div class="m10-hist-list">${filas}</div>`;
+  }catch(e){ cont.innerHTML=''; }
+}
+function m10RestaurarBusqueda(idx){
+  try{
+    const KEY = 'gu_m10_busq_hist';
+    const hist = JSON.parse(localStorage.getItem(KEY)||'[]');
+    const e = hist[idx]; if(!e) return;
+    document.getElementById('inCalle').value  = e.calle;
+    document.getElementById('inColonia').value = e.colonia||'';
+    document.getElementById('inCP').value      = e.cp||'';
+    if(e.municipio && e.municipio !== municipioActual){
+      const btn = document.querySelector(`[onclick*="selMunicipio('${e.municipio}'"]`);
+      if(btn) btn.click();
+    }
+    buscar();
+  }catch(err){ console.warn('restaurar busqueda error', err); }
+}
+function m10EliminarBusqueda(idx){
+  try{
+    const KEY = 'gu_m10_busq_hist';
+    let hist = JSON.parse(localStorage.getItem(KEY)||'[]');
+    hist.splice(idx,1);
+    localStorage.setItem(KEY, JSON.stringify(hist));
+    m10RenderHistBusqueda();
+  }catch(e){}
+}
+function m10LimpiarHistBusqueda(){
+  try{
+    localStorage.removeItem('gu_m10_busq_hist');
+    m10RenderHistBusqueda();
+  }catch(e){}
+}
 function limpiarBusqueda(){
   document.getElementById('inCalle').value = '';
   document.getElementById('inColonia').value = '';
@@ -6084,7 +6171,8 @@ document.addEventListener('click',e=>{const tt=document.getElementById('tooltip'
 window.addEventListener('load', () => {
   renderHistorial();
   const _epEl = document.getElementById('inputEntrepiso');
-  if (_epEl) _epEl.addEventListener('input', function(){ _saveEntrepisoHistorial(parseFloat(this.value)||3.0); });
+  if (_epEl) _epEl.addEventListener('input', function(){ _saveEntrepisoHistorial(parseFloat(this.value)||3.0); })
+m10RenderHistBusqueda();;
 });
 
 // ══════════════════════════════════════════════════

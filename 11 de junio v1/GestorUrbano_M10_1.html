@@ -699,6 +699,7 @@ input[type=range]::-webkit-slider-thumb{
                    min="1" step="0.01" placeholder="Ej: 200.5"
                    style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:7px;background:var(--bg3);color:var(--text1);font-family:var(--sans);font-size:13px;outline:none;-moz-appearance:textfield">
             <span style="font-size:12px;color:var(--text3);white-space:nowrap">m²</span>
+            <button id="m10BtnRecalc" onclick="m10RecalcularSuperficie()" style="display:none;padding:5px 12px;font-size:12px;font-weight:500;background:var(--brand,#0ea5e9);color:#fff;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;transition:opacity .15s">↻ Recalcular</button>
           </div>
           <div style="font-size:10px;color:var(--text3);margin-top:4px">Según escrituras o recibo predial — para cruzar con el plano</div>
         </div>
@@ -7064,25 +7065,6 @@ function m10RenderizarVeredicto(r, esReapertura){
     </div>`;
   }
 
-  // ── Chip 3: SUPERFICIE ───────────────────────────────────────────
-  const tieneAreaPlano = pb_plano !== null || tot_plano !== null;
-  const recalcHintHTML = tieneAreaPlano
-    ? '<span style="font-size:11px;color:var(--text3)">Sin volver a subir el plano</span>'
-    : '<span style="font-size:11px;color:var(--yellow)">Ingresa la superficie y sube el plano para el cálculo</span>';
-  const recalcHTML = `
-  <div style="margin-top:8px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px">
-    <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:7px">Recalcular con otra superficie de terreno</div>
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-      <input id="m10RecalcSup" type="number" min="1" step="1" value="${supReal||''}"
-             placeholder="m² de terreno"
-             style="width:120px;padding:6px 8px;font-size:13px;border-radius:6px;border:1px solid var(--border2);background:var(--bg2);color:var(--text1)">
-      <button onclick="m10RecalcularSuperficie()"
-              style="padding:6px 16px;font-size:12px;font-weight:500;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text2);cursor:pointer">
-        ↻ Recalcular
-      </button>
-      ${recalcHintHTML}
-    </div>
-  </div>`;
   let chip3HTML = '';
   if(r._superficie_real){
     const supPlano = typeof r.superficie_plano === 'number' ? r.superficie_plano : null;
@@ -7122,7 +7104,6 @@ function m10RenderizarVeredicto(r, esReapertura){
     ${inferidoHTML}
   </div>
   ${chip2HTML}
-  ${recalcHTML}
   ${chip3HTML}
   ${obsHTML}
   <div style="display:flex;gap:8px;margin-top:10px">
@@ -7148,9 +7129,13 @@ function m10RenderizarVeredicto(r, esReapertura){
   }
 
   window._m10UltimoVeredicto = r;
+  const _btnR = document.getElementById('m10BtnRecalc');
+  if(_btnR) _btnR.style.display='';
 }
 
 function m10ResetUpload(){
+  const _btnR2 = document.getElementById('m10BtnRecalc');
+  if(_btnR2) _btnR2.style.display='none';
   document.getElementById('m10Veredicto').style.display='none';
   document.getElementById('m10AnalisisStatus').style.display='none';
   const np = document.getElementById('m10NombrePanel');
@@ -7167,7 +7152,7 @@ function m10ResetUpload(){
 }
 
 function m10RecalcularSuperficie(){
-  const inp = document.getElementById('m10RecalcSup');
+  const inp = document.getElementById('m10InputSuperficie');
   if(!inp) return;
   const v = parseFloat(inp.value);
   if(!v || v <= 0){
@@ -7178,8 +7163,6 @@ function m10RecalcularSuperficie(){
   const r = window._m10UltimoVeredicto;
   if(!r) return;
   r._superficie_real = v;
-  const orig = document.getElementById('m10InputSuperficie');
-  if(orig) orig.value = v;
   m10RenderizarVeredicto(r, true);
 }
 

@@ -167,12 +167,6 @@
   <!-- ── SIDEBAR ── -->
   <div class="m15-side">
 
-    <!-- Resumen alertas -->
-    <div class="gu-rcard" id="resumenCard">
-      <div class="gu-rcard-hdr">Estado actual</div>
-      <div class="gu-rcard-body" id="resumenLista"></div>
-    </div>
-
     <!-- Próximas fechas -->
     <div class="gu-rcard">
       <div class="gu-rcard-hdr">Próximas fechas críticas</div>
@@ -574,7 +568,7 @@ function m09LimpiarExtras(){
   if(panel) panel.style.display = 'none';
   renderCalendario();
   renderAlertas();
-  renderResumen();
+
   renderProxFechas();
   renderTarifas();
 }
@@ -865,35 +859,6 @@ function calcularPlazo(){
   renderHistorial();
 }
 
-// ── RENDER RESUMEN SIDEBAR ────────────────────────────────────────────────
-function renderResumen(){
-  const hoy=new Date();
-  const _todasAl=obtenerTodasAlertas();
-  const alertasCrit=_todasAl.filter(a=>a.tipo==='danger').length;
-  const alertasWarn=_todasAl.filter(a=>a.tipo==='warn').length;
-  const proxInhab=obtenerTodosInhabiles().filter(d=>{
-    const f=new Date(d.f+'T12:00:00');
-    const diff=Math.ceil((f-hoy)/86400000);
-    return diff>0&&diff<=30;
-  }).length;
-
-  document.getElementById('resumenLista').innerHTML=`
-    <div style="display:flex;flex-direction:column;gap:6px;padding-top:2px">
-      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;gap:4px">
-        <span style="color:var(--text2);min-width:0">🔴 Alertas críticas</span>
-        <span style="font-family:var(--mono);flex-shrink:0;color:${alertasCrit>0?'#fca5a5':'var(--text3)'};font-weight:${alertasCrit>0?'600':'400'}">${alertasCrit}</span>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;gap:4px">
-        <span style="color:var(--text2);min-width:0">⚠️ Avisos</span>
-        <span style="font-family:var(--mono);flex-shrink:0;color:${alertasWarn>0?'#fcd34d':'var(--text3)'}">${alertasWarn}</span>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;gap:4px">
-        <span style="color:var(--text2);min-width:0">📅 Inhábiles · 30d</span>
-        <span style="font-family:var(--mono);flex-shrink:0;color:var(--brand-light)">${proxInhab}</span>
-      </div>
-    </div>`;
-}
-
 // ── PRÓXIMAS FECHAS SIDEBAR ───────────────────────────────────────────────
 function renderProxFechas(){
   const hoy=new Date();
@@ -1124,7 +1089,7 @@ Responde ÚNICAMENTE con JSON válido (sin texto extra):
     if(salVal){ window._m09SalExtras={[anioSig]:salVal}; }
     renderCalendario();
     renderAlertas();
-    renderResumen();
+  
     renderProxFechas();
     renderTarifas();
     m09MostrarVerifPanel('ok',res,extras);
@@ -1176,7 +1141,7 @@ function agregarAlerta(){
   ALERTAS.unshift(nueva);
   guardarAlertasCustom();
   renderAlertas();
-  renderResumen();
+
 }
 
 function guardarAlertasCustom(){
@@ -1202,7 +1167,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   renderCalendario();
   renderAlertas();
   renderTarifas();
-  renderResumen();
+
   renderProxFechas();
   renderHistorial();
   // Fecha de inicio por defecto = hoy

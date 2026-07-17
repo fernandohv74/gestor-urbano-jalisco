@@ -112,6 +112,7 @@
 .res-val{font-family:var(--mono);font-size:11px;color:var(--text3);transition:color var(--t)}
 
 /* @media print */
+@keyframes spin{to{transform:rotate(360deg)}}
 @media print {
   .gu-nav, .m15-side, .sec-tabs, .fil-badge, .btn-refresh, .btn-ver,
   select, input[type=number], input[type=text], input[type=date] { display:none !important; }
@@ -187,6 +188,7 @@
           <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 2.5A7 7 0 102.5 13.5M13.5 2.5V6.5M13.5 2.5H9.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
           Verificar ahora
         </button>
+        <div id="m09VerifPanel" style="display:none;margin-top:8px"></div>
       </div>
     </div>
 
@@ -194,12 +196,12 @@
     <div class="gu-rcard">
       <div class="gu-rcard-hdr">Fuentes consultadas</div>
       <div class="gu-rcard-body" style="font-size:10px;color:var(--text3);line-height:1.9">
-        <strong style="color:var(--text2)">Automáticas:</strong><br>
-        · DOF — días inhábiles federales<br>
-        · INEGI API — UMA y salario mínimo<br>
-        · Periódico Oficial Jalisco — índice<br><br>
-        <strong style="color:var(--text2)">Manuales (actualizar ene cada año):</strong><br>
-        · tjajal.gob.mx — calendario estatal<br>
+        <strong style="color:var(--text2)">Con IA (al verificar):</strong><br>
+        · LFT Art. 74 — días inhábiles federales<br>
+        · Ley Serv. Púb. Jalisco Art. 38 — estatales<br>
+        · TJAJAL — acuerdos de vacaciones<br>
+        · CONASAMI / INEGI — UMA y salario mínimo<br><br>
+        <strong style="color:var(--text2)">Revisar manualmente c/año:</strong><br>
         · Gaceta municipal GDL, ZPN, TLQ<br>
         · Ley de Ingresos por municipio<br>
         · portal.zapopan.gob.mx — PDU
@@ -222,7 +224,7 @@
     <!-- SECCIÓN CALENDARIO -->
     <div id="sec-calendario" class="gu-rcard">
       <div class="gu-rcard-hdr" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <span>Calendario de días inhábiles 2026</span>
+        <span id="calTitulo">Calendario de días inhábiles 2026</span>
         <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
           <select id="fil-mun-cal" onchange="renderCalendario()" style="background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);padding:3px 8px;color:var(--text2);font-size:11px;cursor:pointer;outline:none">
             <option value="todos">Todos los municipios</option>
@@ -518,6 +520,77 @@ const TARIFAS = [
 const UMA_2026  = 113.14;
 const SMGDF_2026 = 278.80;
 
+// ── CAPA DE EXTRAS (localStorage, generados por IA) ──────────────────────────
+const M09_EXTRAS_KEY = 'gu_m09_extras';
+
+function obtenerTodosInhabiles(){
+  try {
+    const ex = JSON.parse(localStorage.getItem(M09_EXTRAS_KEY)||'{}');
+    const extra = ex.inhabiles_nuevos || [];
+    const base = INHABILES_2026.slice();
+    const fechasBase = new Set(base.map(d=>d.f));
+    extra.forEach(d=>{ if(!fechasBase.has(d.f)) base.push(d); });
+    return base.sort((a,b)=>a.f.localeCompare(b.f));
+  } catch(e){ return INHABILES_2026.slice(); }
+}
+
+function obtenerTodasAlertas(){
+  try {
+    const ex = JSON.parse(localStorage.getItem(M09_EXTRAS_KEY)||'{}');
+    const extra = ex.alertas_nuevas || [];
+    // Evitar duplicados por ttl
+    const ttlsBase = new Set(ALERTAS.map(a=>a.ttl));
+    const nuevas = extra.filter(a=>!ttlsBase.has(a.ttl));
+    return [...ALERTAS, ...nuevas];
+  } catch(e){ return ALERTAS.slice(); }
+}
+
+function m09CargarExtras(){
+  try {
+    const ex = JSON.parse(localStorage.getItem(M09_EXTRAS_KEY)||'{}');
+    if(ex.resumen){
+      const panel = document.getElementById('m09VerifPanel');
+      if(panel){
+        const ts = ex.ts ? new Date(ex.ts).toLocaleDateString('es-MX') : '';
+        const inhabN = (ex.inhabiles_nuevos||[]).length;
+        const alertaN = (ex.alertas_nuevas||[]).length;
+        let info = [];
+        if(inhabN) info.push(`${inhabN} día(s) extra`);
+        if(alertaN) info.push(`${alertaN} alerta(s) nueva(s)`);
+        if(info.length){
+          panel.style.display = 'block';
+          panel.innerHTML = `<div style="padding:6px 8px;background:var(--sem-v-bg);border:0.5px solid var(--sem-v-brd);border-radius:var(--r-md);font-size:9.5px;color:var(--sem-v-txt)">
+            ✅ IA verificó el ${ts}: ${info.join(' · ')}
+            <button onclick="m09LimpiarExtras()" style="margin-left:6px;background:none;border:none;color:var(--text3);font-size:9px;cursor:pointer">↩ revertir</button>
+          </div>`;
+        }
+      }
+    }
+    // Actualizar UMA/Salario si hay override
+    const uma = ex.uma || {};
+    const sal = ex.salario || {};
+    const anios = [...new Set([...Object.keys(uma),...Object.keys(sal)])].sort();
+    if(anios.length){
+      // Se aplica en renderTarifas via _umaExtras global
+      window._m09UmaExtras = uma;
+      window._m09SalExtras = sal;
+    }
+  } catch(e){}
+}
+
+function m09LimpiarExtras(){
+  localStorage.removeItem(M09_EXTRAS_KEY);
+  window._m09UmaExtras = {};
+  window._m09SalExtras = {};
+  const panel = document.getElementById('m09VerifPanel');
+  if(panel) panel.style.display = 'none';
+  renderCalendario();
+  renderAlertas();
+  renderResumen();
+  renderProxFechas();
+  renderTarifas();
+}
+
 // ── FILTRO CALENDARIO ─────────────────────────────────────────────────────
 let _calFiltro = 'todos';
 
@@ -587,23 +660,34 @@ function renderCalendario(){
   const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio',
                'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const hoy=new Date();
+  const todos=obtenerTodosInhabiles();
+
+  // Actualizar título con años presentes
+  const anios=[...new Set(todos.map(d=>d.f.split('-')[0]))].sort();
+  const tit=document.getElementById('calTitulo');
+  if(tit) tit.textContent='Calendario de días inhábiles '+anios.join(' · ');
+
+  // Agrupar por año-mes
+  const grupos={};
+  todos.forEach(d=>{
+    if(!matchFiltro(d)||!matchMunicipio(d)) return;
+    const key=d.f.substring(0,7); // "2026-07"
+    if(!grupos[key]) grupos[key]=[];
+    grupos[key].push(d);
+  });
+
   let html='';
   let totalVisible=0;
-  for(let m=0;m<12;m++){
-    const items=INHABILES_2026.filter(d=>{
-      const mes=parseInt(d.f.split('-')[1])-1;
-      if(mes!==m) return false;
-      if(!matchFiltro(d)) return false;
-      if(!matchMunicipio(d)) return false;
-      return true;
-    });
-    if(!items.length) continue;
+  Object.keys(grupos).sort().forEach(key=>{
+    const items=grupos[key];
+    const [anio,mesStr]=key.split('-');
+    const mesIdx=parseInt(mesStr)-1;
+    const esActual=parseInt(anio)===hoy.getFullYear()&&mesIdx===hoy.getMonth();
     totalVisible+=items.length;
-    const mesIdx=parseInt(items[0].f.split('-')[1])-1;
-    const esActual=mesIdx===hoy.getMonth();
-    html+=`<div class="cal-mes" id="cal-mes-${mesIdx}">
+    const esNuevoAnio=anio!=='2026';
+    html+=`<div class="cal-mes" id="cal-mes-${anio}-${mesIdx}">
       <div class="cal-mes-hdr${esActual?' mes-activo':''}" onclick="toggleMes(this)">
-        <span class="cal-mes-nombre">${meses[mesIdx]} 2026</span>
+        <span class="cal-mes-nombre">${meses[mesIdx]} ${anio}${esNuevoAnio?' <span style="font-size:9px;background:var(--sem-v-bg);color:var(--sem-v-txt);border-radius:3px;padding:1px 5px;margin-left:4px">IA</span>':''}</span>
         <div style="display:flex;gap:5px;align-items:center">
           ${esActual?'<span class="cal-mes-hoy">Mes actual</span>':''}
           <span class="cal-mes-badge">${items.length} día${items.length!==1?'s':''}</span>
@@ -639,15 +723,15 @@ function renderCalendario(){
       </div>`;
     });
     html+='</div></div>';
-  }
+  });
   if(!totalVisible){
     html='<div style="text-align:center;padding:30px;color:var(--text3);font-size:12px">Sin días inhábiles para este filtro.</div>';
   }
-  const cont = document.getElementById('calendarContent');
+  const cont=document.getElementById('calendarContent');
   cont.innerHTML=html;
   // Scroll al mes actual
-  const mesActualId = 'cal-mes-' + new Date().getMonth();
-  const elMes = cont.querySelector('#'+mesActualId);
+  const mesActualId=`cal-mes-${hoy.getFullYear()}-${hoy.getMonth()}`;
+  const elMes=cont.querySelector('#'+mesActualId);
   if(elMes) setTimeout(()=>{ elMes.scrollIntoView({behavior:'smooth',block:'nearest'}); },80);
 }
 
@@ -655,7 +739,7 @@ function renderCalendario(){
 function renderAlertas(){
   const tipoClass={danger:'alerta-danger',warn:'alerta-warn',info:'alerta-info',success:'alerta-success'};
   const resueltas = JSON.parse(localStorage.getItem('m15_resueltas')||'[]');
-  const html=ALERTAS.map((a,idx)=>{
+  const html=obtenerTodasAlertas().map((a,idx)=>{
     const esResuelta = resueltas.includes(idx);
     return `
     <div class="alerta ${tipoClass[a.tipo]||'alerta-gray'}" id="alerta-${idx}" style="${esResuelta?'opacity:.4;filter:grayscale(.6)':''}">
@@ -703,7 +787,7 @@ function esInhabil(fecha, municipio){
   const fStr=fecha.toISOString().split('T')[0];
   const dow=fecha.getDay();
   if(dow===0||dow===6) return {es:true,motivo:'Fin de semana'};
-  const item=INHABILES_2026.find(d=>{
+  const item=obtenerTodosInhabiles().find(d=>{
     if(d.f!==fStr) return false;
     if(d.muns==='todos') return true;
     if(d.muns.includes(municipio.substring(0,3))) return true;
@@ -796,9 +880,10 @@ function calcularPlazo(){
 // ── RENDER RESUMEN SIDEBAR ────────────────────────────────────────────────
 function renderResumen(){
   const hoy=new Date();
-  const alertasCrit=ALERTAS.filter(a=>a.tipo==='danger').length;
-  const alertasWarn=ALERTAS.filter(a=>a.tipo==='warn').length;
-  const proxInhab=INHABILES_2026.filter(d=>{
+  const _todasAl=obtenerTodasAlertas();
+  const alertasCrit=_todasAl.filter(a=>a.tipo==='danger').length;
+  const alertasWarn=_todasAl.filter(a=>a.tipo==='warn').length;
+  const proxInhab=obtenerTodosInhabiles().filter(d=>{
     const f=new Date(d.f+'T12:00:00');
     const diff=Math.ceil((f-hoy)/86400000);
     return diff>0&&diff<=30;
@@ -824,7 +909,7 @@ function renderResumen(){
 // ── PRÓXIMAS FECHAS SIDEBAR ───────────────────────────────────────────────
 function renderProxFechas(){
   const hoy=new Date();
-  const prox=INHABILES_2026.filter(d=>{
+  const prox=obtenerTodosInhabiles().filter(d=>{
     const f=new Date(d.f+'T12:00:00');
     const diff=Math.ceil((f-hoy)/86400000);
     return diff>=0&&diff<=15;
@@ -973,20 +1058,124 @@ function mostrarSec(id,btn){
   btn.classList.add('active');
 }
 
-// ── VERIFICAR AHORA ───────────────────────────────────────────────────────
-function verificarAhora(){
+// ── VERIFICAR AHORA — llamada real a Claude IA ────────────────────────────
+async function verificarAhora(){
   const btn=document.querySelector('.btn-refresh');
-  btn.textContent='⏳ Verificando...';
+  if(!btn) return;
+  btn.innerHTML='<svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="animation:spin 1s linear infinite"><path d="M13.5 2.5A7 7 0 102.5 13.5M13.5 2.5V6.5M13.5 2.5H9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Verificando con IA…';
   btn.disabled=true;
-  // Simular verificación — en producción haría fetch a las fuentes
-  setTimeout(()=>{
-    const now=new Date().toLocaleString('es-MX');
-    document.getElementById('ultimaVer').textContent=now;
-    localStorage.setItem('gu_m15_ultima_ver',now);
-    btn.innerHTML='🔄 Verificar ahora';
+  m09MostrarVerifPanel('loading');
+  try{
+    const anio=new Date().getFullYear();
+    const anioSig=anio+1;
+    const fechaHoy=new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
+    const inhabResumen=INHABILES_2026.map(d=>({f:d.f,m:d.m,n:d.n,muns:d.muns}));
+    const systemPrompt=`Eres experto en normativa jurídica y administrativa de México, especializado en Jalisco y el AMG (GDL, ZPN, TLQ, TLA, TON). Conoces LFT, Ley del Servicio Público del Estado de Jalisco y acuerdos TJAJAL.`;
+    const userPrompt=`Hoy es ${fechaHoy}.
+
+Verifica y actualiza el Monitor Normativo del Gestor Urbano AMG. Tareas:
+
+1. VERIFICA el calendario ${anio}: ¿falta algún día inhábil federal (LFT Art. 74) o estatal Jalisco?
+2. GENERA días inhábiles ${anioSig}:
+   - Federales (LFT Art. 74): Año Nuevo 1 ene, Constitución 1er lunes feb, Juárez 3er lunes mar, Trabajo 1 may, Independencia 16 sep, Revolución 3er lunes nov, Navidad 25 dic
+   - Estatales Jalisco (Art. 38): Jueves+Viernes Santo, Día Jalisco 2° lunes jun, 28 sep Día Servidor Público, 12 oct, 2 nov
+   - Vacaciones TJAJAL: período verano (~jul) e invierno (~dic) si conoces fechas exactas del acuerdo
+3. VERIFICA UMA ${anioSig} y salario mínimo ${anioSig} si los conoces con certeza
+4. SUGIERE alertas normativas nuevas relevantes para el AMG
+
+Días inhábiles ${anio} en el sistema (verificar):
+${JSON.stringify(inhabResumen)}
+
+Responde ÚNICAMENTE con JSON válido (sin texto extra):
+{
+  "resumen": "frase corta del resultado",
+  "inhabiles_faltantes_${anio}": [{"f":"YYYY-MM-DD","m":"nombre","n":"fed|edo|vac|esp","muns":"todos","nota":"fundamento"}],
+  "inhabiles_${anioSig}": [{"f":"YYYY-MM-DD","m":"nombre","n":"fed|edo|vac|esp","muns":"todos","nota":"fundamento"}],
+  "uma_${anioSig}": null,
+  "salario_${anioSig}": null,
+  "alertas_nuevas": [{"tipo":"danger|warn|info","icono":"emoji","ttl":"título","desc":"descripción","src":"fuente","fecha":"vigencia","municipios":"ámbito"}],
+  "observaciones": ["nota corta si aplica"]
+}`;
+    const resp=await fetch('/api/claude-proxy',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:8000,
+        system:systemPrompt,
+        messages:[{role:'user',content:userPrompt}]
+      })
+    });
+    if(!resp.ok) throw new Error('Error servidor '+resp.status);
+    const data=await resp.json();
+    const txt=data.content?.[0]?.text||'';
+    const jm=txt.match(/\{[\s\S]*\}/);
+    if(!jm) throw new Error('Respuesta sin JSON válido');
+    const res=JSON.parse(jm[0]);
+
+    const faltKey=`inhabiles_faltantes_${anio}`;
+    const proxKey=`inhabiles_${anioSig}`;
+    const inhabNuevos=[...(res[faltKey]||[]),...(res[proxKey]||[])];
+    const umaVal=res[`uma_${anioSig}`]||null;
+    const salVal=res[`salario_${anioSig}`]||null;
+    const extras={
+      ts:new Date().toISOString(),
+      inhabiles_nuevos:inhabNuevos,
+      alertas_nuevas:res.alertas_nuevas||[],
+      uma:umaVal?{[anioSig]:umaVal}:{},
+      salario:salVal?{[anioSig]:salVal}:{},
+      resumen:res.resumen||'',
+      observaciones:res.observaciones||[],
+      anio_generado:anioSig
+    };
+    localStorage.setItem(M09_EXTRAS_KEY,JSON.stringify(extras));
+    const ahora=new Date().toLocaleString('es-MX');
+    localStorage.setItem('gu_m15_ultima_ver',ahora);
+    document.getElementById('ultimaVer').textContent=ahora;
+    if(umaVal){ window._m09UmaExtras={[anioSig]:umaVal}; }
+    if(salVal){ window._m09SalExtras={[anioSig]:salVal}; }
+    renderCalendario();
+    renderAlertas();
+    renderResumen();
+    renderProxFechas();
+    renderTarifas();
+    m09MostrarVerifPanel('ok',res,extras);
+  }catch(e){
+    m09MostrarVerifPanel('error',null,null,e.message);
+  }finally{
+    btn.innerHTML='<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 2.5A7 7 0 102.5 13.5M13.5 2.5V6.5M13.5 2.5H9.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg> Verificar ahora';
     btn.disabled=false;
-    alert('Verificación completada. Las alertas manuales requieren actualización por parte del administrador de la plataforma.');
-  },1500);
+  }
+}
+
+function m09MostrarVerifPanel(estado, res, extras, errorMsg){
+  const panel=document.getElementById('m09VerifPanel');
+  if(!panel) return;
+  panel.style.display='block';
+  if(estado==='loading'){
+    panel.innerHTML=`<div style="padding:7px 9px;background:var(--brand-pale);border:0.5px solid var(--brand-light);border-radius:var(--r-md);font-size:10px;color:var(--brand)">⏳ Consultando con IA…</div>`;
+    return;
+  }
+  if(estado==='error'){
+    panel.innerHTML=`<div style="padding:7px 9px;background:var(--sem-r-bg);border:0.5px solid var(--sem-r-brd);border-radius:var(--r-md);font-size:10px;color:var(--sem-r-txt)">❌ ${errorMsg||'Error desconocido'}</div>`;
+    return;
+  }
+  const inhabN=(extras.inhabiles_nuevos||[]).length;
+  const alertaN=(extras.alertas_nuevas||[]).length;
+  const anioSig=extras.anio_generado;
+  const obs=extras.observaciones||[];
+  let items=[];
+  if(inhabN) items.push(`${inhabN} día(s) nuevos agregados`);
+  if(alertaN) items.push(`${alertaN} alerta(s) nueva(s)`);
+  if(extras.uma&&Object.keys(extras.uma).length) items.push(`UMA ${anioSig} cargada`);
+  let html=`<div style="padding:8px 10px;background:var(--sem-v-bg);border:0.5px solid var(--sem-v-brd);border-radius:var(--r-md)">
+    <div style="font-size:10px;font-weight:600;color:var(--sem-v-txt);margin-bottom:3px">✅ Verificación IA completada</div>
+    <div style="font-size:10px;color:var(--text2);margin-bottom:3px">${extras.resumen||''}</div>`;
+  items.forEach(i=>{ html+=`<div style="font-size:9.5px;color:var(--text3)">· ${i}</div>`; });
+  obs.forEach(o=>{ html+=`<div style="font-size:9.5px;color:var(--text3)">· ${o}</div>`; });
+  html+=`<button onclick="m09LimpiarExtras()" style="margin-top:5px;background:none;border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text3);font-size:9px;padding:2px 7px;cursor:pointer">↩ Revertir</button>
+  </div>`;
+  panel.innerHTML=html;
 }
 
 // ── AGREGAR ALERTA ────────────────────────────────────────────────────────
@@ -1014,6 +1203,7 @@ function cargarAlertasCustom(){
 
 // ── INIT ──────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
+  m09CargarExtras();
   cargarAlertasCustom();
   // Aviso actualización 2027 en noviembre y diciembre
   const mesActual = new Date().getMonth(); // 0-based

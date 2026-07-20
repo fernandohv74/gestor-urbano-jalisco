@@ -1535,6 +1535,8 @@ function initKey() {
   }
   // Actualizar disclaimer al cargar
   actualizarDisclaimer();
+  // Ocultar panel de API key en produccion (solo visible en localhost)
+  if (!ES_LOCALHOST) { document.getElementById('apikey-panel').style.display = 'none'; }
 }
 
 // Función centralizada para cambio de municipio desde el selector

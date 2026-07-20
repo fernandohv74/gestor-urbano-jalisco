@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- ==========================================================
+     GestorUrbano Jalisco AMG / TrazaUrbana
+     (c) 2026 Fernando H. - trazaurbana.mx
+     Todos los derechos reservados.
+     Reproduccion o uso no autorizado esta prohibido.
+     ========================================================== -->
+
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -7,13 +14,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="gu-design-system.css">
-<!-- pdf.js — usado para rasterizar paginas de PDF antes de comprimirlas (ver comprimirImagenFile / pdfAPaginasComprimidas) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-<script>
-  if (window.pdfjsLib) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-  }
-</script>
 <script>
 (function(){
   var t=localStorage.getItem('gu_theme');
@@ -80,11 +80,6 @@
 .loading-panel{display:none;background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:28px 24px;text-align:center;transition:background var(--t),border-color var(--t)}
 .loading-spinner{width:36px;height:36px;border:3px solid var(--border2);border-top-color:var(--brand);border-radius:50%;animation:gu-spin .7s linear infinite;margin:0 auto 16px}
 @keyframes gu-spin{to{transform:rotate(360deg)}}
-
-/* Procesando láminas (compresión de imágenes/PDF antes de habilitar Analizar) */
-.upload-processing{display:none;align-items:center;justify-content:center;gap:10px;padding:12px 14px;color:var(--text2);font-size:12.5px;background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-md);margin-top:8px}
-.upload-processing.visible{display:flex}
-.upload-processing-spinner{width:16px;height:16px;border:2.5px solid var(--border2);border-top-color:var(--brand);border-radius:50%;animation:gu-spin .7s linear infinite;flex-shrink:0}
 .loading-steps{list-style:none;padding:0;margin:12px 0 0;text-align:left;display:inline-block}
 .loading-steps li{font-size:12px;color:var(--text3);padding:4px 0;transition:color var(--t)}
 .loading-steps li.active{color:var(--brand);font-weight:500}
@@ -241,10 +236,10 @@
 
 <!-- ── NAVEGACIÓN ── -->
 <nav class="gu-nav">
-  <div class="gu-nav-logo">
-    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 1L1 5v9h5v-4h4v4h5V5L8 1z"/></svg>
+  <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+    <svg width="28" height="28" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="flex-shrink:0"><rect x="3" y="3" width="94" height="94" rx="16" fill="#C4D2E0"/><line x1="0" y1="22" x2="100" y2="22" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="44" x2="100" y2="44" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="66" x2="100" y2="66" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="88" x2="100" y2="88" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="22" y1="0" x2="22" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="44" y1="0" x2="44" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="66" y1="0" x2="66" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="88" y1="0" x2="88" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="-2" y1="20" x2="102" y2="80" stroke="#fff" stroke-width="5.5" opacity="0.55"/><rect x="27" y="27" width="14" height="14" fill="#D85A30"/><rect x="3" y="3" width="94" height="94" rx="16" fill="none" stroke="#14395C" stroke-width="3"/></svg>
+    <span style="font-family:var(--sans);line-height:1;letter-spacing:-.3px"><span style="font-weight:800;font-size:17px;color:var(--text)">Traza</span><span style="font-weight:300;font-size:17px;color:#D85A30">Urbana</span></span>
   </div>
-  <span class="gu-nav-name">Gestor Urbano Jalisco</span>
   <span class="gu-nav-sep">/</span>
   <span class="gu-nav-mod">M04 · Revisor de Planos IA</span>
   <a href="index.html" class="gu-nav-back">
@@ -315,10 +310,6 @@
       <div class="upload-title">Selecciona los planos desde tu computadora</div>
       <div class="upload-hint">JPG · PNG · WEBP · PDF · Máx. 12 MB por archivo · Hasta 10 láminas</div>
       <button class="btn-seleccionar" id="btn-seleccionar" type="button" onclick="document.getElementById('file-input').click()">📂 Seleccionar archivos</button>
-    </div>
-    <div class="upload-processing" id="upload-processing">
-      <div class="upload-processing-spinner"></div>
-      <span id="upload-processing-label">Procesando láminas…</span>
     </div>
     <div id="files-count-label" class="files-count" style="display:none"></div>
     <div class="files-grid" id="files-grid"></div>
@@ -808,12 +799,13 @@ const NORMATIVA = {
    - Ancho mínimo: 1.50 m (GDL es más exigente que el REZ estatal de 1.20 m)
    - Huella mínima: 0.30 m, máxima: 0.50 m
    - Contrahuella: mínimo 0.10 m, máximo 0.15 m
+   - Relación 2 contrahuellas + huella = entre 0.63 y 0.64 m
    - Máximo 12 escalones entre descansos (GDL es más exigente que REZ de 15)
    - Descanso mínimo: 1.50 m de longitud por el ancho de la escalera
-   - Pasamanos: superior 0.90 m, inferior 0.75 m, diámetro 0.04 m, área de aproximación 2.10 m, separación al muro 0.30 m, protección en borde lateral 0.05-0.10 m de altura
+   - Pasamanos: superior 0.90 m, inferior 0.75 m, diámetro 0.04 m
+   - Altura libre bajo rampa: mínimo 1.90 m
    - Sin bocel en escalones; franja de contraste de 0.025 m en borde
-   - En accesos a edificios públicos y equipamientos: señalamiento Braille obligatorio en pasamanos
-   - Escaleras de caracol: diámetro mínimo 1.20 m; altura libre bajo rampa mínimo 1.90 m; relación 2 contrahuellas + huella entre 0.63 y 0.64 m (estos 3 datos provienen del Art. 224, Reg. Zonificación GDL — vigente para lo no cubierto por la reforma del Art. 249 Bis)
+   - Escaleras de caracol: diámetro mínimo 1.20 m
 
 2. PASILLOS Y CORREDORES (Art. 223 Cuadro 58, Reg. Zonificación GDL):
    - Corredores interiores en viviendas: mínimo 0.90 m
@@ -853,21 +845,18 @@ const NORMATIVA = {
    - Auto estándar: 5.00 m × 2.50 m mínimo
    - Motocicleta: 2.50 m × 1.50 m
    - Personas con movilidad reducida (PMR): 5.00 m × 3.80 m con zona de transferencia de 1.50 m lateral
-   - Al menos 2 cajones PMR por cada 25 cajones regulares ubicados (Art. 276 Fr. I inciso a) — situados lo más próximo posible a la entrada o frente al elevador, techados
+   - 1 cajón PMR por cada 25 cajones regulares (mín. 1)
    - 1 ciclopuerto por cada 20 cajones (mín. 1)
    - Altura libre: 2.30 m planta baja, 2.10 m pisos superiores
    - Pendiente máxima de rampa: 18%
    - Carril de circulación a 90°: mínimo 5.00 m de ancho
 
-8. RESTRICCIONES DE CONSTRUCCIÓN (Arts. 1332–1336 y 58 Bis, Reg. Gestión Integral GDL):
-   - Las restricciones frontal y lateral están definidas en el Plan Parcial vigente. Ninguna edificación puede construirse dentro de ellas
-   - RESTRICCIÓN POSTERIOR DINÁMICA (Art. 58 Bis, Fracción II) — NO es un valor fijo del Plan Parcial: se calcula como el 25% de la altura total de la edificación (cota vertical desde el nivel de banqueta hasta el punto más alto), con un mínimo de 3.00 m en cualquier caso. Fórmula: RP_efectiva = max(3.00 m, altura_total_m × 0.25)
-   - Excepción: se permite ocupar parcial o totalmente la restricción posterior en planta baja si esa porción de la edificación no excede 3.00 m de altura
-   - Excepción: los predios cuyo lindero posterior colinde con espacios abiertos de titularidad pública quedan exentos de esta restricción
+8. RESTRICCIONES DE CONSTRUCCIÓN (Arts. 1332–1336, Reg. Gestión Integral GDL):
+   - Las restricciones frontal, lateral y posterior están definidas en el Plan Parcial vigente
+   - Ninguna edificación puede construirse dentro de las restricciones
 
 9. ACCESIBILIDAD UNIVERSAL (Arts. 241, 249 Bis, 276, Reg. Gestión Integral GDL):
-   - Rampas peatonales (banqueta-arroyo vial, Art. 241): ancho mínimo 2.00 m (1.50 m solo si hay imposibilidad constructiva comprobada); pendiente longitudinal máxima 4% normal — 6%/8%/10% solo como "ajuste razonable" con desarrollo máximo de 10/8/6 m respectivamente
-   - Pasamanos de rampa (cuando aplique ajuste razonable): doble altura 0.90 m y 0.75 m, diámetro 0.04 m, área de aproximación 2.10 m, protección de borde 0.05-0.10 m
+   - Rampas peatonales: ancho mínimo 1.50 m libre, pendiente máxima 6%
    - Banqueta previa a la rampa: mínimo 1.60 m de ancho libre
    - Escaleras accesibles: ancho mínimo 1.80 m libre de pasamanos, huellas de 0.34 m
    - Guías táctiles en circulaciones, escaleras y elevadores
@@ -926,8 +915,8 @@ const NORMATIVA = {
 6. ELEVADORES (Art. 138, Reglamento de Construcción Zapopan):
    - OBLIGATORIO en edificaciones con más de 4 niveles cubiertos incluyendo planta baja
    - Excepción: plurifamiliar hasta 5 niveles si cada vivienda ≤ 80 m² (excluye indivisos y áreas comunes)
-   - Cabina mínima interior libre: 1.50 × 1.50 m (Norma Técnica de Accesibilidad Universal ZPN, Art. 22 Fr. III)
-   - Puerta mínima: 1.20 m de ancho (Norma Técnica de Accesibilidad Universal ZPN, Art. 22 Fr. IV)
+   - Cabina mínima interior libre: 1.50 × 1.50 m (Art. 251 REZ)
+   - Puerta mínima: 1.00 m de ancho
    - Pasamanos en 3 lados internos
    - Controles a 1.20 m de altura con botones en relieve
    - Exactitud en parada respecto al nivel de piso
@@ -955,11 +944,11 @@ const NORMATIVA = {
 
 9. ACCESIBILIDAD UNIVERSAL (Art. 38 Fr. IX Reglamento Construcción ZPN / Norma Técnica Accesibilidad Universal ZPN 2019):
    - Ruta accesible obligatoria desde el alineamiento del inmueble hasta cada área de servicio
-   - Rampas peatonales de acceso: ancho mínimo 1.20 m libre entre pasamanos, pendiente entre 4% y 8% (Art. 17 Fr. I) — el 6% fijo solo aplica a rampas de estacionamiento PCD (Art. 11 Fr. VI), no a rampas peatonales generales
+   - Rampas peatonales: ancho mínimo 1.00 m libre entre pasamanos, pendiente máxima 6%
    - Longitud máxima de rampa: 6.00 m; si es mayor, descansos de 1.50 m
-   - Pasamanos: altura 90-105 cm, diámetro 3.5-4.5 cm, separados 3.5-4.5 cm de pared (Art. 17 Fr. II)
+   - Pasamanos: tubulares 1½ pulgadas, a 0.90 m y segundo a 0.75 m, separados 0.50 m de pared
    - Cajón PMR: 3.80 × 5.00 m con franja de maniobra de 1.40 m; letrero a 2.50 m de altura
-   - Elevador cabina mínima 1.50 × 1.50 m, puerta 1.20 m, controles a 1.20 m con Braille
+   - Elevador cabina mínima 1.50 × 1.50 m, puerta 1.00 m, controles a 1.20 m con Braille
    - Pavimento táctil en rutas accesibles, escaleras y cambios de nivel
    - Señalamiento ISA en cajones, elevadores y sanitarios accesibles
 
@@ -982,11 +971,11 @@ const NORMATIVA = {
 
   TLQ: {
     nombre: 'San Pedro Tlaquepaque, Jalisco',
-    fuentes: 'Reglamento de Construcciones del Municipio de Tlaquepaque (escaleras: Art. 105) y Reglamento Estatal de Zonificación del Estado de Jalisco (REZ 2003) para los demás elementos no cubiertos expresamente',
+    fuentes: 'Reglamento Estatal de Zonificación del Estado de Jalisco (REZ 2003), aplicado supletoriamente conforme al Art. 5 del Reglamento de Construcciones del Municipio de Tlaquepaque',
     autoridad: 'Dirección de Obras Públicas del Ayuntamiento de San Pedro Tlaquepaque',
     bloques: `
-1. ESCALERAS (Art. 105, Reglamento de Construcciones de Tlaquepaque; huella/contrahuella y descansos: Art. 220 Cuadro 44 REZ 2003):
-   - Ancho mínimo escalera unifamiliar: 1.00 m (Art. 105 Reg. Construcciones Tlaquepaque — más exigente que el 0.75 m genérico del REZ)
+1. ESCALERAS (Art. 220 Cuadro 44, REZ 2003):
+   - Ancho mínimo escalera privada/interior: 0.75 m
    - Ancho mínimo escalera común a 2 o más viviendas (máx. 4): 1.20 m
    - Ancho mínimo escalera principal: 1.20 m
    - Huella mínima: 0.28 m (Art. 250 REZ — accesibilidad exige 0.34 m)
@@ -1003,40 +992,43 @@ const NORMATIVA = {
    - Altura libre mínima: 2.30 m
    - Barandales cuando existan: altura mínima 0.90 m (Art. 146 REZ)
 
-3. PUERTAS (Art. 110, Reglamento de Construcciones de Tlaquepaque; baños y comercio: Art. 218 Cuadro 41 REZ 2003):
-   - Puertas de comunicación interior (locales habitables): mínimo 0.80 m de ancho, altura mínima 2.10 m (Art. 110)
-   - Acceso principal habitacional (puertas de ingreso): mínimo 0.90 m de ancho, altura mínima 2.10 m (Art. 110 — más exigente que los 2.05 m del REZ)
-   - Baños: mínimo 0.60 m × 2.05 m (sin regla propia en Tlaquepaque, se usa REZ)
-   - Acceso principal comercio/oficinas: mínimo 0.90 m × 2.10 m (REZ)
+3. PUERTAS (Art. 218 Cuadro 41, REZ 2003):
+   - Acceso principal habitacional: mínimo 0.90 m × 2.05 m
+   - Locales habitables y cocinas: mínimo 0.80 m × 2.05 m
+   - Baños: mínimo 0.60 m × 2.05 m
+   - Acceso principal comercio/oficinas: mínimo 0.90 m × 2.10 m
    - Accesibilidad: mínimo 1.00 m de ancho (Art. 252 REZ)
 
-4. PATIOS DE ILUMINACIÓN Y VENTILACIÓN (Arts. 108–109, Reglamento de Construcciones de Tlaquepaque):
-   - Muros hasta 4 m de altura → piezas habitables: patio mínimo 2.50 m
-   - Muros hasta 8 m → piezas habitables: patio mínimo 3.25 m
-   - Muros hasta 12 m → piezas habitables: patio mínimo 4.00 m
-   - Piezas no habitables: hasta 4 m → 2.00 m; hasta 8 m → 2.50 m; hasta 12 m → 3.00 m
-   NOTA: Tlaquepaque usa cortes de altura de 4/8/12 m (no 4/6/9/12 m como el REZ) — no reportes incumplimiento solo por diferir del REZ genérico.
+4. PATIOS DE ILUMINACIÓN Y VENTILACIÓN (Art. 217 Cuadro 40, REZ 2003):
+   - Muros hasta 4 m de altura → piezas habitables: patio mínimo 2.50 × 2.50 m
+   - Muros hasta 6 m → piezas habitables: patio mínimo 3.00 × 3.00 m
+   - Muros hasta 9 m → piezas habitables: patio mínimo 3.50 × 3.50 m
+   - Muros hasta 12 m → piezas habitables: patio mínimo 4.00 × 4.00 m
+   - Muros >12 m → piezas habitables: patio ≥ 1/3 de la altura del muro
+   - Piezas no habitables (baños, cocinas, pasillos): ver Cuadro 40 — valores menores
+   - El lado menor del patio nunca puede ser inferior a 2.50 m absoluto
 
-5. VENTANAS E ILUMINACIÓN NATURAL (Arts. 107, 119, Reglamento de Construcciones de Tlaquepaque):
-   - Piezas habitables: ventana ≥ 12.5% (1/8) del área del local (Art. 107 — menos exigente que el 15% del REZ genérico)
-   - Piezas no habitables: ventana ≥ 8.3% (1/12) del área del local, de la cual 50% debe ser operable para ventilación (Art. 119)
+5. VENTANAS E ILUMINACIÓN NATURAL (Art. 216, REZ 2003):
+   - Piezas habitables: ventana ≥ 15% del área del local
+   - Piezas no habitables: ventana ≥ 10% del área del local (domos: ≥ 4%)
+   - Ventilación: área de abertura ≥ 5% del área del local (Art. 215 REZ)
    - Al menos 40% del área de ventana debe ser operable
 
-6. ELEVADORES (Art. 221 REZ 2003, obligatoriedad confirmada por Tlaquepaque en construcciones de más de 4 niveles):
+6. ELEVADORES (Art. 221, REZ 2003):
    - OBLIGATORIO en edificaciones con más de 4 niveles (incluyendo PB) o altura > 12 m
    - Excepción: plurifamiliar hasta 5 niveles si cada vivienda ≤ 70 m² y altura ≤ 15 m
-   - Dimensiones mínimas de cabina: 1.50 × 1.50 m interior libre (Art. 251 REZ — sin regla propia en Tlaquepaque)
+   - Dimensiones mínimas de cabina: 1.50 × 1.50 m interior libre (Art. 251 REZ)
    - Puerta mínima: 1.00 m de ancho
    - Pasamanos en 3 lados internos
    - Controles a 1.20 m de altura; botones con números en relieve
 
-7. CAJONES DE ESTACIONAMIENTO (Arts. 144–148, Reglamento de Construcciones de Tlaquepaque):
-   - Auto grande: 2.50 m × 5.00 m (65% del total de cajones, Art. 147)
-   - Auto chico: 2.25 m × 4.50 m (35% del total de cajones, Art. 147)
-   - Altura libre: 2.20 m mínimo (Art. 145 — el REZ genérico pide 2.30 m)
-   - Carril de entrada/salida: ancho mínimo 2.50 m (Art. 144)
-   - Rampas: pendiente máxima 15%, radio mínimo 7.50 m al eje (Art. 146)
-   - PMR: 5.00 m × 3.80 m (sin regla propia en Tlaquepaque, se usa REZ) — mínimo 2 cajones si hay menos de 50 en total; 1 c/25 si hay más
+7. CAJONES DE ESTACIONAMIENTO (Arts. 240 y 345, REZ 2003):
+   - Auto estándar en batería: 5.00 m × 2.40 m (grandes/medianos)
+   - Auto chico en batería: 4.20 m × 2.20 m
+   - PMR: 5.00 m × 3.80 m — mínimo 2 cajones si hay menos de 50 en total; 1 c/25 si hay más
+   - Cajones PMR ubicados lo más cerca posible a la entrada (Art. 240 REZ)
+   - Altura libre: 2.30 m mínimo
+   - Carril de circulación 90°: mínimo 6.00 m
 
 8. RESTRICCIONES DE CONSTRUCCIÓN:
    - Las restricciones frontal, lateral y posterior están definidas en el Plan Parcial/PDU vigente
@@ -1056,7 +1048,7 @@ const NORMATIVA = {
    - Estancia (sala): mínimo 7.30 m², lado mínimo 2.60 m
    - Comedor: mínimo 6.30 m², lado mínimo 2.60 m
    - Estancia-comedor integrado: mínimo 13.60 m²
-   - Cocina: mínimo 5.00 m², lado mínimo 1.50 m (Art. 118 Reg. Construcciones Tlaquepaque — más exigente que el 3.00 m² del REZ)
+   - Cocina: mínimo 3.00 m², lado mínimo 1.50 m
    - Baños: lado menor 1.15 m
    - Altura libre mínima locales habitables: 2.30 m; baños: 2.10 m
    REGLA DE CONFIANZA OBLIGATORIA: Solo reporta "cumple" o "incumple" si puedes leer las cotas de dimensión con certeza en el plano. Si las cotas no son claramente legibles o no aparecen en las láminas presentadas, reporta estado "nd" con observación exacta: "Dimensiones no legibles en el plano — requiere verificación en campo". NUNCA estimes ni interpolables dimensiones.`
@@ -1143,11 +1135,11 @@ const NORMATIVA = {
 
   TON: {
     nombre: 'Tonalá, Jalisco',
-    fuentes: 'Reglamento de Construcción del Municipio de Tonalá (escaleras: Norma Técnica 100) y Reglamento Estatal de Zonificación del Estado de Jalisco (REZ 2003) para los demás elementos no cubiertos expresamente',
+    fuentes: 'Reglamento Estatal de Zonificación del Estado de Jalisco (REZ 2003), aplicado supletoriamente conforme al Art. 2 del Reglamento de Construcción del Municipio de Tonalá, Jalisco',
     autoridad: 'Dirección General de Infraestructura, Servicios y Desarrollo Sustentable del Ayuntamiento de Tonalá',
     bloques: `
-1. ESCALERAS (Norma Técnica 100, Reglamento de Construcción de Tonalá; huella/contrahuella y descansos: Art. 220 Cuadro 44 REZ 2003):
-   - Ancho mínimo escalera privada/interior confinada entre 2 muros: 0.90 m (Norma Técnica 100 — más exigente que el 0.75 m genérico del REZ)
+1. ESCALERAS (Art. 220 Cuadro 44, REZ 2003):
+   - Ancho mínimo escalera privada/interior: 0.75 m
    - Ancho mínimo escalera común a 2 o más viviendas (máx. 4): 1.20 m
    - Ancho mínimo escalera principal: 1.20 m
    - Huella mínima: 0.28 m (accesibilidad exige 0.34 m — Art. 250 REZ)
@@ -1163,27 +1155,25 @@ const NORMATIVA = {
    - Altura libre mínima: 2.30 m
    - Barandales cuando existan: altura mínima 0.90 m
 
-3. PUERTAS (Art. 218 Cuadro 41, REZ 2003 — Tonalá no tiene tabla propia de puertas de vivienda):
+3. PUERTAS (Art. 218 Cuadro 41, REZ 2003):
    - Acceso principal habitacional: mínimo 0.90 m × 2.05 m
    - Locales habitables y cocinas: mínimo 0.80 m × 2.05 m
    - Baños: mínimo 0.60 m × 2.05 m
    - Acceso principal comercio/oficinas: mínimo 0.90 m × 2.10 m
    - Accesibilidad: mínimo 1.00 m de ancho (Art. 252 REZ)
 
-4. PATIOS DE ILUMINACIÓN Y VENTILACIÓN (Norma Técnica 94, Reglamento de Construcción de Tonalá — coincide con el REZ):
+4. PATIOS DE ILUMINACIÓN Y VENTILACIÓN (Art. 217 Cuadro 40, REZ 2003):
    - Muros hasta 4 m → piezas habitables: patio mínimo 2.50 × 2.50 m
    - Muros hasta 6 m → piezas habitables: patio mínimo 3.00 × 3.00 m
    - Muros hasta 9 m → piezas habitables: patio mínimo 3.50 × 3.50 m
    - Muros hasta 12 m → piezas habitables: patio mínimo 4.00 × 4.00 m
    - Muros >12 m → piezas habitables: patio ≥ 1/3 de la altura del muro
-   - Piezas no habitables: hasta 4m → 2.00m; hasta 6m → 2.00m; hasta 9m → 2.30m; hasta 12m → 2.40m; >12m → ≥1/5 de la altura del muro
-   - Lado menor nunca inferior a 2.50 m absoluto (habitables)
-   - Se autoriza reducir hasta 15% en un lado si se compensa en el otro sentido (Norma Técnica 94, obs. 3)
+   - Lado menor nunca inferior a 2.50 m absoluto
 
-5. VENTANAS E ILUMINACIÓN NATURAL (Norma Técnica 98, Reglamento de Construcción de Tonalá; ventilación: Norma Técnica 97):
-   - Piezas habitables — el % de ventana exigido depende de la orientación del muro: Norte 15.0%, Sur 20.0%, Este–Oeste 17.5% del área del local
-   - Si la orientación no es determinable en el plano, usa 20% (el valor más exigente) como referencia y reporta "nd" si es dudoso — NUNCA asumas Norte por defecto
-   - Ventilación: área de abertura ≥ 5% del área del local (Norma Técnica 97)
+5. VENTANAS E ILUMINACIÓN NATURAL (Arts. 215–216, REZ 2003):
+   - Piezas habitables: ventana ≥ 15% del área del local
+   - Piezas no habitables: ventana ≥ 10% del área del local
+   - Ventilación: área de abertura ≥ 5% del área del local
    - Al menos 40% del área de ventana operable
 
 6. ELEVADORES (Art. 221, REZ 2003):
@@ -1211,15 +1201,15 @@ const NORMATIVA = {
    - Piso de textura diferente 1.20 m antes de rampas y escaleras
 
 10. DIMENSIONES MÍNIMAS DE LOCALES (Art. 213 Cuadro 36, REZ 2003):
-   - Recámara: mínimo 7.50 m², lado mínimo 2.70 m (Norma Técnica 95 — Tonalá no distingue principal/adicional, un solo valor)
-   - Estancia (sala): mínimo 7.50 m², lado mínimo 2.70 m
-   - Comedor: mínimo 7.50 m², lado mínimo 2.70 m
-   - Área de guardarropa/closet: mínimo 0.72 m² (0.60 × 1.20 m), adicional al espacio de la recámara
-   - Cocina: mínimo 4.50 m², lado mínimo 1.50 m (Norma Técnica 95 — más exigente que el 3.00 m² del REZ)
-   - Baños de uso múltiple: mínimo 2.40 m² (lavabo fuera del área, lado 1.20 m) o 7.50 m² (lavabo dentro, lado 2.70 m)
-   - Cuarto de lavado: mínimo 3.30 m², lado mínimo 1.60 m
-   - Altura libre mínima locales habitables: 2.30 m (Norma Técnica 95)
-   REGLA DE CONFIANZA OBLIGATORIA (Reglamento de Construcción de Tonalá, Norma Técnica 95): Solo reporta "cumple" o "incumple" si puedes leer las cotas de dimensión con certeza en el plano. Si las cotas no son claramente legibles o no aparecen en las láminas presentadas, reporta estado "nd" con observación exacta: "Dimensiones no legibles en el plano — requiere verificación en campo". NUNCA estimes ni interpolables dimensiones.`
+   - Recámara principal: mínimo 7.50 m², dimensiones libres mínimas 2.60 × 2.90 m
+   - Recámaras adicionales: mínimo 7.00 m², dimensiones 2.40 × 2.90 m
+   - Estancia (sala): mínimo 7.30 m², lado mínimo 2.60 m
+   - Comedor: mínimo 6.30 m², lado mínimo 2.60 m
+   - Estancia-comedor integrado: mínimo 13.60 m²
+   - Cocina: mínimo 3.00 m², lado mínimo 1.50 m
+   - Baños: lado menor 1.15 m
+   - Altura libre mínima locales habitables: 2.30 m; baños: 2.10 m
+   REGLA DE CONFIANZA OBLIGATORIA: Solo reporta "cumple" o "incumple" si puedes leer las cotas de dimensión con certeza en el plano. Si las cotas no son claramente legibles o no aparecen en las láminas presentadas, reporta estado "nd" con observación exacta: "Dimensiones no legibles en el plano — requiere verificación en campo". NUNCA estimes ni interpolables dimensiones.`
   }
 
 };
@@ -1291,7 +1281,7 @@ Dependencias: "Dirección de Permisos y Licencias de Construcción del Ayuntamie
 - Si el plano es de TONALÁ → municipio_detectado: "TON"
 - Si no puedes determinarlo → municipio_detectado: null → aplica NORMATIVA GDL como fallback`;
 
-  const userText = `Analiza ${numLam > 1 ? 'las láminas adjuntas' : 'el plano adjunto'} y verifica su cumplimiento con la normativa vigente del Área Metropolitana de Guadalajara. ${contextoLote}
+  return `Analiza ${numLam > 1 ? 'las láminas adjuntas' : 'el plano adjunto'} y verifica su cumplimiento con la normativa vigente del Área Metropolitana de Guadalajara. ${contextoLote}
 
 ${bloquePaso0}
 
@@ -1310,13 +1300,7 @@ ${config.cajonesProyecto ? '- Cajones indicados en proyecto: ' + config.cajonesP
 ${config.cajonesPmr ? '- Cajones PMR indicados: ' + config.cajonesPmr : ''}
 ${config.alturaEntrepiso ? '- Altura de entrepiso indicada: ' + config.alturaEntrepiso + ' m' : ''}
 ${config.supVivTipo ? '- Superficie vivienda tipo: ' + config.supVivTipo + ' m²' : ''}
-${numLam > 1 ? '- Láminas analizadas: ' + nomLam : ''}`;
-
-  // Bloque ESTATICO (cacheable): system prompt + normativa del municipio +
-  // instrucciones fijas. No depende de los datos del proyecto capturados
-  // por el usuario, solo del municipio — se envia como 'system' para que
-  // el proxy lo marque con cache_control (prompt caching).
-  const systemText = `${SYSTEM_PROMPT}
+${numLam > 1 ? '- Láminas analizadas: ' + nomLam : ''}
 
 ${bloqueNormativa}
 
@@ -1461,12 +1445,8 @@ Estructura exacta:
       "observacion": "descripción específica de lo observado",
       "medidas_observadas": "dimensiones detectadas o nd",
       "articulo": "artículo y reglamento exacto",
-      "recomendacion": "acción correctiva concreta o null si cumple",
-      "lamina_fuente": "número y nombre de la lámina de donde se extrajo este dato, p.ej. 'L-02 Planta Baja', o null"
+      "recomendacion": "acción correctiva concreta o null si cumple"
     }
-  ],
-  "laminas_clasificadas": [
-    { "numero": 1, "nombre": "nombre_archivo.jpg", "tipo": "portada|planta_baja|planta_alta|fachada|corte|instalaciones|estructural|detalle|otro", "relevante": true }
   ]
 }
 
@@ -1480,11 +1460,7 @@ REGLAS CRÍTICAS:
 - Estado "na" = elemento que NO APLICA a este tipo de proyecto (ej. elevador en casa baja, ciclopuerto en unifamiliar). Es distinto de "nd": "na" significa que la norma no exige ese elemento aquí.
 - Estado "atencion" = cumple pero con incertidumbre o marginalmente.
 - Para locales_habitables específicamente: si no hay cotas claramente legibles en el plano, SIEMPRE usa "nd". Nunca estimes áreas sin cotas explícitas.
-- REGLA DE SEMÁFORO: el estado "nd" en locales_habitables NO debe penalizar el semáforo general — trátalo igual que "na" para efectos del dictamen. Solo penaliza el semáforo si detectas un incumplimiento real con cota legible ("incumple"). Un "nd" en locales_habitables nunca debe mover el semáforo de verde a amarillo.
-- lamina_fuente: para cada elemento, indica el número y nombre de la lámina de donde extrajiste la información normativa (ej. "L-01 Planta de Azotea", "L-03 Fachada Sur"). Si el dato proviene de varias láminas, cita la principal. Usa null si el elemento no pudo verificarse en ninguna lámina.
-- laminas_clasificadas: lista TODAS las láminas recibidas. "tipo" describe su contenido (portada, planta_baja, planta_alta, fachada, corte, instalaciones, estructural, detalle, otro). "relevante": true si aportó datos normativos verificables, false si fue portada, sello u hoja sin cotas.`;
-
-  return { systemText, userText };
+- REGLA DE SEMÁFORO: el estado "nd" en locales_habitables NO debe penalizar el semáforo general — trátalo igual que "na" para efectos del dictamen. Solo penaliza el semáforo si detectas un incumplimiento real con cota legible ("incumple"). Un "nd" en locales_habitables nunca debe mover el semáforo de verde a amarillo.`;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1589,7 +1565,7 @@ function actualizarDisclaimer() {
 // ══════════════════════════════════════════════════════════════════════════
 // ESTADO GLOBAL — MULTI-IMAGEN
 // ══════════════════════════════════════════════════════════════════════════
-const MAX_FILES = 15;
+const MAX_FILES = 10;
 // Cada entrada: { base64, mime, nombre, size }
 let archivos = [];
 
@@ -1627,169 +1603,47 @@ uploadZone.addEventListener('drop', e => {
 // Click en botón seleccionar
 // Click manejado por onclick en el HTML
 
-// ══════════════════════════════════════════════════════════════════════════
-// COMPRESION DE LAMINAS — evita superar el limite de 4.5MB por peticion
-// que impone Vercel a las funciones serverless (api/claude-proxy.js).
-// Cada lamina se redimensiona a un maximo de 1920px en el lado mas largo y
-// se comprime a JPEG calidad 0.7; si el base64 resultante supera 1MB se
-// vuelve a comprimir a calidad 0.5. Los PDF se rasterizan pagina por pagina
-// con pdf.js antes de aplicar la misma compresion.
-// ══════════════════════════════════════════════════════════════════════════
-const GU_LADO_MAX       = 1920;
-const GU_CALIDAD_JPEG   = 0.7;
-const GU_CALIDAD_JPEG_2 = 0.5;
-const GU_LIMITE_B64     = 1 * 1024 * 1024; // 1 MB, medido sobre el string base64
-
-// Redimensiona (si hace falta) y comprime un <img> ya cargado. Si el base64
-// resultante a calidad GU_CALIDAD_JPEG supera GU_LIMITE_B64, reintenta a
-// GU_CALIDAD_JPEG_2.
-function _comprimirDesdeImagen(imgEl) {
-  let w = imgEl.naturalWidth  || imgEl.width;
-  let h = imgEl.naturalHeight || imgEl.height;
-  const ladoMax = Math.max(w, h);
-  if (ladoMax > GU_LADO_MAX) {
-    const escala = GU_LADO_MAX / ladoMax;
-    w = Math.max(1, Math.round(w * escala));
-    h = Math.max(1, Math.round(h * escala));
-  }
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(imgEl, 0, 0, w, h);
-
-  let calidad = GU_CALIDAD_JPEG;
-  let dataUrl = canvas.toDataURL('image/jpeg', calidad);
-  let b64 = dataUrl.split(',')[1] || '';
-  if (b64.length > GU_LIMITE_B64) {
-    calidad = GU_CALIDAD_JPEG_2;
-    dataUrl = canvas.toDataURL('image/jpeg', calidad);
-    b64 = dataUrl.split(',')[1] || '';
-  }
-  return { dataUrl, base64: b64, mime: 'image/jpeg' };
-}
-
-function _dataUrlAImagen(dataUrl) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload  = () => resolve(img);
-    img.onerror = () => reject(new Error('No se pudo procesar la imagen'));
-    img.src = dataUrl;
-  });
-}
-
-// Lee un File de imagen, lo redimensiona y comprime. Devuelve una entrada
-// lista para 'archivos': { base64, mime, nombre, size, dataUrl }.
-function comprimirImagenFile(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error('No se pudo leer el archivo'));
-    reader.onload = ev => {
-      _dataUrlAImagen(ev.target.result).then(img => {
-        const { dataUrl, base64, mime } = _comprimirDesdeImagen(img);
-        resolve({ base64, mime, nombre: file.name, size: Math.round(base64.length * 0.75), dataUrl });
-      }).catch(reject);
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-// Rasteriza cada pagina de un PDF con pdf.js y aplica la misma compresion
-// que a las imagenes. Devuelve un arreglo de entradas (una por pagina).
-async function pdfAPaginasComprimidas(file) {
-  if (!window.pdfjsLib) {
-    throw new Error('El analizador de PDF (pdf.js) no cargó — revisa tu conexión e intenta de nuevo.');
-  }
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  const paginas = [];
-  const nombreBase = file.name.replace(/\.pdf$/i, '');
-
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    // Escala 2x antes de comprimir para partir de buena resolución
-    const viewport = page.getViewport({ scale: 2 });
-    const canvasPdf = document.createElement('canvas');
-    canvasPdf.width  = viewport.width;
-    canvasPdf.height = viewport.height;
-    const ctxPdf = canvasPdf.getContext('2d');
-    await page.render({ canvasContext: ctxPdf, viewport }).promise;
-
-    const imgTmp = await _dataUrlAImagen(canvasPdf.toDataURL('image/jpeg', GU_CALIDAD_JPEG));
-    const { dataUrl, base64, mime } = _comprimirDesdeImagen(imgTmp);
-    const sufijo = pdf.numPages > 1 ? ` (pág. ${i}/${pdf.numPages})` : '';
-    paginas.push({
-      base64, mime,
-      nombre: nombreBase + sufijo,
-      size: Math.round(base64.length * 0.75),
-      dataUrl
-    });
-  }
-  return paginas;
-}
-
-async function agregarArchivos(files) {
-  if (archivos.length >= MAX_FILES) {
+function agregarArchivos(files) {
+  const disponibles = MAX_FILES - archivos.length;
+  if (disponibles <= 0) {
     mostrarError(`🚫 Ya alcanzaste el máximo de ${MAX_FILES} láminas. Elimina alguna antes de agregar más.`);
     return;
   }
+  const aLeer = files.slice(0, disponibles);
+  if (files.length > disponibles) {
+    mostrarError(`Solo puedes subir hasta ${MAX_FILES} láminas. Se agregarán las primeras ${disponibles}.`);
+  }
+
+  let pendientes = aLeer.length;
+  if (pendientes === 0) return;
 
   let erroresTamanio = [];
-  let limiteAlcanzado = false;
 
-  // Indicador de "procesando" — se muestra mientras se leen/comprimen las
-  // láminas (puede tardar varios segundos por página en PDFs grandes),
-  // para que el usuario sepa que algo está pasando antes de que se habilite
-  // el botón de Analizar.
-  const procEl = document.getElementById('upload-processing');
-  const procLabel = document.getElementById('upload-processing-label');
-  const totalArchivos = files.length;
-  procEl.classList.add('visible');
-
-  try {
-    let idx = 0;
-    for (const file of files) {
-      idx++;
-      if (archivos.length >= MAX_FILES) { limiteAlcanzado = true; break; }
-
-      procLabel.textContent = totalArchivos > 1
-        ? `Procesando ${idx} de ${totalArchivos} — ${file.name}`
-        : `Procesando ${file.name}…`;
-
-      if (file.size > 12 * 1024 * 1024) {
-        const pesoMB = (file.size / 1024 / 1024).toFixed(1);
-        erroresTamanio.push(`🚫 "${file.name}" pesa ${pesoMB} MB y excede el máximo de 12 MB — no se cargó. Comprime el PDF en ilovepdf.com antes de subirlo.`);
-        continue;
+  aLeer.forEach(file => {
+    if (file.size > 12 * 1024 * 1024) {
+      const pesoMB = (file.size / 1024 / 1024).toFixed(1);
+      erroresTamanio.push(`🚫 "${file.name}" pesa ${pesoMB} MB y excede el máximo de 12 MB — no se cargó. Comprime el PDF en ilovepdf.com antes de subirlo.`);
+      pendientes--;
+      if (pendientes === 0) {
+        actualizarUI();
+        if (erroresTamanio.length > 0) mostrarError(erroresTamanio.join(' | '));
       }
-
-      try {
-        if (file.type === 'application/pdf') {
-          const paginas = await pdfAPaginasComprimidas(file);
-          for (const pag of paginas) {
-            if (archivos.length >= MAX_FILES) { limiteAlcanzado = true; break; }
-            archivos.push(pag);
-          }
-        } else {
-          const entrada = await comprimirImagenFile(file);
-          archivos.push(entrada);
-        }
-      } catch (e) {
-        erroresTamanio.push(`⚠️ No se pudo procesar "${file.name}": ${e.message}`);
-      }
-
-      // Refrescar la UI progresivamente para que el usuario vea avance en lotes grandes
-      actualizarUI();
+      return;
     }
-  } finally {
-    // Ocultar el indicador siempre, incluso si algo falla inesperadamente
-    procEl.classList.remove('visible');
-  }
-
-  if (limiteAlcanzado) {
-    erroresTamanio.push(`Solo puedes subir hasta ${MAX_FILES} láminas. Se agregaron las primeras ${MAX_FILES}.`);
-  }
-  actualizarUI();
-  if (erroresTamanio.length > 0) mostrarError(erroresTamanio.join(' | '));
+    const mime = file.type === 'application/pdf' ? 'application/pdf'
+               : (file.type || 'image/jpeg');
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const b64 = ev.target.result.split(',')[1];
+      archivos.push({ base64: b64, mime, nombre: file.name, size: file.size, dataUrl: ev.target.result });
+      pendientes--;
+      if (pendientes === 0) {
+        actualizarUI();
+        if (erroresTamanio.length > 0) mostrarError(erroresTamanio.join(' | '));
+      }
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 function actualizarUI() {
@@ -1856,7 +1710,6 @@ function cambiarArchivo() {
   archivos = [];
   _ultimoResultado = null;
   _ultimoConfig = null;
-  try { localStorage.removeItem('gu_m04_sesion_actual'); } catch(e) {}
   // Resetear los 3 selectores a vacío (detección automática)
   document.getElementById('sel-municipio').value = '';
   document.getElementById('sel-tipo').value = '';
@@ -1910,13 +1763,7 @@ FORMATO DE SALIDA:
 
 // Llama a la API con un lote de láminas y devuelve el resultado parseado
 async function llamarAPI(laminasLote, config, esLoteUnico) {
-  // buildPrompt separa el bloque ESTATICO (system prompt + normativa del
-  // municipio + instrucciones fijas — identico entre lotes de un mismo
-  // analisis y entre analisis del mismo municipio) del bloque VARIABLE
-  // (datos del proyecto capturados por el usuario, que cambian siempre).
-  // El bloque estatico se manda como 'system' para que el proxy lo marque
-  // con cache_control y Anthropic lo reutilice (prompt caching).
-  const { systemText, userText } = buildPrompt(config, esLoteUnico);
+  const prompt = buildPrompt(config, esLoteUnico);
   const contentConLabels = [];
   laminasLote.forEach((a, i) => {
     const numGlobal = archivos.indexOf(a) + 1;
@@ -1926,15 +1773,20 @@ async function llamarAPI(laminasLote, config, esLoteUnico) {
       source: { type: 'base64', media_type: a.mime, data: a.base64 }
     });
   });
-  contentConLabels.push({ type: 'text', text: userText });
+  contentConLabels.push({ type: 'text', text: prompt });
+
+  // Insertar el system prompt como primer bloque de texto en el mensaje user
+  const contentFinal = [
+    { type: 'text', text: SYSTEM_PROMPT },
+    ...contentConLabels
+  ];
 
   const body = {
     model: (document.getElementById('sel-modelo')?.value || 'claude-sonnet-4-6'),
     max_tokens: 5000,
     temperature: 0,
-    system: systemText,
     messages: [
-      { role: 'user', content: contentConLabels }
+      { role: 'user', content: contentFinal }
     ]
   };
 
@@ -1959,8 +1811,7 @@ async function llamarAPI(laminasLote, config, esLoteUnico) {
 
   if (!resp.ok) {
     const err = await resp.json().catch(() => ({}));
-    // El proxy puede mandar error como string ({error:"texto"}) o como objeto anidado ({error:{message:"texto"}})
-    const msg = (typeof err.error === 'string' ? err.error : err.error?.message) || '';
+    const msg = err.error?.message || '';
     // Errores específicos con mensajes claros para el usuario
     if (msg.includes('credit balance') || msg.includes('too low') || msg.includes('billing')) {
       throw new Error('__CREDITOS_AGOTADOS__');
@@ -2104,24 +1955,15 @@ function consolidarResultados(resultados) {
     });
   });
 
-  // Dictamen: concatenar todos (soporta campo 'dictamen' array y 'dictamen_general' string)
-  const getTexto = r => Array.isArray(r.dictamen) && r.dictamen.length
-    ? r.dictamen.filter(Boolean).join('\n\n')
-    : (r.dictamen_general || '');
+  // Dictamen: concatenar todos
   const dictamen_general = resultados
-    .map((r, i) => {
-      const txt = getTexto(r);
-      return resultados.length > 1
-        ? `[Láminas ${i*LOTE_MAX+1}–${Math.min((i+1)*LOTE_MAX, archivos.length)}] ${txt}`
-        : txt;
-    })
+    .map((r, i) => resultados.length > 1 ? `[Láminas ${i*LOTE_MAX+1}–${Math.min((i+1)*LOTE_MAX, archivos.length)}] ${r.dictamen_general}` : r.dictamen_general)
     .join('\n\n');
 
   return {
     semaforo,
     resumen: `Análisis de ${archivos.length} láminas — ${semaforo === 'verde' ? 'sin incumplimientos' : semaforo === 'rojo' ? 'incumplimientos detectados' : 'requiere atención'}`,
     dictamen_general,
-    laminas_clasificadas: resultados.flatMap(r => r.laminas_clasificadas || []),
     elementos: Object.values(mapaElementos),
   };
 }
@@ -2258,9 +2100,7 @@ async function analizarPlano() {
 // ══════════════════════════════════════════════════════════════════════════
 // RENDER RESULTADO
 // ══════════════════════════════════════════════════════════════════════════
-function renderResultado(r, config, opts) {
-  opts = opts || {};
-  const _guardarHist = opts.guardarHistorial !== false;
+function renderResultado(r, config) {
   _ultimoResultado = r;
 
   // ── PASO 1: Inyectar los 3 campos detectados por la IA en los selects ──
@@ -2403,7 +2243,6 @@ function renderResultado(r, config, opts) {
         ${el.estado === 'na' ? `<div style="margin-bottom:8px;padding:8px 12px;background:var(--bg3);border-left:3px solid var(--border2);border-radius:0 var(--r-md) var(--r-md) 0;font-size:11px;color:var(--text2);line-height:1.6">— <strong>No aplica</strong> — La normativa no exige este elemento para el tipo de proyecto detectado. No representa un incumplimiento.</div>` : ''}
         <div class="observacion">${el.observacion || '—'}</div>
         ${el.medidas_observadas ? `<div style="font-size:11px; color:var(--text3); margin-top:6px; font-family:var(--mono);">📐 ${el.medidas_observadas}</div>` : ''}
-        ${el.lamina_fuente ? `<div style="font-size:10px;color:var(--text3);margin-top:4px;">📁 Fuente: ${el.lamina_fuente}</div>` : ''}
         ${el.recomendacion ? `<div style="margin-top:8px; padding:8px 12px; background:rgba(245,158,11,.1); border-radius:6px; font-size:12px; color:var(--sem-am-txt);">💡 ${el.recomendacion}</div>` : ''}
         ${desc ? `<div class="norma-ref">📖 Norma: ${desc}</div>` : ''}
         ${el.articulo ? `<div class="norma-ref" style="margin-top:3px;">⚖️ Fundamento: ${el.articulo}</div>` : ''}
@@ -2421,30 +2260,6 @@ function renderResultado(r, config, opts) {
         🔍 <strong>¿Por qué todo aparece como "No verificable"?</strong><br>
         La IA analizó el plano pero no pudo leer las dimensiones y elementos con suficiente certeza para emitir un dictamen. Esto ocurre cuando: (1) la imagen tiene baja resolución, (2) las cotas del plano son muy pequeñas o están borrosas, o (3) el plano es una fotografía tomada con ángulo. <strong>Sube el plano en mayor resolución o en formato PDF directo desde el software de diseño</strong> para obtener resultados precisos.
       </div>`;
-  }
-
-  // Láminas analizadas: sección de trazabilidad
-  if (Array.isArray(r.laminas_clasificadas) && r.laminas_clasificadas.length > 0) {
-    const relevantes = r.laminas_clasificadas.filter(l => l.relevante);
-    const noRelevantes = r.laminas_clasificadas.filter(l => !l.relevante);
-    const tipoLabel = { portada:'Portada', planta_baja:'Planta Baja', planta_alta:'Planta Alta', fachada:'Fachada', corte:'Corte', instalaciones:'Instalaciones', estructural:'Estructural', detalle:'Detalle', otro:'Otra' };
-    const tipoIco   = { portada:'📄', planta_baja:'🏠', planta_alta:'🏢', fachada:'🖼️', corte:'✂️', instalaciones:'🔌', estructural:'🏗️', detalle:'🔍', otro:'📋' };
-    let lHtml = `<div style="margin-top:16px;padding:12px 16px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);font-size:12px;color:var(--text2);line-height:1.6;transition:background var(--t),border-color var(--t)">`;
-    lHtml += `<div style="font-weight:600;color:var(--text1);margin-bottom:8px;">📂 Láminas analizadas</div>`;
-    if (relevantes.length > 0) {
-      lHtml += `<div style="margin-bottom:6px;font-size:11px;color:var(--text3);font-weight:500;letter-spacing:.03em">CON DATOS NORMATIVOS</div>`;
-      relevantes.forEach(l => {
-        lHtml += `<div style="display:flex;gap:6px;align-items:baseline;margin-bottom:3px;">${tipoIco[l.tipo]||'📋'} <span style="color:var(--text1);font-family:var(--mono);font-size:11px;">L-${String(l.numero).padStart(2,'0')}</span> <span>${l.nombre}</span> <span style="color:var(--text3);font-size:10px;">${tipoLabel[l.tipo]||l.tipo}</span></div>`;
-      });
-    }
-    if (noRelevantes.length > 0) {
-      lHtml += `<div style="margin-top:8px;margin-bottom:6px;font-size:11px;color:var(--text3);font-weight:500;letter-spacing:.03em">SIN DATOS NORMATIVOS</div>`;
-      noRelevantes.forEach(l => {
-        lHtml += `<div style="display:flex;gap:6px;align-items:baseline;margin-bottom:3px;opacity:0.55;">${tipoIco[l.tipo]||'📋'} <span style="font-family:var(--mono);font-size:11px;">L-${String(l.numero).padStart(2,'0')}</span> <span>${l.nombre}</span> <span style="font-size:10px;">${tipoLabel[l.tipo]||l.tipo}</span></div>`;
-      });
-    }
-    lHtml += `</div>`;
-    document.getElementById('elementos-list').innerHTML += lHtml;
   }
 
   // Dictamen: array de párrafos (campo "dictamen") con fallback a dictamen_general
@@ -2548,16 +2363,9 @@ function renderResultado(r, config, opts) {
     document.getElementById('nombre-guardado-msg').style.display = 'none';
   }
 
-  // Guardar en historial y actualizar panel (solo si es un análisis nuevo, no al reabrir uno del historial)
-  if (_guardarHist) {
-    guardarEnHistorial(r, config);
-    renderHistorialPanel();
-  }
-
-  // Guardar sesión actual para que el resultado no se pierda si el usuario navega a otro módulo y regresa
-  try {
-    localStorage.setItem('gu_m04_sesion_actual', JSON.stringify({ r, config, ts: Date.now() }));
-  } catch(e) { /* localStorage lleno o no disponible: no es crítico */ }
+  // Guardar en historial y actualizar panel
+  guardarEnHistorial(r, config);
+  renderHistorialPanel();
 
   // Calcular y mostrar estudios y trámites requeridos
   renderEstudiosRequeridos(r, config);
@@ -3092,7 +2900,6 @@ function nuevoAnalisis() {
   archivos = [];
   _ultimoResultado = null;
   _ultimoConfig = null;
-  try { localStorage.removeItem('gu_m04_sesion_actual'); } catch(e) {}
   // Resetear los 3 selectores a vacío
   document.getElementById('sel-municipio').value = '';
   document.getElementById('sel-tipo').value = '';
@@ -3100,13 +2907,6 @@ function nuevoAnalisis() {
   // Limpiar nombre del proyecto
   const campoNombre = document.getElementById('p-nombre-proyecto');
   if (campoNombre) campoNombre.value = '';
-  // Limpiar campos opcionales del formulario
-  ['p-sup','p-frente','p-rf','p-rl','p-rp','p-cos',
-   'p-sup-const','p-num-viv','p-cajones','p-cajones-pmr','p-altura','p-sup-viv',
-   'p-dro','p-nombre-resultado'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
   // Ocultar badges
   document.getElementById('badge-municipio').style.display = 'none';
   document.getElementById('badge-tipo').style.display = 'none';
@@ -3241,7 +3041,7 @@ function irAM05() {
     alert('Error al guardar datos para M05: ' + e.message);
     return;
   }
-  window.location.href = 'GestorUrbano_M05_2.html';
+  window.location.href = 'GestorUrbano_M05_1.html';
 }
 
 // Mostrar/ocultar botón M01 según si hay dirección disponible post-análisis
@@ -3293,8 +3093,6 @@ function guardarEnHistorial(r, config) {
       elementos: (r.elementos || []).map(e => ({ id: e.id, estado: e.estado })),
       datos_solapa: r.datos_solapa || {},
       estudios: estudiosNombres,
-      resultado: r,       // resultado completo — permite reabrir el análisis desde el historial
-      config: config,
     };
     hist.unshift(entrada);
     localStorage.setItem(HIST_KEY, JSON.stringify(hist.slice(0, HIST_MAX)));
@@ -3332,7 +3130,7 @@ function renderHistorialPanel() {
       : '';
     return `<div class="hist-item">
       <span class="hist-sem ${h.semaforo}"></span>
-      <div class="hist-info" onclick="reabrirHistEntry(${i})" style="cursor:pointer" title="Clic para ver el resultado completo de este análisis">
+      <div class="hist-info">
         <div class="hist-nombre">${h.nombreProyecto}</div>
         <div class="hist-meta">${fecha} · ${munNom} · ${semTexto[h.semaforo] || h.semaforo}</div>
       </div>
@@ -3356,18 +3154,6 @@ function borrarHistEntry(idx) {
     localStorage.setItem(HIST_KEY, JSON.stringify(hist));
     renderHistorialPanel();
   } catch(e) {}
-}
-
-// Reabre el resultado completo de una entrada del historial (clic sobre el nombre/fecha)
-function reabrirHistEntry(idx) {
-  const hist = cargarHistorial();
-  const entry = hist[idx];
-  if (!entry) return;
-  if (!entry.resultado) {
-    mostrarError('Este análisis del historial es de una versión anterior y solo guardó el resumen, no el detalle completo. Los análisis nuevos ya se pueden reabrir completos.');
-    return;
-  }
-  renderResultado(entry.resultado, entry.config || {}, { guardarHistorial: false });
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -3524,23 +3310,17 @@ function guToggleTheme(){
 
 // Inicializar panel de historial al cargar
 document.addEventListener('DOMContentLoaded', function() {
-  if (!ES_LOCALHOST) {
-    const ap = document.getElementById('apikey-panel');
-    if (ap) ap.style.display = 'none';
-  }
   renderHistorialPanel();
-  // Restaurar el último resultado mostrado si el usuario navegó a otro módulo y regresó
-  try {
-    const raw = localStorage.getItem('gu_m04_sesion_actual');
-    if (raw) {
-      const sesion = JSON.parse(raw);
-      if (sesion && sesion.r && sesion.config) {
-        renderResultado(sesion.r, sesion.config, { guardarHistorial: false });
-      }
-    }
-  } catch(e) { /* silencioso */ }
 });
 
 </script>
+
+<footer style="border-top:0.5px solid var(--border);padding:12px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:auto;transition:border-color var(--t),color var(--t)">
+  <span style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.03em;transition:color var(--t)">© 2026 TrazaUrbana · Jalisco AMG · trazaurbana.mx · Todos los derechos reservados.</span>
+  <div style="display:flex;gap:5px;flex-wrap:wrap">
+    <span style="font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg3);border:0.5px solid var(--border);padding:2px 7px;border-radius:4px;transition:background var(--t),border-color var(--t),color var(--t)">HTML · CSS · JS</span>
+    <span style="font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg3);border:0.5px solid var(--border);padding:2px 7px;border-radius:4px;transition:background var(--t),border-color var(--t),color var(--t)">Sin frameworks</span>
+  </div>
+</footer>
 </body>
 </html>

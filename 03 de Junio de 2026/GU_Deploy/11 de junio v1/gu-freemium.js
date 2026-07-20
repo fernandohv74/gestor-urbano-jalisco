@@ -1,3 +1,10 @@
+// ==========================================================
+// GestorUrbano Jalisco AMG / TrazaUrbana
+// (c) 2026 Fernando H. - trazaurbana.mx
+// Todos los derechos reservados.
+// Reproduccion o uso no autorizado esta prohibido.
+// ==========================================================
+
 // gu-freemium.js — Control de uso gratuito sin login
 // Gestor Urbano Jalisco AMG
 const GU_LIMITES = {

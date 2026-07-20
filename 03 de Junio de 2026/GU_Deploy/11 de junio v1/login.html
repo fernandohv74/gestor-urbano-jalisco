@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<!-- ==========================================================
+     GestorUrbano Jalisco AMG / TrazaUrbana
+     (c) 2026 Fernando H. - trazaurbana.mx
+     Todos los derechos reservados.
+     Reproduccion o uso no autorizado esta prohibido.
+     ========================================================== -->
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestor Urbano Jalisco — Acceso</title>
+<!--
+  login.html — pantalla de acceso simple (clave única compartida)
+  Gestor Urbano Jalisco AMG
+
+  Es la única página que middleware.js deja pasar sin sesión válida.
+  Envía la clave a api/auth-login.js, que la compara contra la variable
+  de entorno GU_ACCESS_PASSWORD y, si coincide, pone la cookie de sesión
+  que middleware.js revisa en cada petición al resto de la plataforma.
+
+  Autocontenida a propósito (CSS/JS inline, sin depender de
+  gu-design-system.css ni de ningún otro archivo) para que el
+  middleware solo tenga que excluir esta única ruta.
+-->
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:#F9FAFB;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  padding:20px;
+}
+.card{
+  width:100%;max-width:380px;background:#FFFFFF;border:0.5px solid rgba(0,0,0,0.1);
+  border-radius:16px;padding:36px 32px;box-shadow:0 8px 30px rgba(0,0,0,0.06);
+}
+.logo{
+  width:48px;height:48px;border-radius:12px;background:#1A2744;color:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:600;
+  font-size:18px;margin:0 auto 20px;
+}
+h1{font-size:19px;font-weight:600;color:#0F0F0E;text-align:center;margin-bottom:6px}
+p.sub{font-size:13px;color:#666;text-align:center;margin-bottom:28px}
+label{display:block;font-size:13px;font-weight:500;color:#333;margin-bottom:6px}
+.field-wrap{position:relative;margin-bottom:16px}
+input[type=password],input[type=text].pw-input{
+  width:100%;padding:11px 44px 11px 14px;border:1px solid rgba(0,0,0,0.16);border-radius:10px;
+  font-size:15px;transition:border-color .15s;
+}
+input.pw-input:focus{outline:none;border-color:#1A2744}
+.toggle-eye{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  width:32px;height:32px;border:0;background:transparent;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;color:#888;
+  padding:0;transition:background .15s,color .15s;
+}
+.toggle-eye:hover{background:#F0F0EE;color:#333}
+.toggle-eye svg{width:18px;height:18px}
+button{
+  width:100%;padding:12px;border:0;border-radius:10px;background:#1A2744;color:#fff;
+  font-size:15px;font-weight:500;cursor:pointer;transition:background .15s;
+}
+button:hover{background:#2D3A6B}
+button:disabled{opacity:.6;cursor:not-allowed}
+.error{
+  display:none;background:#FDECEC;border:1px solid #F5B5B5;color:#B42318;
+  font-size:13px;border-radius:8px;padding:10px 12px;margin-bottom:16px;
+}
+.error.visible{display:block}
+.footer{margin-top:22px;text-align:center;font-size:12px;color:#999}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px">
+      <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="flex-shrink:0"><rect x="3" y="3" width="94" height="94" rx="16" fill="#C4D2E0"/><line x1="0" y1="22" x2="100" y2="22" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="44" x2="100" y2="44" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="66" x2="100" y2="66" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="88" x2="100" y2="88" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="22" y1="0" x2="22" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="44" y1="0" x2="44" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="66" y1="0" x2="66" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="88" y1="0" x2="88" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="-2" y1="20" x2="102" y2="80" stroke="#fff" stroke-width="5.5" opacity="0.55"/><rect x="27" y="27" width="14" height="14" fill="#D85A30"/><rect x="3" y="3" width="94" height="94" rx="16" fill="none" stroke="#14395C" stroke-width="3"/></svg>
+      <div style="font-family:'Outfit','Helvetica Neue',Arial,sans-serif;line-height:1;letter-spacing:-.4px"><span style="font-weight:800;font-size:24px;color:#14395C">Traza</span><span style="font-weight:300;font-size:24px;color:#D85A30">Urbana</span></div>
+    </div>
+    <h1>Gestor Urbano Jalisco AMG</h1>
+    <p class="sub">Acceso restringido — plataforma en fase de pruebas</p>
+    <div class="error" id="error-box"></div>
+    <form id="login-form">
+      <label for="password">Clave de acceso</label>
+      <!-- Campo señuelo oculto: absorbe el autocompletado del navegador, que
+           en campos de contraseña suele ignorar autocomplete="off" y rellena
+           el primer input[type=password] que encuentra. -->
+      <input type="password" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" tabindex="-1" aria-hidden="true" autocomplete="off">
+      <div class="field-wrap">
+        <input type="password" class="pw-input" id="password" name="gu_access_key" autocomplete="new-password" autofocus required>
+        <button type="button" class="toggle-eye" id="toggle-eye" aria-label="Mostrar clave" aria-pressed="false">
+          <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+      </div>
+      <button type="submit" id="submit-btn">Entrar</button>
+    </form>
+    <div class="footer">Área Metropolitana de Guadalajara</div>
+  </div>
+
+<script>
+const form = document.getElementById('login-form');
+const errorBox = document.getElementById('error-box');
+const submitBtn = document.getElementById('submit-btn');
+const toggleEye = document.getElementById('toggle-eye');
+const passwordInput = document.getElementById('password');
+const eyeIcon = document.getElementById('eye-icon');
+
+// Nunca dejar la clave visible/precargada en el campo: ni por autocompletado
+// del navegador ni por el cache de "atras/adelante" (bfcache) al volver a
+// esta pagina tras cerrar sesion. El campo señuelo de arriba absorbe la
+// mayoria de los casos, pero algunos navegadores autocompletan un poco
+// despues de que carga la pagina -- por eso se limpia varias veces: al
+// cargar, con un pequeño retraso, y en cada pageshow (bfcache).
+function limpiarClave(){ passwordInput.value = ''; }
+limpiarClave();
+setTimeout(limpiarClave, 60);
+setTimeout(limpiarClave, 300);
+window.addEventListener('pageshow', limpiarClave);
+
+// Ícono de "ojo abierto" (clave oculta) vs "ojo tachado" (clave visible)
+const EYE_OPEN = '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle>';
+const EYE_OFF = '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.4 10.4 0 0 1 12 5c7 0 11 7 11 7a21.6 21.6 0 0 1-2.94 3.94M14.12 14.12a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+
+toggleEye.addEventListener('click', function() {
+  const visible = passwordInput.type === 'text';
+  passwordInput.type = visible ? 'password' : 'text';
+  eyeIcon.innerHTML = visible ? EYE_OPEN : EYE_OFF;
+  toggleEye.setAttribute('aria-label', visible ? 'Mostrar clave' : 'Ocultar clave');
+  toggleEye.setAttribute('aria-pressed', String(!visible));
+});
+
+function paramRedirect() {
+  const params = new URLSearchParams(window.location.search);
+  const r = params.get('redirect');
+  // Solo permitir rutas internas — nunca redirigir a un dominio externo
+  if (r && r.startsWith('/') && !r.startsWith('//')) return r;
+  return '/index.html';
+}
+
+form.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  errorBox.classList.remove('visible');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Verificando…';
+
+  try {
+    const password = document.getElementById('password').value;
+    const r = await fetch('/api/auth-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    });
+    const data = await r.json();
+
+    if (r.ok && data.ok) {
+      window.location.href = paramRedirect();
+      return;
+    }
+    errorBox.textContent = data.error || 'Clave incorrecta. Intenta de nuevo.';
+    errorBox.classList.add('visible');
+  } catch (err) {
+    errorBox.textContent = 'Error de conexión. Intenta de nuevo.';
+    errorBox.classList.add('visible');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Entrar';
+  }
+});
+</script>
+</body>
+</html>

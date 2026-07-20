@@ -734,15 +734,7 @@ function actualizar3D(){
     'canvas.addEventListener("touchmove",function(e){e.preventDefault();if(e.touches.length===1&&drag){aY+=(e.touches[0].clientX-px)*.008;aX=Math.max(-.1,Math.min(1.2,aX-(e.touches[0].clientY-py)*.008));px=e.touches[0].clientX;py=e.touches[0].clientY;draw();}if(e.touches.length===2){var d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);sc=Math.max(4,Math.min(120,sc-(d-lt)*.1));lt=d;draw();}},{passive:false});',
     '})();',
     '</' + scriptTag + '>',
-    '
-<footer style="border-top:0.5px solid var(--border);padding:12px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:auto;transition:border-color var(--t),color var(--t)">
-  <span style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.03em;transition:color var(--t)">© 2026 TrazaUrbana · Jalisco AMG · trazaurbana.mx · Todos los derechos reservados.</span>
-  <div style="display:flex;gap:5px;flex-wrap:wrap">
-    <span style="font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg3);border:0.5px solid var(--border);padding:2px 7px;border-radius:4px;transition:background var(--t),border-color var(--t),color var(--t)">HTML · CSS · JS</span>
-    <span style="font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg3);border:0.5px solid var(--border);padding:2px 7px;border-radius:4px;transition:background var(--t),border-color var(--t),color var(--t)">Sin frameworks</span>
-  </div>
-</footer>
-</body></html>'
+    '</html>'
   ].join('\n');
 
   const blob = new Blob([html3d], {type: 'text/html'});
@@ -6715,5 +6707,13 @@ function guToggleTheme(){
 }
 
 </script>
+
+<footer style="border-top:0.5px solid var(--border);padding:12px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:auto;transition:border-color var(--t),color var(--t)">
+  <span style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.03em;transition:color var(--t)">© 2026 TrazaUrbana · Jalisco AMG · trazaurbana.mx · Todos los derechos reservados.</span>
+  <div style="display:flex;gap:5px;flex-wrap:wrap">
+    <span style="font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg3);border:0.5px solid var(--border);padding:2px 7px;border-radius:4px;transition:background var(--t),border-color var(--t),color var(--t)">HTML · CSS · JS</span>
+    <span style="font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg3);border:0.5px solid var(--border);padding:2px 7px;border-radius:4px;transition:background var(--t),border-color var(--t),color var(--t)">Sin frameworks</span>
+  </div>
+</footer>
 </body>
 </html>

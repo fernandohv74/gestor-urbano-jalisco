@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- ==========================================================
+     GestorUrbano Jalisco AMG / TrazaUrbana
+     (c) 2026 Fernando H. - trazaurbana.mx
+     Todos los derechos reservados.
+     Reproduccion o uso no autorizado esta prohibido.
+     ========================================================== -->
+
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -377,12 +384,10 @@ input[type=range]::-webkit-slider-thumb{
 
 <!-- ── NAVEGACIÓN ── -->
 <nav class="gu-nav">
-  <div class="gu-nav-logo">
-    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-      <path d="M8 1L1 5v9h5v-4h4v4h5V5L8 1z"/>
-    </svg>
+  <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+    <svg width="28" height="28" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="flex-shrink:0"><rect x="3" y="3" width="94" height="94" rx="16" fill="#C4D2E0"/><line x1="0" y1="22" x2="100" y2="22" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="44" x2="100" y2="44" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="66" x2="100" y2="66" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="88" x2="100" y2="88" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="22" y1="0" x2="22" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="44" y1="0" x2="44" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="66" y1="0" x2="66" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="88" y1="0" x2="88" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="-2" y1="20" x2="102" y2="80" stroke="#fff" stroke-width="5.5" opacity="0.55"/><rect x="27" y="27" width="14" height="14" fill="#D85A30"/><rect x="3" y="3" width="94" height="94" rx="16" fill="none" stroke="#14395C" stroke-width="3"/></svg>
+    <span style="font-family:var(--sans);line-height:1;letter-spacing:-.3px"><span style="font-weight:800;font-size:17px;color:var(--text)">Traza</span><span style="font-weight:300;font-size:17px;color:#D85A30">Urbana</span></span>
   </div>
-  <span class="gu-nav-name">Gestor Urbano Jalisco</span>
   <span class="gu-nav-sep">/</span>
   <span class="gu-nav-mod">M01 · Consulta de predio</span>
   <a href="index.html" class="gu-nav-back">
@@ -393,11 +398,12 @@ input[type=range]::-webkit-slider-thumb{
   </a>
   <a href="GestorUrbano_M03_3.html" class="gu-nav-back" style="margin-left:4px" onclick="(window._zonaActivaM01||datosZona)?irAM03():null">M03 · Potencial constructivo</a>
   <a href="GestorUrbano_M02_4.html" class="gu-nav-back" style="margin-left:4px" onclick="if(window._zonaActivaM01||datosZona){irAM02();return false;}">M02 · Giro comercial</a>
-  <a href="GestorUrbano_M10_1.html" class="gu-nav-back" style="margin-left:4px">M10 · Pre-Dictamen IA</a>
   <button class="gu-toggle" onclick="guToggleTheme()" aria-label="Cambiar tema" style="margin-left:8px">
     <div class="gu-toggle-track"><div class="gu-toggle-thumb"></div></div>
     <span id="gu-toggle-label">Modo oscuro</span>
   </button>
+
+  <span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.04em;flex-shrink:0;opacity:.55;margin-left:10px;transition:color var(--t)">&copy; 2026 TrazaUrbana</span>
 </nav>
 
 <!-- ── LAYOUT PRINCIPAL ── -->
@@ -1381,7 +1387,7 @@ function actualizar3D(){
 
 '})();',
 '</' + S + '>',
-'</body></html>'
+'</html>'
   ];
 
   const html3d = lines.join('\n');
@@ -2418,11 +2424,6 @@ const VUJ_BD_LOCAL = {
       cajones_estacionamiento: 'Ver Norma General No. 22',
       observaciones: 'PDU ZPN-02/04 2023. Mismos valores que MV1 estándar. Sujeto a Norma General 23 (Áreas de Desarrollo Controlado). Usos restringidos: solo H1-U, H1-H, EV-V. NO comercio ni servicios.',
       uso_permitido: 'H1-U · H1-H · EV-V',
-      coefs_por_uso: {
-        'H1-U': {cos:'0.40',cus:'0.80',sup:'600',frente:'20',rest_f:'5',rest_l:'2.5',rest_p:'3',jar:'60',modo:'Abierto',nota:'Unifamiliar — ADC NG23',ide:'600'},
-        'H1-H': {cos:'0.40',cus:'0.80',sup:'800',frente:'20',rest_f:'5',rest_l:'2.5',rest_p:'3',jar:'60',modo:'Abierto',nota:'Plurifamiliar horizontal — ADC NG23',ide:'400'},
-        'EV-V': {cos:'0.10',cus:'0.10',sup:'—',frente:'—',rest_f:'5',rest_l:'5',rest_p:'5',jar:'—',modo:'Abierto',nota:'Espacios verdes — COS 0.10 sin construcción cerrada',ide:'—'},
-      },
       municipio_id: 120,
     },
 
@@ -2441,11 +2442,6 @@ const VUJ_BD_LOCAL = {
       cajones_estacionamiento: 'Ver Norma General No. 22',
       observaciones: '⚠️ PPE: Altura sujeta a Dictamen de Imagen Urbana (NG14). PDU ZPN-02 2023. Usos: H1-U, H1-H, EV-V únicamente.',
       uso_permitido: 'H1-U · H1-H · EV-V',
-      coefs_por_uso: {
-        'H1-U': {cos:'0.40',cus:'0.80',sup:'600',frente:'20',rest_f:'5',rest_l:'2.5',rest_p:'3',jar:'60',modo:'Abierto',nota:'Unifamiliar — PPE NG14',ide:'600'},
-        'H1-H': {cos:'0.40',cus:'0.80',sup:'800',frente:'20',rest_f:'5',rest_l:'2.5',rest_p:'3',jar:'60',modo:'Abierto',nota:'Plurifamiliar horizontal — PPE NG14',ide:'400'},
-        'EV-V': {cos:'0.10',cus:'0.10',sup:'—',frente:'—',rest_f:'5',rest_l:'5',rest_p:'5',jar:'—',modo:'Abierto',nota:'Espacios verdes — COS 0.10 sin construcción cerrada',ide:'—'},
-      },
       municipio_id: 120,
     },
 
@@ -2464,12 +2460,6 @@ const VUJ_BD_LOCAL = {
       cajones_estacionamiento: 'Ver Norma General No. 22',
       observaciones: '⚠️ PPE: Altura MÁXIMA 3 niveles. PDU ZPN-02 2023. Restricciones laterales 5ml (más restrictivo que MV2 estándar). NO H2-V. Usos: H2-U, H2-H, EV-V, EI-V.',
       uso_permitido: 'H2-U · H2-H · EV-V · EI-V',
-      coefs_por_uso: {
-        'H2-U': {cos:'0.60',cus:'1.20',sup:'250',frente:'10',rest_f:'5',rest_l:'5',rest_p:'3',jar:'50',modo:'Semicerrado',nota:'⚠️ PPE — máx. 3 niveles (NG14)',ide:'300'},
-        'H2-H': {cos:'0.60',cus:'1.20',sup:'500',frente:'10',rest_f:'5',rest_l:'5',rest_p:'3',jar:'50',modo:'Semicerrado',nota:'⚠️ PPE — máx. 3 niveles (NG14)',ide:'250'},
-        'EV-V': {cos:'0.10',cus:'0.10',sup:'—',frente:'—',rest_f:'5',rest_l:'5',rest_p:'5',jar:'—',modo:'Abierto',nota:'Espacios verdes — COS 0.10 sin construcción cerrada',ide:'—'},
-        'EI-V': {cos:'0.60',cus:'1.20',sup:'—',frente:'—',rest_f:'5',rest_l:'5',rest_p:'5',jar:'50',modo:'Abierto',nota:'Equipamiento vecinal',ide:'—'},
-      },
       municipio_id: 120,
     },
 
@@ -2488,19 +2478,6 @@ const VUJ_BD_LOCAL = {
       cajones_estacionamiento: 'Ver Norma General No. 22',
       observaciones: 'PDU ZPN-11/12 2023 APR. COS 0.70 CUS 1.40 base. H3-V condicionado: CUS 2.10 máx.4 niv. requiere ECPD + contribución especial. MB condicionado COS 0.80 CUS 2.40. MFM/SI/I1 condicionados. Restricción frontal 3ml. NG9.',
       uso_permitido: 'H3-U · H3-H · H3-V(condicionado) · EV-V · EI-V · CS-V · MB(condicionado) · MFD · MFM/SI/I1(condicionados)',
-      coefs_por_uso: {
-        'H3-U': {cos:'0.70',cus:'1.40',sup:'140',frente:'8', rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'40',modo:'Semicerrado',nota:'Unifamiliar densidad media',ide:'140'},
-        'H3-H': {cos:'0.70',cus:'1.40',sup:'260',frente:'8', rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'40',modo:'Semicerrado',nota:'Plurifamiliar horizontal',ide:'130'},
-        'H3-V': {cos:'0.70',cus:'2.10',sup:'480',frente:'12',rest_f:'3',rest_l:'5',         rest_p:'5', jar:'40',modo:'Variable',nota:'⚠️ Condicionado — máx.4 niv., requiere ECPD + contribución especial',ide:'120'},
-        'EV-V': {cos:'0.10',cus:'0.10',sup:'—',frente:'—',rest_f:'3',rest_l:'5',  rest_p:'5', jar:'—',modo:'Abierto',nota:'Espacios verdes — sin construcción cerrada',ide:'—'},
-        'EI-V': {cos:'0.70',cus:'1.40',sup:'—',frente:'8', rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'40',modo:'Variable',nota:'Equipamiento vecinal',ide:'—'},
-        'CS-V': {cos:'0.70',cus:'1.40',sup:'140',frente:'8', rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'40',modo:'Variable',nota:'Máx. 200 m² por local',ide:'140'},
-        'MB':   {cos:'0.80',cus:'2.40',sup:'320',frente:'16',rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Variable',nota:'⚠️ Condicionado — COS/CUS propios (0.80/2.40)',ide:'80'},
-        'MFD':  {cos:'0.70',cus:'1.40',sup:'—',frente:'—',rest_f:'Ver plano',rest_l:'Ver plano',rest_p:'3',jar:'40',modo:'Semicerrado',nota:'⚠️ Condicionado — manufactura domiciliaria, máx. 80 m²',ide:'140'},
-        'MFM':  {cos:'0.80',cus:'8.00 m³/m²',cus_vol:true,sup:'180',frente:'15',rest_f:'5',rest_l:'Ver plano',rest_p:'12',jar:'0.20',modo:'Variable',nota:'⚠️ Condicionado — CUS volumétrico',ide:'—'},
-        'SI':   {cos:'0.80',cus:'8.00 m³/m²',cus_vol:true,sup:'600',frente:'15',rest_f:'5',rest_l:'Ver plano',rest_p:'12',jar:'0.20',modo:'Variable',nota:'⚠️ Condicionado — CUS volumétrico',ide:'—'},
-        'I1':   {cos:'0.80',cus:'8.00 m³/m²',cus_vol:true,sup:'600',frente:'15',rest_f:'5',rest_l:'Ver plano',rest_p:'12',jar:'0.20',modo:'Variable',nota:'⚠️ Condicionado — CUS volumétrico',ide:'—'},
-      },
       municipio_id: 120,
     },
 
@@ -2519,15 +2496,6 @@ const VUJ_BD_LOCAL = {
       cajones_estacionamiento: 'Ver Norma General No. 22',
       observaciones: '⚠️ PPE: Sin H3-V. PDU ZPN-12 2023 PPE. TH condicionado máx.4 niv. Restricciones laterales 5ml. CS-V condicionado. MFD condicionado. NG14.',
       uso_permitido: 'H3-U · H3-H · EV-V · EI-V · TH(condicionado) · CS-V(condicionado) · MFD(condicionado)',
-      coefs_por_uso: {
-        'H3-U': {cos:'0.70',cus:'1.40',sup:'140',frente:'8', rest_f:'3',rest_l:'5',rest_p:'3', jar:'40',modo:'Semicerrado',nota:'⚠️ PPE — altura sujeta a Dictamen (NG14)',ide:'140'},
-        'H3-H': {cos:'0.70',cus:'1.40',sup:'260',frente:'8', rest_f:'3',rest_l:'5',rest_p:'3', jar:'40',modo:'Semicerrado',nota:'⚠️ PPE — altura sujeta a Dictamen (NG14)',ide:'130'},
-        'EV-V': {cos:'0.10',cus:'0.10',sup:'—',frente:'—',rest_f:'3',rest_l:'5',rest_p:'5', jar:'—',modo:'Abierto',nota:'Espacios verdes — sin construcción cerrada',ide:'—'},
-        'EI-V': {cos:'0.70',cus:'1.40',sup:'—',frente:'8', rest_f:'3',rest_l:'5',rest_p:'3', jar:'40',modo:'Variable',nota:'Equipamiento vecinal',ide:'—'},
-        'TH':   {cos:'0.70',cus:'2.10',sup:'200',frente:'16',rest_f:'5',rest_l:'5',rest_p:'3', jar:'30',modo:'Semicerrado',nota:'⚠️ Condicionado — Turístico Hotelero máx.4 niv.',ide:'—'},
-        'CS-V': {cos:'0.70',cus:'1.40',sup:'140',frente:'8', rest_f:'3',rest_l:'5',rest_p:'3', jar:'40',modo:'Variable',nota:'⚠️ Condicionado — máx. 200 m² por local',ide:'140'},
-        'MFD':  {cos:'0.70',cus:'1.40',sup:'—',frente:'—',rest_f:'Ver plano',rest_l:'5',rest_p:'3',jar:'40',modo:'Semicerrado',nota:'⚠️ Condicionado — manufactura domiciliaria, máx. 80 m²',ide:'140'},
-      },
       municipio_id: 120,
     },
 
@@ -2547,19 +2515,6 @@ const VUJ_BD_LOCAL = {
       cajones_estacionamiento: 'Ver Norma General No. 22',
       observaciones: 'PDU ZPN-02/09 2023 APR. COS 0.80. CUS 1.60 H4-U/H; CUS 2.40 H4-V condicionado (NG5 ECPD); CUS 2.40 CS-V; CUS 1.60 MB condicionado. MFM/SI/I1 condicionados (CUS volumétrico). H4-V: rest.posterior 5ml, rest.lateral 5ml, modo abierto. NG9.',
       uso_permitido: 'H4-U · H4-H · H4-V(condicionado) · EV-V · EI-V · CS-V · MB(condicionado) · MFD · MFM/SI/I1(condicionados)',
-      coefs_por_uso: {
-        'H4-U': {cos:'0.80',cus:'1.60',sup:'90', frente:'6', rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Cerrado / Semicerrado',nota:'Unifamiliar — modo cerrado/semicerrado',ide:'90'},
-        'H4-H': {cos:'0.80',cus:'1.60',sup:'120',frente:'8', rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Variable',nota:'Plurifamiliar horizontal',ide:'60'},
-        'H4-V': {cos:'0.80',cus:'2.40',sup:'200',frente:'12',rest_f:'3',rest_l:'5',         rest_p:'5', jar:'30',modo:'Abierto',nota:'⚠️ Condicionado — requiere ECPD (NG5). Alt. resultante según NG5.',ide:'50'},
-        'EV-V': {cos:'0.10',cus:'0.10',sup:'—',frente:'—',rest_f:'3',rest_l:'5',  rest_p:'5', jar:'—',modo:'Abierto',nota:'Espacios verdes — sin construcción cerrada',ide:'—'},
-        'EI-V': {cos:'0.70',cus:'1.60',sup:'—',frente:'8', rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Variable',nota:'Equipamiento vecinal',ide:'—'},
-        'CS-V': {cos:'0.80',cus:'2.40',sup:'90', frente:'6', rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Variable',nota:'Máx. 200 m² por local [nota 6]',ide:'90'},
-        'MB':   {cos:'0.80',cus:'1.60',sup:'320',frente:'16',rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Variable',nota:'⚠️ Condicionado — Mixto Barrial',ide:'50'},
-        'MFD':  {cos:'0.80',cus:'1.60',sup:'140',frente:'12',rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Variable',nota:'⚠️ Condicionado — manufactura domiciliaria',ide:'90'},
-        'MFM':  {cos:'0.80',cus:'8.00 m³/m²',cus_vol:true,sup:'180',frente:'15',rest_f:'5',rest_l:'Ver plano',rest_p:'12',jar:'0.20',modo:'Variable',nota:'⚠️ Condicionado — CUS volumétrico',ide:'—'},
-        'SI':   {cos:'0.80',cus:'8.00 m³/m²',cus_vol:true,sup:'600',frente:'15',rest_f:'5',rest_l:'Ver plano',rest_p:'12',jar:'0.20',modo:'Variable',nota:'⚠️ Condicionado — CUS volumétrico',ide:'—'},
-        'I1':   {cos:'0.80',cus:'8.00 m³/m²',cus_vol:true,sup:'600',frente:'15',rest_f:'5',rest_l:'Ver plano',rest_p:'12',jar:'0.20',modo:'Variable',nota:'⚠️ Condicionado — CUS volumétrico',ide:'—'},
-      },
       municipio_id: 120,
     },
 
@@ -2578,15 +2533,6 @@ const VUJ_BD_LOCAL = {
       cajones_estacionamiento: 'Ver Norma General No. 22',
       observaciones: 'PDU ZPN-02 2023 ADC. NG23 (Desarrollo Controlado). COS 0.80 CUS 1.60. Restricción frontal 2ml. TH condicionado máx.4 niv. CS-V condicionado. MFD condicionado. Sin H4-V, sin MB, sin industria.',
       uso_permitido: 'H4-U · H4-H · EV-V · EI-V · TH(condicionado) · CS-V(condicionado) · MFD(condicionado)',
-      coefs_por_uso: {
-        'H4-U': {cos:'0.80',cus:'1.60',sup:'90', frente:'6', rest_f:'2',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Cerrado / Semicerrado',nota:'Unifamiliar — RF 2 ml (ADC NG23)',ide:'90'},
-        'H4-H': {cos:'0.80',cus:'1.60',sup:'120',frente:'8', rest_f:'2',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Cerrado / Semicerrado',nota:'Plurifamiliar horizontal — RF 2 ml (ADC NG23)',ide:'60'},
-        'EV-V': {cos:'0.10',cus:'0.10',sup:'—',frente:'—',rest_f:'2',rest_l:'5',  rest_p:'5', jar:'—',modo:'Abierto',nota:'Espacios verdes — sin construcción cerrada',ide:'—'},
-        'EI-V': {cos:'0.70',cus:'1.60',sup:'—',frente:'8', rest_f:'2',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Variable',nota:'Equipamiento vecinal',ide:'—'},
-        'TH':   {cos:'0.70',cus:'2.10',sup:'200',frente:'16',rest_f:'5',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Semicerrado',nota:'⚠️ Condicionado — Turístico Hotelero máx.4 niv.',ide:'—'},
-        'CS-V': {cos:'0.80',cus:'1.60',sup:'90', frente:'6', rest_f:'2',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Variable',nota:'⚠️ Condicionado — máx. 200 m² por local',ide:'90'},
-        'MFD':  {cos:'0.80',cus:'1.60',sup:'—',frente:'—',rest_f:'Ver plano',rest_l:'Ver plano',rest_p:'3',jar:'30',modo:'Semicerrado',nota:'⚠️ Condicionado — manufactura domiciliaria, máx. 80 m²',ide:'90'},
-      },
       municipio_id: 120,
     },
 
@@ -2607,13 +2553,90 @@ const VUJ_BD_LOCAL = {
       uso_permitido: 'H4-U · H4-H · EV-V · EI-V · CS-V(condicionado) · TH(condicionado) · MFD(condicionado)',
       municipio_id: 120,
       coefs_por_uso: {
-        'H4-U': {cos:'0.80',cus:'1.60',sup:'90', frente:'6', rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Cerrado / Semicerrado',nota:'⚠️ PPE — máx. 4 niveles (NG14)',ide:'90'},
-        'H4-H': {cos:'0.80',cus:'1.60',sup:'120',frente:'8', rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Cerrado / Semicerrado',nota:'⚠️ PPE — máx. 4 niveles (NG14)',ide:'60'},
-        'EV-V': {cos:'0.10',cus:'0.10',sup:'—',frente:'—',rest_f:'3',rest_l:'5',  rest_p:'5', jar:'—',modo:'Abierto',nota:'Espacios verdes — sin construcción cerrada',ide:'—'},
-        'EI-V': {cos:'0.70',cus:'1.60',sup:'—',frente:'8', rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Variable',nota:'Equipamiento vecinal',ide:'—'},
-        'CS-V': {cos:'0.80',cus:'1.60',sup:'90', frente:'6', rest_f:'3',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Variable',nota:'⚠️ Condicionado — máx. 200 m² por local',ide:'90'},
-        'TH':   {cos:'0.70',cus:'2.10',sup:'200',frente:'16',rest_f:'5',rest_l:'Ver plano',rest_p:'3', jar:'30',modo:'Semicerrado',nota:'⚠️ Condicionado — Turístico Hotelero máx.4 niv.',ide:'—'},
-        'MFD':  {cos:'0.80',cus:'1.60',sup:'—',frente:'—',rest_f:'Ver plano',rest_l:'Ver plano',rest_p:'3',jar:'30',modo:'Semicerrado',nota:'⚠️ Condicionado — manufactura domiciliaria, máx. 80 m²',ide:'90'},
+        'H4-U': {cos:'0.80',cus:'1.60',alt:'Resultante CUS÷COS',modo:'Cerrado / Semicerrado',sup:'90', fre:'6',rf:'3',rl:'3',rp:'3',jar:'30',ide:'90'},
+        'H4-H': {cos:'0.80',cus:'1.60',alt:'Resultante CUS÷COS',modo:'Cerrado / Semicerrado',sup:'120',fre:'8',rf:'2',rl:'5',rp:'5',jar:'30',ide:'60'},
+        'EV-V': {cos:'0.10',cus:'0.10',alt:'Máximo 4 niveles',   modo:'Abierto',             sup:'200',fre:'—',rf:'—',rl:'5',rp:'5',jar:'—', ide:'—'},
+        'EI-V': {cos:'0.80',cus:'1.60',alt:'Resultante CUS÷COS',modo:'Variable',              sup:'90', fre:'6',rf:'—',rl:'—',rp:'—',jar:'—', ide:'90'},
+        'CS-V': {cos:'0.80',cus:'1.60',alt:'Variable',           modo:'Variable',              sup:'90', fre:'6',rf:'—',rl:'—',rp:'3',jar:'30',ide:'90'},
+        'TH':   {cos:'0.80',cus:'1.60',alt:'Resultante CUS÷COS',modo:'Variable',              sup:'200',fre:'8',rf:'—',rl:'5',rp:'5',jar:'—', ide:'—'},
+        'MFD':  {cos:'0.80',cus:'1.60',alt:'Variable',           modo:'Variable',              sup:'90', fre:'6',rf:'—',rl:'—',rp:'3',jar:'30',ide:'90'},
+      },
+    },
+
+    // MB-PPE / MD-PPE / MC-PPE — Zonas Mixtas con PPE (COS baja a 0.70, máx.4 niv.)
+    // Confirmado: ZPN-02, ZPN-03, ZPN-04 — misma matriz en todos los distritos
+    {
+      clave: 'MB-PPE',
+      descripcion_zona: 'Mixto Barrial en Área de Protección al Patrimonio Edificado',
+      coeficiente_ocupacion_suelo: '0.70',
+      coeficiente_utilizacion_suelo: '2.10',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Máximo 4 niveles (PPE — NG14)',
+      modo_edificacion: 'Variable',
+      superficie_minima: '320', frente_minimo: '16',
+      restriccion_frontal: 'Ver plano', restricciones_laterales: 'Ver plano', restriccion_posterior: 'Ver NG5',
+      indice_edificacion: '80', porcentaje_jardinado_restriccion_frontal: '20',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ PPE: Altura MÁXIMA 4 niveles — Dictamen de Imagen Urbana (NG14). PDU ZPN-02/03/04 2023 §5.2.4.3.3. COS 0.70 CUS 2.10. Aplica para MB* en todos los distritos con PPE. Confirmar en plano E-3 del distrito correspondiente.',
+      uso_permitido: 'Habitacional Plurifamiliar V · Comercio Barrial · Servicios · Equipamiento',
+      municipio_id: 120,
+    },
+    {
+      clave: 'MD-PPE',
+      descripcion_zona: 'Mixto Distrital en Área de Protección al Patrimonio Edificado',
+      coeficiente_ocupacion_suelo: '0.70',
+      coeficiente_utilizacion_suelo: '2.10',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Máximo 4 niveles (PPE — NG14)',
+      modo_edificacion: 'Variable',
+      superficie_minima: '320', frente_minimo: '16',
+      restriccion_frontal: 'Ver plano', restricciones_laterales: 'Ver plano', restriccion_posterior: 'Ver NG5',
+      indice_edificacion: '80', porcentaje_jardinado_restriccion_frontal: '20',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ PPE: Altura MÁXIMA 4 niveles (NG14). PDU ZPN-02/03/04 2023 §5.2.4.3.3. COS 0.70 CUS 2.10. Aplica para MD* en todos los distritos con PPE.',
+      uso_permitido: 'Habitacional Plurifamiliar V · Comercio Distrital · Servicios · Oficinas',
+      municipio_id: 120,
+    },
+    {
+      clave: 'MC-PPE',
+      descripcion_zona: 'Mixto Central en Área de Protección al Patrimonio Edificado',
+      coeficiente_ocupacion_suelo: '0.70',
+      coeficiente_utilizacion_suelo: '2.10',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Máximo 4 niveles (PPE — NG14)',
+      modo_edificacion: 'Variable',
+      superficie_minima: '320', frente_minimo: '16',
+      restriccion_frontal: 'Ver plano', restricciones_laterales: 'Ver plano', restriccion_posterior: 'Ver NG5',
+      indice_edificacion: '80', porcentaje_jardinado_restriccion_frontal: '20',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ PPE: Altura MÁXIMA 4 niveles (NG14). PDU ZPN-02/03/04 2023 §5.2.4.3.3. COS 0.70 CUS 2.10. Aplica para MC* en todos los distritos con PPE.',
+      uso_permitido: 'Habitacional Plurifamiliar V · Comercio Central · Servicios · Hotelería · Oficinas',
+      municipio_id: 120,
+    },
+
+    // MR-PPE — Mixto Regional con PPE (COS 0.70 para CS-R, diferente al MR estándar 0.80)
+    // Confirmado: ZPN-02, ZPN-04
+    {
+      clave: 'MR-PPE',
+      descripcion_zona: 'Mixto Regional en Área de Protección al Patrimonio Edificado',
+      coeficiente_ocupacion_suelo: '0.70',
+      coeficiente_utilizacion_suelo: '2.10',
+      icos: '0', icus: '0',
+      altura_maxima_edificacion: 'Resultante COS/CUS — sujeta a NG14',
+      modo_edificacion: 'Variable',
+      superficie_minima: '1500', frente_minimo: '30',
+      restriccion_frontal: '5', restricciones_laterales: 'Ver plano',
+      restriccion_posterior: '3 ml (12 ml si colinda MV-hab o equipamiento)',
+      indice_edificacion: '0', porcentaje_jardinado_restriccion_frontal: '20',
+      cajones_estacionamiento: 'Ver Norma General No. 22',
+      observaciones: '⚠️ USO HABITACIONAL PROHIBIDO. ⚠️ COS DIFERENTE a MR estándar: CS-R→COS 0.70 CUS 2.10 | IJ→COS 0.50 | SI→COS 0.70 CUS 6.00m³ | MFM→CUS 7.00m³. PDU ZPN-02/04 2023 §5.2.4.3.5 PPE. Altura sujeta a NG14. Nota [9]: superficie libre ≥30% verde.',
+      uso_permitido: 'CS-R · MFM · SI · IJ · I1',
+      coefs_por_uso: {
+        'CS-R': { cos:'0.70', cus:'2.10',             sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
+        'MFM':  { cos:'0.70', cus:'7.00 m³/m²', cus_vol:true, sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
+        'SI':   { cos:'0.70', cus:'6.00 m³/m²', cus_vol:true, sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
+        'IJ':   { cos:'0.50', cus:'6.00 m³/m²', cus_vol:true, sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
+        'I1':   { cos:'0.70', cus:'8.00 m³/m²', cus_vol:true, sup:'1500', frente:'30', rest_f:'5', rest_p:'3', jar:'0.20', modo:'Variable' },
       },
       municipio_id: 120,
     },
@@ -3054,12 +3077,10 @@ function construirResultadoBDLocal(b, clave, lat, lng, fuente){
     jar:   b.porcentaje_jardinado_restriccion_frontal||'',
     pdc:   'No aplica',
     dis1:  '—', dis2:'', sub1:'—', sub2:'',
-    ide:   b.indice_edificacion||'',
     uso_per: b.uso_permitido||'',
     uso_con: b.uso_condicionado||'',
     _coefs_por_uso: b.coefs_por_uso||{},
     _observaciones: b.observaciones||'',
-    fuente: fuente,
     _fuente_normas: fuente,
     lat, lng,
   };
@@ -3758,8 +3779,7 @@ async function cambiarZonaVUJ(idx, badgeEl){
       parseFloat(n.restriccion_frontal||datosZona.rest_f1)||0,
       parseFloat(n.restricciones_laterales||datosZona.rest_l1)||0,
       parseFloat(n.restriccion_posterior||datosZona.rest_p1)||0,
-      null, '#1D4ED8',
-      parseFloat(n.icos||datosZona?.icos)||0
+      null, '#1D4ED8'
     );
     if(typeof actualizar3D === 'function' && window._ventana3D && !window._ventana3D.closed) actualizar3D();
     setStatus(null,'');
@@ -4348,10 +4368,9 @@ function cambiarPoligono(idx){
   const z = datosZona;
   const splitUsos = s => {
     if(!s) return [];
-    const clean = u => u.trim().replace(/\(condicionados?\)/i,'').trim();
-    const expand = u => { const c=clean(u); return c.includes('/')?c.split('/').map(x=>x.trim()).filter(Boolean):[c]; };
-    if(s.includes('|')) return s.split('|').flatMap(expand).filter(Boolean);
-    if(s.includes('·')) return s.split('·').flatMap(expand).filter(Boolean);
+    const clean = u => u.trim().replace(/\(condicionado\)/i,'').trim();
+    if(s.includes('|')) return s.split('|').map(clean).filter(Boolean);
+    if(s.includes('·')) return s.split('·').map(clean).filter(Boolean);
     return s.split('-').filter(Boolean);
   };
   const permitidos   = z.uso_per ? splitUsos(z.uso_per) : [];
@@ -4393,16 +4412,14 @@ function cambiarPoligono(idx){
       const usosDiv = cu.querySelector('.usos-wrap');
       if(usosDiv){
         const frase = generarFraseUso(permitidos, condicionados, z.uso);
-        const tieneCoefs = !!(z._coefs_por_uso && Object.keys(z._coefs_por_uso||{}).length);
-        const mkClick = (u, esC) => tieneCoefs ? `seleccionarUso(event,'${u}',${esC})` : `mostrarTT(event,'${u}')`;
         usosDiv.innerHTML = `
         <div style="background:${frase.bg};border:1px solid ${frase.color}33;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--text2);line-height:1.6">
           ${frase.icon} ${frase.texto}
         </div>
-        <div style="font-size:11px;color:var(--text2);margin-bottom:7px">✅ Usos permitidos (${permitidos.length}) — haz clic para ver ${tieneCoefs?'coeficientes':'definición'}</div>
-        <div style="margin-bottom:14px">${permitidos.map(u=>`<span class="gu-uso-badge gu-uso-p" onclick="${mkClick(u,false)}" title="${(USO_INFO[u]||{}).n||u}">${u}</span>`).join('')}</div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:7px">✅ Usos permitidos (${permitidos.length}) — haz clic para ver definición</div>
+        <div style="margin-bottom:14px">${permitidos.map(u=>`<span class="gu-uso-badge gu-uso-p" onclick="mostrarTT(event,'${u}')" title="${(USO_INFO[u]||{}).n||u}">${u}</span>`).join('')}</div>
         <div style="font-size:11px;color:var(--text2);margin-bottom:7px">⚠️ Condicionados (${condicionados.length}) — requieren dictamen adicional</div>
-        <div>${condicionados.map(u=>`<span class="gu-uso-badge gu-uso-c" onclick="${mkClick(u,true)}" title="${(USO_INFO[u]||{}).n||u}">${u}</span>`).join('')}</div>`;
+        <div>${condicionados.map(u=>`<span class="gu-uso-badge gu-uso-c" onclick="mostrarTT(event,'${u}')" title="${(USO_INFO[u]||{}).n||u}">${u}</span>`).join('')}</div>`;
       }
       cu.style.opacity = '1';
     }, 150);
@@ -4537,31 +4554,14 @@ function renderizar(zona,todos){
   // Ej: "H4-V(condicionado)" → "H4-V", "TH(condicionado)" → "TH"
   const splitUsos = s => {
     if(!s) return [];
-    const clean = u => u.trim().replace(/\(condicionados?\)/i,'').trim();
-    const expand = u => { const c=clean(u); return c.includes('/')?c.split('/').map(x=>x.trim()).filter(Boolean):[c]; };
-    if(s.includes('|')) return s.split('|').flatMap(expand).filter(Boolean);
-    if(s.includes('\xB7')) return s.split('\xB7').flatMap(expand).filter(Boolean);
-    if(s.includes('·')) return s.split('·').flatMap(expand).filter(Boolean);
+    const clean = u => u.trim().replace(/\(condicionado\)/i,'').trim();
+    if(s.includes('|')) return s.split('|').map(clean).filter(Boolean);
+    if(s.includes('\xB7')) return s.split('\xB7').map(clean).filter(Boolean);
+    if(s.includes('·')) return s.split('·').map(clean).filter(Boolean);
     return s.split('-').filter(Boolean);
   };
-  // Separar permitidos/condicionados: tokens con (condicionado/s) en uso_per van a condicionados
-  const _sepUsos = s => {
-    if(!s) return { p:[], c:[] };
-    const _isC = t => /\(condicionados?\)/i.test(t.trim());
-    const _clean = u => u.trim().replace(/\(condicionados?\)/i,'').trim();
-    const _exp = u => { const c=_clean(u); return c.includes('/')?c.split('/').map(x=>x.trim()).filter(Boolean):[c]; };
-    let raw;
-    if(s.includes('|')) raw=s.split('|');
-    else if(s.includes('\xB7')) raw=s.split('\xB7');
-    else if(s.includes('·')) raw=s.split('·');
-    else raw=[s];
-    const p=[], c=[];
-    raw.forEach(t => { const keys=_exp(t); if(_isC(t)) c.push(...keys); else p.push(...keys); });
-    return { p:p.filter(Boolean), c:c.filter(Boolean) };
-  };
-  const _sep = tieneBDUsos && zona.uso_per ? _sepUsos(zona.uso_per) : { p: splitUsos(!esVUJ&&zona.uso_per?zona.uso_per:''), c: splitUsos(!esVUJ&&zona.uso_con?zona.uso_con:'') };
-  const permitidos   = _sep.p;
-  const condicionados= (tieneBDUsos ? _sep.c : []).concat(tieneBDUsos&&zona.uso_con?splitUsos(zona.uso_con):[]);
+  const permitidos   = tieneBDUsos && zona.uso_per ? splitUsos(zona.uso_per) : (!esVUJ && zona.uso_per ? splitUsos(zona.uso_per) : []);
+  const condicionados= tieneBDUsos && zona.uso_con ? splitUsos(zona.uso_con) : (!esVUJ && zona.uso_con ? splitUsos(zona.uso_con) : []);
   const vistos=calcularVistos(patGlobal);
   const semaforo=vistos.some(v=>v.u==='alta')?'rojo':(vistos.length||zona._bd_local_usada)?'amarillo':'verde';
   const semTxt=semaforo==='verde'?'Sin restricciones patrimoniales detectadas':semaforo==='amarillo'?(zona._bd_local_usada&&!vistos.length?'Normas de referencia — requiere consulta a los Planes Parciales o a la Dirección de Ordenamiento del Territorio':'Restricciones condicionales — vistos buenos requeridos'):'Restricciones graves — dictamen de organismos patrimoniales requerido (INAH / Cultura Jalisco)';
@@ -4808,7 +4808,7 @@ function renderizar(zona,todos){
           <div class="gu-field"><div class="gu-field-lbl">Superficie mínima de lote</div><div class="gu-field-val" id="dynSUP" style="font-size:15px">${zona.sup_min||'No aplica'} ${zona.sup_min?'m²':''}</div><div class="gu-field-sub">Tamaño mínimo requerido del terreno</div></div>
           <div class="gu-field"><div class="gu-field-lbl">Frente mínimo de lote</div><div class="gu-field-val" id="dynFRENTE" style="font-size:15px">${zona.fre_min||'No aplica'} ${zona.fre_min?'m':''}</div><div class="gu-field-sub">Ancho mínimo del terreno sobre la calle</div></div>
           <div class="gu-field"><div class="gu-field-lbl">Frente ajardinado</div><div class="gu-field-val" id="dynJARD" style="font-size:15px">${(zona.fre_aj!=null&&zona.fre_aj!=='')?(()=>{const v=parseFloat(zona.fre_aj);return (v>0&&v<=1?(v*100):v)+'%';})():'No aplica'}</div><div class="gu-field-sub">% del frente que debe ser área verde</div></div>
-          <div class="gu-field"><div class="gu-field-lbl">Índice de edificación (IDE)</div><div class="gu-field-val" id="dynIDE" style="font-size:15px">${zona.ide||'No aplica'} ${zona.ide?'m²':''}</div><div class="gu-field-sub">Superficie mínima por vivienda</div></div>
+          <div class="gu-field"><div class="gu-field-lbl">Índice de edificación (IDE)</div><div class="gu-field-val" style="font-size:15px">${zona.ide||'No aplica'} ${zona.ide?'m²':''}</div><div class="gu-field-sub">Superficie mínima por vivienda</div></div>
         </div>
       </div>
     </div>
@@ -4830,7 +4830,6 @@ function renderizar(zona,todos){
 
     ${(()=>{
       const cos  = parseFloat(zona.cos)||0;
-      const icos = parseFloat(zona.icos)||0;
       const rf   = parseFloat(zona.rest_f1)||0;
       const rl   = parseFloat(zona.rest_l1)||0;
       const rp   = parseFloat(zona.rest_p1)||0;
@@ -4839,9 +4838,9 @@ function renderizar(zona,todos){
       <div class="gu-rcard">
         <div class="gu-rcard-hdr">Vista aérea del predio — Distribución normativa</div>
         <div class="gu-rcard-body" style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
-          <div id="diagramaPredi">${generarSVGPredi(cos,rf,rl,rp,undefined,icos)}</div>
+          <div id="diagramaPredi">${generarSVGPredi(cos,rf,rl,rp)}</div>
           <div id="diagramaLeyenda" style="flex:1;min-width:140px;font-size:11px;color:var(--text2);line-height:1.8">
-            ${generarLeyendaPredi(cos,rf,rl,rp,undefined,icos)}
+            ${generarLeyendaPredi(cos,rf,rl,rp)}
           </div>
         </div>
       </div>`;
@@ -5158,17 +5157,6 @@ function _renderCajones(supConst, supConstIcus, sup, cajonesTexto, uso){
         ${park.base}
       </div>` : `
       ${hasIcus?`<div style="font-size:9px;color:var(--text3);font-weight:600;margin-bottom:4px;padding:2px 6px;background:rgba(255,255,255,.07);border-radius:3px;display:inline-block">Base (CUS)</div>`:''}
-      ${park.esHabEnCS ? `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:${hasIcus?'6':'8'}px">
-        <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;text-align:center">
-          <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:var(--uso-p-txt)">${park.cajones}</div>
-          <div style="font-size:10px;color:var(--text2);margin-top:2px">Mínimo requerido</div>
-        </div>
-        <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;text-align:center">
-          <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:var(--brand-light)">${park.cajMax !== null ? park.cajMax : '∞'}</div>
-          <div style="font-size:10px;color:var(--text2);margin-top:2px">Máximo permitido</div>
-        </div>
-      </div>` : `
       <div style="display:grid;grid-template-columns:1fr 1fr ${park.cajonesVisita>0?'1fr':''};gap:10px;margin-bottom:${hasIcus?'6':'8'}px">
         <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;text-align:center">
           <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:var(--uso-p-txt)">${park.cajones}</div>
@@ -5183,21 +5171,10 @@ function _renderCajones(supConst, supConstIcus, sup, cajonesTexto, uso){
           <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:var(--uso-p-txt)">${park.total}</div>
           <div style="font-size:10px;color:var(--text2);margin-top:2px">Total requerido</div>
         </div>
-      </div>`}
+      </div>
       ${hasIcus && park2 && (park2.cajones>0||park2.esTexto) ? `
       <div style="background:rgba(20,184,166,.08);border:1px solid rgba(20,184,166,.25);border-radius:6px;padding:8px 10px;margin-bottom:8px">
         <div style="font-size:9px;color:var(--teal);font-weight:600;margin-bottom:6px">⊕ Con iCUS — ${fmt(supConstIcus)} m²</div>
-        ${park2.esHabEnCS ? `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;text-align:center">
-            <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:var(--teal)">${park2.cajones}</div>
-            <div style="font-size:10px;color:var(--text2);margin-top:2px">Mínimo requerido</div>
-          </div>
-          <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;text-align:center">
-            <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:var(--brand-light)">${park2.cajMax !== null ? park2.cajMax : '∞'}</div>
-            <div style="font-size:10px;color:var(--text2);margin-top:2px">Máximo permitido</div>
-          </div>
-        </div>` : `
         <div style="display:grid;grid-template-columns:1fr 1fr ${park2.cajonesVisita>0?'1fr':''};gap:10px">
           <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;text-align:center">
             <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:var(--teal)">${park2.cajones}</div>
@@ -5212,7 +5189,7 @@ function _renderCajones(supConst, supConstIcus, sup, cajonesTexto, uso){
             <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:var(--teal)">${park2.total}</div>
             <div style="font-size:10px;color:var(--text2);margin-top:2px">Total requerido</div>
           </div>
-        </div>`}
+        </div>
       </div>
       `:''}`}
       <div style="font-size:10px;color:var(--text3);line-height:1.6">
@@ -5237,41 +5214,29 @@ function _renderCajones(supConst, supConstIcus, sup, cajonesTexto, uso){
       const clave = ((z._clave_bd||z.uso||z.ppp||'')+'').trim().toUpperCase();
       const usos = (((z.uso_per||z.uso_permitido||''))+' '+((z.uso_con||z.uso_condicionado||''))).toUpperCase();
       // Si la zona ES un tipo CS directo
-      if(/^CS1\b/.test(clave)) return {CS1:'aplica',CS2:'no',CS3:'no',CS4:'no',CS5:'no'};
-      if(/^CS2\b/.test(clave)) return {CS1:'aplica',CS2:'aplica',CS3:'no',CS4:'no',CS5:'no'};
-      if(/^CS3\b/.test(clave)) return {CS1:'aplica',CS2:'aplica',CS3:'aplica',CS4:'no',CS5:'no'};
-      if(/^CS4\b/.test(clave)) return {CS1:'aplica',CS2:'aplica',CS3:'aplica',CS4:'aplica',CS5:'no'};
-      if(/^CS5\b/.test(clave)) return {CS1:'aplica',CS2:'aplica',CS3:'aplica',CS4:'aplica',CS5:'aplica'};
-      if(/^CS-V\b/.test(clave)||clave==='CSV') return {CS1:'aplica',CS2:'no',CS3:'no',CS4:'no',CS5:'no'};
+      if(/^CS1\b/.test(clave)) return {CS1:'aplica',CS2:'no',CS3:'no'};
+      if(/^CS2\b/.test(clave)) return {CS1:'aplica',CS2:'aplica',CS3:'no'};
+      if(/^CS3\b/.test(clave)||/^CS4\b/.test(clave)) return {CS1:'aplica',CS2:'aplica',CS3:'aplica'};
+      if(/^CS-V\b/.test(clave)||clave==='CSV') return {CS1:'aplica',CS2:'no',CS3:'no'};
       // Basado en usos explícitos de la zona
-      if(usos.includes('CS5')) return {CS1:'aplica',CS2:'aplica',CS3:'aplica',CS4:'aplica',CS5:'aplica'};
-      if(usos.includes('CS4')) return {CS1:'aplica',CS2:'aplica',CS3:'aplica',CS4:'aplica',CS5:'no'};
-      if(usos.includes('CS3')) return {CS1:'aplica',CS2:'aplica',CS3:'aplica',CS4:'no',CS5:'no'};
-      if(usos.includes('CS2')) return {CS1:'aplica',CS2:'aplica',CS3:'no',CS4:'no',CS5:'no'};
-      if(usos.includes('CS1')||usos.includes('CS-V')||usos.includes('CSV')) return {CS1:'aplica',CS2:'no',CS3:'no',CS4:'no',CS5:'no'};
+      if(usos.includes('CS3')||usos.includes('CS4')) return {CS1:'aplica',CS2:'aplica',CS3:'aplica'};
+      if(usos.includes('CS2')) return {CS1:'aplica',CS2:'aplica',CS3:'no'};
+      if(usos.includes('CS1')||usos.includes('CS-V')||usos.includes('CSV')) return {CS1:'aplica',CS2:'no',CS3:'no'};
       // Zonas habitacionales puras — solo CS1 condicionado
-      if(/^H[12]\b/.test(clave)||clave==='H1'||clave==='H2') return {CS1:'cond',CS2:'no',CS3:'no',CS4:'no',CS5:'no'};
-      if(/^H[34]\b/.test(clave)||clave==='H3'||clave==='H4') return {CS1:'aplica',CS2:'cond',CS3:'no',CS4:'no',CS5:'no'};
+      if(/^H[12]\b/.test(clave)||clave==='H1'||clave==='H2') return {CS1:'cond',CS2:'no',CS3:'no'};
+      if(/^H[34]\b/.test(clave)||clave==='H3'||clave==='H4') return {CS1:'aplica',CS2:'cond',CS3:'no'};
       return null; // sin info → mostrar todo
     };
     const csApl = _detectCs();
     const niveles = [
-      {clave:'CS1', label:'Comercio vecinal',  minAbs:0,    maxAbs:1,    minRat:null, maxRat:null,  nota:'Tiendas, servicios de barrio',    desc:'Mín: 0 · Máx: 1 cajón'},
-      {clave:'CS2', label:'Comercio barrial',   minAbs:0,    maxAbs:null, minRat:null, maxRat:80,    nota:'Restaurantes, oficinas, centros',  desc:'Mín: 0 · Máx: 1/80 m²'},
-      {clave:'CS3', label:'Comercio distrital', minAbs:null, maxAbs:null, minRat:80,   maxRat:80/3,  nota:'Plaza comercial, súper regional',  desc:'Mín: 1/80 m² · Máx: 3/80 m²'},
-      {clave:'CS4', label:'Comercio intensivo', minAbs:null, maxAbs:null, minRat:80,   maxRat:80/6,  nota:'Grandes superficies, departamentales', desc:'Mín: 1/80 m² · Máx: 6/80 m²'},
-      {clave:'CS5', label:'Comercio máximo',    minAbs:null, maxAbs:null, minRat:80,   maxRat:80/9,  nota:'Centros regionales, macro comercios',  desc:'Mín: 1/80 m² · Máx: 9/80 m²'},
+      {clave:'CS1', label:'Comercio vecinal',   ratio:40, nota:'Tiendas, servicios de barrio'},
+      {clave:'CS2', label:'Comercio barrial',    ratio:30, nota:'Restaurantes, oficinas, centros'},
+      {clave:'CS3', label:'Comercio distrital',  ratio:25, nota:'Plaza comercial, súper regional'},
     ];
-    const _cajMinCom = (sup, n) => n.minAbs !== null ? n.minAbs : (n.minRat ? Math.ceil(sup / n.minRat) : 0);
-    const _cajMaxCom = (sup, n) => n.maxAbs !== null ? n.maxAbs : (n.maxRat ? Math.ceil(sup / n.maxRat) : 0);
     const rows = niveles.map(n=>{
       const apl = csApl ? csApl[n.clave] : 'aplica';
-      const cajMin = _cajMinCom(supConst, n);
-      const cajMax = _cajMaxCom(supConst, n);
-      const cajMin2 = hasIcus ? _cajMinCom(supConstIcus, n) : null;
-      const cajMax2 = hasIcus ? _cajMaxCom(supConstIcus, n) : null;
-      const cajStr  = cajMin===cajMax ? `${cajMax}` : `${cajMin}–${cajMax}`;
-      const cajStr2 = cajMin2===cajMax2 ? `${cajMax2}` : `${cajMin2}–${cajMax2}`;
+      const caj = Math.ceil(supConst / n.ratio);
+      const caj2 = hasIcus ? Math.ceil(supConstIcus / n.ratio) : null;
       if(apl === 'no'){
         return `<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);opacity:0.5">
           <div>
@@ -5287,25 +5252,25 @@ function _renderCajones(supConst, supConstIcus, sup, cajonesTexto, uso){
           <span style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--brand)">${n.clave}</span>
           <span style="font-size:11px;color:var(--text2);margin-left:6px">${n.label}</span>
           ${apl==='cond'?`<span style="font-size:9px;background:rgba(234,179,8,.15);color:#ca8a04;border-radius:3px;padding:1px 5px;margin-left:5px">condicionado</span>`:''}
-          <div style="font-size:10px;color:var(--text3)">${n.nota} · ${n.desc}</div>
+          <div style="font-size:10px;color:var(--text3)">${n.nota} · 1 cajón / ${n.ratio} m²</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:10px">
           <div style="text-align:center">
-            <div style="font-family:var(--mono);font-size:16px;font-weight:600;color:var(--brand);line-height:1">${cajStr}</div>
+            <div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--brand);line-height:1">${caj}</div>
             ${hasIcus?`<div style="font-size:8px;color:var(--text3)">base</div>`:''}
           </div>
-          ${hasIcus && cajMin2!==null?`
+          ${hasIcus && caj2!==null?`
           <div style="text-align:center;border-left:1px solid var(--border);padding-left:8px">
-            <div style="font-family:var(--mono);font-size:16px;font-weight:600;color:var(--teal);line-height:1">${cajStr2}</div>
+            <div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--teal);line-height:1">${caj2}</div>
             <div style="font-size:8px;color:var(--teal)">iCUS</div>
           </div>`:''}
         </div>
       </div>`;
     }).join('');
     el.innerHTML=`<div style="background:var(--bg3);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px">
-      <div style="font-weight:600;color:var(--text);margin-bottom:8px">🏪 Cajones Comercial — mín requerido · máx permitido${hasIcus?` <span style="font-size:10px;color:var(--teal);font-weight:400">(base / con iCUS)</span>`:''}</div>
+      <div style="font-weight:600;color:var(--text);margin-bottom:8px">🏪 Cajones requeridos — Comercial${hasIcus?` <span style="font-size:10px;color:var(--teal);font-weight:400">(base / con iCUS)</span>`:''}</div>
       ${rows}
-      <div style="font-size:10px;color:var(--text3);margin-top:6px">Base: ${fmt(supConst)} m²${hasIcus?` · iCUS: ${fmt(supConstIcus)} m²`:''} · RGIM Cap. VI, Art. 278 I · GDL${csApl?` · Zona ${(datosZona&&(datosZona._clave_bd||datosZona.uso))||''}`:''}</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:6px">Base: ${fmt(supConst)} m²${hasIcus?` · iCUS: ${fmt(supConstIcus)} m²`:''} · Reglamento GDL${csApl?` · Zona ${(datosZona&&(datosZona._clave_bd||datosZona.uso))||''}`:''}</div>
     </div>`;
   }
 }
@@ -5320,8 +5285,8 @@ const CAJONES_GDL = {
   H1:  { label:'Vivienda unifamiliar',          por:'vivienda',  cajones:1,    visita:0.25 },
   H2:  { label:'Vivienda bifamiliar',            por:'vivienda',  cajones:1,    visita:0.25 },
   H3:  { label:'Vivienda plurifamiliar media',   por:'vivienda',  cajones:1,    visita:0.25 },
-  H4:  { label:'Vivienda plurifamiliar alta',    por:'vivienda',  cajones:1,    visita:0.25 },
-  H5:  { label:'Vivienda plurifamiliar máxima',  por:'vivienda',  cajones:0.25, visita:0.25 },
+  H4:  { label:'Vivienda plurifamiliar alta',    por:'vivienda',  cajones:1.5,  visita:0.25 },
+  H5:  { label:'Vivienda plurifamiliar máxima',  por:'vivienda',  cajones:1.5,  visita:0.25 },
   // Comercio y servicios
   CS1: { label:'Comercio mínimo',   por:'m2_const', cajones:1/40,  visita:0 },
   CS2: { label:'Comercio bajo',     por:'m2_const', cajones:1/30,  visita:0 },
@@ -5381,14 +5346,12 @@ function calcularCajones(uso, supConst, supTerreno, cajonesTexto){
     const supViv = Math.max(20, _supPorVivienda || 80);
     const numVivs = Math.max(1, Math.floor(supConst / supViv));
     const hClass = supViv > 300 ? 'H1' : supViv > 120 ? 'H2' : supViv > 90 ? 'H3' : 'H4';
-    const maxFactor = hClass==='H2' ? 3 : hClass==='H3' ? 2 : hClass==='H4' ? 1 : null;
-    const cajMax = maxFactor !== null ? numVivs * maxFactor : null;
-    const maxPorViv = hClass==='H1' ? 'sin límite' : hClass==='H2' ? '3/viv máx' : hClass==='H3' ? '2/viv máx' : '1/viv máx';
+    const maxPorViv = hClass==='H1' ? 'sin límite' : hClass==='H2' ? '3 máx' : hClass==='H3' ? '2 máx' : '1 máx';
     return {
       codigo, label:`Vivienda en zona ${codigo} (${hClass})`,
-      cajones: numVivs, cajMax, cajonesVisita: 0, total: numVivs,
+      cajones: numVivs, cajonesVisita: 0, total: numVivs,
       base: `${numVivs} viviendas est. (${fmt(supConst)} m² ÷ ${supViv} m²/viv)`,
-      detalle: `${hClass}: ${supViv} m²/viv → 1 cajón/viv mín · ${maxPorViv}`,
+      detalle: `${hClass}: ${supViv} m²/viv → 1 cajón mín, ${maxPorViv}`,
       hClass, esHabEnCS: true
     };
   }
@@ -5582,7 +5545,6 @@ function seleccionarUso(event, clave, esCondicionado) {
   set('dynRESTF', coefs.rest_f ? coefs.rest_f+' m' : '—');
   set('dynRESTL', coefs.rest_l ? coefs.rest_l+' m' : '—');
   set('dynRESTp', coefs.rest_p ? coefs.rest_p+' m' : '—');
-  { const ideEl=document.getElementById('dynIDE'); if(ideEl) ideEl.textContent=coefs.ide?coefs.ide+' m²':(zona.ide?zona.ide+' m²':'No aplica'); }
   const info = USO_INFO[clave] || {};
   const condTag = esCondicionado
     ? `<span style="background:var(--sem-am-bg);color:var(--sem-am-txt);border:1px solid #78350F;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;margin-left:8px">▲ CONDICIONADO</span>`
@@ -5668,15 +5630,15 @@ function seleccionarUso(event, clave, esCondicionado) {
             <div class="gu-sim-val">${supDesplante} m²<span class="gu-sim-tag">COS ${cosUso}</span></div>
             <div class="gu-sim-lbl">Área de desplante máx.</div>
           </div>
-          <div class="gu-sim-item" style="border-color:${coefs.cus_vol?'#B45309':'var(--brand)'}">
-            <div class="gu-sim-val">${supConstr} ${coefs.cus_vol?'m³':'m²'}<span class="gu-sim-tag" style="${coefs.cus_vol?'background:#92400E;color:#FEF3C7':''}">${coefs.cus_vol?'VOL m³ ':''}CUS ${cusUso}</span></div>
-            <div class="gu-sim-lbl">${coefs.cus_vol?'Volumen edificado máx.':'Área construible base'}</div>
+          <div class="gu-sim-item" style="border-color:var(--brand)">
+            <div class="gu-sim-val">${supConstr} m²<span class="gu-sim-tag">CUS ${cusUso}</span></div>
+            <div class="gu-sim-lbl">Área construible base</div>
           </div>
           <div class="gu-sim-total" style="grid-column:1/-1;border-color:var(--brand)">
             <div style="font-size:10px;color:var(--brand-light);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">Uso: ${clave}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
               <div><div style="font-size:10px;color:var(--text2);font-family:var(--mono);margin-bottom:3px">COS ${cosUso}</div><div style="font-size:17px;font-weight:600;font-family:var(--mono)">${supDesplante} m²</div><div style="font-size:10px;color:var(--text3);margin-top:2px">${cosUso} × ${fmt(sup)} m²</div></div>
-              <div><div style="font-size:10px;color:var(--text2);font-family:var(--mono);margin-bottom:3px">CUS ${cusUso}${coefs.cus_vol?' <span style=\"background:#92400E;color:#FEF3C7;border-radius:3px;padding:0 4px;font-size:7px;font-weight:700\">VOL</span>':''}</div><div style="font-size:17px;font-weight:600;font-family:var(--mono)">${total} ${coefs.cus_vol?'m³':'m²'}</div><div style="font-size:10px;color:var(--text3);margin-top:2px">${cusUso} × ${fmt(sup)} m²${coefs.cus_vol?' → volumen':''}</div></div>
+              <div><div style="font-size:10px;color:var(--text2);font-family:var(--mono);margin-bottom:3px">CUS ${cusUso}</div><div style="font-size:17px;font-weight:600;font-family:var(--mono)">${total} m²</div><div style="font-size:10px;color:var(--text3);margin-top:2px">${cusUso} × ${fmt(sup)} m²</div></div>
             </div>
           </div>`;
         // Scroll al simulador
@@ -5687,19 +5649,14 @@ function seleccionarUso(event, clave, esCondicionado) {
       const rfU = parseFloat(coefs.rest_f)||parseFloat(datosZona?.rest_f1)||0;
       const rlU = parseFloat(coefs.rest_l)||parseFloat(datosZona?.rest_l1)||0;
       const rpU = parseFloat(coefs.rest_p)||parseFloat(datosZona?.rest_p1)||0;
-      actualizarDiagramaPredi(cosUso, rfU, rlU, rpU, clave, '#F59E0B', parseFloat(coefs.icos||datosZona?.icos)||0);
+      actualizarDiagramaPredi(cosUso, rfU, rlU, rpU, clave, '#F59E0B');
       if(simNota){
         const info = USO_INFO[clave]||{};
         const supD = (sup * cosUso).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
         const supC = (sup * cusUso).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
-        const _entrepiso = parseFloat(document.getElementById('inputEntrepiso')?.value)||3.0;
-        const _altMax = cosUso > 0 ? fmt(Math.round(cusUso/cosUso*10)/10) : '—';
-        const _msgCus = coefs.cus_vol
-          ? '⚡ <strong>CUS volumétrico — ' + clave + ':</strong> En un terreno de <strong>' + fmt(sup) + ' m²</strong> el <strong>volumen edificado máximo</strong> es <strong>' + supC + ' m³</strong>. Altura máx. resultante: <strong>' + _altMax + ' m</strong> (CUS÷COS). Con entrepiso de <strong>' + _entrepiso.toFixed(1) + ' m</strong> → <strong>' + fmt(Math.round(sup*cusUso/_entrepiso)) + ' m² construibles</strong> estimados.'
-          : '🏗️ <strong>En términos simples para ' + clave + ':</strong> En un terreno de <strong>' + fmt(sup) + ' m²</strong> puedes construir una huella máxima de <strong>' + supD + ' m²</strong> por nivel, y hasta <strong>' + supC + ' m²</strong> totales.';
         simNota.innerHTML = `
           <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:6px;font-size:13px;color:var(--text2);line-height:1.7">
-            ${_msgCus}
+            🏗️ <strong>En términos simples para ${clave}:</strong> En un terreno de <strong>${fmt(sup)} m²</strong> puedes construir una huella máxima de <strong>${supD} m²</strong> por nivel, y hasta <strong>${supC} m²</strong> totales.
             ${info.n?`<br><span style="font-size:11px;color:var(--text3)">${info.n}</span>`:''}
           </div>`;
       }
@@ -5734,7 +5691,7 @@ function cerrarCoefsUso(){
   set('dynRESTL', z.rest_l1 ? z.rest_l1+' m' : '—');
   set('dynRESTp', z.rest_p1 ? z.rest_p1+' m' : '—');
   // Restaurar diagrama del predio con valores originales de la zona
-  actualizarDiagramaPredi(parseFloat(z.cos)||0, parseFloat(z.rest_f1)||0, parseFloat(z.rest_l1)||0, parseFloat(z.rest_p1)||0, null, '#1D4ED8', parseFloat(z.icos)||0);
+  actualizarDiagramaPredi(parseFloat(z.cos)||0, parseFloat(z.rest_f1)||0, parseFloat(z.rest_l1)||0, parseFloat(z.rest_p1)||0, null, '#1D4ED8');
   if(_ventana3D && !_ventana3D.closed) actualizar3D();
 }
 
@@ -5780,7 +5737,7 @@ function limpiarBusqueda(){
   document.getElementById('inCalle').focus();
   setStatus(null);
 }
-function generarSVGPredi(cos, rf, rl, rp, color, icos){
+function generarSVGPredi(cos, rf, rl, rp, color){
   const W=240, H=200, PAD=36;
   const TW=W, TH=H;
   const escala = Math.min(TH/20, TW/14);
@@ -5790,16 +5747,6 @@ function generarSVGPredi(cos, rf, rl, rp, color, icos){
   const cx=PAD+pxL, cy=PAD+pxF, cw=TW-pxL*2, ch=TH-pxF-pxP;
   const cConst = color||'#1D4ED8';
   const pct = v => v>0&&v<=1 ? Math.round(v*100) : Math.round(v);
-  const icosV    = parseFloat(icos)||0;
-  const cosTotal = +(cos + icosV).toFixed(2);
-  const tieneIcos = icosV > 0;
-  const lblMain  = tieneIcos ? `COS+iCOS ${cosTotal}` : `COS ${cos}`;
-  const pctTotal = pct(cosTotal);
-  const y1 = cy+ch/2 + (tieneIcos ? -14 : -4);
-  const y2 = cy+ch/2 + (tieneIcos ? 4 : 8);
-  const desgloseSVG = tieneIcos
-    ? `<text x="${cx+cw/2}" y="${cy+ch/2+18}" text-anchor="middle" fill="#94A3B8" font-size="9" font-family="monospace">COS ${cos} + iCOS ${icosV}</text>`
-    : '';
   return `<svg width="${TW+PAD*2}" height="${TH+PAD*2}" viewBox="0 0 ${TW+PAD*2} ${TH+PAD*2}" xmlns="http://www.w3.org/2000/svg" style="display:block">
     <rect x="${PAD}" y="${PAD}" width="${TW}" height="${TH}" fill="#1E293B" stroke="#334155" stroke-width="1.5" rx="2"/>
     ${pxF>0?`<rect x="${PAD}" y="${PAD}" width="${TW}" height="${pxF}" fill="#0F172A" opacity="0.7"/>
@@ -5814,35 +5761,20 @@ function generarSVGPredi(cos, rf, rl, rp, color, icos){
     <line x1="${PAD+TW-pxL}" y1="${PAD}" x2="${PAD+TW-pxL}" y2="${PAD+TH}" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4,3"/>
     <text x="${PAD+pxL/2}" y="${PAD+TH/2+4}" text-anchor="middle" fill="#F59E0B" font-size="9" font-family="monospace" transform="rotate(-90,${PAD+pxL/2},${PAD+TH/2})">RL ${rl}m</text>`:''}
     <rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" fill="${cConst}" opacity="0.85" rx="2"/>
-    <text x="${cx+cw/2}" y="${y1}" text-anchor="middle" fill="#fff" font-size="${tieneIcos?10:11}" font-weight="bold" font-family="monospace">${lblMain}</text>
-    <text x="${cx+cw/2}" y="${y2}" text-anchor="middle" fill="#93C5FD" font-size="10" font-family="monospace">${pctTotal}% del terreno</text>
-    ${desgloseSVG}
+    <text x="${cx+cw/2}" y="${cy+ch/2-8}" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold" font-family="monospace">COS ${cos}</text>
+    <text x="${cx+cw/2}" y="${cy+ch/2+8}" text-anchor="middle" fill="#93C5FD" font-size="10" font-family="monospace">${pct(cos)}% del terreno</text>
     <text x="${PAD+TW/2}" y="${PAD-8}" text-anchor="middle" fill="#64748B" font-size="9" font-family="sans-serif" letter-spacing="2">CALLE / FRENTE</text>
     <text x="${PAD+TW+8}" y="${PAD+14}" fill="#64748B" font-size="10" font-family="sans-serif">N↑</text>
   </svg>`;
 }
-function generarLeyendaPredi(cos, rf, rl, rp, clave, icos){
+function generarLeyendaPredi(cos, rf, rl, rp, clave){
   const pct = v => v>0&&v<=1 ? Math.round(v*100) : Math.round(v);
-  const colorBox  = clave ? '#F59E0B' : '#1D4ED8';
-  const icosV     = parseFloat(icos)||0;
-  const cosTotal  = +(cos + icosV).toFixed(2);
-  const pctTotal  = pct(cosTotal);
-  const tieneIcos = icosV > 0;
-  const lblArea   = tieneIcos ? `COS+iCOS — ${pctTotal}% del terreno` : `${pct(cos)}% del terreno`;
-  const icosRow   = tieneIcos ? `
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-      <div style="width:12px;height:12px;background:#1E40AF;border:2px dashed #93C5FD;border-radius:2px;flex-shrink:0"></div>
-      <span><strong>iCOS ${icosV}</strong> — área libre sin constr. cerrada ${pct(icosV)}%</span>
-    </div>` : '';
-  const cosLinea = tieneIcos
-    ? `<div style="margin-top:4px;padding-top:4px;border-top:1px solid var(--border)">COS <strong>${cos}</strong> + iCOS <strong>${icosV}</strong> = <strong>${cosTotal}</strong> → desplante máx <strong>${pctTotal}%</strong> del terreno</div>`
-    : `<div style="margin-top:4px;padding-top:4px;border-top:1px solid var(--border)">COS <strong>${cos}</strong> = desplante máx ${pct(cos)}% del terreno</div>`;
+  const colorBox = clave ? '#F59E0B' : '#1D4ED8';
   return `<div style="margin-bottom:8px">
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
       <div style="width:12px;height:12px;background:${colorBox};border-radius:2px;flex-shrink:0"></div>
-      <span><strong>Área construible${clave?' ('+clave+')':''}</strong> — ${lblArea}</span>
+      <span><strong>Área construible${clave?' ('+clave+')':''}</strong> — ${pct(cos)}% del terreno</span>
     </div>
-    ${icosRow}
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
       <div style="width:12px;height:12px;background:#0F172A;border:1px solid #F59E0B;border-radius:2px;flex-shrink:0"></div>
       <span><strong>Restricciones</strong> — sin construcción cerrada</span>
@@ -5856,15 +5788,15 @@ function generarLeyendaPredi(cos, rf, rl, rp, clave, icos){
     ${rf>0?`<div>↑ Frontal: <strong>${rf} ml</strong></div>`:''}
     ${rp>0?`<div>↓ Posterior: <strong>${rp} ml</strong></div>`:''}
     ${rl>0?`<div>↔ Lateral: <strong>${rl} ml</strong> c/lado</div>`:''}
-    ${cosLinea}
+    <div style="margin-top:4px;padding-top:4px;border-top:1px solid var(--border)">COS <strong>${cos}</strong> = desplante máx ${pct(cos)}% del terreno</div>
   </div>
   <div style="margin-top:8px;font-size:10px;color:var(--text3);line-height:1.5">⚠️ Diagrama esquemático. Las medidas reales dependen de la forma del predio.</div>`;
 }
-function actualizarDiagramaPredi(cos, rf, rl, rp, clave, color, icos){
+function actualizarDiagramaPredi(cos, rf, rl, rp, clave, color){
   const d = document.getElementById('diagramaPredi');
   const l = document.getElementById('diagramaLeyenda');
-  if(d) d.innerHTML = generarSVGPredi(cos, rf, rl, rp, color, icos);
-  if(l) l.innerHTML = generarLeyendaPredi(cos, rf, rl, rp, clave, icos);
+  if(d) d.innerHTML = generarSVGPredi(cos, rf, rl, rp, color);
+  if(l) l.innerHTML = generarLeyendaPredi(cos, rf, rl, rp, clave);
 }
 
 function generarFraseUso(permitidos, condicionados, uso){
@@ -6298,5 +6230,6 @@ function guToggleTheme(){
   localStorage.setItem('gu_theme',isDark?'light':'dark');
 }
 </script>
+
 </body>
 </html>

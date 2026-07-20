@@ -1,6 +1,13 @@
+/* ==========================================================
+   GestorUrbano Jalisco AMG / TrazaUrbana
+   (c) 2026 Fernando H. - trazaurbana.mx
+   Todos los derechos reservados.
+   Reproduccion o uso no autorizado esta prohibido.
+   ========================================================== */
+
 /* ============================================================
-   GU DESIGN SYSTEM — Gestor Urbano Jalisco AMG
-   Versión: 1.0 · Junio 2026
+   GU DESIGN SYSTEM — Traza Urbana · Gestor Urbano Jalisco AMG
+   Versión: 2.0 · Jul 2026
    Uso: <link rel="stylesheet" href="gu-design-system.css">
    Requiere: Outfit + Geist Mono via Google Fonts
    ============================================================ */
@@ -18,10 +25,18 @@
    1. TOKENS — MODO CLARO
    ============================================================ */
 :root{
-  /* Marca */
-  --brand:        #1A2744;
-  --brand-light:  #2D3A6B;
-  --brand-pale:   #E6EAF4;
+  /* ── Paleta TrazaUrbana ── */
+  --tinta:        #0B2340;
+  --plano:        #14395C;
+  --obra:         #D85A30;
+  --piedra:       #B4B2A9;
+  --papel:        #F6F3EC;
+
+  /* Marca (mapeada a paleta TrazaUrbana) */
+  --brand:        #0B2340;
+  --brand-light:  #14395C;
+  --brand-pale:   #E6EDF4;
+  --brand-warm:   #D85A30;
 
   /* Fondos */
   --bg:           #F9FAFB;

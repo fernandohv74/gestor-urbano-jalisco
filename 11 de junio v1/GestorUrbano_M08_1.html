@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- ==========================================================
+     GestorUrbano Jalisco AMG / TrazaUrbana
+     (c) 2026 Fernando H. - trazaurbana.mx
+     Todos los derechos reservados.
+     Reproduccion o uso no autorizado esta prohibido.
+     ========================================================== -->
+
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -175,10 +182,10 @@ function guToggleTheme(){
 
 <!-- NAV -->
 <nav class="gu-nav">
-  <div class="gu-nav-logo">
-    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 1L1 5v9h5v-4h4v4h5V5L8 1z"/></svg>
+  <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+    <svg width="28" height="28" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="flex-shrink:0"><rect x="3" y="3" width="94" height="94" rx="16" fill="#C4D2E0"/><line x1="0" y1="22" x2="100" y2="22" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="44" x2="100" y2="44" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="66" x2="100" y2="66" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="88" x2="100" y2="88" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="22" y1="0" x2="22" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="44" y1="0" x2="44" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="66" y1="0" x2="66" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="88" y1="0" x2="88" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="-2" y1="20" x2="102" y2="80" stroke="#fff" stroke-width="5.5" opacity="0.55"/><rect x="27" y="27" width="14" height="14" fill="#D85A30"/><rect x="3" y="3" width="94" height="94" rx="16" fill="none" stroke="#14395C" stroke-width="3"/></svg>
+    <span style="font-family:var(--sans);line-height:1;letter-spacing:-.3px"><span style="font-weight:800;font-size:17px;color:var(--text)">Traza</span><span style="font-weight:300;font-size:17px;color:#D85A30">Urbana</span></span>
   </div>
-  <span class="gu-nav-name">Gestor Urbano Jalisco</span>
   <span class="gu-nav-sep">/</span>
   <span class="gu-nav-mod">M08 · Calculadora de Derechos</span>
   <a href="index.html" class="gu-nav-back">
@@ -197,6 +204,8 @@ function guToggleTheme(){
     <div class="gu-toggle-track"><div class="gu-toggle-thumb"></div></div>
     <span id="gu-toggle-label">Modo oscuro</span>
   </button>
+
+  <span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.04em;flex-shrink:0;opacity:.55;margin-left:10px;transition:color var(--t)">&copy; 2026 TrazaUrbana</span>
 </nav>
 
 <div class="m08-wrap">
@@ -308,26 +317,6 @@ function guToggleTheme(){
   </div>
   <div id="wrap-zpn-extras">
     <label class="chk-row"><input type="checkbox" id="chk-revision" checked onchange="onInputChange()"> Revisión de proyecto (por revisión)</label>
-  </div>
-
-  <!-- iCUS EXCEDENCIA — solo GDL y ZPN -->
-  <div id="wrap-icus-toggle" style="display:none">
-    <label class="chk-row"><input type="checkbox" id="chk-icus" onchange="toggleICUS();onInputChange()"> <span id="lbl-icus-toggle">Excedencia de iCUS</span> <span id="lbl-icus-sub" style="font-size:10px;color:var(--text3);margin-left:4px">&#8212; requiere coef. iCUS y sup. terreno</span></label>
-    <div id="wrap-icus-inputs" style="display:none;padding:4px 12px 4px 36px">
-      <div class="form-grid" style="margin-top:4px;max-width:440px">
-        <div class="field">
-          <label style="font-size:11px">Coef. iCUS <span style="color:var(--text3)">(ej. 0.7)</span></label>
-          <input type="number" id="inp-icus-coef" placeholder="0.7" min="0" step="0.01" oninput="onInputChange()">
-        </div>
-        <div class="field">
-          <label style="font-size:11px">Sup. terreno (m&#178;)</label>
-          <input type="number" id="inp-icus-sup" placeholder="ej. 300" min="0" step="0.01" oninput="onInputChange()">
-        </div>
-      </div>
-      <div id="wrap-zpn-ecpd" style="display:none;margin-top:2px">
-        <label class="chk-row" style="font-size:12px;padding-left:0"><input type="checkbox" id="chk-zpn-ecpd" onchange="onInputChange()"> Incluir ECPD fijo (solo si hay CUS m&#225;ximo) <span style="font-size:10px;color:var(--text3)">+$15,349</span></label>
-      </div>
-    </div>
   </div>
 
   <label class="chk-row"><input type="checkbox" id="chk-siapa" onchange="toggleSIAPADen();onInputChange()"> Factibilidad SIAPA (agua potable y drenaje) <span style="font-size:10px;color:var(--text3);margin-left:4px">&#8212; requiere sup. del predio</span></label>
@@ -772,23 +761,6 @@ function selMun(mun, el) {
   // Aviso sin tarifas para TLQ/TLA/TON
   const banSinTar = document.getElementById('banner-sin-tarifas');
   if (banSinTar) banSinTar.style.display = TARIFAS[mun]?.sinTarifas ? '' : 'none';
-  // iCUS: solo GDL y ZPN tienen contribución por intensidad
-  const wrapICUS = document.getElementById('wrap-icus-toggle');
-  if (wrapICUS) {
-    const icusVisible = (mun === 'GDL' || mun === 'ZPN');
-    wrapICUS.style.display = icusVisible ? '' : 'none';
-    if (!icusVisible) {
-      const chkICUS = document.getElementById('chk-icus');
-      if (chkICUS) { chkICUS.checked = false; toggleICUS(); }
-    }
-    // Etiqueta dinámica según municipio
-    const lblTog = document.getElementById('lbl-icus-toggle');
-    const lblSub = document.getElementById('lbl-icus-sub');
-    if (lblTog) lblTog.textContent = mun === 'ZPN' ? 'Excedencia de CUS Máx' : 'Excedencia de iCUS';
-    if (lblSub) lblSub.innerHTML   = mun === 'ZPN'
-      ? '&#8212; requiere coef. CUS M&#225;x y sup. terreno'
-      : '&#8212; requiere coef. iCUS y sup. terreno';
-  }
   onUsoChange();
 }
 
@@ -813,15 +785,6 @@ function toggleSIAPADen() {
   var chk = document.getElementById('chk-siapa');
   var wrap = document.getElementById('wrap-siapa-den');
   wrap.style.display = chk && chk.checked ? 'block' : 'none';
-}
-
-function toggleICUS() {
-  const chk     = document.getElementById('chk-icus');
-  const wrap    = document.getElementById('wrap-icus-inputs');
-  const zpnEcpd = document.getElementById('wrap-zpn-ecpd');
-  const active  = chk && chk.checked;
-  if (wrap)    wrap.style.display    = active ? 'block' : 'none';
-  if (zpnEcpd) zpnEcpd.style.display = (active && munActual === 'ZPN') ? 'block' : 'none';
 }
 
 function onUsoChange() { /* live recalc si ya hay resultado */ }
@@ -1050,61 +1013,6 @@ function calcular() {
     rows.push({ concepto: 'Evaluación de Impacto Ambiental<br><span class="subtotal-badge">' + rangoLabel + '</span>', tarifa: fmt(subAmb), base: 'Por proyecto', sub: subAmb, art: t.impactoAmbientalArt });
   }
 
-  // -- Excedencia iCUS (GDL y ZPN) --
-  const chkICUS = document.getElementById('chk-icus');
-  if (chkICUS && chkICUS.checked) {
-    const icusCoef = parseFloat(document.getElementById('inp-icus-coef').value) || 0;
-    const icusSup  = parseFloat(document.getElementById('inp-icus-sup').value)  || 0;
-    if (icusCoef > 0 && icusSup > 0) {
-      const mICUS = Math.round(icusCoef * icusSup * 100) / 100;
-      if (munActual === 'GDL') {
-        const T_GDL   = 1516;
-        const subICUS = Math.round(mICUS * T_GDL);
-        total += subICUS;
-        rows.push({
-          concepto: 'Contribuci&#243;n iCUS &#8212; excedencia de intensidad de construcci&#243;n'
-                  + '<br><span class="subtotal-badge">' + mICUS.toLocaleString('es-MX') + ' m&#178; &times; $1,516/m&#178;</span>',
-          tarifa: '$1,516/m²',
-          base:   mICUS.toLocaleString('es-MX') + ' m²',
-          sub:    subICUS,
-          art:    'Art. 37, Ley Ingresos GDL 2026'
-        });
-      } else if (munActual === 'ZPN') {
-        const T_ZPN   = 1595;
-        const T_ECPD  = 15349;
-        const subICUS = Math.round(mICUS * T_ZPN);
-        total += subICUS;
-        rows.push({
-          concepto: 'Excedencia de CUS M&#225;x &#8212; contribuci&#243;n por densificaci&#243;n'
-                  + '<br><span class="subtotal-badge">' + mICUS.toLocaleString('es-MX') + ' m&#178; &times; $1,595/m&#178;</span>',
-          tarifa: '$1,595/m²',
-          base:   mICUS.toLocaleString('es-MX') + ' m²',
-          sub:    subICUS,
-          art:    'Art. 62, Ley Ingresos ZPN 2026'
-        });
-        const chkECPD = document.getElementById('chk-zpn-ecpd');
-        if (chkECPD && chkECPD.checked) {
-          total += T_ECPD;
-          rows.push({
-            concepto: 'ECPD &#8212; Contribuci&#243;n por Densificaci&#243;n (cuota fija)'
-                    + '<br><span class="subtotal-badge">Solo cuando aplica CUS m&#225;ximo</span>',
-            tarifa: fmt(T_ECPD),
-            base:   'Cuota fija',
-            sub:    T_ECPD,
-            art:    'Art. 62, Ley Ingresos ZPN 2026'
-          });
-        }
-      }
-    } else {
-      rows.push({
-        concepto: 'Excedencia iCUS &#8212; ingresa coef. y sup. terreno',
-        tarifa: '&#8212;', base: '&#8212;', sub: null,
-        art: 'Ingresa coef. iCUS y sup. terreno para calcular el importe',
-        infoRow: true, infoVal: 'Sin datos'
-      });
-    }
-  }
-
   // -- Filas informativas (sin costo) --
   if (niveles > 0) {
     rows.push({
@@ -1281,142 +1189,6 @@ function calcularSoloSIAPA(t) {
   document.getElementById('result-panel').style.display = '';
 }
 
-// ── NUEVO ANÁLISIS ────────────────────────────────────────────────────────────
-function nuevoAnalisis() {
-  // Municipio y tipo de obra — vía las mismas funciones que usan los botones
-  selMun('GDL', document.getElementById('btn-mun-GDL'));
-  selTipo('nueva', document.querySelector('.tipo-btn[data-tipo="nueva"]'));
-
-  // Inputs numéricos y fecha
-  ['inp-uso','inp-sup','inp-frente','inp-ml','inp-sup-predio','inp-niveles','inp-fecha-inicio']
-    .forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.tagName === 'SELECT' ? el.selectedIndex = 0 : el.value = '';
-    });
-
-  // Checkboxes — restaurar valores por defecto de carga
-  const defaults = {
-    'chk-alineamiento': true, 'chk-habitabilidad': true,
-    'chk-dtude': true, 'chk-planos': true,
-    'chk-bitacora': false, 'chk-patrimonio': false,
-    'chk-revision': true, 'chk-siapa': false,
-    'chk-eit': false, 'chk-int-vial': false,
-    'chk-imp-amb': false, 'chk-icus': false, 'chk-zpn-ecpd': false
-  };
-  Object.entries(defaults).forEach(([id, val]) => {
-    const el = document.getElementById(id);
-    if (el) el.checked = val;
-  });
-
-  // Paneles expandibles — cerrar
-  toggleSIAPADen();
-  toggleICUS();
-
-  // Resultado
-  costoLicenciaBase = 0;
-  document.getElementById('result-panel').style.display = 'none';
-  document.getElementById('btn-reset').style.display = 'none';
-  limpiarRefrendo();
-}
-
-// ── REFRENDO / PRÓRROGA ───────────────────────────────────────────────────────
-function calcularRefrendo() {
-  const meses = parseInt(document.getElementById('inp-refrendo').value) || 0;
-  const div   = document.getElementById('refrendo-result');
-  if (!meses || meses < 1) { div.style.display = 'none'; div.innerHTML = ''; return; }
-
-  const costo = costoLicenciaBase;
-  if (!costo || costo <= 0) {
-    div.innerHTML = '<span style="color:var(--text3);font-size:11px">Calcula primero la licencia para obtener el costo base.</span>';
-    div.style.display = 'block';
-    return;
-  }
-
-  let costoRefrendo = 0, detalle = '', artRef = '';
-
-  if (munActual === 'GDL') {
-    const limite5A   = 30; // meses adicionales hasta completar 5 años de vigencia total
-    const mesesBajos = Math.min(meses, limite5A);
-    const mesesAltos = Math.max(0, meses - limite5A);
-    const rf1 = mesesBajos > 0 ? costo * 0.025 * mesesBajos : 0;
-    const rf2 = mesesAltos > 0 ? costo * 0.050 * mesesAltos : 0;
-    costoRefrendo = rf1 + rf2;
-    if (mesesBajos > 0 && mesesAltos > 0) {
-      detalle = mesesBajos + ' mes' + (mesesBajos > 1 ? 'es' : '') + ' &times; 2.5% = ' + fmt(rf1)
-              + ' &nbsp;+&nbsp; '
-              + mesesAltos + ' mes' + (mesesAltos > 1 ? 'es' : '') + ' &times; 5.0% = ' + fmt(rf2);
-    } else if (mesesBajos > 0) {
-      detalle = mesesBajos + ' mes' + (mesesBajos > 1 ? 'es' : '') + ' &times; 2.5% sobre ' + fmt(costo);
-    } else {
-      detalle = mesesAltos + ' mes' + (mesesAltos > 1 ? 'es' : '') + ' &times; 5.0% sobre ' + fmt(costo);
-    }
-    artRef = 'Art. 49 Fracc. II &middot; Vigencia base: 30 meses';
-  } else if (munActual === 'ZPN') {
-    const bimestres = Math.ceil(meses / 2);
-    costoRefrendo = costo * 0.05 * bimestres;
-    detalle = bimestres + ' bimestre' + (bimestres > 1 ? 's' : '') + ' &times; 5% sobre ' + fmt(costo);
-    artRef = 'Art. 82, Ley Ingresos ZPN 2026 &middot; Vigencia base: 24 meses';
-  } else if (munActual === 'TLQ') {
-    const bimestres = Math.ceil(meses / 2);
-    costoRefrendo = costo * 0.10 * bimestres;
-    detalle = bimestres + ' bimestre' + (bimestres > 1 ? 's' : '') + ' &times; 10% sobre ' + fmt(costo);
-    artRef = 'Art. 63 Fracc. IV, Ley Ingresos TLQ 2026 &middot; Vigencia base: 24 meses';
-  } else {
-    const nombreMun = munActual === 'TLA' ? 'Tlajomulco' : 'Ton&#225;l&#225;';
-    div.innerHTML = '<span style="color:var(--sem-am-txt,#92400e);font-size:12px">'
-      + '&#9888; La tasa de pr&#243;rroga de ' + nombreMun + ' no est&#225; especificada en la Ley de Ingresos 2026 disponible. '
-      + 'Solicita la c&#233;dula de c&#225;lculo directamente en ventanilla.'
-      + '</span>';
-    div.style.display = 'block';
-    return;
-  }
-
-  const vigBase  = munActual === 'GDL' ? 30 : 24;
-  const vigTotal = vigBase + meses;
-  div.innerHTML = detalle
-    + '<br><span class="rf-detalle">'
-    + 'Vigencia total: <strong>' + vigTotal + ' meses</strong>'
-    + ' (' + Math.floor(vigTotal / 12) + ' a&ntilde;os ' + (vigTotal % 12) + ' meses)'
-    + ' &middot; ' + artRef
-    + '</span>'
-    + '<span class="rf-total">Refrendo estimado: ' + fmt(costoRefrendo) + '</span>';
-  div.style.display = 'block';
-}
-
-function limpiarRefrendo() {
-  document.getElementById('inp-refrendo').value = '';
-  const div = document.getElementById('refrendo-result');
-  div.style.display = 'none';
-  div.innerHTML = '';
-}
-
-// ── DEEP LINK M01 → M08 ───────────────────────────────────────────────────────
-(function leerDeepLinkM01(){
-  var raw = localStorage.getItem('GU_m01_a_m08');
-  if (!raw) return;
-  try {
-    var d = JSON.parse(raw);
-    if (!d || (Date.now() - d.ts) > 600000) { localStorage.removeItem('GU_m01_a_m08'); return; }
-
-    if (d.mun) {
-      var btnMun = document.getElementById('btn-mun-' + d.mun);
-      if (btnMun) selMun(d.mun, btnMun);
-    }
-    if (d.supPredio) { var el = document.getElementById('inp-sup-predio'); if (el) el.value = d.supPredio; }
-    if (d.niveles)   { var el = document.getElementById('inp-niveles');    if (el) el.value = d.niveles; }
-
-    localStorage.removeItem('GU_m01_a_m08');
-
-    var banner = document.createElement('div');
-    banner.style.cssText = 'background:rgba(26,39,68,.06);border:0.5px solid var(--brand);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text2);margin-bottom:12px';
-    banner.innerHTML = '&#9989; <strong>Datos recibidos desde M01</strong> &#8212; revisa los campos, ingresa la superficie de construcci&#243;n y presiona Calcular.';
-    var wrap = document.querySelector('.m08-wrap');
-    if (wrap) wrap.insertBefore(banner, wrap.firstChild);
-  } catch(e) {
-    localStorage.removeItem('GU_m01_a_m08');
-  }
-})();
-
 // ── DEEP LINK M05 → M08 ───────────────────────────────────────────────────────
 (function leerDeepLinkM05(){
   var raw = localStorage.getItem('GU_m05_a_m08');
@@ -1460,5 +1232,6 @@ function limpiarRefrendo() {
   }
 })();
 </script>
-</body>
-</html>
+
+</html
+>

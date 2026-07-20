@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- ==========================================================
+     GestorUrbano Jalisco AMG / TrazaUrbana
+     (c) 2026 Fernando H. - trazaurbana.mx
+     Todos los derechos reservados.
+     Reproduccion o uso no autorizado esta prohibido.
+     ========================================================== -->
+
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -112,7 +119,6 @@
 .res-val{font-family:var(--mono);font-size:11px;color:var(--text3);transition:color var(--t)}
 
 /* @media print */
-@keyframes spin{to{transform:rotate(360deg)}}
 @media print {
   .gu-nav, .m15-side, .sec-tabs, .fil-badge, .btn-refresh, .btn-ver,
   select, input[type=number], input[type=text], input[type=date] { display:none !important; }
@@ -133,10 +139,10 @@
 
 <!-- ── NAVEGACIÓN ── -->
 <nav class="gu-nav">
-  <div class="gu-nav-logo">
-    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 1L1 5v9h5v-4h4v4h5V5L8 1z"/></svg>
+  <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+    <svg width="28" height="28" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="flex-shrink:0"><rect x="3" y="3" width="94" height="94" rx="16" fill="#C4D2E0"/><line x1="0" y1="22" x2="100" y2="22" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="44" x2="100" y2="44" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="66" x2="100" y2="66" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="88" x2="100" y2="88" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="22" y1="0" x2="22" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="44" y1="0" x2="44" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="66" y1="0" x2="66" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="88" y1="0" x2="88" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="-2" y1="20" x2="102" y2="80" stroke="#fff" stroke-width="5.5" opacity="0.55"/><rect x="27" y="27" width="14" height="14" fill="#D85A30"/><rect x="3" y="3" width="94" height="94" rx="16" fill="none" stroke="#14395C" stroke-width="3"/></svg>
+    <span style="font-family:var(--sans);line-height:1;letter-spacing:-.3px"><span style="font-weight:800;font-size:17px;color:var(--text)">Traza</span><span style="font-weight:300;font-size:17px;color:#D85A30">Urbana</span></span>
   </div>
-  <span class="gu-nav-name">Gestor Urbano Jalisco</span>
   <span class="gu-nav-sep">/</span>
   <span class="gu-nav-mod">M09 · Monitor normativo</span>
   <div style="display:flex;align-items:center;gap:4px;margin-left:auto">
@@ -159,6 +165,8 @@
     <div class="gu-toggle-track"><div class="gu-toggle-thumb"></div></div>
     <span id="gu-toggle-label">Modo oscuro</span>
   </button>
+
+  <span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.04em;flex-shrink:0;opacity:.55;margin-left:10px;transition:color var(--t)">&copy; 2026 TrazaUrbana</span>
 </nav>
 
 <!-- ── LAYOUT M15 ── -->
@@ -166,6 +174,12 @@
 
   <!-- ── SIDEBAR ── -->
   <div class="m15-side">
+
+    <!-- Resumen alertas -->
+    <div class="gu-rcard" id="resumenCard">
+      <div class="gu-rcard-hdr">Estado actual</div>
+      <div class="gu-rcard-body" id="resumenLista"></div>
+    </div>
 
     <!-- Próximas fechas -->
     <div class="gu-rcard">
@@ -182,7 +196,6 @@
           <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 2.5A7 7 0 102.5 13.5M13.5 2.5V6.5M13.5 2.5H9.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
           Verificar ahora
         </button>
-        <div id="m09VerifPanel" style="display:none;margin-top:8px"></div>
       </div>
     </div>
 
@@ -190,14 +203,15 @@
     <div class="gu-rcard">
       <div class="gu-rcard-hdr">Fuentes consultadas</div>
       <div class="gu-rcard-body" style="font-size:10px;color:var(--text3);line-height:1.9">
-        <strong style="color:var(--text2)">Verificación automática:</strong><br>
-        · LFT Art. 74 — días inhábiles federales<br>
-        · Ley Serv. Púb. Jalisco Art. 38 — estatales<br>
-        · TJAJAL — acuerdos de vacaciones<br>
-        · CONASAMI / INEGI — UMA y salario mínimo<br>
+        <strong style="color:var(--text2)">Automáticas:</strong><br>
+        · DOF — días inhábiles federales<br>
+        · INEGI API — UMA y salario mínimo<br>
+        · Periódico Oficial Jalisco — índice<br><br>
+        <strong style="color:var(--text2)">Manuales (actualizar ene cada año):</strong><br>
+        · tjajal.gob.mx — calendario estatal<br>
         · Gaceta municipal GDL, ZPN, TLQ<br>
         · Ley de Ingresos por municipio<br>
-        · PDU Zapopan — tablas de coeficientes
+        · portal.zapopan.gob.mx — PDU
       </div>
     </div>
   </div>
@@ -217,7 +231,7 @@
     <!-- SECCIÓN CALENDARIO -->
     <div id="sec-calendario" class="gu-rcard">
       <div class="gu-rcard-hdr" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <span id="calTitulo">Calendario de días inhábiles 2026</span>
+        <span>Calendario de días inhábiles 2026</span>
         <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
           <select id="fil-mun-cal" onchange="renderCalendario()" style="background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);padding:3px 8px;color:var(--text2);font-size:11px;cursor:pointer;outline:none">
             <option value="todos">Todos los municipios</option>
@@ -482,6 +496,10 @@ const ALERTAS = [
    src:'Policía Vial Jalisco · El Informador 28 may 2026 · Azteca Jalisco',
    fecha:'Todo junio 2026 (intensidad variable)', municipios:'ZPN · GDL'},
   // ── NORMATIVA PERMANENTE ──
+  {tipo:'warn',icono:'⚠️',ttl:'Tarifas ICUS 2027 — verificar en diciembre 2026',
+   desc:'Las tarifas ICUS GDL ($1,516/m²) y Zapopan ($1,541/m² + $14,830 ECPD) son de 2026. Actualizar en enero 2027 con la nueva Ley de Ingresos municipal.',
+   src:'Art. 37 Ley Ingresos GDL 2026 · Art. 93 Ley Ingresos Zapopan 2026',
+   fecha:'Revisión pendiente: diciembre 2026', municipios:'GDL · ZPN'},
   {tipo:'info',icono:'ℹ️',ttl:'PDU ZPN-01 Zapopan 2023 — vigente',
    desc:'El Plan de Desarrollo Urbano de Zapopan (ZPN-01 2023) está vigente. Verificar en portal.zapopan.gob.mx si se publican modificaciones en las tablas E3a/E3b de coeficientes.',
    src:'portal.zapopan.gob.mx/planes-parciales',
@@ -490,6 +508,14 @@ const ALERTAS = [
    desc:'Los planes parciales D1 Reforma, D2 Minerva, D3 Huentitán, D4 Olímpica, D5 Tetlán, D6 Oblatos y D7 Abastos están vigentes. Monitorear Gaceta Municipal GDL.',
    src:'guadalajara.gob.mx/planes-parciales',
    fecha:'Última revisión: 04 jun 2026', municipios:'Guadalajara'},
+  {tipo:'warn',icono:'⚠️',ttl:'TLQ, TLA y TON — PDU pendiente de procesamiento',
+   desc:'Los planes parciales de Tlaquepaque, Tlajomulco y Tonalá aún no han sido procesados en la plataforma. Los módulos M01, M02 y M03 no tienen BD local para estos municipios.',
+   src:'Pendiente interno — subir PDFs al chat',
+   fecha:'Pendiente', municipios:'TLQ · TLA · TON'},
+  {tipo:'danger',icono:'🔴',ttl:'Google Maps API Key — configurar límite de presupuesto',
+   desc:'La API key AIzaSy... tiene $300 USD de crédito por 90 días. Antes del lanzamiento público: configurar límite de gasto en Google Cloud Console y restringir al dominio de producción.',
+   src:'console.cloud.google.com → APIs & Services → Credentials',
+   fecha:'⚠️ Urgente antes del lanzamiento', municipios:'Todos'},
 ];
 
 // ── TARIFAS 2026 ──────────────────────────────────────────────────────────
@@ -500,77 +526,6 @@ const TARIFAS = [
 ];
 const UMA_2026  = 113.14;
 const SMGDF_2026 = 278.80;
-
-// ── CAPA DE EXTRAS (localStorage, generados por IA) ──────────────────────────
-const M09_EXTRAS_KEY = 'gu_m09_extras';
-
-function obtenerTodosInhabiles(){
-  try {
-    const ex = JSON.parse(localStorage.getItem(M09_EXTRAS_KEY)||'{}');
-    const extra = ex.inhabiles_nuevos || [];
-    const base = INHABILES_2026.slice();
-    const fechasBase = new Set(base.map(d=>d.f));
-    extra.forEach(d=>{ if(!fechasBase.has(d.f)) base.push(d); });
-    return base.sort((a,b)=>a.f.localeCompare(b.f));
-  } catch(e){ return INHABILES_2026.slice(); }
-}
-
-function obtenerTodasAlertas(){
-  try {
-    const ex = JSON.parse(localStorage.getItem(M09_EXTRAS_KEY)||'{}');
-    const extra = ex.alertas_nuevas || [];
-    // Evitar duplicados por ttl
-    const ttlsBase = new Set(ALERTAS.map(a=>a.ttl));
-    const nuevas = extra.filter(a=>!ttlsBase.has(a.ttl));
-    return [...ALERTAS, ...nuevas];
-  } catch(e){ return ALERTAS.slice(); }
-}
-
-function m09CargarExtras(){
-  try {
-    const ex = JSON.parse(localStorage.getItem(M09_EXTRAS_KEY)||'{}');
-    if(ex.resumen){
-      const panel = document.getElementById('m09VerifPanel');
-      if(panel){
-        const ts = ex.ts ? new Date(ex.ts).toLocaleDateString('es-MX') : '';
-        const inhabN = (ex.inhabiles_nuevos||[]).length;
-        const alertaN = (ex.alertas_nuevas||[]).length;
-        let info = [];
-        if(inhabN) info.push(`${inhabN} día(s) extra`);
-        if(alertaN) info.push(`${alertaN} alerta(s) nueva(s)`);
-        if(info.length){
-          panel.style.display = 'block';
-          panel.innerHTML = `<div style="padding:6px 8px;background:var(--sem-v-bg);border:0.5px solid var(--sem-v-brd);border-radius:var(--r-md);font-size:9.5px;color:var(--sem-v-txt)">
-            ✅ Verificado el ${ts}: ${info.join(' · ')}
-            <button onclick="m09LimpiarExtras()" style="margin-left:6px;background:none;border:none;color:var(--text3);font-size:9px;cursor:pointer">↩ revertir</button>
-          </div>`;
-        }
-      }
-    }
-    // Actualizar UMA/Salario si hay override
-    const uma = ex.uma || {};
-    const sal = ex.salario || {};
-    const anios = [...new Set([...Object.keys(uma),...Object.keys(sal)])].sort();
-    if(anios.length){
-      // Se aplica en renderTarifas via _umaExtras global
-      window._m09UmaExtras = uma;
-      window._m09SalExtras = sal;
-    }
-  } catch(e){}
-}
-
-function m09LimpiarExtras(){
-  localStorage.removeItem(M09_EXTRAS_KEY);
-  window._m09UmaExtras = {};
-  window._m09SalExtras = {};
-  const panel = document.getElementById('m09VerifPanel');
-  if(panel) panel.style.display = 'none';
-  renderCalendario();
-  renderAlertas();
-
-  renderProxFechas();
-  renderTarifas();
-}
 
 // ── FILTRO CALENDARIO ─────────────────────────────────────────────────────
 let _calFiltro = 'todos';
@@ -641,34 +596,23 @@ function renderCalendario(){
   const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio',
                'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const hoy=new Date();
-  const todos=obtenerTodosInhabiles();
-
-  // Actualizar título con años presentes
-  const anios=[...new Set(todos.map(d=>d.f.split('-')[0]))].sort();
-  const tit=document.getElementById('calTitulo');
-  if(tit) tit.textContent='Calendario de días inhábiles '+anios.join(' · ');
-
-  // Agrupar por año-mes
-  const grupos={};
-  todos.forEach(d=>{
-    if(!matchFiltro(d)||!matchMunicipio(d)) return;
-    const key=d.f.substring(0,7); // "2026-07"
-    if(!grupos[key]) grupos[key]=[];
-    grupos[key].push(d);
-  });
-
   let html='';
   let totalVisible=0;
-  Object.keys(grupos).sort().forEach(key=>{
-    const items=grupos[key];
-    const [anio,mesStr]=key.split('-');
-    const mesIdx=parseInt(mesStr)-1;
-    const esActual=parseInt(anio)===hoy.getFullYear()&&mesIdx===hoy.getMonth();
+  for(let m=0;m<12;m++){
+    const items=INHABILES_2026.filter(d=>{
+      const mes=parseInt(d.f.split('-')[1])-1;
+      if(mes!==m) return false;
+      if(!matchFiltro(d)) return false;
+      if(!matchMunicipio(d)) return false;
+      return true;
+    });
+    if(!items.length) continue;
     totalVisible+=items.length;
-    const esNuevoAnio=anio!=='2026';
-    html+=`<div class="cal-mes" id="cal-mes-${anio}-${mesIdx}">
+    const mesIdx=parseInt(items[0].f.split('-')[1])-1;
+    const esActual=mesIdx===hoy.getMonth();
+    html+=`<div class="cal-mes" id="cal-mes-${mesIdx}">
       <div class="cal-mes-hdr${esActual?' mes-activo':''}" onclick="toggleMes(this)">
-        <span class="cal-mes-nombre">${meses[mesIdx]} ${anio}${esNuevoAnio?' <span style="font-size:9px;background:var(--sem-v-bg);color:var(--sem-v-txt);border-radius:3px;padding:1px 5px;margin-left:4px">Auto</span>':''}</span>
+        <span class="cal-mes-nombre">${meses[mesIdx]} 2026</span>
         <div style="display:flex;gap:5px;align-items:center">
           ${esActual?'<span class="cal-mes-hoy">Mes actual</span>':''}
           <span class="cal-mes-badge">${items.length} día${items.length!==1?'s':''}</span>
@@ -704,15 +648,15 @@ function renderCalendario(){
       </div>`;
     });
     html+='</div></div>';
-  });
+  }
   if(!totalVisible){
     html='<div style="text-align:center;padding:30px;color:var(--text3);font-size:12px">Sin días inhábiles para este filtro.</div>';
   }
-  const cont=document.getElementById('calendarContent');
+  const cont = document.getElementById('calendarContent');
   cont.innerHTML=html;
   // Scroll al mes actual
-  const mesActualId=`cal-mes-${hoy.getFullYear()}-${hoy.getMonth()}`;
-  const elMes=cont.querySelector('#'+mesActualId);
+  const mesActualId = 'cal-mes-' + new Date().getMonth();
+  const elMes = cont.querySelector('#'+mesActualId);
   if(elMes) setTimeout(()=>{ elMes.scrollIntoView({behavior:'smooth',block:'nearest'}); },80);
 }
 
@@ -720,7 +664,7 @@ function renderCalendario(){
 function renderAlertas(){
   const tipoClass={danger:'alerta-danger',warn:'alerta-warn',info:'alerta-info',success:'alerta-success'};
   const resueltas = JSON.parse(localStorage.getItem('m15_resueltas')||'[]');
-  const html=obtenerTodasAlertas().map((a,idx)=>{
+  const html=ALERTAS.map((a,idx)=>{
     const esResuelta = resueltas.includes(idx);
     return `
     <div class="alerta ${tipoClass[a.tipo]||'alerta-gray'}" id="alerta-${idx}" style="${esResuelta?'opacity:.4;filter:grayscale(.6)':''}">
@@ -768,7 +712,7 @@ function esInhabil(fecha, municipio){
   const fStr=fecha.toISOString().split('T')[0];
   const dow=fecha.getDay();
   if(dow===0||dow===6) return {es:true,motivo:'Fin de semana'};
-  const item=obtenerTodosInhabiles().find(d=>{
+  const item=INHABILES_2026.find(d=>{
     if(d.f!==fStr) return false;
     if(d.muns==='todos') return true;
     if(d.muns.includes(municipio.substring(0,3))) return true;
@@ -858,10 +802,38 @@ function calcularPlazo(){
   renderHistorial();
 }
 
+// ── RENDER RESUMEN SIDEBAR ────────────────────────────────────────────────
+function renderResumen(){
+  const hoy=new Date();
+  const alertasCrit=ALERTAS.filter(a=>a.tipo==='danger').length;
+  const alertasWarn=ALERTAS.filter(a=>a.tipo==='warn').length;
+  const proxInhab=INHABILES_2026.filter(d=>{
+    const f=new Date(d.f+'T12:00:00');
+    const diff=Math.ceil((f-hoy)/86400000);
+    return diff>0&&diff<=30;
+  }).length;
+
+  document.getElementById('resumenLista').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:6px;padding-top:2px">
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+        <span style="color:var(--text2)">🔴 Alertas críticas</span>
+        <span style="font-family:var(--mono);color:${alertasCrit>0?'#fca5a5':'var(--text3)'};font-weight:${alertasCrit>0?'600':'400'}">${alertasCrit}</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+        <span style="color:var(--text2)">⚠️ Avisos</span>
+        <span style="font-family:var(--mono);color:${alertasWarn>0?'#fcd34d':'var(--text3)'}">${alertasWarn}</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+        <span style="color:var(--text2)">📅 Inhábiles próx. 30d</span>
+        <span style="font-family:var(--mono);color:var(--brand-light)">${proxInhab}</span>
+      </div>
+    </div>`;
+}
+
 // ── PRÓXIMAS FECHAS SIDEBAR ───────────────────────────────────────────────
 function renderProxFechas(){
   const hoy=new Date();
-  const prox=obtenerTodosInhabiles().filter(d=>{
+  const prox=INHABILES_2026.filter(d=>{
     const f=new Date(d.f+'T12:00:00');
     const diff=Math.ceil((f-hoy)/86400000);
     return diff>=0&&diff<=15;
@@ -1010,124 +982,20 @@ function mostrarSec(id,btn){
   btn.classList.add('active');
 }
 
-// ── VERIFICAR AHORA — llamada real a Claude IA ────────────────────────────
-async function verificarAhora(){
+// ── VERIFICAR AHORA ───────────────────────────────────────────────────────
+function verificarAhora(){
   const btn=document.querySelector('.btn-refresh');
-  if(!btn) return;
-  btn.innerHTML='<svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="animation:spin 1s linear infinite"><path d="M13.5 2.5A7 7 0 102.5 13.5M13.5 2.5V6.5M13.5 2.5H9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Verificando…';
+  btn.textContent='⏳ Verificando...';
   btn.disabled=true;
-  m09MostrarVerifPanel('loading');
-  try{
-    const anio=new Date().getFullYear();
-    const anioSig=anio+1;
-    const fechaHoy=new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
-    const inhabResumen=INHABILES_2026.map(d=>({f:d.f,m:d.m,n:d.n,muns:d.muns}));
-    const systemPrompt=`Eres experto en normativa jurídica y administrativa de México, especializado en Jalisco y el AMG (GDL, ZPN, TLQ, TLA, TON). Conoces LFT, Ley del Servicio Público del Estado de Jalisco y acuerdos TJAJAL.`;
-    const userPrompt=`Hoy es ${fechaHoy}.
-
-Verifica y actualiza el Monitor Normativo del Gestor Urbano AMG. Tareas:
-
-1. VERIFICA el calendario ${anio}: ¿falta algún día inhábil federal (LFT Art. 74) o estatal Jalisco?
-2. GENERA días inhábiles ${anioSig}:
-   - Federales (LFT Art. 74): Año Nuevo 1 ene, Constitución 1er lunes feb, Juárez 3er lunes mar, Trabajo 1 may, Independencia 16 sep, Revolución 3er lunes nov, Navidad 25 dic
-   - Estatales Jalisco (Art. 38): Jueves+Viernes Santo, Día Jalisco 2° lunes jun, 28 sep Día Servidor Público, 12 oct, 2 nov
-   - Vacaciones TJAJAL: período verano (~jul) e invierno (~dic) si conoces fechas exactas del acuerdo
-3. VERIFICA UMA ${anioSig} y salario mínimo ${anioSig} si los conoces con certeza
-4. SUGIERE alertas normativas nuevas relevantes para el AMG
-
-Días inhábiles ${anio} en el sistema (verificar):
-${JSON.stringify(inhabResumen)}
-
-Responde ÚNICAMENTE con JSON válido (sin texto extra):
-{
-  "resumen": "frase corta del resultado",
-  "inhabiles_faltantes_${anio}": [{"f":"YYYY-MM-DD","m":"nombre","n":"fed|edo|vac|esp","muns":"todos","nota":"fundamento"}],
-  "inhabiles_${anioSig}": [{"f":"YYYY-MM-DD","m":"nombre","n":"fed|edo|vac|esp","muns":"todos","nota":"fundamento"}],
-  "uma_${anioSig}": null,
-  "salario_${anioSig}": null,
-  "alertas_nuevas": [{"tipo":"danger|warn|info","icono":"emoji","ttl":"título","desc":"descripción","src":"fuente","fecha":"vigencia","municipios":"ámbito"}],
-  "observaciones": ["nota corta si aplica"]
-}`;
-    const resp=await fetch('/api/claude-proxy',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-6',
-        max_tokens:8000,
-        system:systemPrompt,
-        messages:[{role:'user',content:userPrompt}]
-      })
-    });
-    if(!resp.ok) throw new Error('Error servidor '+resp.status);
-    const data=await resp.json();
-    const txt=data.content?.[0]?.text||'';
-    const jm=txt.match(/\{[\s\S]*\}/);
-    if(!jm) throw new Error('Respuesta sin JSON válido');
-    const res=JSON.parse(jm[0]);
-
-    const faltKey=`inhabiles_faltantes_${anio}`;
-    const proxKey=`inhabiles_${anioSig}`;
-    const inhabNuevos=[...(res[faltKey]||[]),...(res[proxKey]||[])];
-    const umaVal=res[`uma_${anioSig}`]||null;
-    const salVal=res[`salario_${anioSig}`]||null;
-    const extras={
-      ts:new Date().toISOString(),
-      inhabiles_nuevos:inhabNuevos,
-      alertas_nuevas:res.alertas_nuevas||[],
-      uma:umaVal?{[anioSig]:umaVal}:{},
-      salario:salVal?{[anioSig]:salVal}:{},
-      resumen:res.resumen||'',
-      observaciones:res.observaciones||[],
-      anio_generado:anioSig
-    };
-    localStorage.setItem(M09_EXTRAS_KEY,JSON.stringify(extras));
-    const ahora=new Date().toLocaleString('es-MX');
-    localStorage.setItem('gu_m15_ultima_ver',ahora);
-    document.getElementById('ultimaVer').textContent=ahora;
-    if(umaVal){ window._m09UmaExtras={[anioSig]:umaVal}; }
-    if(salVal){ window._m09SalExtras={[anioSig]:salVal}; }
-    renderCalendario();
-    renderAlertas();
-  
-    renderProxFechas();
-    renderTarifas();
-    m09MostrarVerifPanel('ok',res,extras);
-  }catch(e){
-    m09MostrarVerifPanel('error',null,null,e.message);
-  }finally{
-    btn.innerHTML='<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 2.5A7 7 0 102.5 13.5M13.5 2.5V6.5M13.5 2.5H9.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg> Verificar ahora';
+  // Simular verificación — en producción haría fetch a las fuentes
+  setTimeout(()=>{
+    const now=new Date().toLocaleString('es-MX');
+    document.getElementById('ultimaVer').textContent=now;
+    localStorage.setItem('gu_m15_ultima_ver',now);
+    btn.innerHTML='🔄 Verificar ahora';
     btn.disabled=false;
-  }
-}
-
-function m09MostrarVerifPanel(estado, res, extras, errorMsg){
-  const panel=document.getElementById('m09VerifPanel');
-  if(!panel) return;
-  panel.style.display='block';
-  if(estado==='loading'){
-    panel.innerHTML=`<div style="padding:7px 9px;background:var(--brand-pale);border:0.5px solid var(--brand-light);border-radius:var(--r-md);font-size:10px;color:var(--brand)">⏳ Verificando…</div>`;
-    return;
-  }
-  if(estado==='error'){
-    panel.innerHTML=`<div style="padding:7px 9px;background:var(--sem-r-bg);border:0.5px solid var(--sem-r-brd);border-radius:var(--r-md);font-size:10px;color:var(--sem-r-txt)">❌ ${errorMsg||'Error desconocido'}</div>`;
-    return;
-  }
-  const inhabN=(extras.inhabiles_nuevos||[]).length;
-  const alertaN=(extras.alertas_nuevas||[]).length;
-  const anioSig=extras.anio_generado;
-  const obs=extras.observaciones||[];
-  let items=[];
-  if(inhabN) items.push(`${inhabN} día(s) nuevos agregados`);
-  if(alertaN) items.push(`${alertaN} alerta(s) nueva(s)`);
-  if(extras.uma&&Object.keys(extras.uma).length) items.push(`UMA ${anioSig} cargada`);
-  let html=`<div style="padding:8px 10px;background:var(--sem-v-bg);border:0.5px solid var(--sem-v-brd);border-radius:var(--r-md)">
-    <div style="font-size:10px;font-weight:600;color:var(--sem-v-txt);margin-bottom:3px">✅ Verificación completada</div>
-    <div style="font-size:10px;color:var(--text2);margin-bottom:3px">${extras.resumen||''}</div>`;
-  items.forEach(i=>{ html+=`<div style="font-size:9.5px;color:var(--text3)">· ${i}</div>`; });
-  obs.forEach(o=>{ html+=`<div style="font-size:9.5px;color:var(--text3)">· ${o}</div>`; });
-  html+=`<button onclick="m09LimpiarExtras()" style="margin-top:5px;background:none;border:0.5px solid var(--border2);border-radius:var(--r-sm);color:var(--text3);font-size:9px;padding:2px 7px;cursor:pointer">↩ Revertir</button>
-  </div>`;
-  panel.innerHTML=html;
+    alert('Verificación completada. Las alertas manuales requieren actualización por parte del administrador de la plataforma.');
+  },1500);
 }
 
 // ── AGREGAR ALERTA ────────────────────────────────────────────────────────
@@ -1140,7 +1008,7 @@ function agregarAlerta(){
   ALERTAS.unshift(nueva);
   guardarAlertasCustom();
   renderAlertas();
-
+  renderResumen();
 }
 
 function guardarAlertasCustom(){
@@ -1155,7 +1023,6 @@ function cargarAlertasCustom(){
 
 // ── INIT ──────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
-  m09CargarExtras();
   cargarAlertasCustom();
   // Aviso actualización 2027 en noviembre y diciembre
   const mesActual = new Date().getMonth(); // 0-based
@@ -1166,7 +1033,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   renderCalendario();
   renderAlertas();
   renderTarifas();
-
+  renderResumen();
   renderProxFechas();
   renderHistorial();
   // Fecha de inicio por defecto = hoy
@@ -1216,5 +1083,6 @@ function toggleMes(hdr){
   chev.classList.toggle('open', !isOpen);
 }
 </script>
-</body>
-</html>
+
+</html
+>

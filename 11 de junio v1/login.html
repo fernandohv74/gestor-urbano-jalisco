@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- ==========================================================
+     GestorUrbano Jalisco AMG / TrazaUrbana
+     (c) 2026 Fernando H. - trazaurbana.mx
+     Todos los derechos reservados.
+     Reproduccion o uso no autorizado esta prohibido.
+     ========================================================== -->
+
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -17,6 +24,7 @@
   gu-design-system.css ni de ningún otro archivo) para que el
   middleware solo tenga que excluir esta única ruta.
 -->
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{
@@ -66,7 +74,10 @@ button:disabled{opacity:.6;cursor:not-allowed}
 </head>
 <body>
   <div class="card">
-    <div class="logo">GU</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px">
+      <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="flex-shrink:0"><rect x="3" y="3" width="94" height="94" rx="16" fill="#C4D2E0"/><line x1="0" y1="22" x2="100" y2="22" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="44" x2="100" y2="44" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="66" x2="100" y2="66" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="88" x2="100" y2="88" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="22" y1="0" x2="22" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="44" y1="0" x2="44" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="66" y1="0" x2="66" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="88" y1="0" x2="88" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="-2" y1="20" x2="102" y2="80" stroke="#fff" stroke-width="5.5" opacity="0.55"/><rect x="27" y="27" width="14" height="14" fill="#D85A30"/><rect x="3" y="3" width="94" height="94" rx="16" fill="none" stroke="#14395C" stroke-width="3"/></svg>
+      <div style="font-family:'Outfit','Helvetica Neue',Arial,sans-serif;line-height:1;letter-spacing:-.4px"><span style="font-weight:800;font-size:24px;color:#14395C">Traza</span><span style="font-weight:300;font-size:24px;color:#D85A30">Urbana</span></div>
+    </div>
     <h1>Gestor Urbano Jalisco AMG</h1>
     <p class="sub">Acceso restringido — plataforma en fase de pruebas</p>
     <div class="error" id="error-box"></div>

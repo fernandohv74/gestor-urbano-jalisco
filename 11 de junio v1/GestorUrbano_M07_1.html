@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- ==========================================================
+     GestorUrbano Jalisco AMG / TrazaUrbana
+     (c) 2026 Fernando H. - trazaurbana.mx
+     Todos los derechos reservados.
+     Reproduccion o uso no autorizado esta prohibido.
+     ========================================================== -->
+
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
@@ -244,10 +251,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 <body>
 
 <nav class="gu-nav">
-  <div class="gu-nav-logo">
-    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 1L1 5v9h5v-4h4v4h5V5L8 1z"/></svg>
+  <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+    <svg width="28" height="28" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="flex-shrink:0"><rect x="3" y="3" width="94" height="94" rx="16" fill="#C4D2E0"/><line x1="0" y1="22" x2="100" y2="22" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="44" x2="100" y2="44" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="66" x2="100" y2="66" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="88" x2="100" y2="88" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="22" y1="0" x2="22" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="44" y1="0" x2="44" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="66" y1="0" x2="66" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="88" y1="0" x2="88" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="-2" y1="20" x2="102" y2="80" stroke="#fff" stroke-width="5.5" opacity="0.55"/><rect x="27" y="27" width="14" height="14" fill="#D85A30"/><rect x="3" y="3" width="94" height="94" rx="16" fill="none" stroke="#14395C" stroke-width="3"/></svg>
+    <span style="font-family:var(--sans);line-height:1;letter-spacing:-.3px"><span style="font-weight:800;font-size:17px;color:var(--text)">Traza</span><span style="font-weight:300;font-size:17px;color:#D85A30">Urbana</span></span>
   </div>
-  <span class="gu-nav-name">Gestor Urbano Jalisco</span>
   <span class="gu-nav-sep">/</span>
   <span class="gu-nav-mod">M07 · Directorio y Glosario</span>
   <a href="index.html" class="gu-nav-back">
@@ -262,6 +269,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <div class="gu-toggle-track"><div class="gu-toggle-thumb"></div></div>
     <span id="gu-toggle-label">Modo oscuro</span>
   </button>
+
+  <span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.04em;flex-shrink:0;opacity:.55;margin-left:10px;transition:color var(--t)">&copy; 2026 TrazaUrbana</span>
 </nav>
 
 <div class="wrap">
@@ -349,27 +358,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://retys.zapopan.gob.mx/regulaciones/139/detalle" target="_blank">Ley de Catastro Municipal del Estado de Jalisco (aplicación Zapopan)</a><span class="fue-mod">M07 M08</span></div>
         <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://info.jalisco.gob.mx" target="_blank">Reglamento de Zonificación del Estado de Jalisco</a><span class="fue-mod">M01 M03 M04</span></div>
         <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://semadet.jalisco.gob.mx" target="_blank">Ley Estatal del Equilibrio Ecológico y la Protección al Ambiente (LEEPA)</a><span class="fue-mod">M07</span></div>
-        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://info.jalisco.gob.mx" target="_blank">Ley de Desarrollo Urbano del Estado de Jalisco</a><span class="fue-mod">M01 M03</span></div>
-        <div class="fue-item"><span class="fue-tag fue-fed">Federal</span><a href="https://www.diputados.gob.mx" target="_blank">Ley General de Asentamientos Humanos, Ordenamiento Territorial y Desarrollo Urbano (LGAHOTDU)</a><span class="fue-mod">M01 M02 M03</span></div>
+        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><span>Ley de Desarrollo Urbano del Estado de Jalisco</span><span class="fue-mod">M01 M03</span></div>
+        <div class="fue-item"><span class="fue-tag fue-fed">Federal</span><span>Ley General de Asentamientos Humanos, Ordenamiento Territorial y Desarrollo Urbano (LGAHOTDU)</span><span class="fue-mod">M01 M02 M03</span></div>
         <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/reglamentos" target="_blank">Reglamento de Gestión del Desarrollo Urbano para el Municipio de Guadalajara</a><span class="fue-mod">M01 M02 M03 M05 M10</span></div>
         <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/reglamentos" target="_blank">Reglamento de Zonificación Urbana del Municipio de Guadalajara</a><span class="fue-mod">M01 M02 M03 M04</span></div>
         <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/reglamentos" target="_blank">Reglamento para la Gestión Integral del Municipio de Guadalajara — última reforma: 10 abr 2025, publicada 30 abr 2025 en Gaceta Municipal — Arts. 50 VIII (escaleras no computan CUS), 50 Ter (rejilla herrería sí computa), XII Bis / XIII Bis (ICOS/ICUS), Arts. 32, 89 Ter, 149 Ter, 157, 159 Bis, 161, 190, 241, 249 Bis, 273, 276, 278, 1332-1336</a><span class="fue-mod">M02 M03 M04 M05</span></div>
         <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/reglamentos" target="_blank">Reglamento para el Funcionamiento de Giros Comerciales, Industriales y de Prestación de Servicios — Municipio de Guadalajara (últ. reforma 2023)</a><span class="fue-mod">M02 M06</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLQ</span><a href="https://transparencia.info.jalisco.gob.mx" target="_blank">Reglamento para el Funcionamiento de Establecimientos Comerciales, Industriales y de Prestación de Servicios — Municipio de San Pedro Tlaquepaque (aprobado 11 abr 2019, últ. reforma 31 oct 2023)</a><span class="fue-mod">M06</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><a href="https://tlajomulco.gob.mx/reglamentos" target="_blank">Reglamento para el Funcionamiento de Giros Comerciales, Industriales y de Prestación de Servicios del Municipio de Tlajomulco de Zúñiga (aprobado 2014, últ. reforma 4 jun 2021) — Arts. 13 Ter (SARE), 15 (vigencia/refrendo), 29 (requisitos apertura)</a><span class="fue-mod">M06</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TON</span><a href="https://transparencia.info.jalisco.gob.mx" target="_blank">Código Municipal de Comercio para el Municipio de Tonalá, Jalisco (Acuerdo 135 — 2025) — Arts. 5 (Consejo de Giros Restringidos), 8 y 12 (vigencia indefinida / pago anual)</a><span class="fue-mod">M06</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLQ</span><span>Reglamento para el Funcionamiento de Establecimientos Comerciales, Industriales y de Prestación de Servicios — Municipio de San Pedro Tlaquepaque (aprobado 11 abr 2019, últ. reforma 31 oct 2023) — Texto completo pendiente de localizar en portal oficial; ficha de mejora regulatoria disponible (JMRA)</span><span class="fue-mod">M06</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><span>Reglamento para el Funcionamiento de Giros Comerciales, Industriales y de Prestación de Servicios del Municipio de Tlajomulco de Zúñiga (aprobado 2014, últ. reforma 4 jun 2021) — Arts. 13 Ter (SARE), 15 (vigencia/refrendo), 29 (requisitos apertura)</span><span class="fue-mod">M06</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TON</span><span>Código Municipal de Comercio para el Municipio de Tonalá, Jalisco (Acuerdo 135 — 2025) — Arts. 5 (Consejo de Giros Restringidos), 8 y 12 (vigencia indefinida / pago anual)</span><span class="fue-mod">M06</span></div>
         <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://movilidad.guadalajara.gob.mx" target="_blank">Reglamento de Movilidad, Transporte y Seguridad Vial de Guadalajara — Arts. 73, 74, 76 (Dictamen de Movilidad / Impacto Vial)</a><span class="fue-mod">M04 M05</span></div>
         <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://retys.zapopan.gob.mx/regulaciones" target="_blank">Norma Técnica de Accesibilidad Universal para el Municipio de Zapopan (GMZ 13/12/2019)</a><span class="fue-mod">M04 M05</span></div>
         <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><a href="https://tlajomulco.gob.mx/reglamentos" target="_blank">Reglamento Municipal de Zonificación de Tlajomulco de Zúñiga (publicado 21/11/2014)</a><span class="fue-mod">M01 M03 M04</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLQ</span><a href="https://transparencia.info.jalisco.gob.mx/sites/default/files/Reglamento%20de%20Construcciones%20en%20el%20Municipio%20de%20Tlaquepaque,%20Jalisco.pdf" target="_blank">Reglamento de Construcciones del Municipio de San Pedro Tlaquepaque, Jalisco</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLQ</span><a href="https://www.tlaquepaque.gob.mx/assets/cargas/general/REGLAMENTO%20DE%20MOVILIDAD,%20TRANSPORTE,%20ESTACIONAMIENTO%20Y%20SEGURIDAD%20VIAL%20PARA%20EL%20MUNICIPIO%20DE%20SAN%20PEDRO%20TLAQUEPAQUE,%20JALISCO-.docx" target="_blank">Reglamento de Movilidad, Transporte, Estacionamiento y Seguridad Vial — San Pedro Tlaquepaque — Art. 28 (usos comerciales, servicios, industriales y equipamiento → dictamen integración vial)</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLQ</span><a href="https://transparencia.info.jalisco.gob.mx/sites/default/files/Reglamento%20Municipal%20del%20Equilibrio%20Ecol%C3%B3gico%20y%20la%20Protecci%C3%B3n%20al%20Ambiente%20del%20Municipio%20de%20Tlaquepaque.pdf" target="_blank">Reglamento Municipal del Equilibrio Ecológico y la Protección al Ambiente — Tlaquepaque — Arts. 5, 18–20 (evaluación de impacto ambiental vinculada a licencias)</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><a href="https://www.tlajomulco.gob.mx/sites/default/files/transparencia/reglamentos/Reglamento-de-Construccion-y-Normas-Tecnicas-24oct17-31oct19.pdf" target="_blank">Reglamento de Construcción y Normas Técnicas — Tlajomulco de Zúñiga (oct. 2019)</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><a href="https://tlajomulco.gob.mx/sites/default/files/transparencia/reglamentos/ReglamentoMovilidadSeguridadVial-23Jun2024.pdf" target="_blank">Reglamento de Movilidad y Seguridad Vial — Tlajomulco de Zúñiga (jun. 2024) — Art. 56 (usos comerciales, servicios, industriales y equipamiento → dictamen DGM), Art. 10 Bis, Art. 53 Bis</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><a href="https://tlajomulco.gob.mx/sites/default/files/transparencia/reglamentos/8IIImarconormativoReglamentoDeProteccionAmbientalCambioclimaticoydesarrolloSustentableaprobadoypublicado-05nov21.pdf" target="_blank">Reglamento de Protección Ambiental, Cambio Climático y Desarrollo Sustentable — Tlajomulco (nov. 2021) — Art. 27 Fracc. I (uso no habitacional &gt;500 m² → dictamen impacto ambiental)</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TON</span><a href="https://www.tonala.gob.mx/portal/assets/reglamento_de_construccion.pdf" target="_blank">Reglamento de Construcción — Tonalá, Jalisco — Art. 77 Fracc. IV (dictamen de impacto ambiental como requisito de licencia cuando lo exija la ley aplicable)</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TON</span><a href="https://portal-transparencia.tonala.gob.mx/wp-content/uploads/2024/10/ACUERDOS-1186-Y-1203-REGLAMENTO-DE-MOVILIDAD-SEGURIDAD-VIAL-Y-TRANSPORTE-DEL-MUNICIPIO-DE-TONALA-JALISCO.docx" target="_blank">Reglamento de Movilidad, Seguridad Vial y Transporte — Tonalá (Acuerdos 1186 y 1203, oct. 2024) — Art. 31 Fracc. III (dictamen impacto al tránsito para nuevos desarrollos), Art. 33 (gaseras / gasolineras)</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TON</span><a href="http://siga.jalisco.gob.mx/assets/pdf/leyes/reglaproambientetonala.pdf" target="_blank">Reglamento de Protección al Ambiente — Tonalá, Jalisco (vía SIGA Jalisco)</a><span class="fue-mod">M05</span></div>
       </div>
     </div>
 
@@ -396,9 +396,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <div class="fue-body">
         <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/contenido/pmdu" target="_blank">Plan de Desarrollo Urbano de Centro de Población — Guadalajara (PDUCP)</a><span class="fue-mod">M01 M03</span></div>
         <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://portal.zapopan.gob.mx/ordenamiento/normatividad.html" target="_blank">Plan de Desarrollo Urbano Zapopan ZPN-01 2023 y sus 12 Planes Parciales (ZPN-01 a ZPN-12) — Normas de edificación calibradas para todos los distritos: MV1-MV4, MB/MD/MC, MR, APD/CPD y zonas especiales TC (ZPN-4/12), MVJ (ZPN-9), GH (ZPN-12), CS-C* PPE</a><span class="fue-mod">M01 M03</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLQ</span><a href="https://transparencia.info.jalisco.gob.mx" target="_blank">Plan Municipal de Desarrollo Urbano Tlaquepaque</a><span class="fue-mod">M01 M03</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><a href="https://tlajomulco.gob.mx" target="_blank">Plan Municipal de Desarrollo Urbano Tlajomulco de Zúñiga</a><span class="fue-mod">M01 M03</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TON</span><a href="https://transparencia.info.jalisco.gob.mx" target="_blank">Plan Municipal de Desarrollo Urbano Tonalá</a><span class="fue-mod">M01 M03</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLQ</span><span>Plan Municipal de Desarrollo Urbano Tlaquepaque</span><span class="fue-mod">M01 M03</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><span>Plan Municipal de Desarrollo Urbano Tlajomulco de Zúñiga</span><span class="fue-mod">M01 M03</span></div>
+        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TON</span><span>Plan Municipal de Desarrollo Urbano Tonalá</span><span class="fue-mod">M01 M03</span></div>
         <div class="fue-item"><span class="fue-tag fue-metro">Metropolitano</span><a href="https://www.imeplan.mx/wp-content/uploads/2021/12/POTmet_IIIFB-BajaRes-1.pdf" target="_blank">Plan de Ordenamiento Territorial Metropolitano del AMG — POTmet 2042 (IMEPLAN)</a><span class="fue-mod">M01 M03 M07 M10</span></div>
       </div>
     </div>
@@ -457,7 +457,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <div style="margin-top:24px;padding:12px 16px;background:var(--bg2);border-radius:8px;font-size:.8rem;color:var(--text2);line-height:1.6;">
       <strong>Nota:</strong> Las etiquetas <span style="background:var(--accent);color:#fff;padding:1px 6px;border-radius:4px;font-size:.75rem;">M01</span> indican en qué módulo se utilizó cada fuente.
       Los domicilios del Directorio (Tab 1) fueron verificados directamente en portales oficiales de cada organismo.
-      Última actualización de fuentes: <strong>julio 2026</strong>.
+      Última actualización de fuentes: <strong>junio 2026</strong>.
     </div>
   </div>
 
@@ -915,12 +915,6 @@ const GLOSARIO = [
     ejemplo:'Un taller mecánico en GDL es giro tipo C. Requiere visto bueno de PC, SEMADET y uso de suelo compatible. Una librería es tipo A y tiene trámite simplificado.'
   },
   {
-    ico:'🚫', termino:'Giro restringido', nombre:'Giro Restringido o de Control Especial',
-    categoria:'tramites',
-    def:'Actividad comercial cuyo funcionamiento requiere autorización especial adicional a la licencia ordinaria de funcionamiento, por el impacto potencial que genera en el entorno social, la salud pública, la seguridad o la tranquilidad vecinal. Incluye: cantinas, bares, centros nocturnos, establecimientos con baile, venta de bebidas alcohólicas para consumo en el lugar, casas de empeño y giros con entretenimiento para adultos, entre otros. Cada municipio del AMG define su propio catálogo: en Guadalajara se denominan "giros de control especial" (RGIM); en Tonalá los regula el Consejo Municipal para Giros de Control Especial (Acuerdo 135/2025); otros municipios tienen esquemas similares. El proceso de autorización incluye inspección previa al local, opinión de vecinos colindantes y dictamen de la comisión o consejo municipal competente — solo después de ese dictamen favorable se puede tramitar la licencia de funcionamiento.',
-    ejemplo:'Una tienda de conveniencia que solo vende alcohol en botella cerrada puede tramitar licencia ordinaria. Si instala mesas y sirve bebidas para consumo en el lugar, se convierte en giro restringido: debe obtener primero el dictamen del consejo correspondiente antes de ingresar el trámite de licencia de funcionamiento.'
-  },
-  {
     ico:'🌊', termino:'Impacto Hidrológico Cero', nombre:'Impacto Hidrológico Cero (IHC)',
     categoria:'tramites',
     def:'Obligación normativa de no aumentar el escurrimiento pluvial respecto al estado natural del predio. Proyectos grandes deben incluir sistemas de captación, pozos de infiltración o superficies permeables para compensar la impermeabilización.',
@@ -929,8 +923,8 @@ const GLOSARIO = [
   {
     ico:'🗺️', termino:'Perímetro A / Perímetro B', nombre:'Perímetros de Contención Urbana',
     categoria:'zonificacion',
-    def:'Delimitaciones territoriales del POTmet 2042 (IMEPLAN) que regulan el crecimiento urbano del AMG y orientan las políticas de inversión, densidad y uso de suelo. Perímetro A (zona consolidada): ciudad construida con infraestructura completa (agua, drenaje, vialidades, transporte público); se favorece la redensificación y rehabilitación con COS/CUS más elevados permitidos; para giros comerciales de alto impacto (alcoholes, entretenimiento nocturno, giros restringidos), las restricciones de distancias mínimas y de impacto vecinal son más estrictas debido a la alta densidad de población. Perímetro B (crecimiento controlado): periferia urbana donde se permiten nuevos desarrollos, pero el promovente debe garantizar la urbanización a su cargo (agua, drenaje, pavimentación); densidades y alturas más moderadas; menor presión regulatoria de impacto vecinal por menor densidad. Fuera de perímetros: restricción máxima; prácticamente no se autorizan nuevos desarrollos habitacionales o comerciales de gran escala. Regla práctica: Perímetro A = más consolidado, más regulado en giros de impacto social; Perímetro B = más permisivo en densidades bajas pero condicionado a urbanizar; Exterior = prohibición de crecimiento.',
-    ejemplo:'Un bar que abre en el Centro de Guadalajara (Perímetro A) debe respetar distancias mínimas estrictas a escuelas, iglesias y otros giros de alcohol; uno en la periferia de Tonalá (Perímetro B) enfrenta restricciones menores. Un fraccionamiento en Tlajomulco dentro del Perímetro B debe urbanizar a su cuenta; uno fuera de ambos perímetros prácticamente no se puede autorizar.'
+    def:'Delimitaciones del POTmet que clasifican áreas según su grado de consolidación urbana. Perímetro A = zona urbana consolidada (inversión prioritaria en infraestructura). Perímetro B = zona de crecimiento controlado. Fuera de perímetros = restricción de crecimiento.',
+    ejemplo:'Un fraccionamiento nuevo en Tlajomulco dentro del Perímetro B tiene requisitos de urbanización distintos a uno fuera del perímetro, donde prácticamente no se permiten nuevos desarrollos.'
   },
   {
     ico:'📄', termino:'Manifestación de Impacto Ambiental', nombre:'MIA — Manifestación de Impacto Ambiental',
@@ -1169,46 +1163,10 @@ const GLOSARIO = [
     ejemplo:'Una papelería que va a abrir junto a una casa habitación recibe objeción del vecino de la derecha. El municipio de Tlajomulco exige la carta de anuencia de ese vecino. El solicitante tiene 5 días hábiles para gestionarla con apoyo del Consejo Social de Participación Ciudadana. Si el vecino se niega sin causa justificada, el municipio puede mediar o conceder la licencia según el caso.'
   },
   {
-    ico:'🏛️', termino:'Consejo de Giros Restringidos TON', nombre:'Consejo Municipal para Giros de Control Especial — Tonalá',
+    ico:'🏛️', termino:'Consejo de Giros Restringidos TON', nombre:'Consejo Municipal para Giros de Control Especial — Tomalá',
     categoria:'organismos',
     def:'Órgano colegiado del Municipio de Tonalá que evalúa y dictamina las solicitudes de establecimientos considerados de control especial según el Acuerdo 135 (2025): cantinas, centros nocturnos, establecimientos con baile, venta de alcohol, entre otros. El consejo revisa la solicitud, realiza visita de inspección, recibe opinión de vecinos y emite dictamen en un plazo definido. Su aprobación es requisito previo para tramitar la licencia de funcionamiento en esa categoría.',
     ejemplo:'Una cervecería artesanal que quiere abrir en Tonalá (giro con venta de alcohol para consumo en el lugar) debe primero presentar su solicitud ante el Consejo de Giros Restringidos. El consejo verifica la distancia a escuelas, el impacto en la colonia, y recaba opinión de los vecinos antes de emitir su dictamen. Sin ese dictamen favorable, el trámite de licencia no procede en Padrón y Licencias del municipio.'
-  },
-  {
-    ico:'🏙️', termino:'IMEPLAN', nombre:'Instituto Metropolitano de Planeación del AMG',
-    categoria:'organismos',
-    def:'Organismo público intermunicipal creado en 2014 que planifica y coordina el desarrollo urbano y territorial de la Zona Metropolitana de Guadalajara. Es el autor del POTmet 2042, que establece los Perímetros de Contención Urbana y las directrices metropolitanas de uso de suelo, movilidad e infraestructura. Sus dictámenes tienen jerarquía sobre los planes municipales para proyectos de escala metropolitana.',
-    ejemplo:'Un desarrollo inmobiliario de gran escala en Tlajomulco que impacta la movilidad de toda la zona metropolitana requiere dictamen de IMEPLAN antes de que el municipio pueda emitir el uso de suelo. El POTmet que emitió IMEPLAN define si el predio está dentro del Perímetro A, B o fuera de perímetros.'
-  },
-  {
-    ico:'🌿', termino:'Área libre / Área verde', nombre:'Área Libre y Área Verde Obligatoria',
-    categoria:'coeficientes',
-    def:'Proporción del predio que debe quedar libre de construcción en planta baja, determinada como el complemento del COS (Área libre = 1 − COS). Se subdivide en: Área libre permeable (suelo natural, jardín o superficie que permite infiltración pluvial) y Área verde obligatoria (porcentaje mínimo de vegetación que exige el reglamento). Un COS de 0.70 obliga a dejar libre el 30% del terreno; parte de ese 30% debe ser área verde real. Relevante para calcular el Impacto Hidrológico Cero (IHC).',
-    ejemplo:'Un predio de 500 m² con COS 0.60 puede construir máximo 300 m² en planta baja. Los 200 m² restantes son área libre; si el reglamento exige 10% de área verde, el propietario debe destinar al menos 50 m² a jardín o vegetación real, no pavimento.'
-  },
-  {
-    ico:'🏘️', termino:'Densidad habitacional', nombre:'Densidad Habitacional (viviendas/hectárea)',
-    categoria:'zonificacion',
-    def:'Número máximo de viviendas que el PDU o PPDU permite edificar por hectárea de terreno en una zona determinada. Controla la intensidad de uso habitacional independientemente del CUS. Una zona con alta densidad permite más unidades de vivienda aunque sean de menor tamaño; una zona de baja densidad limita el número de viviendas aunque el predio sea grande. Se expresa como VIV/ha (viviendas por hectárea) o UNI/ha (unidades por hectárea).',
-    ejemplo:'Una zona H3 en Guadalajara puede tener densidad de 120 VIV/ha. Un predio de 2,000 m² (0.2 ha) solo podría tener hasta 24 viviendas aunque el CUS permitiera construir más superficie. Si el promotor quiere más unidades debe fraccionar o tramitar un cambio de densidad.'
-  },
-  {
-    ico:'📐', termino:'Polígono de actuación', nombre:'Polígono de Actuación Urbanística',
-    categoria:'zonificacion',
-    def:'Delimitación territorial establecida en un PPDU que define un área específica donde se coordinan acciones de desarrollo, regeneración o mejoramiento urbano de manera integral. Permite que varios predios actúen en conjunto para cumplir obligaciones de urbanización, cesión de áreas verdes y equipamiento, transferencia de potencial o proyectos de redensificación. Dentro del polígono, los propietarios pueden celebrar convenios entre sí y con el municipio para distribuir cargas y beneficios.',
-    ejemplo:'Un conjunto de 8 predios vecinos en el Centro de Guadalajara que individualmente no cumplen el frente mínimo para proyectos de redensificación, pueden constituir un polígono de actuación. Así actúan como una sola unidad, comparten la obligación de ceder área verde y pueden acceder colectivamente al mecanismo de Transferencia de Derechos de Desarrollo.'
-  },
-  {
-    ico:'🤝', termino:'Área de cesión municipal', nombre:'Área de Cesión para Destinos Municipales',
-    categoria:'tramites',
-    def:'Proporción del predio o superficie equivalente que el propietario o desarrollador debe ceder gratuitamente al municipio como condición para autorizar subdivisiones, fusiones, fraccionamientos o proyectos de gran escala. La cesión se destina a vías públicas, áreas verdes, equipamiento urbano o donación al fondo municipal. El porcentaje varía según el municipio y el tipo de desarrollo; en algunos casos puede cubrirse con pago en efectivo equivalente al valor del terreno a ceder. Se registra en el Registro Público de la Propiedad y es requisito previo a la autorización de la subdivisión.',
-    ejemplo:'Un desarrollador que quiere subdividir un terreno de 3,000 m² en Guadalajara en 6 lotes debe ceder al municipio el porcentaje de área establecido para destinos públicos (jardín vecinal, vialidad interna, etc.) antes de que se autorice el plano de subdivisión. Sin la escritura de cesión, el RPP no inscribe los nuevos lotes.'
-  },
-  {
-    ico:'⚡', termino:'TDD — Transferencia de Derechos de Desarrollo', nombre:'Transferencia de Derechos de Desarrollo Urbano (TDD)',
-    categoria:'coeficientes',
-    def:'Mecanismo normativo establecido en el Capítulo VIII del RGIM de Guadalajara que permite ceder los derechos excedentes de edificación (CUS/iCUS no utilizados) de un predio emisor a un predio receptor dentro de la misma zona o zonas compatibles. El predio emisor normalmente es un bien patrimonial, área natural o predio subutilizado que no puede o no quiere aprovechar todo su potencial de construcción. El predio receptor adquiere esa capacidad adicional de edificación, pagando al fondo municipal administrado por IMEPLAN/Ayuntamiento. El trámite requiere Dictamen Técnico de la Dirección de Ordenamiento del Territorio.',
-    ejemplo:'Una casona catalogada en el Centro Histórico de Guadalajara no puede demolerse ni aumentar sus metros construidos. Sus derechos de desarrollo excedentes (diferencia entre lo que se podría construir según CUS y lo que tiene actualmente) se transfieren a un edificio en construcción en la misma zona. El nuevo edificio paga al fondo municipal y puede agregar pisos adicionales que de otro modo no podría.'
   }
 ];
 
@@ -1361,5 +1319,6 @@ window.onload = function() {
   switchTab('dir');
 };
 </script>
-</body>
-</html>
+
+</html
+>

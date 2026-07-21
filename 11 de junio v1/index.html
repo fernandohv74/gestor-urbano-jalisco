@@ -96,6 +96,7 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
   </div>
   <div class="hbadge">Plataforma · 10 módulos</div>
   <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙 Modo oscuro</button>
+  <button class="theme-btn" id="logoutBtn" onclick="guCerrarSesion()">🔒 Cerrar sesión</button>
 </header>
 
 <div class="hero">
@@ -332,6 +333,10 @@ function applyTheme(theme) {
   document.body.classList.toggle('light', theme === 'light');
   var btn = document.getElementById('themeBtn');
   if (btn) btn.textContent = theme === 'light' ? '☀️ Modo claro' : '🌙 Modo oscuro';
+}
+async function guCerrarSesion(){
+  try{ await fetch('/api/auth-logout', {method:'POST'}); }catch(e){}
+  window.location.href = '/login.html';
 }
 function toggleTheme() {
   var isLight = document.body.classList.contains('light');

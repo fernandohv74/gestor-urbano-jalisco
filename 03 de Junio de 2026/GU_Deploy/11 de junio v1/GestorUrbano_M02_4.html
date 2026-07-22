@@ -1,11 +1,4 @@
 <!DOCTYPE html>
-<!-- ==========================================================
-     GestorUrbano Jalisco AMG / TrazaUrbana
-     (c) 2026 Fernando H. - trazaurbana.mx
-     Todos los derechos reservados.
-     Reproduccion o uso no autorizado esta prohibido.
-     ========================================================== -->
-
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -160,7 +153,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
     <div class="gu-toggle-track"><div class="gu-toggle-thumb"></div></div>
     <span id="gu-toggle-label">Modo oscuro</span>
   </button>
-
   <span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.04em;flex-shrink:0;opacity:.55;margin-left:10px;transition:color var(--t)">&copy; 2026 TrazaUrbana</span>
 </nav>
 
@@ -736,7 +728,7 @@ function actualizar3D(){
     'canvas.addEventListener("touchmove",function(e){e.preventDefault();if(e.touches.length===1&&drag){aY+=(e.touches[0].clientX-px)*.008;aX=Math.max(-.1,Math.min(1.2,aX-(e.touches[0].clientY-py)*.008));px=e.touches[0].clientX;py=e.touches[0].clientY;draw();}if(e.touches.length===2){var d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);sc=Math.max(4,Math.min(120,sc-(d-lt)*.1));lt=d;draw();}},{passive:false});',
     '})();',
     '</' + scriptTag + '>',
-    '</html>'
+    '</body></html>'
   ].join('\n');
 
   const blob = new Blob([html3d], {type: 'text/html'});
@@ -1672,18 +1664,11 @@ function construirResultadoBDLocal(b, clave, lat, lng, fuente){
 
 async function consultarArcGISZapopan(lat, lng){
   try{
-    const base = 'https://mapa.zapopan.gob.mx/arcgis/rest/services/PPDU/PPDU_estrategias/MapServer/identify';
-    const params = new URLSearchParams({
-      geometry: JSON.stringify({x: lng, y: lat}),
-      geometryType: 'esriGeometryPoint',
-      layers: 'all',
-      tolerance: '2',
-      mapExtent: `${lng-0.001},${lat-0.001},${lng+0.001},${lat+0.001}`,
-      imageDisplay: '800,600,96',
-      returnGeometry: 'false',
-      f: 'json'
-    });
-    const r = await fetch(`${base}?${params}`, {signal: AbortSignal.timeout(6000)});
+    // Se llama vía proxy serverless propio (api/arcgis-zapopan-proxy.js) en
+    // vez de directo a mapa.zapopan.gob.mx — el navegador bloqueaba la
+    // llamada directa por CORS (el servidor de Zapopan no manda el header
+    // Access-Control-Allow-Origin para dominios externos).
+    const r = await fetch(`/api/arcgis-zapopan-proxy?lat=${lat}&lng=${lng}`, {signal: AbortSignal.timeout(8000)});
     if(!r.ok) return null;
     const data = await r.json();
     const resultados = data.results||[];
@@ -1716,7 +1701,12 @@ async function consultarVisorJalisco(lat, lng, munId){
   // ══════════════════════════════════════════════════════════════════
   if(munId === 120){
     // 1. ArcGIS Zapopan — clave exacta del polígono
-    const claveArcGIS = await consultarArcGISZapopan(lat, lng);
+    // BUG CORREGIDO: antes decía "const claveArcGIS" aquí, lo que creaba una
+    // variable nueva dentro de este bloque (sombreaba a la de la función) —
+    // el resultado real de ArcGIS nunca llegaba al resto de la función y se
+    // perdía en silencio, cayendo siempre al respaldo VUJ aunque ArcGIS
+    // hubiera respondido bien.
+    claveArcGIS = await consultarArcGISZapopan(lat, lng);
     if(claveArcGIS){
       // 2a. BD local con clave ArcGIS exacta
       const bdRes = vujBDLocalNormas(`municipio_id=120 AND clave LIKE '%${claveArcGIS}%'`);
@@ -2687,15 +2677,15 @@ function calcularVistos(pat){
   if(c.includes('Monumento Histórico')&&!c.includes('Artístico'))
     v.push({u:'alta',t:'Dictamen Técnico INAH requerido — obligatorio antes de cualquier obra',
       f:'Clasificación: '+c+(zona?' · Zona: '+zona:''),
-      d:'📍 Centro INAH Jalisco — Av. Alcalde 1351, Col. Miraflores, Guadalajara. Tel. (33) 3613-1827. Trámite INAH-07-001 — Autorización de intervención en monumentos históricos.'});
+      d:'📍 Centro INAH Jalisco — Liceo 168, Sector Hidalgo, Zona Centro, C.P. 44100, Guadalajara, Jalisco. Tel. (33) 3614-5464.'});
   if(c.includes('Artístico'))
-    v.push({u:'alta',t:'Autorización INBAL requerida',
+    v.push({u:'alta',t:'Autorización INAH requerida',
       f:'Clasificación: '+c,
-      d:'📍 INBAL — Reforma 175, Col. Juárez, CDMX. Trámite INBA-07-002.'});
+      d:'📍 Centro INAH Jalisco — Liceo 168, Sector Hidalgo, Zona Centro, C.P. 44100, Guadalajara, Jalisco. Tel. (33) 3614-5464.'});
   if(c.includes('Civil Relevante'))
-    v.push({u:'media',t:'Posible dictamen INAH y/o INBAL según alcance de la obra',
+    v.push({u:'media',t:'Posible dictamen INAH según alcance de la obra',
       f:'Clasificación Civil Relevante — consulta previa obligatoria',
-      d:'📍 Iniciar en Centro INAH Jalisco — Av. Alcalde 1351. Ellos determinan si se requiere INBAL.'});
+      d:'📍 Centro INAH Jalisco — Liceo 168, Sector Hidalgo, Zona Centro, C.P. 44100, Guadalajara, Jalisco. Tel. (33) 3614-5464.'});
   if(zona)
     v.push({u:'media',t:'Zona patrimonial: '+zona+' — autorización de imagen urbana requerida',
       f:'Predio en zona de protección patrimonial catalogada por el Estado de Jalisco',
@@ -3260,11 +3250,60 @@ function renderizar(zona,todos){
       <!-- Botones de zona -->
       <div id="zonaBtnsGiro" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"></div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px">
-        <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--text2)">
-          Buscar giro compatible
+        <!-- PESTAÑAS -->
+        <div style="display:flex;border-bottom:1px solid var(--border)">
+          <button id="m02tabIA" onclick="m02TabIA()"
+            style="flex:1;padding:11px 8px;background:var(--brand-pale);border:none;border-radius:10px 0 0 0;
+                   font-family:var(--sans);font-size:12px;font-weight:600;color:var(--brand-light);
+                   cursor:pointer;border-bottom:2px solid var(--brand);transition:all .2s">
+            ✨ Describir con IA
+          </button>
+          <button id="m02tabManual" onclick="m02TabManual()"
+            style="flex:1;padding:11px 8px;background:var(--bg2);border:none;border-radius:0 10px 0 0;
+                   font-family:var(--sans);font-size:12px;font-weight:500;color:var(--text3);
+                   cursor:pointer;border-bottom:2px solid transparent;transition:all .2s">
+            🔍 Buscar manual
+          </button>
         </div>
-        <div style="padding:12px 16px">
-          <!-- Filtro -->
+        <!-- MODO IA (principal / default) -->
+        <div id="panelModoIA" style="padding:14px 16px">
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">
+            <span style="font-size:10px;color:var(--text3);align-self:center;flex-shrink:0">Ej.:</span>
+            <button onclick="m02ChipEj(this.textContent)" style="font-size:11px;padding:3px 9px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;color:var(--text2);cursor:pointer;font-family:var(--sans)">tortería artesanal</button>
+            <button onclick="m02ChipEj(this.textContent)" style="font-size:11px;padding:3px 9px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;color:var(--text2);cursor:pointer;font-family:var(--sans)">taller mecánico</button>
+            <button onclick="m02ChipEj(this.textContent)" style="font-size:11px;padding:3px 9px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;color:var(--text2);cursor:pointer;font-family:var(--sans)">estética de mascotas</button>
+            <button onclick="m02ChipEj(this.textContent)" style="font-size:11px;padding:3px 9px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;color:var(--text2);cursor:pointer;font-family:var(--sans)">consultorio dental</button>
+            <button onclick="m02ChipEj(this.textContent)" style="font-size:11px;padding:3px 9px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;color:var(--text2);cursor:pointer;font-family:var(--sans)">bodega de materiales</button>
+          </div>
+          <textarea id="iaDescInput" rows="3"
+            placeholder="Describe tu negocio con tus propias palabras&#10;Ej: quiero poner un puesto de hot dogs en la calle"
+            style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border);
+                   border-radius:7px;padding:10px 12px;color:var(--text);font-family:var(--sans);
+                   font-size:13px;outline:none;resize:none;transition:border-color .2s;margin-bottom:10px;display:block"
+            onfocus="this.style.borderColor='var(--brand)'"
+            onblur="this.style.borderColor='var(--border)'"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();detectarGiroIA()}"></textarea>
+          <button id="btnDetectarIA" onclick="detectarGiroIA()"
+            style="width:100%;background:var(--brand);color:#fff;border:none;border-radius:7px;
+                   padding:11px;font-family:var(--sans);font-size:13px;font-weight:600;
+                   cursor:pointer;transition:opacity .2s">
+            ✨ Detectar giro
+          </button>
+          <div id="iaListaGiros" style="display:none;margin-top:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <span id="iaListaCount" style="font-size:11px;color:var(--text3)"></span>
+              <button onclick="cancelarGiroIA()" style="background:none;border:none;font-size:11px;color:var(--text3);cursor:pointer;text-decoration:underline">Limpiar</button>
+            </div>
+            <div id="iaListaItems" style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:7px;background:var(--bg3)"></div>
+            <button onclick="irAM06()"
+              style="width:100%;margin-top:8px;background:var(--sem-c-bg);color:var(--sem-c-txt);border:1px solid var(--sem-c-brd);border-radius:7px;padding:10px;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zM7 4h2v5H7V4zm0 6h2v2H7v-2z"/></svg>
+              Ver requisitos de licencia → Módulo 06
+            </button>
+          </div>
+        </div>
+        <!-- MODO MANUAL (secundario) -->
+        <div id="panelModoManual" style="padding:12px 16px;display:none">
           <div style="display:flex;gap:8px;margin-bottom:10px">
             <input type="text" id="giroFiltro" placeholder="Escribe el tipo de negocio: restaurante, farmacia..."
               oninput="filtrarGirosM02(this.value)"
@@ -3281,13 +3320,9 @@ function renderizar(zona,todos){
               onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'"
               onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">🗑️</button>
           </div>
-
-          <!-- Lista de giros -->
           <div id="giroLista" style="max-height:350px;overflow-y:auto;
             border:1px solid var(--border);border-radius:7px;background:var(--bg3);
             margin-bottom:10px"></div>
-
-          <!-- Giro seleccionado -->
           <div id="giroBadge" style="display:none;background:var(--brand-pale);
             border:1px solid var(--brand);border-radius:7px;padding:10px 14px;
             margin-bottom:10px;position:relative">
@@ -3296,8 +3331,6 @@ function renderizar(zona,todos){
             <div id="giroBadgeClave" style="font-family:var(--mono);font-size:11px;color:var(--brand-light);margin-bottom:3px"></div>
             <div id="giroBadgeNombre" style="font-size:13px;font-weight:500"></div>
           </div>
-
-          <!-- Botón verificar -->
           <button id="btnVerifGiro" onclick="verificarGiro()" disabled
             style="width:100%;background:var(--brand);color:#fff;border:none;border-radius:7px;
                    padding:12px;font-family:var(--sans);font-size:14px;font-weight:500;
@@ -4483,7 +4516,7 @@ const GU_SCIAN_GDL = [
   {c:'311512',n:'Elaboración de leche en polvo, condensada y evaporada',u:'I3',x:''},
   {c:'311513',n:'Elaboración de derivados y fermentos lácteos',u:'I2',x:''},
   {c:'311520',n:'Elaboración de helados y paletas',u:'I1',x:''},
-  {c:'311611',n:'Matanza de ganado, aves y otros animales comestibles',u:'CS5',x:''},
+  {c:'311611',n:'Rastro · Matanza · Carnes en canal',ns:'Matanza de ganado, aves y otros animales comestibles',u:'CS5',x:''},
   {c:'311612',n:'Corte y empacado de carne de ganado, aves y otros animales',u:'I4',x:''},
   {c:'311613',n:'Preparación de embutidos y otras conservas de carne de',u:'I3',x:''},
   {c:'311614',n:'Elaboración de manteca y otras grasas animales comestibles',u:'I3',x:''},
@@ -4492,7 +4525,7 @@ const GU_SCIAN_GDL = [
   {c:'311812',n:'Panificación tradicional',u:'I1',x:''},
   {c:'311813',n:'I1',u:'N/A',x:''},
   {c:'311820',n:'Elaboración de galletas y pastas para sopa',u:'I3',x:''},
-  {c:'311830',n:'Elaboración de tortillas de maíz y molienda de nixtamal',u:'CS2',x:''},
+  {c:'311830',n:'Tortillería · Masa · Nixtamal',ns:'Elaboración de tortillas de maíz y molienda de nixtamal',u:'CS2',x:''},
   {c:'311910',n:'Elaboración de botanas',u:'I1',x:''},
   {c:'311921',n:'Beneficio del café',u:'I2',x:''},
   {c:'311922',n:'Elaboración de café tostado y molido',u:'I2',x:''},
@@ -4753,573 +4786,573 @@ const GU_SCIAN_GDL = [
   {c:'339994',n:'Fabricación de velas y veladoras',u:'I2',x:''},
   {c:'339995',n:'Fabricación de ataúdes',u:'I3',x:''},
   {c:'339999',n:'Otras industrias manufactureras',u:'I3',x:''},
-  {c:'431110',n:'Comercio al por mayor de abarrotes',u:'CS5',x:''},
-  {c:'431121',n:'Comercio al por mayor de carnes rojas',u:'CS5',x:''},
-  {c:'431122',n:'Comercio al por mayor de carne de aves',u:'CS5',x:''},
-  {c:'431123',n:'Comercio al por mayor de pescados y mariscos',u:'CS5',x:''},
-  {c:'431130',n:'Comercio al por mayor de frutas y verduras frescas',u:'CS5',x:''},
-  {c:'431140',n:'Comercio al por mayor de huevo',u:'CS5',x:''},
-  {c:'431150',n:'Comercio al por mayor de semillas y granos alimenticios,',u:'CS5',x:''},
-  {c:'431160',n:'Comercio al por mayor de leche y otros productos lácteos',u:'CS5',x:''},
-  {c:'431170',n:'Comercio al por mayor de embutidos',u:'CS5',x:''},
-  {c:'431180',n:'Comercio al por mayor de dulces y materias primas para',u:'CS5',x:''},
-  {c:'431191',n:'Comercio al por mayor de pan y pasteles',u:'CS5',x:''},
-  {c:'431192',n:'Comercio al por mayor de botanas y frituras',u:'CS5',x:''},
-  {c:'431193',n:'Comercio al por mayor de conservas alimenticias',u:'CS5',x:''},
-  {c:'431194',n:'Comercio al por mayor de miel',u:'CS5',x:''},
-  {c:'431199',n:'Comercio al por mayor de otros alimentos',u:'CS5',x:''},
-  {c:'431211',n:'Comercio al por mayor de bebidas no alcohólicas y hielo',u:'CS5',x:''},
-  {c:'431212',n:'Comercio al por mayor de vinos y licores',u:'CS5',x:''},
-  {c:'431213',n:'Comercio al por mayor de cerveza',u:'CS5',x:''},
-  {c:'431220',n:'Comercio al por mayor de cigarros, puros y tabaco',u:'CS5',x:''},
-  {c:'432111',n:'Comercio al por mayor de fibras, hilos y telas',u:'CS5',x:''},
-  {c:'432112',n:'Comercio al por mayor de blancos',u:'CS5',x:''},
-  {c:'432113',n:'Comercio al por mayor de cueros y pieles',u:'CS5',x:''},
-  {c:'432119',n:'Comercio al por mayor de otros productos textiles',u:'CS5',x:''},
-  {c:'432120',n:'Comercio al por mayor de ropa, bisutería y accesorios de vestir',u:'CS5',x:''},
-  {c:'432130',n:'Comercio al por mayor de calzado',u:'CS5',x:''},
-  {c:'433110',n:'Comercio al por mayor de productos farmacéuticos',u:'CS5',x:''},
-  {c:'433210',n:'Comercio al por mayor de artículos de perfumería y cosméticos',u:'CS5',x:''},
-  {c:'433220',n:'Comercio al por mayor de artículos de joyería y relojes',u:'CS5',x:''},
-  {c:'433311',n:'Comercio al por mayor de discos y casetes',u:'CS5',x:''},
-  {c:'433312',n:'Comercio al por mayor de juguetes y bicicletas',u:'CS5',x:''},
-  {c:'433313',n:'Comercio al por mayor de artículos y aparatos deportivos',u:'CS5',x:''},
-  {c:'433410',n:'Comercio al por mayor de artículos de papelería',u:'CS5',x:''},
-  {c:'433420',n:'Comercio al por mayor de libros',u:'CS5',x:''},
-  {c:'433430',n:'Comercio al por mayor de revistas y periódicos',u:'CS5',x:''},
-  {c:'433510',n:'Comercio al por mayor de electrodomésticos menores y',u:'CS5',x:''},
-  {c:'434111',n:'Comercio al por mayor de fertilizantes, plaguicidas y semillas',u:'CS5',x:''},
-  {c:'434112',n:'Comercio al por mayor de medicamentos veterinarios y',u:'CS5',x:''},
-  {c:'434211',n:'Comercio al por mayor de cemento, tabique y grava',u:'CS5',x:''},
-  {c:'434219',n:'Comercio al por mayor de otros materiales para la',u:'CS5',x:''},
-  {c:'434221',n:'Comercio al por mayor de materiales metálicos para la',u:'CS5',x:''},
-  {c:'434222',n:'Comercio al por mayor de productos químicos para la industria',u:'CS5',x:''},
-  {c:'434223',n:'Comercio al por mayor de envases en general, papel y cartón',u:'CS5',x:''},
-  {c:'434224',n:'Comercio al por mayor de madera para la construcción y la',u:'CS5',x:''},
-  {c:'434225',n:'Comercio al por mayor de equipo y material eléctrico',u:'CS5',x:''},
-  {c:'434226',n:'Comercio al por mayor de pintura',u:'CS5',x:''},
-  {c:'434227',n:'Comercio al por mayor de vidrios y espejos',u:'CS5',x:''},
-  {c:'434228',n:'Comercio al por mayor de ganado y aves en pie',u:'CS5',x:''},
-  {c:'434229',n:'Comercio al por mayor de otras materias primas para otras',u:'CS5',x:''},
-  {c:'434230',n:'Comercio al por mayor de combustibles de uso industrial',u:'CS5',x:''},
-  {c:'434240',n:'Comercio al por mayor de artículos desechables',u:'CS5',x:''},
-  {c:'434311',n:'Comercio al por mayor de desechos metálicos',u:'CS5',x:''},
-  {c:'434312',n:'Comercio al por mayor de desechos de papel y de cartón',u:'CS5',x:''},
-  {c:'434313',n:'Comercio al por mayor de desechos de vidrio',u:'CS5',x:''},
-  {c:'434314',n:'Comercio al por mayor de desechos de plástico',u:'CS5',x:''},
-  {c:'434319',n:'Comercio al por mayor de otros materiales de desecho',u:'CS5',x:''},
-  {c:'435110',n:'Comercio al por mayor de maquinaria y equipo agropecuario,',u:'CS5',x:''},
-  {c:'435210',n:'Comercio al por mayor de maquinaria y equipo para la',u:'CS5',x:''},
-  {c:'435220',n:'Comercio al por mayor de maquinaria y equipo para la industria',u:'CS5',x:''},
-  {c:'435311',n:'Comercio al por mayor de equipo de telecomunicaciones,',u:'CS5',x:''},
-  {c:'435312',n:'Comercio al por mayor de artículos y accesorios para diseño y',u:'CS3',x:''},
-  {c:'435313',n:'Comercio al por mayor de mobiliario, equipo e instrumental',u:'CS4',x:''},
-  {c:'435319',n:'Comercio al por mayor de maquinaria y equipo para otros',u:'CS3',x:''},
-  {c:'435411',n:'Comercio al por mayor de mobiliario, equipo, y accesorios de',u:'CS5',x:''},
-  {c:'435412',n:'Comercio al por mayor de mobiliario y equipo de oficina',u:'CS5',x:''},
-  {c:'435419',n:'Comercio al por mayor de otra maquinaria y equipo de uso',u:'CS5',x:''},
-  {c:'436111',n:'Comercio al por mayor de camiones',u:'CS5',x:''},
-  {c:'436112',n:'Comercio al por mayor de partes y refacciones nuevas para',u:'CS5',x:''},
-  {c:'437111',n:'agropecuarios, excepto a través de Internet y de otros medios',u:'CS5',x:''},
-  {c:'437112',n:'industria, el comercio y los servicios, excepto a través de',u:'CS5',x:''},
-  {c:'437113',n:'uso doméstico y personal, excepto a través de Internet y de',u:'CS5',x:''},
-  {c:'437210',n:'Intermediación de comercio al por mayor exclusivamente a',u:'CS5',x:''},
-  {c:'461110',n:'Comercio al por menor en tiendas de abarrotes, ultramarinos y',u:'CS1',x:''},
-  {c:'461121',n:'Comercio al por menor de carnes rojas',u:'CS1',x:''},
-  {c:'461122',n:'Comercio al por menor de carne de aves',u:'CS1',x:''},
-  {c:'461123',n:'Comercio al por menor de pescados y mariscos',u:'CS1',x:''},
-  {c:'461130',n:'Comercio al por menor de frutas y verduras frescas',u:'CS1',x:''},
-  {c:'461140',n:'Comercio al por menor de semillas y granos alimenticios,',u:'CS1',x:''},
-  {c:'461150',n:'Comercio al por menor de leche, otros productos lácteos y',u:'CS1',x:''},
-  {c:'461160',n:'Comercio al por menor de dulces y materias primas para',u:'CS1',x:''},
-  {c:'461170',n:'Comercio al por menor de paletas de hielo y helados',u:'CS1',x:''},
-  {c:'461190',n:'Comercio al por menor de otros alimentos',u:'CS1',x:''},
-  {c:'461211',n:'Comercio al por menor de vinos y licores',u:'CS1',x:''},
-  {c:'461212',n:'Comercio al por menor de cerveza',u:'CS1',x:''},
-  {c:'461213',n:'Comercio al por menor de bebidas no alcohólicas y hielo',u:'CS1',x:''},
-  {c:'461220',n:'Comercio al por menor de cigarros, puros y tabaco',u:'CS1',x:''},
-  {c:'462111',n:'Comercio al por menor en supermercados',u:'CS3',x:''},
-  {c:'462112',n:'Comercio al por menor en minisupers',u:'CS2',x:''},
-  {c:'462210',n:'Comercio al por menor en tiendas departamentales',u:'CS3',x:''},
-  {c:'463111',n:'Comercio al por menor de telas',u:'CS2',x:''},
-  {c:'463112',n:'Comercio al por menor de blancos',u:'CS2',x:''},
-  {c:'463113',n:'Comercio al por menor de artículos de mercería y bonetería',u:'CS1',x:''},
-  {c:'463211',n:'Comercio al por menor de ropa, excepto de bebé y lencería',u:'CS1',x:''},
-  {c:'463212',n:'Comercio al por menor de ropa de bebé',u:'CS1',x:''},
-  {c:'463213',n:'Comercio al por menor de lencería',u:'CS1',x:''},
-  {c:'463214',n:'Comercio al por menor de disfraces, vestimenta regional y',u:'CS2',x:''},
-  {c:'463215',n:'Comercio al por menor de bisutería y accesorios de vestir',u:'CS1',x:''},
-  {c:'463216',n:'Comercio al por menor de ropa de cuero y piel y de otros',u:'CS1',x:''},
-  {c:'463217',n:'Comercio al por menor de pañales desechables',u:'CS1',x:''},
-  {c:'463218',n:'Comercio al por menor de sombreros',u:'CS1',x:''},
-  {c:'463310',n:'Comercio al por menor de calzado',u:'CS1',x:''},
-  {c:'464111',n:'Farmacias sin minisúper',u:'CS1',x:''},
-  {c:'464112',n:'Farmacias con minisúper',u:'CS2-CS3',x:''},
-  {c:'464113',n:'Comercio al por menor de productos naturistas, medicamentos',u:'CS1',x:''},
-  {c:'464121',n:'Comercio al por menor de lentes',u:'CS2',x:''},
-  {c:'464122',n:'Comercio al por menor de artículos ortopédicos',u:'CS2',x:''},
-  {c:'465111',n:'Comercio al por menor de artículos de perfumería y cosméticos',u:'CS2',x:''},
-  {c:'465112',n:'Comercio al por menor de artículos de joyería y relojes',u:'CS2',x:''},
-  {c:'465211',n:'Comercio al por menor de discos y casetes',u:'CS2',x:''},
-  {c:'465212',n:'Comercio al por menor de juguetes',u:'CS2',x:''},
-  {c:'465213',n:'Comercio al por menor de bicicletas',u:'CS2',x:''},
-  {c:'465214',n:'Comercio al por menor de equipo y material fotográfico',u:'CS2',x:''},
-  {c:'465215',n:'Comercio al por menor de artículos y aparatos deportivos',u:'CS2',x:''},
-  {c:'465216',n:'Comercio al por menor de instrumentos musicales',u:'CS2',x:''},
-  {c:'465311',n:'Comercio al por menor de artículos de papelería',u:'CS1',x:''},
-  {c:'465312',n:'Comercio al por menor de libros',u:'CS1',x:''},
-  {c:'465313',n:'Comercio al por menor de revistas y periódicos',u:'CS1',x:''},
-  {c:'465911',n:'Comercio al por menor de mascotas',u:'CS3',x:''},
-  {c:'465912',n:'Comercio al por menor de regalos',u:'CS1',x:''},
-  {c:'465913',n:'Comercio al por menor de artículos religiosos',u:'CS2',x:''},
-  {c:'465914',n:'Comercio al por menor de artículos desechables',u:'CS2',x:''},
-  {c:'465915',n:'Comercio al por menor en tiendas de artesanías',u:'CS2',x:''},
-  {c:'465919',n:'Comercio al por menor de otros artículos de uso personal',u:'CS3',x:''},
-  {c:'466111',n:'Comercio al por menor de muebles para el hogar',u:'CS3',x:''},
-  {c:'466112',n:'Comercio al por menor de electrodomésticos menores y',u:'CS3',x:''},
-  {c:'466113',n:'Comercio al por menor de muebles para jardín',u:'CS3',x:''},
-  {c:'466114',n:'Comercio al por menor de cristalería, loza y utensilios de',u:'CS1',x:''},
-  {c:'466211',n:'Comercio al por menor de mobiliario, equipo y accesorios de',u:'CS2',x:''},
-  {c:'466212',n:'Comercio al por menor de teléfonos y otros aparatos de',u:'CS2',x:''},
-  {c:'466311',n:'Comercio al por menor de alfombras, cortinas, tapices y',u:'CS2',x:''},
-  {c:'466312',n:'Comercio al por menor de plantas y flores naturales',u:'CS1',x:''},
-  {c:'466313',n:'Comercio al por menor de antigüedades y obras de arte',u:'CS2',x:''},
-  {c:'466314',n:'Comercio al por menor de lámparas ornamentales y candiles',u:'CS2',x:''},
-  {c:'466319',n:'Comercio al por menor de otros artículos para la decoración de',u:'CS2',x:''},
-  {c:'466410',n:'Comercio al por menor de artículos usados',u:'CS2',x:''},
-  {c:'467111',n:'Comercio al por menor en ferreterías y tlapalerías',u:'CS2',x:''},
-  {c:'467112',n:'Comercio al por menor de pisos y recubrimientos cerámicos',u:'CS3',x:''},
-  {c:'467113',n:'Comercio al por menor de pintura',u:'CS3',x:''},
-  {c:'467114',n:'Comercio al por menor de vidrios y espejos',u:'CS2',x:''},
-  {c:'467115',n:'Comercio al por menor de artículos para la limpieza',u:'CS1',x:''},
-  {c:'467116',n:'Comercio al por menor de materiales para la construcción en',u:'CS3',x:''},
-  {c:'467117',n:'Comercio al por menor de artículos para albercas y otros',u:'CS2',x:''},
-  {c:'468111',n:'Comercio al por menor de automóviles y camionetas nuevos',u:'CS4',x:''},
-  {c:'468112',n:'Comercio al por menor de automóviles y camionetas usados',u:'CS4',x:''},
-  {c:'468211',n:'Comercio al por menor de partes y refacciones nuevas para',u:'CS4',x:''},
-  {c:'468212',n:'Comercio al por menor de partes y refacciones usadas para',u:'CS4',x:''},
-  {c:'468213',n:'Comercio al por menor de llantas y cámaras para automóviles,',u:'CS4',x:''},
-  {c:'468311',n:'Comercio al por menor de motocicletas',u:'CS3',x:''},
-  {c:'468319',n:'Comercio al por menor de otros vehículos de motor',u:'CS4',x:''},
-  {c:'468411',n:'Comercio al por menor de gasolina y diesel',u:'CS4',x:''},
-  {c:'468412',n:'Comercio al por menor de gas L.P. en cilindros y para tanques',u:'CS4',x:''},
-  {c:'468413',n:'Comercio al por menor de gas L.P. en estaciones de',u:'CS4',x:''},
+  {c:'431110',n:'Abarrotes mayoreo · Distribuidora de abarrotes',ns:'Comercio al por mayor de abarrotes',u:'CS5',x:''},
+  {c:'431121',n:'Carnicería mayoreo · Carne al mayoreo',ns:'Comercio al por mayor de carnes rojas',u:'CS5',x:''},
+  {c:'431122',n:'Pollos mayoreo · Aves al mayoreo',ns:'Comercio al por mayor de carne de aves',u:'CS5',x:''},
+  {c:'431123',n:'Mariscos mayoreo · Pescado al mayoreo',ns:'Comercio al por mayor de pescados y mariscos',u:'CS5',x:''},
+  {c:'431130',n:'Frutas y verduras mayoreo · Central de abastos',ns:'Comercio al por mayor de frutas y verduras frescas',u:'CS5',x:''},
+  {c:'431140',n:'Huevo mayoreo',ns:'Comercio al por mayor de huevo',u:'CS5',x:''},
+  {c:'431150',n:'Semillas y granos mayoreo · Granel',ns:'Comercio al por mayor de semillas y granos alimenticios, leguminosas y oleaginosas',u:'CS5',x:''},
+  {c:'431160',n:'Lácteos mayoreo · Leche al mayoreo',ns:'Comercio al por mayor de leche y otros productos lácteos',u:'CS5',x:''},
+  {c:'431170',n:'Embutidos mayoreo · Carnes frías mayoreo',ns:'Comercio al por mayor de embutidos',u:'CS5',x:''},
+  {c:'431180',n:'Dulces mayoreo · Confitería mayoreo',ns:'Comercio al por mayor de dulces y materias primas para repostería',u:'CS5',x:''},
+  {c:'431191',n:'Pan y pasteles mayoreo',ns:'Comercio al por mayor de pan y pasteles',u:'CS5',x:''},
+  {c:'431192',n:'Botanas y frituras mayoreo',ns:'Comercio al por mayor de botanas y frituras',u:'CS5',x:''},
+  {c:'431193',n:'Conservas mayoreo · Enlatados',ns:'Comercio al por mayor de conservas alimenticias',u:'CS5',x:''},
+  {c:'431194',n:'Miel mayoreo',ns:'Comercio al por mayor de miel',u:'CS5',x:''},
+  {c:'431199',n:'Alimentos mayoreo · Distribuidora',ns:'Comercio al por mayor de otros alimentos',u:'CS5',x:''},
+  {c:'431211',n:'Bebidas mayoreo · Refrescos mayoreo',ns:'Comercio al por mayor de bebidas no alcohólicas y hielo',u:'CS5',x:''},
+  {c:'431212',n:'Licores mayoreo · Vinos al mayoreo',ns:'Comercio al por mayor de vinos y licores',u:'CS5',x:''},
+  {c:'431213',n:'Cerveza mayoreo · Distribuidora de cerveza',ns:'Comercio al por mayor de cerveza',u:'CS5',x:''},
+  {c:'431220',n:'Tabaco mayoreo · Cigarros al mayoreo',ns:'Comercio al por mayor de cigarros, puros y tabaco',u:'CS5',x:''},
+  {c:'432111',n:'Telas mayoreo · Hilos y telas al mayoreo',ns:'Comercio al por mayor de fibras, hilos y telas',u:'CS5',x:''},
+  {c:'432112',n:'Blancos mayoreo · Sábanas y toallas',ns:'Comercio al por mayor de blancos',u:'CS5',x:''},
+  {c:'432113',n:'Cueros y pieles mayoreo',ns:'Comercio al por mayor de cueros y pieles',u:'CS5',x:''},
+  {c:'432119',n:'Textiles mayoreo · Telas al mayoreo',ns:'Comercio al por mayor de otros productos textiles',u:'CS5',x:''},
+  {c:'432120',n:'Ropa mayoreo · Bisutería mayoreo',ns:'Comercio al por mayor de ropa, bisutería y accesorios de vestir',u:'CS5',x:''},
+  {c:'432130',n:'Calzado mayoreo · Zapatos al mayoreo',ns:'Comercio al por mayor de calzado',u:'CS5',x:''},
+  {c:'433110',n:'Farmacéuticos mayoreo · Medicamentos mayoreo',ns:'Comercio al por mayor de productos farmacéuticos',u:'CS5',x:''},
+  {c:'433210',n:'Perfumería mayoreo · Cosméticos mayoreo',ns:'Comercio al por mayor de artículos de perfumería y cosméticos',u:'CS5',x:''},
+  {c:'433220',n:'Joyería mayoreo · Relojes al mayoreo',ns:'Comercio al por mayor de artículos de joyería y relojes',u:'CS5',x:''},
+  {c:'433311',n:'Discos mayoreo · Música mayoreo',ns:'Comercio al por mayor de discos y casetes',u:'CS5',x:''},
+  {c:'433312',n:'Juguetes mayoreo · Bicicletas mayoreo',ns:'Comercio al por mayor de juguetes y bicicletas',u:'CS5',x:''},
+  {c:'433313',n:'Deportivos mayoreo · Artículos deportivos mayoreo',ns:'Comercio al por mayor de artículos y aparatos deportivos',u:'CS5',x:''},
+  {c:'433410',n:'Papelería mayoreo · Artículos de papelería',ns:'Comercio al por mayor de artículos de papelería',u:'CS5',x:''},
+  {c:'433420',n:'Libros mayoreo · Editorial · Distribuidora de libros',ns:'Comercio al por mayor de libros',u:'CS5',x:''},
+  {c:'433430',n:'Revistas y periódicos mayoreo',ns:'Comercio al por mayor de revistas y periódicos',u:'CS5',x:''},
+  {c:'433510',n:'Electrodomésticos mayoreo · Línea blanca mayoreo',ns:'Comercio al por mayor de electrodomésticos menores y aparatos de línea blanca',u:'CS5',x:''},
+  {c:'434111',n:'Agroquímicos · Fertilizantes · Semillas',ns:'Comercio al por mayor de fertilizantes, plaguicidas y semillas mejoradas',u:'CS5',x:''},
+  {c:'434112',n:'Medicamentos veterinarios mayoreo',ns:'Comercio al por mayor de medicamentos veterinarios y alimentos para animales',u:'CS5',x:''},
+  {c:'434211',n:'Materiales de construcción · Cemento · Grava',ns:'Comercio al por mayor de cemento, tabique y grava',u:'CS5',x:''},
+  {c:'434219',n:'Materiales construcción mayoreo',ns:'Comercio al por mayor de otros materiales para la construcción',u:'CS5',x:''},
+  {c:'434221',n:'Materiales metálicos · Acero · Varilla',ns:'Comercio al por mayor de materiales metálicos para la construcción y la manufactura',u:'CS5',x:''},
+  {c:'434222',n:'Químicos industriales · Productos químicos',ns:'Comercio al por mayor de productos químicos para la industria',u:'CS5',x:''},
+  {c:'434223',n:'Cajas · Empaques · Cartón mayoreo',ns:'Comercio al por mayor de envases en general, papel y cartón',u:'CS5',x:''},
+  {c:'434224',n:'Madera mayoreo · Maderería',ns:'Comercio al por mayor de madera para la construcción y la industria',u:'CS5',x:''},
+  {c:'434225',n:'Material eléctrico mayoreo · Cable',ns:'Comercio al por mayor de equipo y material eléctrico',u:'CS5',x:''},
+  {c:'434226',n:'Pintura mayoreo · Impermeabilizante',ns:'Comercio al por mayor de pintura',u:'CS5',x:''},
+  {c:'434227',n:'Vidrio mayoreo · Espejos mayoreo',ns:'Comercio al por mayor de vidrios y espejos',u:'CS5',x:''},
+  {c:'434228',n:'Ganado · Aves · Porcino mayoreo',ns:'Comercio al por mayor de ganado y aves en pie',u:'CS5',x:''},
+  {c:'434229',n:'Materias primas industriales · Insumos',ns:'Comercio al por mayor de otras materias primas para otras industrias',u:'CS5',x:''},
+  {c:'434230',n:'Combustibles industriales · Diesel mayoreo',ns:'Comercio al por mayor de combustibles de uso industrial',u:'CS5',x:''},
+  {c:'434240',n:'Desechables mayoreo · Platos y vasos mayoreo',ns:'Comercio al por mayor de artículos desechables',u:'CS5',x:''},
+  {c:'434311',n:'Chatarra · Metales reciclados',ns:'Comercio al por mayor de desechos metálicos',u:'CS5',x:''},
+  {c:'434312',n:'Papel reciclado · Cartón reciclado',ns:'Comercio al por mayor de desechos de papel y de cartón',u:'CS5',x:''},
+  {c:'434313',n:'Vidrio reciclado',ns:'Comercio al por mayor de desechos de vidrio',u:'CS5',x:''},
+  {c:'434314',n:'Plástico reciclado · PET',ns:'Comercio al por mayor de desechos de plástico',u:'CS5',x:''},
+  {c:'434319',n:'Reciclaje · Acopio de materiales',ns:'Comercio al por mayor de otros materiales de desecho',u:'CS5',x:''},
+  {c:'435110',n:'Maquinaria agrícola mayoreo · Tractores',ns:'Comercio al por mayor de maquinaria y equipo agropecuario, pesquero y forestal',u:'CS5',x:''},
+  {c:'435210',n:'Maquinaria industrial · Equipo industrial',ns:'Comercio al por mayor de maquinaria y equipo para la construcción',u:'CS5',x:''},
+  {c:'435220',n:'Maquinaria manufactura · Equipo manufactura',ns:'Comercio al por mayor de maquinaria y equipo para la industria manufacturera',u:'CS5',x:''},
+  {c:'435311',n:'Telecomunicaciones · Equipo de telecomunicaciones',ns:'Comercio al por mayor de equipo de telecomunicaciones, fotografía y cinematografía',u:'CS5',x:''},
+  {c:'435312',n:'Artículos de diseño · Equipo creativo',ns:'Comercio al por mayor de artículos y accesorios para diseño y actividades científicas',u:'CS3',x:''},
+  {c:'435313',n:'Equipamiento médico · Muebles hospitalarios',ns:'Comercio al por mayor de mobiliario, equipo e instrumental médico y de laboratorio',u:'CS4',x:''},
+  {c:'435319',n:'Maquinaria y equipo especializado',ns:'Comercio al por mayor de maquinaria y equipo para otros usos',u:'CS3',x:''},
+  {c:'435411',n:'Mobiliario hospitalario mayoreo',ns:'Comercio al por mayor de mobiliario, equipo, y accesorios de oficina y servicios',u:'CS5',x:''},
+  {c:'435412',n:'Muebles y equipo de oficina mayoreo',ns:'Comercio al por mayor de mobiliario y equipo de oficina',u:'CS5',x:''},
+  {c:'435419',n:'Maquinaria de uso general mayoreo',ns:'Comercio al por mayor de otra maquinaria y equipo de uso general',u:'CS5',x:''},
+  {c:'436111',n:'Camiones mayoreo · Vehículos de carga',ns:'Comercio al por mayor de camiones',u:'CS5',x:''},
+  {c:'436112',n:'Refacciones para camiones · Autopartes mayoreo',ns:'Comercio al por mayor de partes y refacciones nuevas para camiones',u:'CS5',x:''},
+  {c:'437111',n:'Intermediario comercial agropecuario',ns:'Comercio al por mayor a través de agentes de bienes agropecuarios, excepto a través de Internet y de otros medios electrónicos',u:'CS5',x:''},
+  {c:'437112',n:'Intermediario comercial industrial',ns:'Comercio al por mayor a través de agentes de bienes para la industria, comercio y servicios, excepto a través de Internet y de otros medios electrónicos',u:'CS5',x:''},
+  {c:'437113',n:'Intermediario comercial doméstico',ns:'Comercio al por mayor a través de agentes de artículos de uso doméstico y personal, excepto a través de Internet y de otros medios electrónicos',u:'CS5',x:''},
+  {c:'437210',n:'Intermediación comercial · Comisionista',ns:'Intermediación de comercio al por mayor exclusivamente a través de Internet, catálogos y similares',u:'CS5',x:''},
+  {c:'461110',n:'Abarrotes · Miscelánea',ns:'Comercio al por menor en tiendas de abarrotes, ultramarinos y misceláneas',u:'CS1',x:''},
+  {c:'461121',n:'Carnicería',ns:'Comercio al por menor de carne de ganado y cerdo en tiendas especializadas',u:'CS1',x:''},
+  {c:'461122',n:'Carnicería de aves',ns:'Comercio al por menor de carne de aves en tiendas especializadas',u:'CS1',x:''},
+  {c:'461123',n:'Pescadería · Marisquería',ns:'Comercio al por menor de pescados y mariscos',u:'CS1',x:''},
+  {c:'461130',n:'Verdulería · Frutería',ns:'Comercio al por menor de frutas y verduras frescas en tiendas especializadas',u:'CS1',x:''},
+  {c:'461140',n:'Pescadería · Marisquería',ns:'Comercio al por menor de pescados y mariscos en tiendas especializadas',u:'CS1',x:''},
+  {c:'461150',n:'Panadería · Pastelería',ns:'Comercio al por menor de pan y pasteles en panaderías y pastelerías',u:'CS1',x:''},
+  {c:'461160',n:'Dulcería · Chocolatería',ns:'Comercio al por menor de dulces y materias primas para repostería',u:'CS1',x:''},
+  {c:'461170',n:'Cremería · Lácteos · Embutidos',ns:'Comercio al por menor de leche, otros productos lácteos y embutidos',u:'CS1',x:''},
+  {c:'461190',n:'Tienda de alimentos',ns:'Comercio al por menor de otros alimentos',u:'CS1',x:''},
+  {c:'461211',n:'Licorería · Vinos y licores',ns:'Comercio al por menor de vinos y licores',u:'CS1',x:''},
+  {c:'461212',n:'Depósito de cervezas · Caguamón',ns:'Comercio al por menor de cerveza',u:'CS1',x:''},
+  {c:'461213',n:'Refrescos · Agua purificada · Bebidas',ns:'Comercio al por menor de bebidas no alcohólicas y hielo',u:'CS1',x:''},
+  {c:'461220',n:'Tabaquería · Cigarros · Puros',ns:'Comercio al por menor de cigarros, puros y tabaco',u:'CS1',x:''},
+  {c:'462111',n:'Licorería · Vinatería',ns:'Comercio al por menor de cerveza, vinos y licores en tiendas especializadas',u:'CS3',x:''},
+  {c:'462112',n:'Bar · Cantina (consumo en local)',ns:'Comercio al por menor de cerveza, vinos y licores para su consumo dentro del establecimiento',u:'CS2',x:''},
+  {c:'462210',n:'Tienda departamental',ns:'Comercio al por menor en tiendas departamentales',u:'CS3',x:''},
+  {c:'463111',n:'Tlapalería · Pinturas',ns:'Comercio al por menor de pinturas, materiales para pintar y similares',u:'CS2',x:''},
+  {c:'463112',n:'Papelería · Útiles escolares',ns:'Comercio al por menor de artículos de papelería',u:'CS2',x:''},
+  {c:'463113',n:'Mercería · Bonetería',ns:'Comercio al por menor de artículos de mercería y bonetería',u:'CS1',x:''},
+  {c:'463211',n:'Tienda de ropa · Boutique',ns:'Comercio al por menor de ropa, excepto de bebé y lencería',u:'CS1',x:''},
+  {c:'463212',n:'Heladería · Nevería · Paletería',ns:'Comercio al por menor en tiendas de helados y paletas',u:'CS1',x:''},
+  {c:'463213',n:'Lencería · Ropa interior',ns:'Comercio al por menor de lencería',u:'CS1',x:''},
+  {c:'463214',n:'Disfraces · Vestimenta regional · Novias',ns:'Comercio al por menor de disfraces, vestimenta regional y vestidos de novia',u:'CS2',x:''},
+  {c:'463215',n:'Bisutería · Accesorios de vestir',ns:'Comercio al por menor de bisutería y accesorios de vestir',u:'CS1',x:''},
+  {c:'463216',n:'Ropa de piel · Cuero · Piel',ns:'Comercio al por menor de ropa de cuero y piel y de otros artículos de piel',u:'CS1',x:''},
+  {c:'463217',n:'Pañalera · Artículos de bebé',ns:'Comercio al por menor de pañales desechables',u:'CS1',x:''},
+  {c:'463218',n:'Sombrerería',ns:'Comercio al por menor de sombreros',u:'CS1',x:''},
+  {c:'463310',n:'Zapatería · Calzado · Tenis',ns:'Comercio al por menor de calzado',u:'CS1',x:''},
+  {c:'464111',n:'Farmacia',ns:'Comercio al por menor de medicamentos',u:'CS1',x:''},
+  {c:'464112',n:'Farmacia con consultorio',ns:'Comercio al por menor de medicamentos con consultorio médico',u:'CS2-CS3',x:''},
+  {c:'464113',n:'Herbolaria · Naturista · Homeopática',ns:'Comercio al por menor de productos naturistas, medicamentos homeopáticos y de complementos alimenticios',u:'CS1',x:''},
+  {c:'464121',n:'Óptica · Lentes · Armazones',ns:'Comercio al por menor de lentes',u:'CS2',x:''},
+  {c:'464122',n:'Ortopedia · Artículos ortopédicos',ns:'Comercio al por menor de artículos ortopédicos',u:'CS2',x:''},
+  {c:'465111',n:'Perfumería · Cosméticos',ns:'Comercio al por menor de artículos de perfumería y cosméticos',u:'CS2',x:''},
+  {c:'465112',n:'Joyería · Relojería',ns:'Comercio al por menor de artículos de joyería y relojes',u:'CS2',x:''},
+  {c:'465211',n:'Tienda de mascotas · Acuario',ns:'Comercio al por menor de mascotas',u:'CS2',x:''},
+  {c:'465212',n:'Veterinaria (tienda)',ns:'Comercio al por menor de accesorios y alimentos para mascotas',u:'CS2',x:''},
+  {c:'465213',n:'Bicicletas · Ciclismo',ns:'Comercio al por menor de bicicletas',u:'CS2',x:''},
+  {c:'465214',n:'Fotografía · Equipo fotográfico · Cámara',ns:'Comercio al por menor de equipo y material fotográfico',u:'CS2',x:''},
+  {c:'465215',n:'Artículos deportivos · Equipo deportivo',ns:'Comercio al por menor de artículos y aparatos deportivos',u:'CS2',x:''},
+  {c:'465216',n:'Instrumentos musicales',ns:'Comercio al por menor de instrumentos musicales',u:'CS2',x:''},
+  {c:'465311',n:'Librería',ns:'Comercio al por menor de libros',u:'CS1',x:''},
+  {c:'465312',n:'Periódicos · Revistas',ns:'Comercio al por menor de periódicos y revistas',u:'CS1',x:''},
+  {c:'465313',n:'Papelería fina · Material escolar',ns:'Comercio al por menor de materiales y artículos de papelería y escritorio',u:'CS1',x:''},
+  {c:'465911',n:'Mascotas · Pet shop',ns:'Comercio al por menor de mascotas',u:'CS3',x:''},
+  {c:'465912',n:'Regalos · Detalles · Souvenirs',ns:'Comercio al por menor de regalos',u:'CS1',x:''},
+  {c:'465913',n:'Artículos religiosos · Imágenes · Rosarios',ns:'Comercio al por menor de artículos religiosos',u:'CS2',x:''},
+  {c:'465914',n:'Artículos desechables · Platos y vasos',ns:'Comercio al por menor de artículos desechables',u:'CS2',x:''},
+  {c:'465915',n:'Artesanías · Manualidades',ns:'Comercio al por menor en tiendas de artesanías',u:'CS2',x:''},
+  {c:'465919',n:'Artículos personales · Miscelánea',ns:'Comercio al por menor de otros artículos de uso personal',u:'CS3',x:''},
+  {c:'466111',n:'Mueblería',ns:'Comercio al por menor de muebles para el hogar',u:'CS3',x:''},
+  {c:'466112',n:'Mueblería (oficina)',ns:'Comercio al por menor de muebles para oficina',u:'CS3',x:''},
+  {c:'466113',n:'Muebles de jardín · Exterior',ns:'Comercio al por menor de muebles para jardín',u:'CS3',x:''},
+  {c:'466114',n:'Cristalería · Loza · Utensilios de cocina',ns:'Comercio al por menor de cristalería, loza y utensilios de cocina',u:'CS1',x:''},
+  {c:'466211',n:'Artículos de cocina · Hogar',ns:'Comercio al por menor de mobiliario, equipo y accesorios de cocina',u:'CS2',x:''},
+  {c:'466212',n:'Telefonía · Celulares · Accesorios móviles',ns:'Comercio al por menor de teléfonos y otros aparatos de comunicación',u:'CS2',x:''},
+  {c:'466311',n:'Pinturas · Recubrimientos',ns:'Comercio al por menor de pinturas y recubrimientos',u:'CS2',x:''},
+  {c:'466312',n:'Jardinería · Vivero',ns:'Comercio al por menor de plantas y artículos para jardinería',u:'CS1',x:''},
+  {c:'466313',n:'Antigüedades · Arte · Coleccionables',ns:'Comercio al por menor de antigüedades y obras de arte',u:'CS2',x:''},
+  {c:'466314',n:'Lámparas · Candiles · Iluminación',ns:'Comercio al por menor de lámparas ornamentales y candiles',u:'CS2',x:''},
+  {c:'466319',n:'Decoración · Artículos del hogar',ns:'Comercio al por menor de otros artículos para la decoración de interiores',u:'CS2',x:''},
+  {c:'466410',n:'Segunda mano · Artículos usados',ns:'Comercio al por menor de artículos usados',u:'CS2',x:''},
+  {c:'467111',n:'Ferretería · Tlapalería',ns:'Comercio al por menor de ferretería y tlapalería',u:'CS2',x:''},
+  {c:'467112',n:'Vidrería · Aluminios',ns:'Comercio al por menor de vidrios y espejos',u:'CS3',x:''},
+  {c:'467113',n:'Materiales de construcción (cemento)',ns:'Comercio al por menor de cemento, tabique, grava y arena',u:'CS3',x:''},
+  {c:'467114',n:'Vidriería · Espejos',ns:'Comercio al por menor de vidrios y espejos',u:'CS2',x:''},
+  {c:'467115',n:'Artículos de limpieza · Detergentes',ns:'Comercio al por menor de artículos para la limpieza',u:'CS1',x:''},
+  {c:'467116',n:'Materiales de construcción',ns:'Comercio al por menor de materiales para la construcción en general',u:'CS3',x:''},
+  {c:'467117',n:'Artículos para alberca · Piscinas',ns:'Comercio al por menor de artículos para albercas y otros',u:'CS2',x:''},
+  {c:'468111',n:'Agencia de autos nuevos · Concesionaria',ns:'Comercio al por menor de automóviles y camionetas nuevos',u:'CS4',x:''},
+  {c:'468112',n:'Autos usados · Carros seminuevos',ns:'Comercio al por menor de automóviles y camionetas usados',u:'CS4',x:''},
+  {c:'468211',n:'Refaccionaria · Autopartes nuevas',ns:'Comercio al por menor de partes y refacciones nuevas para automóviles',u:'CS4',x:''},
+  {c:'468212',n:'Yonke · Autopartes usadas',ns:'Comercio al por menor de partes y refacciones usadas para automóviles',u:'CS4',x:''},
+  {c:'468213',n:'Llantera · Vulcanizadora',ns:'Comercio al por menor de llantas y cámaras para automóviles, camiones y similares',u:'CS4',x:''},
+  {c:'468311',n:'Motos · Motocicletas',ns:'Comercio al por menor de motocicletas',u:'CS3',x:''},
+  {c:'468319',n:'Cuatrimotos · Vehículos especiales',ns:'Comercio al por menor de otros vehículos de motor',u:'CS4',x:''},
+  {c:'468411',n:'Gas doméstico (cilindro)',ns:'Comercio al por menor de gas L.P. en recipientes portátiles',u:'CS4',x:''},
+  {c:'468412',n:'Gas L.P. (estacionario)',ns:'Comercio al por menor de gas L.P. en cilindros y para tanques estacionarios',u:'CS4',x:''},
+  {c:'468413',n:'Gas LP · Distribución de gas',ns:'Comercio al por menor de gas L.P. en estaciones de servicio',u:'CS4',x:''},
   {c:'468414',n:'CS4',u:'N/A',x:''},
-  {c:'468419',n:'Comercio al por menor de otros combustibles',u:'CS4',x:''},
-  {c:'468420',n:'Comercio al por menor de aceites y grasas lubricantes, aditivos',u:'CS3',x:''},
-  {c:'469110',n:'Comercio al por menor exclusivamente a través de Internet, y',u:'CS1',x:''},
-  {c:'484111',n:'Autotransporte local de productos agrícolas sin refrigeración',u:'CS5',x:''},
-  {c:'484119',n:'Otro autotransporte local de carga general',u:'CS5',x:''},
-  {c:'484121',n:'Autotransporte foráneo de productos agrícolas sin refrigeración',u:'CS5',x:''},
-  {c:'484129',n:'Otro autotransporte foráneo de carga general',u:'CS5',x:''},
-  {c:'484210',n:'Servicios de mudanzas',u:'CS4',x:''},
-  {c:'484221',n:'Autotransporte local de materiales para la construcción',u:'CS5',x:''},
-  {c:'484222',n:'Autotransporte local de materiales y residuos peligrosos',u:'CS5',x:''},
-  {c:'484223',n:'Autotransporte local con refrigeración',u:'CS5',x:''},
-  {c:'484224',n:'Autotransporte local de madera',u:'CS5',x:''},
-  {c:'484229',n:'Otro autotransporte local de carga especializado',u:'CS5',x:''},
-  {c:'484231',n:'Autotransporte foráneo de materiales para la construcción',u:'CS5',x:''},
-  {c:'484232',n:'Autotransporte foráneo de materiales y residuos peligrosos',u:'CS5',x:''},
-  {c:'484233',n:'Autotransporte foráneo con refrigeración',u:'CS5',x:''},
-  {c:'484234',n:'Autotransporte foráneo de madera',u:'CS5',x:''},
-  {c:'484239',n:'Otro autotransporte foráneo de carga especializado',u:'CS5',x:''},
-  {c:'485320',n:'Alquiler de automóviles con chofer',u:'CS3',x:''},
-  {c:'485410',n:'Transporte escolar y de personal',u:'CS3',x:''},
-  {c:'485510',n:'Alquiler de autobuses con chofer',u:'CS4',x:''},
-  {c:'485990',n:'Otro transporte terrestre de pasajeros',u:'CS3',x:''},
+  {c:'468419',n:'Gasolinera · Combustibles',ns:'Comercio al por menor de otros combustibles',u:'CS4',x:''},
+  {c:'468420',n:'Refaccionaria · Aceites y lubricantes',ns:'Comercio al por menor de aceites y grasas lubricantes, aditivos y similares para vehículos de motor',u:'CS3',x:''},
+  {c:'469110',n:'Tienda en línea · E-commerce',ns:'Comercio al por menor exclusivamente a través de Internet, catálogos impresos, televisión y similares',u:'CS1',x:''},
+  {c:'484111',n:'Transporte de carga local · Agrícola',ns:'Autotransporte local de productos agrícolas sin refrigeración',u:'CS5',x:''},
+  {c:'484119',n:'Autotransporte local de carga',ns:'Otro autotransporte local de carga general',u:'CS5',x:''},
+  {c:'484121',n:'Autotransporte foráneo agrícola',ns:'Autotransporte foráneo de productos agrícolas sin refrigeración',u:'CS5',x:''},
+  {c:'484129',n:'Autotransporte foráneo de carga',ns:'Otro autotransporte foráneo de carga general',u:'CS5',x:''},
+  {c:'484210',n:'Mudanzas · Fletes',ns:'Servicios de mudanzas',u:'CS4',x:''},
+  {c:'484221',n:'Transporte de materiales de construcción',ns:'Autotransporte local de materiales para la construcción',u:'CS5',x:''},
+  {c:'484222',n:'Transporte de residuos peligrosos',ns:'Autotransporte local de materiales y residuos peligrosos',u:'CS5',x:''},
+  {c:'484223',n:'Transporte refrigerado · Cámara fría',ns:'Autotransporte local con refrigeración',u:'CS5',x:''},
+  {c:'484224',n:'Transporte de madera',ns:'Autotransporte local de madera',u:'CS5',x:''},
+  {c:'484229',n:'Transporte especializado de carga',ns:'Otro autotransporte local de carga especializado',u:'CS5',x:''},
+  {c:'484231',n:'Transporte foráneo de construcción',ns:'Autotransporte foráneo de materiales para la construcción',u:'CS5',x:''},
+  {c:'484232',n:'Transporte foráneo de residuos peligrosos',ns:'Autotransporte foráneo de materiales y residuos peligrosos',u:'CS5',x:''},
+  {c:'484233',n:'Transporte foráneo refrigerado',ns:'Autotransporte foráneo con refrigeración',u:'CS5',x:''},
+  {c:'484234',n:'Transporte foráneo de madera',ns:'Autotransporte foráneo de madera',u:'CS5',x:''},
+  {c:'484239',n:'Transporte foráneo especializado',ns:'Otro autotransporte foráneo de carga especializado',u:'CS5',x:''},
+  {c:'485320',n:'Transporte ejecutivo · Chofer',ns:'Alquiler de automóviles con chofer',u:'CS3',x:''},
+  {c:'485410',n:'Transporte escolar · Camión de personal',ns:'Transporte escolar y de personal',u:'CS3',x:''},
+  {c:'485510',n:'Renta de autobús · Tour',ns:'Alquiler de autobuses con chofer',u:'CS4',x:''},
+  {c:'485990',n:'Transporte de pasajeros',ns:'Otro transporte terrestre de pasajeros',u:'CS3',x:''},
   {c:'486110',n:'Transporte de petróleo crudo por ductos            RIS',u:'N/A',x:''},
-  {c:'486210',n:'Transporte de gas natural por ductos',u:'CS3',x:''},
+  {c:'486210',n:'Gas natural · Ductos',ns:'Transporte de gas natural por ductos',u:'CS3',x:''},
   {c:'486910',n:'RIS',u:'N/A',x:''},
   {c:'486990',n:'RIS',u:'N/A',x:''},
-  {c:'487110',n:'Transporte turístico por tierra',u:'CS4',x:''},
-  {c:'487210',n:'Transporte turístico por agua',u:'CS4',x:''},
-  {c:'487990',n:'Otro transporte turístico',u:'CS4',x:''},
-  {c:'488112',n:'Administración de aeropuertos y helipuertos',u:'CS5',x:''},
-  {c:'488190',n:'Otros servicios relacionados con el transporte aéreo',u:'CS5',x:''},
-  {c:'488210',n:'Servicios relacionados con el transporte por ferrocarril',u:'CS4',x:''},
-  {c:'488410',n:'Servicios de grúa',u:'CS4',x:''},
+  {c:'487110',n:'Tour terrestre · Turismo por tierra',ns:'Transporte turístico por tierra',u:'CS4',x:''},
+  {c:'487210',n:'Turismo acuático · Lanchas',ns:'Transporte turístico por agua',u:'CS4',x:''},
+  {c:'487990',n:'Turismo · Excursiones',ns:'Otro transporte turístico',u:'CS4',x:''},
+  {c:'488112',n:'Aeropuerto · Helipuerto',ns:'Administración de aeropuertos y helipuertos',u:'CS5',x:''},
+  {c:'488190',n:'Servicios aeroportuarios · Aviación',ns:'Otros servicios relacionados con el transporte aéreo',u:'CS5',x:''},
+  {c:'488210',n:'Ferrocarril · Servicios ferroviarios',ns:'Servicios relacionados con el transporte por ferrocarril',u:'CS4',x:''},
+  {c:'488410',n:'Grúa · Servicio de grúas',ns:'Servicios de grúa',u:'CS4',x:''},
   {c:'488491',n:'Servicios de administración de centrales camioneras',u:'RIT',x:''},
-  {c:'488492',n:'Servicios de administración de carreteras, puentes y servicios',u:'CS3',x:''},
-  {c:'488493',n:'Servicios de báscula para el transporte y otros servicios',u:'CS5',x:''},
-  {c:'488511',n:'Servicios de agencias aduanales',u:'CS3',x:''},
-  {c:'488519',n:'Otros servicios de intermediación para el transporte de carga',u:'CS5',x:''},
-  {c:'488990',n:'Otros servicios relacionados con el transporte',u:'CS5',x:''},
-  {c:'491110',n:'Servicios postales',u:'CS2-CS3',x:''},
-  {c:'492110',n:'Servicios de mensajería y paquetería foránea',u:'CS4',x:''},
-  {c:'492210',n:'Servicios de mensajería y paquetería local',u:'CS3',x:''},
-  {c:'493111',n:'Almacenes generales de depósito',u:'CS3-CS4',x:''},
-  {c:'493119',n:'Otros servicios de almacenamiento general sin instalaciones',u:'CS3',x:''},
-  {c:'493120',n:'Almacenamiento con refrigeración',u:'CS5',x:''},
-  {c:'493130',n:'Almacenamiento de productos agrícolas que no requieren',u:'CS5',x:''},
-  {c:'493190',n:'Otros servicios de almacenamiento con instalaciones',u:'CS5',x:''},
-  {c:'511111',n:'Edición de periódicos',u:'CS3',x:''},
-  {c:'511112',n:'Edición de periódicos integrada con la impresión',u:'CS3',x:''},
-  {c:'511121',n:'Edición de revistas y otras publicaciones periódicas',u:'CS3',x:''},
-  {c:'511122',n:'Edición de revistas y otras publicaciones periódicas integrada',u:'CS3',x:''},
-  {c:'511131',n:'Edición de libros',u:'CS3',x:''},
-  {c:'511132',n:'Edición de libros integrada con la impresión',u:'CS3',x:''},
-  {c:'511141',n:'Edición de directorios y de listas de correo',u:'CS3',x:''},
-  {c:'511142',n:'Edición de directorios y de listas de correo integrada con la',u:'CS3',x:''},
-  {c:'511191',n:'Edición de otros materiales',u:'CS3',x:''},
-  {c:'511192',n:'Edición de otros materiales integrada con la impresión',u:'CS3',x:''},
-  {c:'511210',n:'Edición de software y edición de software integrada con la',u:'CS3',x:''},
-  {c:'512111',n:'Producción de películas',u:'CS4',x:''},
-  {c:'512112',n:'Producción de programas para la televisión',u:'CS4',x:''},
-  {c:'512113',n:'Producción de videoclips, comerciales y otros materiales',u:'CS4',x:''},
-  {c:'512120',n:'Distribución de películas y de otros materiales audiovisuales',u:'CS2',x:''},
-  {c:'512130',n:'Exhibición de películas y otros materiales audiovisuales',u:'CS3',x:''},
-  {c:'512190',n:'Servicios de postproducción y otros servicios para la industria',u:'CS3',x:''},
-  {c:'512210',n:'Productoras discográficas',u:'CS3',x:''},
-  {c:'512220',n:'Producción de material discográfico integrada con su',u:'CS3',x:''},
-  {c:'512230',n:'Editoras de música',u:'CS3',x:''},
-  {c:'512240',n:'Grabación de discos compactos (CD) y de video digital (DVD) o',u:'CS3',x:''},
-  {c:'512290',n:'Otros servicios de grabación del sonido',u:'CS3',x:''},
-  {c:'515110',n:'Transmisión de programas de radio',u:'CS3',x:''},
-  {c:'515120',n:'Transmisión de programas de televisión',u:'CS3',x:''},
-  {c:'515210',n:'Producción de programación de canales para sistemas de',u:'CS3',x:''},
-  {c:'517110',n:'Operadores de servicios de telecomunicaciones alámbricas',u:'CS3',x:''},
-  {c:'517210',n:'Operadores de servicios de telecomunicaciones inalámbricas',u:'CS3',x:''},
-  {c:'517410',n:'Operadores de servicios de telecomunicaciones vía satélite',u:'CS3',x:''},
-  {c:'517910',n:'Otros servicios de telecomunicaciones',u:'CS1',x:''},
-  {c:'518210',n:'Procesamiento electrónico de información, hospedaje y otros',u:'CS3',x:''},
-  {c:'519110',n:'Agencias noticiosas',u:'CS3',x:''},
-  {c:'519121',n:'Bibliotecas y archivos del sector privado',u:'CS2',x:''},
+  {c:'488492',n:'Caseta · Autopista · Carretera',ns:'Servicios de administración de carreteras, puentes y servicios auxiliares',u:'CS3',x:''},
+  {c:'488493',n:'Báscula · Pesaje para transporte',ns:'Servicios de báscula para el transporte y otros servicios auxiliares',u:'CS5',x:''},
+  {c:'488511',n:'Agencia aduanal · Aduana',ns:'Servicios de agencias aduanales',u:'CS3',x:''},
+  {c:'488519',n:'Intermediación de carga · Agente de carga',ns:'Otros servicios de intermediación para el transporte de carga',u:'CS5',x:''},
+  {c:'488990',n:'Servicios de transporte · Logística',ns:'Otros servicios relacionados con el transporte',u:'CS5',x:''},
+  {c:'491110',n:'Correo · Servicios postales',ns:'Servicios postales',u:'CS2-CS3',x:''},
+  {c:'492110',n:'Paquetería foránea · Mensajería nacional',ns:'Servicios de mensajería y paquetería foránea',u:'CS4',x:''},
+  {c:'492210',n:'Paquetería local · Mensajería · Envíos',ns:'Servicios de mensajería y paquetería local',u:'CS3',x:''},
+  {c:'493111',n:'Almacén · Bodega · Depósito',ns:'Almacenes generales de depósito',u:'CS3-CS4',x:''},
+  {c:'493119',n:'Almacén sin instalaciones · Bodega',ns:'Otros servicios de almacenamiento general sin instalaciones',u:'CS3',x:''},
+  {c:'493120',n:'Almacén refrigerado · Cámara fría',ns:'Almacenamiento con refrigeración',u:'CS5',x:''},
+  {c:'493130',n:'Almacén agrícola · Silo · Bodega de granos',ns:'Almacenamiento de productos agrícolas que no requieren refrigeración',u:'CS5',x:''},
+  {c:'493190',n:'Almacenamiento especializado · Bodega industrial',ns:'Otros servicios de almacenamiento con instalaciones',u:'CS5',x:''},
+  {c:'511111',n:'Periódico · Editorial de periódicos',ns:'Edición de periódicos',u:'CS3',x:''},
+  {c:'511112',n:'Periódico con imprenta',ns:'Edición de periódicos integrada con la impresión',u:'CS3',x:''},
+  {c:'511121',n:'Revista · Editorial de revistas',ns:'Edición de revistas y otras publicaciones periódicas',u:'CS3',x:''},
+  {c:'511122',n:'Revista con imprenta',ns:'Edición de revistas y otras publicaciones periódicas integrada con la impresión',u:'CS3',x:''},
+  {c:'511131',n:'Editorial · Edición de libros',ns:'Edición de libros',u:'CS3',x:''},
+  {c:'511132',n:'Editorial con imprenta',ns:'Edición de libros integrada con la impresión',u:'CS3',x:''},
+  {c:'511141',n:'Directorios · Listas de correo · Publicaciones',ns:'Edición de directorios y de listas de correo',u:'CS3',x:''},
+  {c:'511142',n:'Directorios con imprenta',ns:'Edición de directorios y de listas de correo integrada con la impresión',u:'CS3',x:''},
+  {c:'511191',n:'Edición de materiales · Publicaciones',ns:'Edición de otros materiales',u:'CS3',x:''},
+  {c:'511192',n:'Edición con imprenta · Materiales impresos',ns:'Edición de otros materiales integrada con la impresión',u:'CS3',x:''},
+  {c:'511210',n:'Desarrollo de software · Edición de videojuegos',ns:'Edición de software y edición de software integrada con la reproducción',u:'CS3',x:''},
+  {c:'512111',n:'Producción de películas · Cine',ns:'Producción de películas',u:'CS4',x:''},
+  {c:'512112',n:'Producción de televisión · Contenido TV',ns:'Producción de programas para la televisión',u:'CS4',x:''},
+  {c:'512113',n:'Producción de videoclips · Comerciales · Videos',ns:'Producción de videoclips, comerciales y otros materiales audiovisuales',u:'CS4',x:''},
+  {c:'512120',n:'Distribución de películas · Cine distribuidora',ns:'Distribución de películas y de otros materiales audiovisuales',u:'CS2',x:''},
+  {c:'512130',n:'Cine · Sala de cine · Exhibición de películas',ns:'Exhibición de películas y otros materiales audiovisuales',u:'CS3',x:''},
+  {c:'512190',n:'Postproducción · Edición de video',ns:'Servicios de postproducción y otros servicios para la industria fílmica',u:'CS3',x:''},
+  {c:'512210',n:'Disquera · Productora musical',ns:'Productoras discográficas',u:'CS3',x:''},
+  {c:'512220',n:'Disquera con grabación · Producción musical',ns:'Producción de material discográfico integrada con su reproducción',u:'CS3',x:''},
+  {c:'512230',n:'Editorial musical · Derechos de música',ns:'Editoras de música',u:'CS3',x:''},
+  {c:'512240',n:'Grabación de CD y DVD · Estudio de grabación',ns:'Grabación de discos compactos (CD) y de video digital (DVD) o de otro material audiovisual',u:'CS3',x:''},
+  {c:'512290',n:'Estudio de grabación · Sonido',ns:'Otros servicios de grabación del sonido',u:'CS3',x:''},
+  {c:'515110',n:'Radio · Estación de radio · Difusión',ns:'Transmisión de programas de radio',u:'CS3',x:''},
+  {c:'515120',n:'Televisión · Canal de TV',ns:'Transmisión de programas de televisión',u:'CS3',x:''},
+  {c:'515210',n:'Canal de televisión · Contenido para cable',ns:'Producción de programación de canales para sistemas de televisión de paga',u:'CS3',x:''},
+  {c:'517110',n:'Telefonía fija · Internet · Cable',ns:'Operadores de servicios de telecomunicaciones alámbricas',u:'CS3',x:''},
+  {c:'517210',n:'Telefonía celular · Internet móvil',ns:'Operadores de servicios de telecomunicaciones inalámbricas',u:'CS3',x:''},
+  {c:'517410',n:'Satelital · Internet satelital',ns:'Operadores de servicios de telecomunicaciones vía satélite',u:'CS3',x:''},
+  {c:'517910',n:'Telecomunicaciones · Servicios de comunicación',ns:'Otros servicios de telecomunicaciones',u:'CS1',x:''},
+  {c:'518210',n:'Hospedaje web · Data center · Nube',ns:'Procesamiento electrónico de información, hospedaje y otros servicios relacionados',u:'CS3',x:''},
+  {c:'519110',n:'Agencia de noticias · Periodismo',ns:'Agencias noticiosas',u:'CS3',x:''},
+  {c:'519121',n:'Biblioteca · Archivo histórico',ns:'Bibliotecas y archivos del sector privado',u:'CS2',x:''},
   {c:'519122',n:'Bibliotecas y archivos del sector público',u:'E2',x:''},
-  {c:'519130',n:'Edición y difusión de contenido exclusivamente a través de',u:'CS2',x:''},
-  {c:'519190',n:'Otros servicios de suministro de información',u:'CS2',x:''},
-  {c:'521110',n:'Banca central',u:'CS3',x:''},
-  {c:'522110',n:'Banca múltiple',u:'CS3',x:''},
-  {c:'522210',n:'Banca de desarrollo',u:'CS3',x:''},
-  {c:'522220',n:'Fondos y fideicomisos financieros',u:'CS2',x:''},
-  {c:'522310',n:'Uniones de crédito',u:'CS2',x:''},
-  {c:'522320',n:'Cajas de ahorro popular',u:'CS2',x:''},
-  {c:'522390',n:'Otras instituciones de ahorro y préstamo',u:'CS3-CS4',x:''},
-  {c:'522410',n:'Arrendadoras financieras',u:'CS2',x:''},
-  {c:'522420',n:'Compañías de factoraje financiero',u:'CS2',x:''},
-  {c:'522430',n:'Sociedades financieras de objeto limitado',u:'CS2',x:''},
-  {c:'522440',n:'Compañías de autofinanciamiento',u:'CS2',x:''},
-  {c:'522451',n:'Montepíos',u:'CS2',x:''},
-  {c:'522452',n:'Casas de empeño',u:'CS2',x:''},
-  {c:'522460',n:'Sociedades financieras de objeto múltiple',u:'CS2',x:''},
-  {c:'522490',n:'Otras instituciones de intermediación crediticia y financiera no',u:'CS3',x:''},
-  {c:'522510',n:'Servicios relacionados con la intermediación crediticia no',u:'CS3',x:''},
-  {c:'523110',n:'Casas de bolsa',u:'CS3',x:''},
-  {c:'523121',n:'Casas de cambio',u:'CS3',x:''},
-  {c:'523122',n:'Centros cambiarios',u:'CS3',x:''},
-  {c:'523210',n:'Bolsa de valores',u:'CS3',x:''},
-  {c:'523910',n:'Asesoría en inversiones',u:'CS3',x:''},
-  {c:'523990',n:'Otros servicios relacionados con la intermediación bursátil',u:'CS3',x:''},
-  {c:'524110',n:'Compañías de seguros',u:'CS3',x:''},
-  {c:'524120',n:'Fondos de aseguramiento campesino',u:'CS3',x:''},
-  {c:'524130',n:'Compañías afianzadoras',u:'CS3',x:''},
-  {c:'524210',n:'Agentes, ajustadores y gestores de seguros y fianzas',u:'CS3',x:''},
-  {c:'524220',n:'Administración de cajas de pensión y de seguros',u:'CS3',x:''},
-  {c:'531111',n:'Alquiler sin intermediación de viviendas amuebladas',u:'CS1',x:''},
-  {c:'531112',n:'Alquiler sin intermediación de viviendas no amuebladas',u:'CS1',x:''},
-  {c:'531113',n:'Alquiler sin intermediación de salones para fiestas y',u:'CS4',x:''},
-  {c:'531114',n:'Alquiler sin intermediación de oficinas y locales comerciales',u:'CS1',x:''},
-  {c:'531115',n:'Alquiler sin intermediación de teatros, estadios, auditorios y',u:'CS1',x:''},
-  {c:'531116',n:'Alquiler sin intermediación de edificios industriales dentro de un',u:'CS1',x:''},
-  {c:'531119',n:'Alquiler sin intermediación de otros bienes raíces',u:'CS1',x:''},
-  {c:'531210',n:'Inmobiliarias y corredores de bienes raíces',u:'CS2',x:''},
-  {c:'531311',n:'Servicios de administración de bienes raíces',u:'CS2',x:''},
-  {c:'531319',n:'Otros servicios relacionados con los servicios inmobiliarios',u:'CS2',x:''},
-  {c:'532110',n:'Alquiler de automóviles sin chofer',u:'CS3',x:''},
-  {c:'532121',n:'Alquiler de camiones de carga sin chofer',u:'CS5',x:''},
-  {c:'532122',n:'Alquiler de autobuses, minibuses y remolques sin chofer',u:'CS5',x:''},
-  {c:'532210',n:'Alquiler de aparatos eléctricos y electrónicos para el hogar y',u:'CS3',x:''},
-  {c:'532220',n:'Alquiler de prendas de vestir',u:'CS2',x:''},
-  {c:'532230',n:'Alquiler de videocasetes y discos',u:'CS2',x:''},
-  {c:'532291',n:'Alquiler de mesas, sillas, vajillas y similares',u:'CS2',x:''},
-  {c:'532292',n:'Alquiler de instrumentos musicales',u:'CS2',x:''},
-  {c:'532299',n:'Alquiler de otros artículos para el hogar y personales',u:'CS2',x:''},
-  {c:'532310',n:'Centros generales de alquiler',u:'CS3',x:''},
-  {c:'532411',n:'Alquiler de maquinaria y equipo para construcción, minería y',u:'CS5',x:''},
-  {c:'532412',n:'Alquiler de equipo de transporte, excepto terrestre',u:'CS5',x:''},
-  {c:'532420',n:'Alquiler de equipo de cómputo y de otras máquinas y mobiliario',u:'CS3',x:''},
-  {c:'532491',n:'Alquiler de maquinaria y equipo agropecuario, pesquero y para',u:'CS5',x:''},
-  {c:'532492',n:'Alquiler de maquinaria y equipo para mover, levantar y',u:'CS5',x:''},
-  {c:'532493',n:'Alquiler de maquinaria y equipo comercial y de servicios',u:'CS3',x:''},
-  {c:'533110',n:'Servicios de alquiler de marcas registradas, patentes y',u:'CS2',x:''},
-  {c:'541110',n:'Bufetes jurídicos',u:'CS3',x:''},
-  {c:'541120',n:'Notarías públicas',u:'CS3',x:''},
-  {c:'541190',n:'Servicios de apoyo para efectuar trámites legales',u:'CS2',x:''},
-  {c:'541211',n:'Servicios de contabilidad y auditoría',u:'CS2',x:''},
-  {c:'541219',n:'Otros servicios relacionados con la contabilidad',u:'CS2',x:''},
-  {c:'541310',n:'Servicios de arquitectura',u:'CS2',x:''},
-  {c:'541320',n:'Servicios de arquitectura de paisaje y urbanismo',u:'CS2',x:''},
-  {c:'541330',n:'Servicios de ingeniería',u:'CS2',x:''},
-  {c:'541340',n:'Servicios de dibujo',u:'CS2',x:''},
-  {c:'541350',n:'Servicios de inspección de edificios',u:'CS2',x:''},
-  {c:'541360',n:'Servicios de levantamiento geofísico',u:'CS2',x:''},
-  {c:'541370',n:'Servicios de elaboración de mapas',u:'CS2',x:''},
-  {c:'541380',n:'Laboratorios de pruebas',u:'CS3',x:''},
-  {c:'541410',n:'Diseño y decoración de interiores',u:'CS2',x:''},
-  {c:'541420',n:'Diseño industrial',u:'CS2',x:''},
-  {c:'541430',n:'Diseño gráfico',u:'CS2',x:''},
-  {c:'541490',n:'Diseño de modas y otros diseños especializados',u:'CS2',x:''},
-  {c:'541510',n:'Servicios de diseño de sistemas de cómputo y servicios',u:'CS2',x:''},
-  {c:'541610',n:'Servicios de consultoría en administración',u:'CS2',x:''},
-  {c:'541620',n:'Servicios de consultoría en medio ambiente',u:'CS2',x:''},
-  {c:'541690',n:'Otros servicios de consultoría científica y técnica',u:'CS2',x:''},
-  {c:'541711',n:'naturales y exactas, ingeniería, y ciencias de la vida, prestados',u:'CS2',x:''},
-  {c:'541712',n:'naturales y exactas, ingeniería, y ciencias de la vida, prestados',u:'E3',x:''},
-  {c:'541721',n:'Servicios de investigación científica y desarrollo en ciencias',u:'CS2',x:''},
-  {c:'541722',n:'Servicios de investigación científica y desarrollo en ciencias',u:'E3',x:''},
-  {c:'541810',n:'Agencias de publicidad',u:'CS2',x:''},
-  {c:'541820',n:'Agencias de relaciones públicas',u:'CS2',x:''},
-  {c:'541830',n:'Agencias de compra de medios a petición del cliente',u:'CS2',x:''},
-  {c:'541840',n:'Agencias de representación de medios',u:'CS2',x:''},
-  {c:'541850',n:'Agencias de anuncios publicitarios',u:'CS2',x:''},
-  {c:'541860',n:'Agencias de correo directo',u:'CS2',x:''},
-  {c:'541870',n:'Distribución de material publicitario',u:'CS2',x:''},
-  {c:'541890',n:'Servicios de rotulación y otros servicios de publicidad',u:'CS2',x:''},
-  {c:'541910',n:'Servicios de investigación de mercados y encuestas de opinión',u:'CS2',x:''},
-  {c:'541920',n:'Servicios de fotografía y videograbación',u:'CS2',x:''},
-  {c:'541930',n:'Servicios de traducción e interpretación',u:'CS2',x:''},
-  {c:'541941',n:'Servicios veterinarios para mascotas prestados por el sector',u:'CS2',x:''},
-  {c:'541942',n:'Servicios veterinarios para mascotas prestados por el sector',u:'E2',x:''},
+  {c:'519130',n:'Blog · Podcast · Contenido digital',ns:'Edición y difusión de contenido exclusivamente a través de Internet',u:'CS2',x:''},
+  {c:'519190',n:'Suministro de información · Datos',ns:'Otros servicios de suministro de información',u:'CS2',x:''},
+  {c:'521110',n:'Banco central · Institución reguladora',ns:'Banca central',u:'CS3',x:''},
+  {c:'522110',n:'Banco · Sucursal bancaria',ns:'Banca múltiple',u:'CS3',x:''},
+  {c:'522210',n:'Banca de desarrollo · Banco gubernamental',ns:'Banca de desarrollo',u:'CS3',x:''},
+  {c:'522220',n:'Fondo · Fideicomiso financiero',ns:'Fondos y fideicomisos financieros',u:'CS2',x:''},
+  {c:'522310',n:'Casa de cambio',ns:'Casas de cambio y centros cambiarios',u:'CS2',x:''},
+  {c:'522320',n:'Casa de empeño · Monte de piedad',ns:'Compra-venta y empeño de alhajas y artículos de segunda mano',u:'CS2',x:''},
+  {c:'522390',n:'Caja de ahorro · Cooperativa · Microfinanciera',ns:'Otras instituciones de ahorro y préstamo',u:'CS3-CS4',x:''},
+  {c:'522410',n:'Arrendadora · Leasing',ns:'Arrendadoras financieras',u:'CS2',x:''},
+  {c:'522420',n:'Factoraje · Factoring',ns:'Compañías de factoraje financiero',u:'CS2',x:''},
+  {c:'522430',n:'SOFOL · Financiera especializada',ns:'Sociedades financieras de objeto limitado',u:'CS2',x:''},
+  {c:'522440',n:'Autofinanciamiento · Plan de ahorro',ns:'Compañías de autofinanciamiento',u:'CS2',x:''},
+  {c:'522451',n:'Montepío',ns:'Montepíos',u:'CS2',x:''},
+  {c:'522452',n:'Casa de empeño · Empeño',ns:'Casas de empeño',u:'CS2',x:''},
+  {c:'522460',n:'SOFOM · Financiera múltiple',ns:'Sociedades financieras de objeto múltiple',u:'CS2',x:''},
+  {c:'522490',n:'Institución financiera · Crédito',ns:'Otras instituciones de intermediación crediticia y financiera no bancaria',u:'CS3',x:''},
+  {c:'522510',n:'Servicios financieros · Asesoría crediticia',ns:'Servicios relacionados con la intermediación crediticia no bancaria',u:'CS3',x:''},
+  {c:'523110',n:'Casa de bolsa · Inversiones bursátiles',ns:'Casas de bolsa',u:'CS3',x:''},
+  {c:'523121',n:'Casa de cambio · Divisas',ns:'Casas de cambio',u:'CS3',x:''},
+  {c:'523122',n:'Centro cambiario · Cambio de moneda',ns:'Centros cambiarios',u:'CS3',x:''},
+  {c:'523210',n:'Bolsa de valores',ns:'Bolsa de valores',u:'CS3',x:''},
+  {c:'523910',n:'Asesoría financiera · Inversiones · Finanzas',ns:'Asesoría en inversiones',u:'CS3',x:''},
+  {c:'523990',n:'Servicios bursátiles · Intermediario financiero',ns:'Otros servicios relacionados con la intermediación bursátil',u:'CS3',x:''},
+  {c:'524110',n:'Aseguradora · Seguros',ns:'Compañías de seguros',u:'CS3',x:''},
+  {c:'524120',n:'Seguro agrícola · Fondo de aseguramiento',ns:'Fondos de aseguramiento campesino',u:'CS3',x:''},
+  {c:'524130',n:'Afianzadora · Fianzas',ns:'Compañías afianzadoras',u:'CS3',x:''},
+  {c:'524210',n:'Agente de seguros · Ajustador',ns:'Agentes, ajustadores y gestores de seguros y fianzas',u:'CS3',x:''},
+  {c:'524220',n:'Pensiones · AFORE · Fondo de retiro',ns:'Administración de cajas de pensión y de seguros',u:'CS3',x:''},
+  {c:'531111',n:'Renta de casa amueblada · Departamento amueblado',ns:'Alquiler sin intermediación de viviendas amuebladas',u:'CS1',x:''},
+  {c:'531112',n:'Renta de casa · Departamento · Arrendamiento',ns:'Alquiler sin intermediación de viviendas no amuebladas',u:'CS1',x:''},
+  {c:'531113',n:'Salón de fiestas · Salón de eventos · Terraza',ns:'Alquiler sin intermediación de salones para fiestas y convenciones',u:'CS4',x:''},
+  {c:'531114',n:'Arrendadora (oficinas · locales)',ns:'Alquiler sin intermediación de oficinas y locales comerciales',u:'CS1',x:''},
+  {c:'531115',n:'Arrendadora (teatros · estadios)',ns:'Alquiler sin intermediación de teatros, estadios, auditorios y similares',u:'CS1',x:''},
+  {c:'531116',n:'Arrendadora (naves industriales)',ns:'Alquiler sin intermediación de edificios industriales dentro de un parque industrial',u:'CS1',x:''},
+  {c:'531119',n:'Renta de local · Bodega · Nave industrial',ns:'Alquiler sin intermediación de otros bienes raíces',u:'CS1',x:''},
+  {c:'531210',n:'Inmobiliaria · Desarrolladora',ns:'Compra, venta y fraccionamiento de bienes raíces',u:'CS2',x:''},
+  {c:'531311',n:'Administración de condominios · Inmobiliaria',ns:'Servicios de administración de bienes raíces',u:'CS2',x:''},
+  {c:'531319',n:'Servicios inmobiliarios',ns:'Otros servicios relacionados con los servicios inmobiliarios',u:'CS2',x:''},
+  {c:'532110',n:'Renta de autos · Car rental',ns:'Alquiler de automóviles sin chofer',u:'CS3',x:''},
+  {c:'532121',n:'Renta de camiones de carga',ns:'Alquiler de camiones de carga sin chofer',u:'CS5',x:''},
+  {c:'532122',n:'Renta de autobús · Minibús',ns:'Alquiler de autobuses, minibuses y remolques sin chofer',u:'CS5',x:''},
+  {c:'532210',n:'Renta de electrodomésticos · Línea blanca',ns:'Alquiler de aparatos eléctricos y electrónicos para el hogar y personales',u:'CS3',x:''},
+  {c:'532220',n:'Renta de trajes · Disfraces · Ropa',ns:'Alquiler de prendas de vestir',u:'CS2',x:''},
+  {c:'532230',n:'Videoclub · Renta de películas',ns:'Alquiler de videocasetes y discos',u:'CS2',x:''},
+  {c:'532291',n:'Renta de mobiliario para eventos · Sillas y mesas',ns:'Alquiler de mesas, sillas, vajillas y similares',u:'CS2',x:''},
+  {c:'532292',n:'Renta de instrumentos musicales',ns:'Alquiler de instrumentos musicales',u:'CS2',x:''},
+  {c:'532299',n:'Renta de artículos personales · Alquiler',ns:'Alquiler de otros artículos para el hogar y personales',u:'CS2',x:''},
+  {c:'532310',n:'Centro de renta · Renta general',ns:'Centros generales de alquiler',u:'CS3',x:''},
+  {c:'532411',n:'Renta de maquinaria para construcción',ns:'Alquiler de maquinaria y equipo para construcción, minería y actividades similares',u:'CS5',x:''},
+  {c:'532412',n:'Renta de equipo de transporte',ns:'Alquiler de equipo de transporte, excepto terrestre',u:'CS5',x:''},
+  {c:'532420',n:'Renta de cómputo · Renta de equipo de oficina',ns:'Alquiler de equipo de cómputo y de otras máquinas y mobiliario de oficina',u:'CS3',x:''},
+  {c:'532491',n:'Renta de maquinaria agropecuaria',ns:'Alquiler de maquinaria y equipo agropecuario, pesquero y para la industria',u:'CS5',x:''},
+  {c:'532492',n:'Renta de grúa · Maquinaria pesada',ns:'Alquiler de maquinaria y equipo para mover, levantar y transportar',u:'CS5',x:''},
+  {c:'532493',n:'Renta de equipo comercial',ns:'Alquiler de maquinaria y equipo comercial y de servicios',u:'CS3',x:''},
+  {c:'533110',n:'Franquicias · Marcas · Patentes · Licencias',ns:'Servicios de alquiler de marcas registradas, patentes y franquicias',u:'CS2',x:''},
+  {c:'541110',n:'Abogados · Despacho legal',ns:'Servicios jurídicos',u:'CS3',x:''},
+  {c:'541120',n:'Notaría pública',ns:'Servicios de notarios públicos',u:'CS3',x:''},
+  {c:'541190',n:'Gestoría · Trámites legales',ns:'Servicios de apoyo para efectuar trámites legales',u:'CS2',x:''},
+  {c:'541211',n:'Contaduría · Despacho fiscal (privado)',ns:'Servicios de contabilidad y auditoría prestados por el sector privado',u:'CS2',x:''},
+  {c:'541219',n:'Contabilidad · Servicios contables',ns:'Otros servicios relacionados con la contabilidad',u:'CS2',x:''},
+  {c:'541310',n:'Arquitectura · Diseño arquitectónico',ns:'Servicios de arquitectura',u:'CS2',x:''},
+  {c:'541320',n:'Paisajismo · Diseño de jardines · Urbanismo',ns:'Servicios de arquitectura de paisaje y urbanismo',u:'CS2',x:''},
+  {c:'541330',n:'Ingeniería civil',ns:'Servicios de ingeniería civil',u:'CS2',x:''},
+  {c:'541340',n:'Delineación · Dibujo técnico',ns:'Servicios de dibujo',u:'CS2',x:''},
+  {c:'541350',n:'Peritaje · Inspección de edificios',ns:'Servicios de inspección de edificios',u:'CS2',x:''},
+  {c:'541360',n:'Topografía · Levantamiento geofísico',ns:'Servicios de levantamiento geofísico',u:'CS2',x:''},
+  {c:'541370',n:'Cartografía · Elaboración de mapas',ns:'Servicios de elaboración de mapas',u:'CS2',x:''},
+  {c:'541380',n:'Laboratorio de pruebas · Control de calidad',ns:'Laboratorios de pruebas',u:'CS3',x:''},
+  {c:'541410',n:'Diseño de interiores · Decoración',ns:'Diseño y decoración de interiores',u:'CS2',x:''},
+  {c:'541420',n:'Diseño industrial · Producto',ns:'Diseño industrial',u:'CS2',x:''},
+  {c:'541430',n:'Diseño gráfico · Agencia creativa',ns:'Diseño gráfico',u:'CS2',x:''},
+  {c:'541490',n:'Diseño de modas · Vestuario',ns:'Diseño de modas y otros diseños especializados',u:'CS2',x:''},
+  {c:'541510',n:'Desarrollo de software · Programación · TI',ns:'Servicios de diseño de sistemas de cómputo y servicios relacionados',u:'CS2',x:''},
+  {c:'541610',n:'Consultoría de negocios · Management',ns:'Servicios de consultoría en administración',u:'CS2',x:''},
+  {c:'541620',n:'Consultoría ambiental · Ecología',ns:'Servicios de consultoría en medio ambiente',u:'CS2',x:''},
+  {c:'541690',n:'Consultoría técnica · Ingeniería',ns:'Otros servicios de consultoría científica y técnica',u:'CS2',x:''},
+  {c:'541711',n:'Investigación científica (privado)',ns:'Servicios de investigación científica y desarrollo en ciencias naturales, exactas, ingeniería y ciencias de la vida, prestados por el sector privado',u:'CS2',x:''},
+  {c:'541712',n:'Investigación científica (público)',ns:'Servicios de investigación científica y desarrollo en ciencias naturales, exactas, ingeniería y ciencias de la vida, prestados por el sector público',u:'E3',x:''},
+  {c:'541721',n:'Investigación social (privado)',ns:'Servicios de investigación científica y desarrollo en ciencias sociales y humanidades prestados por el sector privado',u:'CS2',x:''},
+  {c:'541722',n:'Investigación social (público)',ns:'Servicios de investigación científica y desarrollo en ciencias sociales y humanidades prestados por el sector público',u:'E3',x:''},
+  {c:'541810',n:'Publicidad · Agencia creativa',ns:'Servicios de publicidad',u:'CS2',x:''},
+  {c:'541820',n:'Relaciones públicas · PR',ns:'Agencias de relaciones públicas',u:'CS2',x:''},
+  {c:'541830',n:'Marketing · Relaciones públicas',ns:'Agencias de relaciones públicas',u:'CS2',x:''},
+  {c:'541840',n:'Agencia de medios · Compra de medios',ns:'Agencias de representación de medios',u:'CS2',x:''},
+  {c:'541850',n:'Publicidad · Agencia de publicidad',ns:'Agencias de anuncios publicitarios',u:'CS2',x:''},
+  {c:'541860',n:'Marketing directo · Correo directo',ns:'Agencias de correo directo',u:'CS2',x:''},
+  {c:'541870',n:'Distribución de publicidad · Volanteo',ns:'Distribución de material publicitario',u:'CS2',x:''},
+  {c:'541890',n:'Rotulación · Letreros · Señalética',ns:'Servicios de rotulación y otros servicios de publicidad',u:'CS2',x:''},
+  {c:'541910',n:'Investigación de mercados · Encuestas',ns:'Servicios de investigación de mercados y encuestas de opinión',u:'CS2',x:''},
+  {c:'541920',n:'Fotografía · Estudio fotográfico · Video',ns:'Servicios de fotografía y videograbación',u:'CS2',x:''},
+  {c:'541930',n:'Traducción · Intérprete · Idiomas',ns:'Servicios de traducción e interpretación',u:'CS2',x:''},
+  {c:'541941',n:'Veterinaria clínica (privada)',ns:'Servicios veterinarios para mascotas prestados por el sector privado',u:'CS2',x:''},
+  {c:'541942',n:'Veterinaria clínica (pública)',ns:'Servicios veterinarios para mascotas prestados por el sector público',u:'E2',x:''},
   {c:'541943',n:'Servicios veterinarios para la ganadería prestados por el sector',u:'CS5',x:''},
   {c:'541944',n:'Servicios veterinarios para la ganadería prestados por el sector',u:'E5',x:''},
-  {c:'541990',n:'Otros servicios profesionales, científicos y técnicos',u:'CS2',x:''},
+  {c:'541990',n:'Servicios profesionales · Consultoría especializada',ns:'Otros servicios profesionales, científicos y técnicos',u:'CS2',x:''},
   {c:'551111',n:'Corporativos',u:'CS3',x:''},
   {c:'551112',n:'Tenedoras de acciones',u:'CS2',x:''},
-  {c:'561110',n:'Servicios de administración de negocios',u:'CS2',x:''},
-  {c:'561210',n:'Servicios combinados de apoyo en instalaciones',u:'CS2',x:''},
-  {c:'561310',n:'Agencias de colocación',u:'CS3',x:''},
-  {c:'561320',n:'Agencias de empleo temporal',u:'CS3',x:''},
-  {c:'561330',n:'Suministro de personal permanente',u:'CS3',x:''},
-  {c:'561410',n:'Servicios de preparación de documentos',u:'CS1',x:''},
+  {c:'561110',n:'Administración de negocios · Outsourcing',ns:'Servicios de administración de negocios',u:'CS2',x:''},
+  {c:'561210',n:'Mantenimiento de instalaciones · Facility',ns:'Servicios combinados de apoyo en instalaciones',u:'CS2',x:''},
+  {c:'561310',n:'Agencia de empleo · Reclutamiento',ns:'Agencias de empleo y agencias de empleo temporal',u:'CS3',x:''},
+  {c:'561320',n:'Agencia de empleo temporal · Reclutamiento',ns:'Agencias de empleo temporal',u:'CS3',x:''},
+  {c:'561330',n:'Suministro de personal · Outsourcing RH',ns:'Suministro de personal permanente',u:'CS3',x:''},
+  {c:'561410',n:'Centro de copiado · Impresión',ns:'Servicios de fotocopiado e impresión',u:'CS1',x:''},
   {c:'561421',n:'Servicios de casetas telefónicas',u:'RIS',x:''},
-  {c:'561422',n:'Servicios de recepción de llamadas telefónicas y promoción por',u:'CS3',x:''},
-  {c:'561431',n:'Servicios de fotocopiado, fax y afines',u:'CS1',x:''},
-  {c:'561432',n:'Servicios de acceso a computadoras',u:'CS1',x:''},
-  {c:'561440',n:'Agencias de cobranza',u:'CS2',x:''},
-  {c:'561450',n:'Despachos de investigación de solvencia financiera',u:'CS2',x:''},
-  {c:'561490',n:'Otros servicios de apoyo secretarial y similares',u:'CS2',x:''},
-  {c:'561510',n:'Agencias de viajes',u:'CS2',x:''},
-  {c:'561520',n:'Organización de excursiones y paquetes turísticos para',u:'CS2',x:''},
-  {c:'561590',n:'Otros servicios de reservaciones',u:'CS2',x:''},
-  {c:'561610',n:'Servicios de investigación y de protección y custodia, excepto',u:'CS3',x:''},
-  {c:'561620',n:'Servicios de protección y custodia mediante el monitoreo de',u:'CS3',x:''},
-  {c:'561710',n:'Servicios de control y exterminación de plagas',u:'CS3',x:''},
-  {c:'561720',n:'Servicios de limpieza de inmuebles',u:'CS2',x:''},
-  {c:'561730',n:'Servicios de instalación y mantenimiento de áreas verdes',u:'CS2',x:''},
-  {c:'561740',n:'Servicios de limpieza de tapicería, alfombras y muebles',u:'CS2',x:''},
-  {c:'561790',n:'Otros servicios de limpieza',u:'CS2',x:''},
-  {c:'561910',n:'Servicios de empacado y etiquetado',u:'CS3',x:''},
-  {c:'561920',n:'Organizadores de convenciones y ferias comerciales e',u:'CS3',x:''},
-  {c:'561990',n:'Otros servicios de apoyo a los negocios',u:'CS2',x:''},
-  {c:'562111',n:'Manejo de residuos peligrosos y servicios de remediación a',u:'CS5',x:''},
-  {c:'562112',n:'Manejo de desechos no peligrosos y servicios de remediación',u:'CS5',x:''},
-  {c:'611111',n:'Escuelas de educación preescolar del sector privado',u:'CS2',x:''},
-  {c:'611112',n:'Escuelas de educación preescolar del sector público',u:'E1',x:''},
-  {c:'611121',n:'Escuelas de educación primaria del sector privado',u:'CS2',x:''},
-  {c:'611122',n:'Escuelas de educación primaria del sector público',u:'E1',x:''},
-  {c:'611131',n:'Escuelas de educación secundaria general del sector privado',u:'CS3',x:''},
-  {c:'611132',n:'Escuelas de educación secundaria general del sector público',u:'E2',x:''},
-  {c:'611141',n:'Escuelas de educación secundaria técnica del sector privado',u:'CS3',x:''},
-  {c:'611142',n:'Escuelas de educación secundaria técnica del sector público',u:'E2',x:''},
-  {c:'611151',n:'Escuelas de educación media técnica terminal del sector',u:'CS3',x:''},
+  {c:'561422',n:'Call center · Telemarketing',ns:'Servicios de recepción de llamadas telefónicas y promoción por teléfono',u:'CS3',x:''},
+  {c:'561431',n:'Fotocopias · Impresión · Escáner',ns:'Servicios de fotocopiado, fax y afines',u:'CS1',x:''},
+  {c:'561432',n:'Café internet · Cómputo · Impresión',ns:'Servicios de acceso a computadoras',u:'CS1',x:''},
+  {c:'561440',n:'Despacho de cobranza · Recuperación de cartera',ns:'Agencias de cobranza',u:'CS2',x:''},
+  {c:'561450',n:'Investigación crediticia · Buró privado',ns:'Despachos de investigación de solvencia financiera',u:'CS2',x:''},
+  {c:'561490',n:'Servicios secretariales · Centro de negocios',ns:'Otros servicios de apoyo secretarial y similares',u:'CS2',x:''},
+  {c:'561510',n:'Agencia de viajes',ns:'Agencias de viajes y servicios de reservaciones',u:'CS2',x:''},
+  {c:'561520',n:'Agencia de viajes · Tour operador',ns:'Organización de excursiones y paquetes turísticos para agencias de viajes',u:'CS2',x:''},
+  {c:'561590',n:'Reservaciones · Boletos · Servicios turísticos',ns:'Otros servicios de reservaciones',u:'CS2',x:''},
+  {c:'561610',n:'Vigilancia · Seguridad privada',ns:'Servicios de investigación y de protección y custodia, excepto investigación de mercados',u:'CS3',x:''},
+  {c:'561620',n:'Monitoreo · Alarmas',ns:'Servicios de protección y custodia mediante el monitoreo de sistemas de seguridad',u:'CS3',x:''},
+  {c:'561710',n:'Limpieza · Mantenimiento de edificios',ns:'Servicios de limpieza y mantenimiento a edificios e inmuebles',u:'CS3',x:''},
+  {c:'561720',n:'Limpieza de oficinas · Aseo de inmuebles',ns:'Servicios de limpieza de inmuebles',u:'CS2',x:''},
+  {c:'561730',n:'Jardinería · Áreas verdes · Paisajismo',ns:'Servicios de instalación y mantenimiento de áreas verdes',u:'CS2',x:''},
+  {c:'561740',n:'Limpieza de tapicería · Alfombras',ns:'Servicios de limpieza de tapicería, alfombras y muebles',u:'CS2',x:''},
+  {c:'561790',n:'Limpieza industrial · Servicios de aseo',ns:'Otros servicios de limpieza',u:'CS2',x:''},
+  {c:'561910',n:'Empaque · Maquiladora · Etiquetado',ns:'Servicios de empacado y etiquetado',u:'CS3',x:''},
+  {c:'561920',n:'Organización de eventos · Convenciones · Ferias',ns:'Organizadores de convenciones y ferias comerciales e industriales',u:'CS3',x:''},
+  {c:'561990',n:'Servicios de apoyo · Outsourcing empresarial',ns:'Otros servicios de apoyo a los negocios',u:'CS2',x:''},
+  {c:'562111',n:'Residuos peligrosos · Remediación',ns:'Manejo de residuos peligrosos y servicios de remediación a zonas dañadas',u:'CS5',x:''},
+  {c:'562112',n:'Recolección de basura · Desechos',ns:'Manejo de desechos no peligrosos y servicios de remediación a zonas dañadas',u:'CS5',x:''},
+  {c:'611111',n:'Kínder · Preescolar (privado)',ns:'Escuelas de educación preescolar del sector privado',u:'CS2',x:''},
+  {c:'611112',n:'Kínder · Preescolar (público)',ns:'Escuelas de educación preescolar del sector público',u:'E1',x:''},
+  {c:'611121',n:'Primaria (privada)',ns:'Escuelas de educación primaria del sector privado',u:'CS2',x:''},
+  {c:'611122',n:'Primaria (pública)',ns:'Escuelas de educación primaria del sector público',u:'E1',x:''},
+  {c:'611131',n:'Secundaria general (privada)',ns:'Escuelas de educación secundaria general del sector privado',u:'CS3',x:''},
+  {c:'611132',n:'Secundaria general (pública)',ns:'Escuelas de educación secundaria general del sector público',u:'E2',x:''},
+  {c:'611141',n:'Secundaria técnica (privada)',ns:'Escuelas de educación secundaria técnica del sector privado',u:'CS3',x:''},
+  {c:'611142',n:'Secundaria técnica (pública)',ns:'Escuelas de educación secundaria técnica del sector público',u:'E2',x:''},
+  {c:'611151',n:'Preparatoria técnica · Bachillerato técnico',ns:'Escuelas de educación media técnica terminal del sector privado',u:'CS3',x:''},
   {c:'611152',n:'Escuelas de educación media técnica terminal del sector',u:'E3',x:''},
-  {c:'611161',n:'Escuelas de educación media superior del sector privado',u:'CS3',x:''},
+  {c:'611161',n:'Preparatoria · Bachillerato · Prepa',ns:'Escuelas de educación media superior del sector privado',u:'CS3',x:''},
   {c:'611162',n:'Escuelas de educación media superior del sector público',u:'E3',x:''},
-  {c:'611171',n:'Escuelas del sector privado que combinan diversos niveles de',u:'CS3',x:''},
-  {c:'611172',n:'Escuelas del sector público que combinan diversos niveles de',u:'E3',x:''},
-  {c:'611181',n:'Escuelas del sector privado de educación para necesidades',u:'CS3',x:''},
+  {c:'611171',n:'Colegio (privado, niveles combinados)',ns:'Escuelas del sector privado que combinan diversos niveles de educación',u:'CS3',x:''},
+  {c:'611172',n:'Colegio (público, niveles combinados)',ns:'Escuelas del sector público que combinan diversos niveles de educación',u:'E3',x:''},
+  {c:'611181',n:'Educación especial · Necesidades educativas',ns:'Escuelas del sector privado de educación para necesidades especiales',u:'CS3',x:''},
   {c:'611182',n:'Escuelas del sector público de educación para necesidades',u:'E3',x:''},
-  {c:'611211',n:'Escuelas de educación técnica superior del sector privado',u:'CS3',x:''},
+  {c:'611211',n:'Universidad · Instituto técnico superior',ns:'Escuelas de educación técnica superior del sector privado',u:'CS3',x:''},
   {c:'611212',n:'Escuelas de educación técnica superior del sector público',u:'E4',x:''},
-  {c:'611311',n:'Escuelas de educación superior del sector privado',u:'CS3',x:''},
-  {c:'611312',n:'Escuelas de educación superior del sector público',u:'E4',x:''},
-  {c:'611411',n:'Escuelas comerciales y secretariales del sector privado',u:'CS2',x:''},
+  {c:'611311',n:'Universidad · Instituto (privado)',ns:'Escuelas de educación superior del sector privado',u:'CS3',x:''},
+  {c:'611312',n:'Universidad · Instituto (público)',ns:'Escuelas de educación superior del sector público',u:'E4',x:''},
+  {c:'611411',n:'Academia · Capacitación técnica',ns:'Escuelas y estudios de capacitación para el trabajo del sector privado',u:'CS2',x:''},
   {c:'611412',n:'Escuelas comerciales y secretariales del sector público',u:'E3',x:''},
-  {c:'611421',n:'Escuelas de computación del sector privado',u:'CS2',x:''},
+  {c:'611421',n:'Escuela de computación · Informática · Sistemas',ns:'Escuelas de computación del sector privado',u:'CS2',x:''},
   {c:'611422',n:'Escuelas de computación del sector público',u:'E2',x:''},
-  {c:'611431',n:'Escuelas para la capacitación de ejecutivos del sector privado',u:'CS3',x:''},
-  {c:'611432',n:'Escuelas para la capacitación de ejecutivos del sector público',u:'E3',x:''},
-  {c:'611511',n:'Escuelas del sector privado dedicadas a la enseñanza de',u:'CS2',x:''},
+  {c:'611431',n:'Capacitación ejecutiva (privado)',ns:'Escuelas para la capacitación de ejecutivos del sector privado',u:'CS3',x:''},
+  {c:'611432',n:'Capacitación ejecutiva (público)',ns:'Escuelas para la capacitación de ejecutivos del sector público',u:'E3',x:''},
+  {c:'611511',n:'Capacitación · Artes y oficios · Cursos',ns:'Escuelas del sector privado dedicadas a la enseñanza de capacitación para el trabajo',u:'CS2',x:''},
   {c:'611512',n:'Escuelas del sector público dedicadas a la enseñanza de',u:'E3',x:''},
-  {c:'611611',n:'Escuelas de arte del sector privado',u:'CS2',x:''},
+  {c:'611611',n:'Escuela de arte · Taller artístico · Pintura',ns:'Escuelas de arte del sector privado',u:'CS2',x:''},
   {c:'611612',n:'Escuelas de arte del sector público',u:'E1',x:''},
-  {c:'611621',n:'Escuelas de deporte del sector privado',u:'CS2',x:''},
+  {c:'611621',n:'Academia deportiva · Artes marciales · Natación',ns:'Escuelas de deporte del sector privado',u:'CS2',x:''},
   {c:'611622',n:'Escuelas de deporte del sector público',u:'E1',x:''},
-  {c:'611631',n:'Escuelas de idiomas del sector privado',u:'CS2',x:''},
+  {c:'611631',n:'Escuela de idiomas · Centro de inglés',ns:'Escuelas de idiomas del sector privado',u:'CS2',x:''},
   {c:'611632',n:'Escuelas de idiomas del sector público',u:'E2',x:''},
-  {c:'611691',n:'Servicios de profesores particulares',u:'CS2',x:''},
-  {c:'611698',n:'Otros servicios educativos proporcionados por el sector privado',u:'CS2',x:''},
-  {c:'611699',n:'Otros servicios educativos proporcionados por el sector público',u:'E2',x:''},
-  {c:'611710',n:'Servicios de apoyo a la educación',u:'CS2',x:''},
-  {c:'621111',n:'Consultorios de medicina general del sector privado',u:'CS1',x:''},
-  {c:'621112',n:'Consultorios de medicina general del sector público',u:'E1',x:''},
-  {c:'621113',n:'Consultorios de medicina especializada del sector privado',u:'CS2',x:''},
+  {c:'611691',n:'Profesor particular · Tutoría · Clases',ns:'Servicios de profesores particulares',u:'CS2',x:''},
+  {c:'611698',n:'Otros servicios educativos (privado)',ns:'Otros servicios educativos proporcionados por el sector privado',u:'CS2',x:''},
+  {c:'611699',n:'Otros servicios educativos (público)',ns:'Otros servicios educativos proporcionados por el sector público',u:'E2',x:''},
+  {c:'611710',n:'Apoyo escolar · Asesoría académica',ns:'Servicios de apoyo a la educación',u:'CS2',x:''},
+  {c:'621111',n:'Consultorio médico (privado)',ns:'Consultorios médicos del sector privado',u:'CS1',x:''},
+  {c:'621112',n:'Consultorio médico (público)',ns:'Consultorios médicos del sector público',u:'E1',x:''},
+  {c:'621113',n:'Médico especialista · Clínica de especialidades',ns:'Consultorios de medicina especializada del sector privado',u:'CS2',x:''},
   {c:'621114',n:'Consultorios de medicina especializada del sector público',u:'E2',x:''},
-  {c:'621115',n:'Clínicas de consultorios médicos del sector privado',u:'CS3',x:''},
+  {c:'621115',n:'Clínica médica · Policlínico',ns:'Clínicas de consultorios médicos del sector privado',u:'CS3',x:''},
   {c:'621116',n:'Clínicas de consultorios médicos del sector público',u:'E3',x:''},
-  {c:'621211',n:'Consultorios dentales del sector privado',u:'CS2',x:''},
-  {c:'621212',n:'Consultorios dentales del sector público',u:'E2',x:''},
-  {c:'621311',n:'Consultorios de quiropráctica del sector privado',u:'CS2',x:''},
-  {c:'621312',n:'Consultorios de quiropráctica del sector público',u:'E2',x:''},
-  {c:'621320',n:'Consultorios de optometría',u:'CS2',x:''},
-  {c:'621331',n:'Consultorios de psicología del sector privado',u:'CS2',x:''},
-  {c:'621332',n:'Consultorios de psicología del sector público',u:'E2',x:''},
-  {c:'621341',n:'Consultorios del sector privado de audiología y de terapia',u:'CS2',x:''},
-  {c:'621342',n:'Consultorios del sector público de audiología y de terapia',u:'E2',x:''},
-  {c:'621391',n:'Consultorios de nutriólogos y dietistas del sector privado',u:'CS2',x:''},
-  {c:'621392',n:'Consultorios de nutriólogos y dietistas del sector público',u:'E2',x:''},
-  {c:'621398',n:'Otros consultorios del sector privado para el cuidado de la',u:'CS2',x:''},
-  {c:'621399',n:'Otros consultorios del sector público para el cuidado de la',u:'E2',x:''},
-  {c:'621411',n:'Centros de planificación familiar del sector privado',u:'CS2',x:''},
+  {c:'621211',n:'Consultorio dental (privado)',ns:'Consultorios dentales del sector privado',u:'CS2',x:''},
+  {c:'621212',n:'Consultorio dental (público)',ns:'Consultorios dentales del sector público',u:'E2',x:''},
+  {c:'621311',n:'Psicología (privado)',ns:'Consultorios del sector privado de psicología',u:'CS2',x:''},
+  {c:'621312',n:'Psicología (público)',ns:'Consultorios del sector público de psicología',u:'E2',x:''},
+  {c:'621320',n:'Optometría · Óptica · Examen de vista',ns:'Consultorios de optometría',u:'CS2',x:''},
+  {c:'621331',n:'Quiropráctica (privado)',ns:'Consultorios del sector privado de quiropráctica y osteopatía',u:'CS2',x:''},
+  {c:'621332',n:'Quiropráctica (público)',ns:'Consultorios del sector público de quiropráctica y osteopatía',u:'E2',x:''},
+  {c:'621341',n:'Audiología · Terapia (privado)',ns:'Consultorios del sector privado de audiología y terapia del lenguaje, ocupacional y física',u:'CS2',x:''},
+  {c:'621342',n:'Audiología · Terapia (público)',ns:'Consultorios del sector público de audiología y terapia del lenguaje, ocupacional y física',u:'E2',x:''},
+  {c:'621391',n:'Nutriólogo · Dietista (privado)',ns:'Consultorios de nutriólogos y dietistas del sector privado',u:'CS2',x:''},
+  {c:'621392',n:'Nutriólogo · Dietista (público)',ns:'Consultorios de nutriólogos y dietistas del sector público',u:'E2',x:''},
+  {c:'621398',n:'Otros consultorios (privado)',ns:'Otros consultorios del sector privado para el cuidado de la salud',u:'CS2',x:''},
+  {c:'621399',n:'Otros consultorios (público)',ns:'Otros consultorios del sector público para el cuidado de la salud',u:'E2',x:''},
+  {c:'621411',n:'Planificación familiar · Salud reproductiva',ns:'Centros de planificación familiar del sector privado',u:'CS2',x:''},
   {c:'621412',n:'Centros de planificación familiar del sector público',u:'E2',x:''},
-  {c:'621421',n:'Centros del sector privado de atención médica externa para',u:'CS3',x:''},
-  {c:'621422',n:'Centros del sector público de atención médica externa para',u:'E3',x:''},
-  {c:'621491',n:'Otros centros del sector privado para la atención de pacientes',u:'CS3',x:''},
-  {c:'621492',n:'Otros centros del sector público para la atención de pacientes',u:'E3',x:''},
-  {c:'621511',n:'Laboratorios médicos y de diagnóstico del sector privado',u:'CS3',x:''},
+  {c:'621421',n:'Clínica externa (privada)',ns:'Centros del sector privado de atención médica externa para enfermedades crónicas',u:'CS3',x:''},
+  {c:'621422',n:'Clínica externa (pública)',ns:'Centros del sector público de atención médica externa para enfermedades crónicas',u:'E3',x:''},
+  {c:'621491',n:'Clínica (privada)',ns:'Otros centros del sector privado para la atención de pacientes',u:'CS3',x:''},
+  {c:'621492',n:'Clínica (pública)',ns:'Otros centros del sector público para la atención de pacientes',u:'E3',x:''},
+  {c:'621511',n:'Laboratorio clínico · Análisis médicos',ns:'Laboratorios médicos y de diagnóstico del sector privado',u:'CS3',x:''},
   {c:'621512',n:'Laboratorios médicos y de diagnóstico del sector público',u:'E2',x:''},
-  {c:'621610',n:'Servicios de enfermería a domicilio',u:'CS2',x:''},
-  {c:'621910',n:'Servicios de ambulancias',u:'CS3',x:''},
-  {c:'621991',n:'servicios auxiliares al tratamiento médico prestados por el',u:'CS4',x:''},
-  {c:'621992',n:'servicios auxiliares al tratamiento médico prestados por el',u:'E3',x:''},
-  {c:'622111',n:'Hospitales generales del sector privado',u:'CS4',x:''},
-  {c:'622112',n:'Hospitales generales del sector público',u:'E4',x:''},
-  {c:'622211',n:'Hospitales psiquiátricos y para el tratamiento por adicción del',u:'CS4',x:''},
-  {c:'622212',n:'Hospitales psiquiátricos y para el tratamiento por adicción del',u:'E4',x:''},
-  {c:'622311',n:'Hospitales del sector privado de otras especialidades médicas',u:'CS4',x:''},
-  {c:'622312',n:'Hospitales del sector público de otras especialidades médicas',u:'E4',x:''},
-  {c:'623111',n:'para enfermos convalecientes, en rehabilitación, incurables y',u:'CS2',x:''},
-  {c:'623112',n:'para enfermos convalecientes, en rehabilitación, incurables y',u:'E2',x:''},
-  {c:'623211',n:'Residencias del sector privado para el cuidado de personas',u:'CS2',x:''},
-  {c:'623212',n:'Residencias del sector público para el cuidado de personas con',u:'E3',x:''},
-  {c:'623221',n:'Residencias del sector privado para el cuidado de personas',u:'CS3',x:''},
-  {c:'623222',n:'Residencias del sector público para el cuidado de personas con',u:'E3',x:''},
-  {c:'623311',n:'Asilos y otras residencias del sector privado para el cuidado de',u:'CS1',x:''},
-  {c:'623312',n:'Asilos y otras residencias del sector público para el cuidado de',u:'E1',x:''},
-  {c:'623991',n:'Orfanatos y otras residencias de asistencia social del sector',u:'CS2',x:''},
-  {c:'623992',n:'Orfanatos y otras residencias de asistencia social del sector',u:'E1',x:''},
-  {c:'624111',n:'Servicios de orientación y trabajo social para la niñez y la',u:'CS2',x:''},
-  {c:'624112',n:'Servicios de orientación y trabajo social para la niñez y la',u:'E2',x:''},
-  {c:'624121',n:'Centros del sector privado dedicados a la atención y cuidado',u:'CS3',x:''},
-  {c:'624122',n:'Centros del sector público dedicados a la atención y cuidado',u:'E2',x:''},
-  {c:'624191',n:'Agrupaciones de autoayuda para alcohólicos y personas con',u:'CS1',x:''},
-  {c:'624198',n:'Otros servicios de orientación y trabajo social prestados por el',u:'CS1',x:''},
-  {c:'624199',n:'Otros servicios de orientación y trabajo social prestados por el',u:'E2',x:''},
-  {c:'624211',n:'Servicios de alimentación comunitarios prestados por el sector',u:'CS2',x:''},
-  {c:'624212',n:'Servicios de alimentación comunitarios prestados por el sector',u:'E2',x:''},
-  {c:'624221',n:'Refugios temporales comunitarios del sector privado',u:'CS3',x:''},
+  {c:'621610',n:'Enfermería a domicilio · Cuidados médicos',ns:'Servicios de enfermería a domicilio',u:'CS2',x:''},
+  {c:'621910',n:'Ambulancia · Urgencias médicas',ns:'Servicios de ambulancias',u:'CS3',x:''},
+  {c:'621991',n:'Laboratorio · Diagnóstico (privado)',ns:'Otros servicios auxiliares al tratamiento médico prestados por el sector privado',u:'CS4',x:''},
+  {c:'621992',n:'Laboratorio · Diagnóstico (público)',ns:'Otros servicios auxiliares al tratamiento médico prestados por el sector público',u:'E3',x:''},
+  {c:'622111',n:'Hospital general (privado)',ns:'Hospitales generales del sector privado',u:'CS4',x:''},
+  {c:'622112',n:'Hospital general (público)',ns:'Hospitales generales del sector público',u:'E4',x:''},
+  {c:'622211',n:'Hospital psiquiátrico · Adicciones (privado)',ns:'Hospitales psiquiátricos y para el tratamiento por adicción del sector privado',u:'CS4',x:''},
+  {c:'622212',n:'Hospital psiquiátrico · Adicciones (público)',ns:'Hospitales psiquiátricos y para el tratamiento por adicción del sector público',u:'E4',x:''},
+  {c:'622311',n:'Hospital de especialidades (privado)',ns:'Hospitales del sector privado de otras especialidades médicas',u:'CS4',x:''},
+  {c:'622312',n:'Hospital de especialidades (público)',ns:'Hospitales del sector público de otras especialidades médicas',u:'E4',x:''},
+  {c:'623111',n:'Casa de convalecencia (privada)',ns:'Residencias del sector privado para enfermos convalecientes, en rehabilitación, incurables y terminales',u:'CS2',x:''},
+  {c:'623112',n:'Casa de convalecencia (pública)',ns:'Residencias del sector público para enfermos convalecientes, en rehabilitación, incurables y terminales',u:'E2',x:''},
+  {c:'623211',n:'Residencia para discapacidad (privada)',ns:'Residencias del sector privado para el cuidado de personas con discapacidad',u:'CS2',x:''},
+  {c:'623212',n:'Residencia para discapacidad (pública)',ns:'Residencias del sector público para el cuidado de personas con discapacidad',u:'E3',x:''},
+  {c:'623221',n:'Casa de asistencia adultos mayores (privada)',ns:'Residencias del sector privado para el cuidado de personas de edad avanzada',u:'CS3',x:''},
+  {c:'623222',n:'Casa de asistencia adultos mayores (pública)',ns:'Residencias del sector público para el cuidado de personas de edad avanzada y con discapacidad',u:'E3',x:''},
+  {c:'623311',n:'Asilo · Casa hogar (privada)',ns:'Asilos y otras residencias del sector privado para el cuidado de personas de edad avanzada',u:'CS1',x:''},
+  {c:'623312',n:'Asilo · Casa hogar (pública)',ns:'Asilos y otras residencias del sector público para el cuidado de personas de edad avanzada',u:'E1',x:''},
+  {c:'623991',n:'Orfanato · Asistencia social (privado)',ns:'Orfanatos y otras residencias de asistencia social del sector privado',u:'CS2',x:''},
+  {c:'623992',n:'Orfanato · Asistencia social (público)',ns:'Orfanatos y otras residencias de asistencia social del sector público',u:'E1',x:''},
+  {c:'624111',n:'Trabajo social · Orientación infantil (privado)',ns:'Servicios de orientación y trabajo social para la niñez y la juventud del sector privado',u:'CS2',x:''},
+  {c:'624112',n:'Trabajo social · Orientación infantil (público)',ns:'Servicios de orientación y trabajo social para la niñez y la juventud del sector público',u:'E2',x:''},
+  {c:'624121',n:'Guardería · Estancia infantil (privada)',ns:'Centros del sector privado dedicados a la atención y cuidado de niños',u:'CS3',x:''},
+  {c:'624122',n:'Guardería · Estancia infantil (pública)',ns:'Centros del sector público dedicados a la atención y cuidado de niños',u:'E2',x:''},
+  {c:'624191',n:'Grupos de autoayuda · AA · Rehabilitación',ns:'Agrupaciones de autoayuda para alcohólicos y personas con otras adicciones',u:'CS1',x:''},
+  {c:'624198',n:'Otros servicios sociales (privado)',ns:'Otros servicios de orientación y trabajo social prestados por el sector privado',u:'CS1',x:''},
+  {c:'624199',n:'Otros servicios sociales (público)',ns:'Otros servicios de orientación y trabajo social prestados por el sector público',u:'E2',x:''},
+  {c:'624211',n:'Comedor comunitario (privado)',ns:'Servicios de alimentación comunitarios prestados por el sector privado',u:'CS2',x:''},
+  {c:'624212',n:'Comedor comunitario (público)',ns:'Servicios de alimentación comunitarios prestados por el sector público',u:'E2',x:''},
+  {c:'624221',n:'Refugio · Albergue · Casa hogar',ns:'Refugios temporales comunitarios del sector privado',u:'CS3',x:''},
   {c:'624222',n:'Refugios temporales comunitarios del sector público',u:'E3',x:''},
-  {c:'624231',n:'Servicios de emergencia comunitarios prestados por el sector',u:'CS3',x:''},
-  {c:'624232',n:'Servicios de emergencia comunitarios prestados por el sector',u:'E3',x:''},
-  {c:'624311',n:'sector privado para personas desempleadas, subempleadas o',u:'CS3',x:''},
+  {c:'624231',n:'Servicios de emergencia comunitaria (privado)',ns:'Servicios de emergencia comunitarios prestados por el sector privado',u:'CS3',x:''},
+  {c:'624232',n:'Servicios de emergencia comunitaria (público)',ns:'Servicios de emergencia comunitarios prestados por el sector público',u:'E3',x:''},
+  {c:'624311',n:'Capacitación laboral · Bolsa de trabajo',ns:'Servicios de capacitación para el trabajo para personas desempleadas, subempleadas o discapacitadas',u:'CS3',x:''},
   {c:'624312',n:'sector público para personas desempleadas, subempleadas o',u:'E3',x:''},
-  {c:'624411',n:'Guarderías del sector privado',u:'CS2',x:''},
+  {c:'624411',n:'Guardería · Estancia infantil · Kínder',ns:'Guarderías del sector privado',u:'CS2',x:''},
   {c:'624412',n:'Guarderías del sector público',u:'E1',x:''},
-  {c:'711111',n:'Compañías de teatro del sector privado',u:'CS2',x:''},
+  {c:'711111',n:'Teatro · Compañía de espectáculos',ns:'Compañías y grupos de teatro',u:'CS2',x:''},
   {c:'711112',n:'Compañías de teatro del sector público',u:'E3',x:''},
-  {c:'711121',n:'Compañías de danza del sector privado',u:'CS2',x:''},
+  {c:'711121',n:'Compañía de danza · Ballet · Baile',ns:'Compañías de danza del sector privado',u:'CS2',x:''},
   {c:'711122',n:'Compañías de danza del sector público',u:'E3',x:''},
-  {c:'711131',n:'Cantantes y grupos musicales del sector privado',u:'CS2',x:''},
+  {c:'711131',n:'Músicos · Banda · Grupo musical',ns:'Cantantes y grupos musicales del sector privado',u:'CS2',x:''},
   {c:'711132',n:'Grupos musicales del sector público',u:'E3',x:''},
-  {c:'711191',n:'Otras compañías y grupos de espectáculos artísticos del sector',u:'CS2',x:''},
-  {c:'711192',n:'Otras compañías y grupos de espectáculos artísticos del sector',u:'E3',x:''},
-  {c:'711211',n:'Deportistas profesionales',u:'CS1-CS2-CS3',x:''},
-  {c:'711212',n:'Equipos deportivos profesionales',u:'CS4',x:''},
-  {c:'711311',n:'culturales, deportivos y similares que cuentan con instalaciones',u:'CS3-CS4',x:''},
-  {c:'711312',n:'culturales, deportivos y similares que cuentan con instalaciones',u:'E3-E4',x:''},
-  {c:'711320',n:'Promotores de espectáculos artísticos, culturales, deportivos y',u:'CS3-CS4',x:''},
-  {c:'711410',n:'Agentes y representantes de artistas, deportistas y similares',u:'CS2-CS3-CS4',x:''},
-  {c:'711510',n:'Artistas, escritores y técnicos independientes',u:'CS1-CS2-CS3',x:''},
-  {c:'712111',n:'Museos del sector privado',u:'CS3',x:''},
+  {c:'711191',n:'Otras artes escénicas (privado)',ns:'Otras compañías y grupos de espectáculos artísticos del sector privado',u:'CS2',x:''},
+  {c:'711192',n:'Otras artes escénicas (público)',ns:'Otras compañías y grupos de espectáculos artísticos del sector público',u:'E3',x:''},
+  {c:'711211',n:'Deportistas profesionales',ns:'Deportistas profesionales',u:'CS1-CS2-CS3',x:''},
+  {c:'711212',n:'Equipo deportivo · Club de fútbol',ns:'Equipos deportivos profesionales',u:'CS4',x:''},
+  {c:'711311',n:'Promotor de eventos (con instalaciones)',ns:'Promotores de espectáculos artísticos, culturales, deportivos y similares que cuentan con instalaciones propias',u:'CS3-CS4',x:''},
+  {c:'711312',n:'Promotor de eventos (sin instalaciones)',ns:'Promotores de espectáculos artísticos, culturales, deportivos y similares sin instalaciones propias',u:'E3-E4',x:''},
+  {c:'711320',n:'Promotor de eventos',ns:'Promotores de espectáculos artísticos, culturales, deportivos y similares sin instalaciones propias',u:'CS3-CS4',x:''},
+  {c:'711410',n:'Agente · Representante artístico',ns:'Agentes y representantes de artistas, deportistas y similares',u:'CS2-CS3-CS4',x:''},
+  {c:'711510',n:'Artistas independientes · Creativos',ns:'Artistas, escritores y técnicos independientes',u:'CS1-CS2-CS3',x:''},
+  {c:'712111',n:'Museo',ns:'Museos',u:'CS3',x:''},
   {c:'712112',n:'Museos del sector público',u:'E3',x:''},
-  {c:'712120',n:'Sitios históricos',u:'CS2-CS3-CS4',x:''},
-  {c:'712131',n:'Jardines botánicos y zoológicos del sector privado',u:'CS5',x:''},
+  {c:'712120',n:'Sitio histórico · Patrimonio cultural',ns:'Sitios históricos',u:'CS2-CS3-CS4',x:''},
+  {c:'712131',n:'Zoológico · Jardín botánico',ns:'Jardines botánicos y zoológicos del sector privado',u:'CS5',x:''},
   {c:'712132',n:'Jardines botánicos y zoológicos del sector público',u:'E4',x:''},
-  {c:'712190',n:'Grutas, parques naturales y otros sitios del patrimonio cultural',u:'ANP',x:''},
-  {c:'713111',n:'Parques de diversiones y temáticos del sector privado',u:'CS4',x:''},
+  {c:'712190',n:'Gruta · Parque natural · Patrimonio',ns:'Grutas, parques naturales y otros sitios del patrimonio cultural y natural',u:'ANP',x:''},
+  {c:'713111',n:'Cine · Sala de cine',ns:'Exhibición de películas y otros materiales audiovisuales',u:'CS4',x:''},
   {c:'713112',n:'Parques de diversiones y temáticos del sector público',u:'E5',x:''},
-  {c:'713113',n:'Parques acuáticos y balnearios del sector privado',u:'CS4',x:''},
+  {c:'713113',n:'Parque acuático · Balneario · Alberca',ns:'Parques acuáticos y balnearios del sector privado',u:'CS4',x:''},
   {c:'713114',n:'Parques acuáticos y balnearios del sector público',u:'E5',x:''},
-  {c:'713120',n:'Casas de juegos electrónicos',u:'CS2',x:''},
+  {c:'713120',n:'Videojuegos · Maquinitas · Arcade',ns:'Casas de juegos electrónicos',u:'CS2',x:''},
   {c:'713210',n:'Casinos',u:'PROHIBIDO',x:''},
-  {c:'713291',n:'Venta de billetes de lotería, pronósticos deportivos y otros',u:'CS1',x:''},
+  {c:'713291',n:'Lotería · Pronósticos deportivos',ns:'Venta de billetes de lotería, pronósticos deportivos y otros boletos de juegos de azar',u:'CS1',x:''},
   {c:'713299',n:'Otros juegos de azar',u:'PROHIBIDO',x:''},
-  {c:'713910',n:'Campos de golf',u:'CS3',x:''},
-  {c:'713920',n:'Pistas para esquiar',u:'CS4',x:''},
-  {c:'713930',n:'Marinas turísticas',u:'CS4',x:''},
-  {c:'713941',n:'Clubes deportivos del sector privado',u:'CS3',x:''},
+  {c:'713910',n:'Club deportivo · Cancha · Golf',ns:'Campos de golf y clubes de campo',u:'CS3',x:''},
+  {c:'713920',n:'Campo de golf · Club de golf',ns:'Pistas para esquiar',u:'CS4',x:''},
+  {c:'713930',n:'Marina · Puerto deportivo · Embarcadero',ns:'Marinas turísticas',u:'CS4',x:''},
+  {c:'713941',n:'Club deportivo · Deportes',ns:'Clubes deportivos del sector privado',u:'CS3',x:''},
   {c:'713942',n:'Clubes deportivos del sector público',u:'E3',x:''},
-  {c:'713943',n:'Centros de acondicionamiento físico del sector privado',u:'CS2',x:''},
+  {c:'713943',n:'Gimnasio · Fitness · Acondicionamiento físico',ns:'Centros de acondicionamiento físico del sector privado',u:'CS2',x:''},
   {c:'713944',n:'Centros de acondicionamiento físico del sector público',u:'E2',x:''},
-  {c:'713950',n:'Boliches',u:'CS3',x:''},
-  {c:'713991',n:'Billares',u:'CS3',x:''},
-  {c:'713992',n:'Clubes o ligas de aficionados',u:'CS3-CS4',x:''},
-  {c:'713998',n:'Otros servicios recreativos prestados por el sector privado',u:'CS3',x:''},
-  {c:'713999',n:'Otros servicios recreativos prestados por el sector público',u:'E3',x:''},
-  {c:'721111',n:'Hoteles con otros servicios integrados',u:'CS4',x:''},
-  {c:'721112',n:'Hoteles sin otros servicios integrados',u:'CS3',x:''},
-  {c:'721113',n:'Moteles',u:'CS4',x:''},
+  {c:'713950',n:'Boliche · Bolera',ns:'Boliches',u:'CS3',x:''},
+  {c:'713991',n:'Salón de fiestas · Club social',ns:'Organización de fiestas, bodas y eventos similares',u:'CS3',x:''},
+  {c:'713992',n:'Liga deportiva · Club de aficionados',ns:'Clubes o ligas de aficionados',u:'CS3-CS4',x:''},
+  {c:'713998',n:'Otros recreativos (privado)',ns:'Otros servicios recreativos prestados por el sector privado',u:'CS3',x:''},
+  {c:'713999',n:'Otros recreativos (público)',ns:'Otros servicios recreativos prestados por el sector público',u:'E3',x:''},
+  {c:'721111',n:'Hotel con restaurante',ns:'Hoteles con servicios integrados',u:'CS4',x:''},
+  {c:'721112',n:'Hotel sin restaurante',ns:'Hoteles sin servicios integrados',u:'CS3',x:''},
+  {c:'721113',n:'Motel · Posada',ns:'Moteles',u:'CS4',x:''},
   {c:'721120',n:'Hoteles con casino',u:'PROHIBIDO',x:''},
-  {c:'721190',n:'Cabañas, villas y similares',u:'CS2',x:''},
-  {c:'721210',n:'Campamentos y albergues recreativos',u:'CS3',x:''},
-  {c:'721311',n:'Pensiones y casas de huéspedes',u:'CS1',x:''},
-  {c:'721312',n:'Departamentos y casas amueblados con servicios de hotelería',u:'CS1',x:''},
-  {c:'722310',n:'Servicios de comedor para empresas e instituciones',u:'CS2',x:''},
-  {c:'722320',n:'Servicios de preparación de alimentos para ocasiones',u:'CS2',x:''},
-  {c:'722330',n:'Servicios de preparación de alimentos en unidades móviles',u:'CS2',x:''},
-  {c:'722411',n:'Centros nocturnos, discotecas y similares',u:'CS4',x:''},
-  {c:'722412',n:'Bares, cantinas y similares',u:'CS3',x:''},
-  {c:'722511',n:'Restaurantes con servicio de preparación de alimentos a la',u:'CS2',x:''},
-  {c:'722512',n:'Restaurantes con servicio de preparación de pescados y',u:'CS2',x:''},
-  {c:'722513',n:'Restaurantes con servicio de preparación de antojitos',u:'CS2',x:''},
-  {c:'722514',n:'Restaurantes con servicio de preparación de tacos y tortas',u:'CS2',x:''},
-  {c:'722515',n:'Cafeterías, fuentes de sodas, neverías, refresquerías y',u:'CS2',x:''},
-  {c:'722516',n:'Restaurantes de autoservicio',u:'CS2',x:''},
-  {c:'722517',n:'Restaurantes con servicio de preparación de pizzas,',u:'CS2',x:''},
-  {c:'722518',n:'Restaurantes que preparan otro tipo de alimentos para llevar',u:'CS2',x:''},
-  {c:'722519',n:'Servicios de preparación de otros alimentos para consumo',u:'CS2',x:''},
-  {c:'811111',n:'Reparación mecánica en general de automóviles y camiones',u:'CS4',x:''},
-  {c:'811112',n:'Reparación del sistema eléctrico de automóviles y camiones',u:'CS4',x:''},
-  {c:'811113',n:'Rectificación de partes de motor de automóviles y camiones',u:'CS4',x:''},
-  {c:'811114',n:'Reparación de transmisiones de automóviles y camiones',u:'CS4',x:''},
-  {c:'811115',n:'Reparación de suspensiones de automóviles y camiones',u:'CS4',x:''},
-  {c:'811116',n:'Alineación y balanceo de automóviles y camiones',u:'CS4',x:''},
-  {c:'811119',n:'Otras reparaciones mecánicas de automóviles y camiones',u:'CS4',x:''},
-  {c:'811121',n:'Hojalatería y pintura de automóviles y camiones',u:'CS5',x:''},
-  {c:'811122',n:'Tapicería de automóviles y camiones',u:'CS4',x:''},
-  {c:'811129',n:'Instalación de cristales y otras reparaciones a la carrocería de',u:'CS4',x:''},
-  {c:'811191',n:'Reparación menor de llantas',u:'CS2',x:''},
-  {c:'811192',n:'Lavado y Lubricado de Automóviles y Camiones',u:'CS3',x:''},
-  {c:'811199',n:'Otros servicios de reparación y mantenimiento de automóviles',u:'CS3',x:''},
-  {c:'811211',n:'Reparación y mantenimiento de equipo electrónico de uso',u:'CS2',x:''},
-  {c:'811219',n:'Reparación y mantenimiento de otro equipo electrónico y de',u:'CS2',x:''},
+  {c:'721190',n:'Cabaña · Villa · Casa de descanso',ns:'Cabañas, villas y similares',u:'CS2',x:''},
+  {c:'721210',n:'Campamento · Albergue recreativo',ns:'Campamentos y albergues recreativos',u:'CS3',x:''},
+  {c:'721311',n:'Pensión · Casa de huéspedes',ns:'Pensiones y casas de huéspedes',u:'CS1',x:''},
+  {c:'721312',n:'Departamento amueblado (con servicios)',ns:'Departamentos y casas amueblados con servicios de hotelería',u:'CS1',x:''},
+  {c:'722310',n:'Comedor empresarial · Catering institucional',ns:'Servicios de comedor para empresas e instituciones',u:'CS2',x:''},
+  {c:'722320',n:'Catering · Banquetes · Eventos',ns:'Servicios de preparación de alimentos para ocasiones especiales',u:'CS2',x:''},
+  {c:'722330',n:'Food truck · Cocina móvil · Unidad móvil',ns:'Servicios de preparación de alimentos en unidades móviles',u:'CS2',x:''},
+  {c:'722411',n:'Discoteca · Centro nocturno · Club',ns:'Centros nocturnos, discotecas y similares',u:'CS4',x:''},
+  {c:'722412',n:'Bar · Cantina · Pulquería',ns:'Bares, cantinas y similares',u:'CS3',x:''},
+  {c:'722511',n:'Fonda · Restaurante · Comida corrida',ns:'Restaurantes con servicio de preparación de alimentos a la carta o de comida corrida',u:'CS2',x:''},
+  {c:'722512',n:'Marisquería · Pescados',ns:'Restaurantes con servicio de preparación de pescados y mariscos',u:'CS2',x:''},
+  {c:'722513',n:'Antojitos · Gorditas',ns:'Restaurantes con servicio de preparación de antojitos',u:'CS2',x:''},
+  {c:'722514',n:'Taquería · Tortas',ns:'Restaurantes con servicio de preparación de tacos y tortas',u:'CS2',x:''},
+  {c:'722515',n:'Nevería · Heladería · Juguería · Café',ns:'Cafeterías, fuentes de sodas, neverías, refresquerías y similares',u:'CS2',x:''},
+  {c:'722516',n:'Cafetería · Autoservicio',ns:'Restaurantes de autoservicio',u:'CS2',x:''},
+  {c:'722517',n:'Pizza · Hamburguesas · Pollo asado',ns:'Restaurantes con servicio de preparación de pizzas, hamburguesas, hot dogs y pollos asados',u:'CS2',x:''},
+  {c:'722518',n:'Para llevar · Lonchería · Lonche · Fonda express',ns:'Restaurantes que preparan otro tipo de alimentos para llevar',u:'CS2',x:''},
+  {c:'722519',n:'Puestos de comida callejeros',ns:'Servicios de preparación y venta de alimentos en puestos de venta callejeros y similares',u:'CS2',x:''},
+  {c:'811111',n:'Taller mecánico (automóviles)',ns:'Servicio de mantenimiento y reparación de automóviles y camiones',u:'CS4',x:''},
+  {c:'811112',n:'Taller eléctrico automotriz',ns:'Reparación del sistema eléctrico de automóviles y camiones',u:'CS4',x:''},
+  {c:'811113',n:'Rectificadora de motores',ns:'Rectificación de partes de motor de automóviles y camiones',u:'CS4',x:''},
+  {c:'811114',n:'Taller de transmisiones',ns:'Reparación de transmisiones de automóviles y camiones',u:'CS4',x:''},
+  {c:'811115',n:'Taller de suspensiones · Amortiguadores',ns:'Reparación de suspensiones de automóviles y camiones',u:'CS4',x:''},
+  {c:'811116',n:'Alineación y balanceo',ns:'Alineación y balanceo de automóviles y camiones',u:'CS4',x:''},
+  {c:'811119',n:'Taller mecánico · Reparación de autos',ns:'Otras reparaciones mecánicas de automóviles y camiones',u:'CS4',x:''},
+  {c:'811121',n:'Hojalatería · Enderezado y pintura',ns:'Enderezado y pintura de automóviles y camiones',u:'CS5',x:''},
+  {c:'811122',n:'Tapicería automotriz',ns:'Tapicería de automóviles y camiones',u:'CS4',x:''},
+  {c:'811129',n:'Vidrios autos · Carrocería',ns:'Instalación de cristales y otras reparaciones a la carrocería de automóviles y camiones',u:'CS4',x:''},
+  {c:'811191',n:'Llantería · Vulcanizadora',ns:'Reparación menor de llantas',u:'CS2',x:''},
+  {c:'811192',n:'Car wash · Lavado de autos · Lubricación',ns:'Lavado y Lubricado de Automóviles y Camiones',u:'CS3',x:''},
+  {c:'811199',n:'Taller automotriz general',ns:'Otros servicios de reparación y mantenimiento de automóviles y camiones',u:'CS3',x:''},
+  {c:'811211',n:'Reparación de electrónica',ns:'Reparación y mantenimiento de equipo electrónico de uso personal',u:'CS2',x:''},
+  {c:'811219',n:'Reparación de equipo eléctrico',ns:'Reparación y mantenimiento de otro equipo electrónico y de comunicaciones',u:'CS2',x:''},
   {c:'811311',n:'Reparación y mantenimiento de maquinaria y equipo',u:'CS5',x:''},
-  {c:'811312',n:'Reparación y mantenimiento de maquinaria y equipo industrial',u:'CS4',x:''},
+  {c:'811312',n:'Reparación industrial (maquinaria)',ns:'Reparación y mantenimiento de maquinaria y equipo industrial',u:'CS4',x:''},
   {c:'811313',n:'Reparación y mantenimiento de maquinaria y equipo para',u:'CS5',x:''},
-  {c:'811314',n:'Reparación y mantenimiento de maquinaria y equipo comercial',u:'CS2',x:''},
-  {c:'811410',n:'Reparación y mantenimiento de aparatos eléctricos para el',u:'CS2',x:''},
-  {c:'811420',n:'Reparación de tapicería de muebles para el hogar',u:'CS2',x:''},
-  {c:'811430',n:'Reparación de calzado y otros artículos de piel y cuero',u:'CS2',x:''},
-  {c:'811491',n:'Cerrajerías',u:'CS1',x:''},
-  {c:'811492',n:'Reparación y mantenimiento de motocicletas',u:'CS3',x:''},
-  {c:'811493',n:'Reparación y mantenimiento de bicicletas',u:'CS1',x:''},
-  {c:'811499',n:'Reparación y mantenimiento de otros artículos para el hogar y',u:'CS2',x:''},
-  {c:'812110',n:'Salones y clínicas de belleza y peluquerías',u:'CS2',x:''},
-  {c:'812120',n:'Baños públicos',u:'CS3',x:''},
-  {c:'812130',n:'Sanitarios públicos y bolerías',u:'CS1',x:''},
-  {c:'812210',n:'Lavanderías y tintorerías',u:'CS1',x:''},
-  {c:'812310',n:'Servicios funerarios',u:'CS4',x:''},
-  {c:'812321',n:'Administración de cementerios pertenecientes al sector privado',u:'RIS',x:''},
-  {c:'812322',n:'Administración de cementerios pertenecientes al sector público',u:'RIS',x:''},
-  {c:'812410',n:'Estacionamientos y pensiones para vehículos automotores',u:'CS3',x:''},
-  {c:'812910',n:'Servicios de revelado e impresión de fotografías',u:'CS2',x:''},
-  {c:'812990',n:'Otros servicios personales',u:'CS3',x:''},
-  {c:'813110',n:'Asociaciones, organizaciones y cámaras de productores,',u:'CS3',x:''},
-  {c:'813120',n:'Asociaciones y organizaciones laborales y sindicales',u:'CS3',x:''},
-  {c:'813130',n:'Asociaciones y organizaciones de profesionistas',u:'CS3',x:''},
-  {c:'813140',n:'Asociaciones regulatorias de actividades recreativas',u:'CS3',x:''},
-  {c:'813210',n:'Asociaciones y organizaciones religiosas',u:'CS3',x:''},
-  {c:'813220',n:'Asociaciones y organizaciones políticas',u:'CS3',x:''},
-  {c:'813230',n:'Asociaciones y organizaciones civiles',u:'CS2',x:''},
+  {c:'811314',n:'Reparación de equipo comercial',ns:'Reparación y mantenimiento de maquinaria y equipo comercial y de servicios',u:'CS2',x:''},
+  {c:'811410',n:'Tapicería',ns:'Tapizado y retapizado de muebles para el hogar',u:'CS2',x:''},
+  {c:'811420',n:'Plomería · Electricidad · Electrodomésticos',ns:'Reparación y mantenimiento de electrodomésticos y otros enseres domésticos',u:'CS2',x:''},
+  {c:'811430',n:'Cerrajería · Reparación de calzado',ns:'Reparación de calzado y artículos de cuero y piel',u:'CS2',x:''},
+  {c:'811491',n:'Cerrajería',ns:'Cerrajerías',u:'CS1',x:''},
+  {c:'811492',n:'Taller de motos · Motocicletas',ns:'Reparación y mantenimiento de motocicletas',u:'CS3',x:''},
+  {c:'811493',n:'Bicicletas · Velería',ns:'Reparación y mantenimiento de bicicletas',u:'CS1',x:''},
+  {c:'811499',n:'Reparaciones del hogar',ns:'Reparación y mantenimiento de otros artículos para el hogar y personales',u:'CS2',x:''},
+  {c:'812110',n:'Peluquería · Estética · Spa',ns:'Salones y clínicas de belleza y peluquerías',u:'CS2',x:''},
+  {c:'812120',n:'Baños públicos · Sauna · Vapor',ns:'Baños públicos',u:'CS3',x:''},
+  {c:'812130',n:'Bolería · Sanitarios',ns:'Sanitarios públicos y bolerías',u:'CS1',x:''},
+  {c:'812210',n:'Lavandería · Tintorería',ns:'Servicio de lavado y planchado de ropa a domicilio y en establecimientos',u:'CS1',x:''},
+  {c:'812310',n:'Estacionamiento · Pensión · Valet',ns:'Estacionamientos y pensiones para automóviles',u:'CS4',x:''},
+  {c:'812321',n:'Panteón · Cementerio (privado)',ns:'Administración de cementerios pertenecientes al sector privado',u:'RIS',x:''},
+  {c:'812322',n:'Panteón · Cementerio (público)',ns:'Administración de cementerios pertenecientes al sector público',u:'RIS',x:''},
+  {c:'812410',n:'Estacionamiento · Pensión',ns:'Estacionamientos y pensiones para vehículos automotores',u:'CS3',x:''},
+  {c:'812910',n:'Foto · Impresión de fotografías',ns:'Servicios de revelado e impresión de fotografías',u:'CS2',x:''},
+  {c:'812990',n:'Servicios personales · Masajes · Spa',ns:'Otros servicios personales',u:'CS3',x:''},
+  {c:'813110',n:'Cámara de comercio · Asociación gremial',ns:'Asociaciones, organizaciones y cámaras de productores, comerciantes y prestadores de servicios',u:'CS3',x:''},
+  {c:'813120',n:'Sindicato · Asociación laboral',ns:'Asociaciones y organizaciones laborales y sindicales',u:'CS3',x:''},
+  {c:'813130',n:'Colegio de profesionistas · Asociación',ns:'Asociaciones y organizaciones de profesionistas',u:'CS3',x:''},
+  {c:'813140',n:'Club deportivo · Asociación recreativa',ns:'Asociaciones regulatorias de actividades recreativas',u:'CS3',x:''},
+  {c:'813210',n:'Iglesia · Templo · Asociación religiosa',ns:'Asociaciones y organizaciones religiosas',u:'CS3',x:''},
+  {c:'813220',n:'Partido político · Asociación política',ns:'Asociaciones y organizaciones políticas',u:'CS3',x:''},
+  {c:'813230',n:'ONG · Asociación civil · A.C.',ns:'Asociaciones y organizaciones civiles',u:'CS2',x:''},
   {c:'931110',n:'Órganos legislativos',u:'E4',x:''},
   {c:'931210',n:'Administración pública en general',u:'E3-E4',x:''},
   {c:'931310',n:'Regulación y fomento del desarrollo económico',u:'E3-E4',x:''},
@@ -5478,6 +5511,7 @@ const GU_SCIAN_ZAP = [
   {c:'431160',n:'Cremería',ns:'Comercio al por mayor de leche y otros productos lácteos',u:'CS5'},
   {c:'466114',n:'Cristalería',ns:'Comercio al por menor de cristalería, loza y utensilios de cocina',u:'CS1'},
   {c:'111211',n:'Cultivo de jitomate o tomate rojo',ns:'Cultivo de jitomate o tomate rojo',u:'ARN'},
+  {c:'812110',n:'Spa · Baños de belleza',ns:'Salones y clínicas de belleza y peluquerías',u:'CS2'},
   {c:'812110',n:'Depilación con cera',ns:'Salones y clínicas de belleza y peluquerías',u:'CS2'},
   {c:'711211',n:'Deportistas profesionales',ns:'Deportistas profesionales',u:'CS1-CS2-CS3'},
   {c:'434240',n:'Desechables',ns:'Comercio al por mayor de artículos desechables',u:'CS5'},
@@ -6344,11 +6378,13 @@ function filtrarGirosM02(q){
     ? activos
     : activos.filter(g => {
         const nombre = (g.nombre||'').toLowerCase();
+        const ns = (g.ns||'').toLowerCase();
         const codigo = (g.codigo||'').toLowerCase();
         if(codigo.startsWith(ql)) return true;
         if(nombre.includes(ql)) return true;
+        if(ns.includes(ql)) return true;
         const palabras = ql.split(/\s+/).filter(p => p.length > 2);
-        if(palabras.length > 1 && palabras.every(p => nombre.includes(p))) return true;
+        if(palabras.length > 1 && palabras.every(p => nombre.includes(p) || ns.includes(p))) return true;
         return false;
       });
   const lista = document.getElementById('giroLista');
@@ -6406,6 +6442,115 @@ function clearGiroM02(){
   const btn=document.getElementById('btnVerifGiro'); if(btn){btn.disabled=true;btn.style.opacity='.5';}
 }
 
+// ──── IA Detector de giro ──────────────────────────────────────
+function m02TabIA(){
+  const pIA=document.getElementById('panelModoIA'), pM=document.getElementById('panelModoManual');
+  if(pIA) pIA.style.display='block';
+  if(pM)  pM.style.display='none';
+  const tIA=document.getElementById('m02tabIA'), tM=document.getElementById('m02tabManual');
+  if(tIA){tIA.style.background='var(--brand-pale)';tIA.style.color='var(--brand-light)';tIA.style.fontWeight='600';tIA.style.borderBottom='2px solid var(--brand)';}
+  if(tM) {tM.style.background='var(--bg2)';tM.style.color='var(--text3)';tM.style.fontWeight='500';tM.style.borderBottom='2px solid transparent';}
+}
+function m02TabManual(){
+  const pIA=document.getElementById('panelModoIA'), pM=document.getElementById('panelModoManual');
+  if(pIA) pIA.style.display='none';
+  if(pM)  pM.style.display='block';
+  const tIA=document.getElementById('m02tabIA'), tM=document.getElementById('m02tabManual');
+  if(tM) {tM.style.background='var(--brand-pale)';tM.style.color='var(--brand-light)';tM.style.fontWeight='600';tM.style.borderBottom='2px solid var(--brand)';}
+  if(tIA){tIA.style.background='var(--bg2)';tIA.style.color='var(--text3)';tIA.style.fontWeight='500';tIA.style.borderBottom='2px solid transparent';}
+  setTimeout(()=>{const f=document.getElementById('giroFiltro');if(f)f.focus();},100);
+}
+function m02ChipEj(txt){
+  const inp=document.getElementById('iaDescInput'); if(inp){inp.value=txt.trim();inp.focus();}
+}
+async function detectarGiroIA(){
+  const inp=document.getElementById('iaDescInput');
+  const raw=(inp&&inp.value||'').trim();
+  if(!raw){if(inp)inp.focus();return;}
+  const btn=document.getElementById('btnDetectarIA');
+  const lg=document.getElementById('iaListaGiros');
+  const lc=document.getElementById('iaListaCount');
+  const li=document.getElementById('iaListaItems');
+  if(lg) lg.style.display='none';
+  if(btn){btn.disabled=true;btn.textContent='⏳ Buscando…';}
+  const norm=function(s){return(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();};
+  // Quitar prefijos de intención: "quiero poner un SPA" → "SPA"
+  const desc=raw.replace(/^(?:quiero|quiere|quisiera|queremos|me gustar[íi]a|voy a|planeamos|planea|necesito|busco|quer[íi]a|requiero|piensa|pensamos)\s+(?:poner|abrir|instalar|montar|establecer|tener|ponen|abre|abren|instala|renta|rentar|dedicarme a|dedicarme)\s+(?:un|una|el|la|lo|los|las|mi|nuestro|nuestra|el negocio de)?\s*/i,'').trim()||raw;
+  const activos=window._girosActivos||[...(window._girosP||[]),...(window._girosC||[])];
+  const STOP=new Set(['venta','vende','vender','vendo','compra','comprar','servicio','servicios','articulo','articulos','producto','productos','otro','otros','otra','otras','menor','mayor','comercio','negocio','los','las','con','sin','por','que','del','una','uno','sus','les']);
+  const palabras=norm(desc).split(/\s+/).filter(function(p){return p.length>2&&!STOP.has(p);});
+  const _stem=function(w){if(w.length>=6&&w.endsWith('eria'))return w.slice(0,-4);return w.length>=6?w.slice(0,-2):w.length===5?w.slice(0,-1):w;};
+  const _filDirecto=function(kws){
+    return activos.filter(function(g){
+      const n=norm(g.nombre);
+      const ns=norm(g.ns);
+      const c=(g.codigo||'').toLowerCase();
+      return kws.some(function(kw){
+        if(n.includes(kw)||ns.includes(kw)||c.startsWith(kw)) return true;
+        const st=_stem(kw);
+        if(st===kw) return false;
+        if(/^[123]/.test(c)) return false;
+        return n.includes(st)||ns.includes(st);
+      });
+    });
+  };
+  const _renderLista=function(fil){
+    return fil.map(function(g){
+      const nombre=g.nombre.replace(/'/g,"\\'");
+      const ns=g.ns&&g.ns!==g.nombre?'<span style="display:block;font-size:10px;color:var(--text3);margin-top:1px">'+g.ns+'</span>':'';
+      return '<div onclick="seleccionarGiroM02(\''+g.codigo+'\',\''+nombre+'\');verificarGiro()" style="padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px;align-items:center;font-size:12px" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\'\'"><span style="font-family:var(--mono);font-size:10px;color:var(--uso-p-txt);min-width:54px;flex-shrink:0">'+g.codigo+'</span><span style="flex:1"><span style="display:block">'+g.nombre+'</span>'+ns+'</span></div>';
+    }).join('');
+  };
+  let fil=palabras.length>0?_filDirecto(palabras):[];
+  if(fil.length>=4){
+    if(lc) lc.textContent=fil.length+' giro'+(fil.length!==1?'s':'')+' encontrados';
+    if(li) li.innerHTML=_renderLista(fil);
+    if(lg) lg.style.display='block';
+    if(btn){btn.disabled=false;btn.textContent='✨ Detectar giro';}
+    return;
+  }
+  if(btn) btn.textContent='⏳ Consultando IA…';
+  try{
+    const ES_LOCAL=location.hostname==='localhost'||location.hostname==='127.0.0.1';
+    const body={
+      model:'claude-haiku-4-5-20251001',
+      max_tokens:100,
+      system:'Dado un tipo de negocio en español (ignora frases como "quiero poner" o "me gustaría abrir"), da 2-3 palabras clave del catálogo SCIAN México incluyendo el tipo principal Y subtipos relacionados. Ejemplos: spa→spa,belleza,masaje; tortería→tortas,antojitos; veterinaria→mascotas,veterinaria. SOLO JSON: {"busqueda":"termino1","alt":"termino2","alt2":"termino3 o vacio"}',
+      messages:[{role:'user',content:'Negocio: '+desc}]
+    };
+    let resp;
+    if(ES_LOCAL){
+      resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':window.ANTHROPIC_KEY||'','anthropic-version':'2023-06-01'},body:JSON.stringify(body)});
+    } else {
+      resp=await fetch('/api/claude-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    }
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    const data=await resp.json();
+    let txt=((data.content&&data.content[0]&&data.content[0].text)||'{}').replace(/```json?/g,'').replace(/```/g,'').trim();
+    const parsed=JSON.parse(txt);
+    const kws=[parsed.busqueda,parsed.alt,parsed.alt2].map(norm).filter(function(k){return k&&k.length>2;});
+    if(kws.length>0){
+      const filIA=_filDirecto(kws);
+      const vistos=new Set(fil.map(function(g){return g.codigo;}));
+      filIA.forEach(function(g){if(!vistos.has(g.codigo)){fil.push(g);vistos.add(g.codigo);}});
+    }
+    if(lc) lc.textContent=fil.length>0?fil.length+' giro'+(fil.length!==1?'s':'')+' encontrados':'Sin resultados para "'+desc+'"';
+    if(li){
+      li.innerHTML=fil.length>0?_renderLista(fil):'<div style="padding:12px;font-size:12px;color:var(--text3)">No hay giros en esta zona para esa descripción. Prueba con otra palabra o usa "Buscar manual".</div>';
+    }
+    if(lg) lg.style.display='block';
+  }catch(e){
+    if(lc) lc.textContent=fil.length>0?fil.length+' giro'+(fil.length!==1?'s':'')+' encontrados':'Sin resultados';
+    if(li) li.innerHTML=fil.length>0?_renderLista(fil):'<div style="padding:12px;font-size:12px;color:var(--text3)">No se pudo consultar la IA. Usa "Buscar manual".</div>';
+    if(lg) lg.style.display='block';
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='✨ Detectar giro';}
+  }
+}
+function cancelarGiroIA(){
+  const lg=document.getElementById('iaListaGiros'); if(lg) lg.style.display='none';
+  const inp=document.getElementById('iaDescInput'); if(inp){inp.value='';inp.focus();}
+}
 function getMensajeM2(clave, condGiro, zonaActual){
   const c = (clave||'').toUpperCase();
   const base = c.replace(/-.*$/,'');
@@ -6709,6 +6854,5 @@ function guToggleTheme(){
 }
 
 </script>
-
 </body>
 </html>

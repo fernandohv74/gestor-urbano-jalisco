@@ -4091,15 +4091,15 @@ function calcularVistos(pat){
   if(c.includes('Monumento Histórico')&&!c.includes('Artístico'))
     v.push({u:'alta',t:'Dictamen Técnico INAH requerido — obligatorio antes de cualquier obra',
       f:'Clasificación: '+c+(zona?' · Zona: '+zona:''),
-      d:'📍 Centro INAH Jalisco — Av. Alcalde 1351, Col. Miraflores, Guadalajara. Tel. (33) 3613-1827. Trámite INAH-07-001 — Autorización de intervención en monumentos históricos.'});
+      d:'📍 Centro INAH Jalisco — Liceo 168, Sector Hidalgo, Zona Centro, C.P. 44100, Guadalajara, Jalisco. Tel. (33) 3614-5464.'});
   if(c.includes('Artístico'))
-    v.push({u:'alta',t:'Autorización INBAL requerida',
+    v.push({u:'alta',t:'Autorización INAH requerida',
       f:'Clasificación: '+c,
-      d:'📍 INBAL — Reforma 175, Col. Juárez, CDMX. Trámite INBA-07-002.'});
+      d:'📍 Centro INAH Jalisco — Liceo 168, Sector Hidalgo, Zona Centro, C.P. 44100, Guadalajara, Jalisco. Tel. (33) 3614-5464.'});
   if(c.includes('Civil Relevante'))
-    v.push({u:'media',t:'Posible dictamen INAH y/o INBAL según alcance de la obra',
+    v.push({u:'media',t:'Posible dictamen INAH según alcance de la obra',
       f:'Clasificación Civil Relevante — consulta previa obligatoria',
-      d:'📍 Iniciar en Centro INAH Jalisco — Av. Alcalde 1351. Ellos determinan si se requiere INBAL.'});
+      d:'📍 Centro INAH Jalisco — Liceo 168, Sector Hidalgo, Zona Centro, C.P. 44100, Guadalajara, Jalisco. Tel. (33) 3614-5464.'});
   if(zona)
     v.push({u:'media',t:'Zona patrimonial: '+zona+' — autorización de imagen urbana requerida',
       f:'Predio en zona de protección patrimonial catalogada por el Estado de Jalisco',

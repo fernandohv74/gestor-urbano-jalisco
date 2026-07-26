@@ -1,11 +1,18 @@
 <!DOCTYPE html>
+<!-- ==========================================================
+     GestorUrbano Jalisco AMG / TrazaUrbana
+     (c) 2026 Fernando H. - trazaurbana.mx
+     Todos los derechos reservados.
+     Reproduccion o uso no autorizado esta prohibido.
+     ========================================================== -->
+
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Gestor Urbano Jalisco AMG</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=Outfit:wght@300;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -80,12 +87,14 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
 <body>
 
 <header>
-  <div class="logo-mark">🏙️</div>
-  <div>
-    <div class="logo-txt">Gestor Urbano Jalisco</div>
-    <div class="logo-sub">AMG · 5 municipios</div>
+  <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+    <svg width="34" height="34" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="flex-shrink:0"><rect x="3" y="3" width="94" height="94" rx="16" fill="#C4D2E0"/><line x1="0" y1="22" x2="100" y2="22" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="44" x2="100" y2="44" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="66" x2="100" y2="66" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="88" x2="100" y2="88" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="22" y1="0" x2="22" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="44" y1="0" x2="44" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="66" y1="0" x2="66" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="88" y1="0" x2="88" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="-2" y1="20" x2="102" y2="80" stroke="#fff" stroke-width="5.5" opacity="0.55"/><rect x="27" y="27" width="14" height="14" fill="#D85A30"/><rect x="3" y="3" width="94" height="94" rx="16" fill="none" stroke="#14395C" stroke-width="3"/></svg>
+    <div>
+      <div style="font-family:'Outfit','Helvetica Neue',Arial,sans-serif;line-height:1;letter-spacing:-.3px;margin-bottom:2px"><span style="font-weight:800;font-size:19px;color:var(--text)">Traza</span><span style="font-weight:300;font-size:19px;color:#D85A30">Urbana</span></div>
+      <div class="logo-sub">Jalisco AMG · 5 municipios</div>
+    </div>
   </div>
-  <div class="hbadge">Plataforma de 23 módulos</div>
+  <div class="hbadge">Plataforma · 11 módulos</div>
   <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙 Modo oscuro</button>
 </header>
 
@@ -97,7 +106,7 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
 </div>
 
 <div class="status-row">
-  <div class="stat-box"><div class="stat-val">10</div><div class="stat-lbl">Módulos activos</div></div>
+  <div class="stat-box"><div class="stat-val">11</div><div class="stat-lbl">Módulos activos</div></div>
   <div class="stat-box"><div class="stat-val">5</div><div class="stat-lbl">Municipios cubiertos</div></div>
   <div class="stat-box"><div class="stat-val">53</div><div class="stat-lbl">Subdistritos GDL</div></div>
   <div class="stat-box"><div class="stat-val">23</div><div class="stat-lbl">Módulos planificados</div></div>
@@ -300,6 +309,24 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
     </div>
   </a>
 
+  <a class="mod-card" href="GestorUrbano_M11_1.html">
+    <div class="mod-card-top">
+      <div class="mod-icon" style="background:linear-gradient(135deg,#065F46,#0891B2)">📊</div>
+      <div><div class="mod-num">Módulo 11</div><div class="mod-name">Corrida Financiera</div></div>
+      <span class="mod-badge live">✓ Activo</span>
+    </div>
+    <div class="mod-card-body">
+      <p class="mod-desc">¿Es viable tu proyecto inmobiliario? Ingresa terreno, metros cuadrados y tipo de desarrollo, y obtén en segundos la TIR, VPN, Payback y ROI. Modo Express para análisis rápido; modo Pro para corrida completa con flujos mensuales y análisis de sensibilidad.</p>
+      <div class="mod-tags">
+        <span class="tag">Express · Pro</span>
+        <span class="tag">TIR · VPN · Payback</span>
+        <span class="tag">Residencial · Bodega · Industrial</span>
+        <span class="tag">Sensibilidad</span>
+      </div>
+      <span class="mod-cta primary">Abrir Módulo 11 →</span>
+    </div>
+  </a>
+
 </div>
 
 <div style="max-width:960px;margin:24px auto 0;padding:0 16px">
@@ -309,4 +336,32 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
 </div>
 
 <footer>
-  <span class="foo
+  <span class="footer-txt">© 2026 TrazaUrbana · Jalisco AMG · trazaurbana.mx · Todos los derechos reservados.</span>
+  <div class="footer-stack">
+    <span class="stack-tag">HTML · CSS · JS</span>
+    <span class="stack-tag">Sin frameworks</span>
+    <span class="stack-tag">Google Maps API</span>
+    <span class="stack-tag">GeoServer WMS/WFS</span>
+  </div>
+</footer>
+
+<script>
+function applyTheme(theme) {
+  document.body.classList.toggle('light', theme === 'light');
+  var btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = theme === 'light' ? '☀️ Modo claro' : '🌙 Modo oscuro';
+}
+function toggleTheme() {
+  var isLight = document.body.classList.contains('light');
+  var next = isLight ? 'dark' : 'light';
+  applyTheme(next);
+  try { localStorage.setItem('gu_theme', next); } catch(e) {}
+}
+(function() {
+  var saved = null;
+  try { saved = localStorage.getItem('gu_theme'); } catch(e) {}
+  if (saved === 'light') applyTheme('light');
+})();
+</script>
+</body>
+</html>

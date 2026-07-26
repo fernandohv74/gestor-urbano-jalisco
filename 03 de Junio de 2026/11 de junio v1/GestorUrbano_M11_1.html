@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<!-- ==========================================================
+     GestorUrbano Jalisco AMG / TrazaUrbana
+     (c) 2026 Fernando H. - trazaurbana.mx
+     Todos los derechos reservados.
+     Reproduccion o uso no autorizado esta prohibido.
+     ========================================================== -->
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestor Urbano Jalisco — Corrida Financiera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="gu-design-system.css">
+<script>
+(function(){
+  var t=localStorage.getItem('gu_theme');
+  if(t) document.documentElement.setAttribute('data-theme',t);
+})();
+</script>
+<style>
+/* ── M11 Corrida Financiera v1 ── */
+.main{max-width:980px;margin:0 auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+
+/* Modo tabs */
+.mode-tabs{display:flex;background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:background var(--t),border-color var(--t)}
+.mtab{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;padding:13px 16px;cursor:pointer;position:relative;transition:background var(--t-fast);border-right:0.5px solid var(--border)}
+.mtab:last-child{border-right:none}
+.mtab-ico{font-size:20px;flex-shrink:0}
+.mtab-info{display:flex;flex-direction:column;gap:2px}
+.mtab-name{font-size:13px;font-weight:600;color:var(--text2);transition:color var(--t-fast)}
+.mtab-desc{font-size:10px;color:var(--text3);transition:color var(--t)}
+.mtab.active{background:var(--brand-pale)}
+.mtab.active .mtab-name{color:var(--brand)}
+.mtab.active .mtab-desc{color:var(--brand)}
+
+/* Card base */
+.m11-card{background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:18px 20px;transition:background var(--t),border-color var(--t)}
+.m11-card h2{font-size:14px;font-weight:600;color:var(--text);margin:0 0 4px;display:flex;align-items:center;gap:8px;transition:color var(--t)}
+.m11-card .card-sub{font-size:11px;color:var(--text3);margin-bottom:14px;transition:color var(--t)}
+
+/* Panel visibility */
+.m11-panel{display:none}.m11-panel.visible{display:flex;flex-direction:column;gap:14px}
+
+/* Tipo selector */
+.tipo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.tipo-btn{background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-lg);padding:10px 8px;text-align:center;cursor:pointer;transition:all var(--t-fast)}
+.tipo-btn:hover{border-color:var(--brand)}
+.tipo-btn.sel{border-color:var(--brand);background:var(--brand-pale)}
+.tipo-ico{font-size:22px;margin-bottom:4px}
+.tipo-name{font-size:11px;font-weight:600;color:var(--text);display:block;margin-bottom:2px;transition:color var(--t)}
+.tipo-rng{font-family:var(--mono);font-size:9px;color:var(--text3);display:block;transition:color var(--t)}
+.tipo-btn.sel .tipo-name{color:var(--brand)}
+.tipo-btn.sel .tipo-rng{color:var(--brand)}
+
+/* Form grid */
+.f-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.f-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.f-single{margin-bottom:10px}
+.f-group{display:flex;flex-direction:column;gap:5px}
+.f-group label{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;display:flex;justify-content:space-between;align-items:center;transition:color var(--t)}
+.f-group label .f-bench{font-family:var(--mono);font-size:9px;color:var(--brand);cursor:help;font-weight:400;letter-spacing:0;text-transform:none}
+.f-group input,.f-group select{background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:8px 11px;color:var(--text);font-size:13px;font-family:var(--sans);outline:none;width:100%;transition:border-color var(--t-fast),background var(--t)}
+.f-group input:focus,.f-group select:focus{border-color:var(--brand)}
+.f-note{font-size:10px;color:var(--text3);margin-top:3px;transition:color var(--t)}
+.f-group input::placeholder{color:var(--text3)}
+
+/* Slider row */
+.slider-wrap{display:flex;align-items:center;gap:10px}
+.slider-wrap input[type=range]{flex:1;accent-color:var(--brand);cursor:pointer}
+.slider-val{font-family:var(--mono);font-size:12px;color:var(--text);min-width:42px;text-align:right}
+
+/* Resultados — Express */
+.res-panel{background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:all var(--t)}
+.res-empty{padding:28px 20px;text-align:center;color:var(--text3);font-size:13px}
+.res-hero{padding:16px 20px;display:flex;align-items:center;gap:14px;border-bottom:0.5px solid var(--border);transition:border-color var(--t)}
+.res-tir-big{font-family:var(--mono);font-size:34px;font-weight:500;line-height:1;flex-shrink:0}
+.res-viab{flex:1}
+.res-viab-label{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px}
+.res-viab-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.res-viab-sub{font-size:11px;color:var(--text3);margin-top:3px;transition:color var(--t)}
+.res-tir-lbl{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:3px;letter-spacing:.5px}
+.res-kpis{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:0.5px solid var(--border)}
+.res-kpi{padding:11px 14px;border-right:0.5px solid var(--border);transition:border-color var(--t)}
+.res-kpi:last-child{border-right:none}
+.res-kpi-v{font-family:var(--mono);font-size:15px;font-weight:500;color:var(--text);transition:color var(--t)}
+.res-kpi-l{font-size:10px;color:var(--text3);margin-top:2px;transition:color var(--t)}
+.res-util{padding:13px 20px;display:flex;align-items:baseline;justify-content:space-between;border-bottom:0.5px solid var(--border);transition:border-color var(--t)}
+.res-util-lbl{font-size:12px;color:var(--text2);transition:color var(--t)}
+.res-util-v{font-family:var(--mono);font-size:18px;font-weight:500;transition:color var(--t)}
+.res-bar{padding:13px 20px}
+.res-bar-lbl{font-size:9px;color:var(--text3);margin-bottom:6px;letter-spacing:.5px;font-family:var(--mono);text-transform:uppercase}
+.res-bar-track{height:12px;border-radius:6px;overflow:hidden;display:flex;gap:1px;background:var(--border)}
+.res-bar-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,.85);font-family:var(--mono);overflow:hidden;white-space:nowrap;transition:width .3s var(--ease)}
+.res-bar-leg{display:flex;flex-wrap:wrap;gap:10px;margin-top:7px}
+.res-leg-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);transition:color var(--t)}
+.res-leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* Soft costs row */
+.soft-row{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);padding:8px 12px;font-size:12px;color:var(--text2);transition:all var(--t)}
+.soft-val{font-family:var(--mono);font-size:12px;color:var(--brand);font-weight:500}
+
+/* ── PRO MODE ── */
+.blk-accordion{background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:all var(--t)}
+.blk-head{display:flex;align-items:center;gap:10px;padding:13px 18px;cursor:pointer;transition:background var(--t-fast)}
+.blk-head:hover{background:var(--bg3)}
+.blk-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.blk-title{font-size:13px;font-weight:600;color:var(--text);flex:1;transition:color var(--t)}
+.blk-desc{font-size:11px;color:var(--text3);margin-right:10px;transition:color var(--t)}
+.blk-chevron{font-size:12px;color:var(--text3);transition:transform var(--t-fast),color var(--t)}
+.blk-accordion.open .blk-chevron{transform:rotate(180deg)}
+.blk-body{display:none;padding:0 18px 16px;border-top:0.5px solid var(--border)}
+.blk-accordion.open .blk-body{display:block}
+.blk-body .f-grid-2{margin-top:14px}
+
+/* Pro results */
+.pro-res{background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:all var(--t)}
+.pro-res-head{padding:14px 18px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;transition:border-color var(--t)}
+.pro-res-title{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;transition:color var(--t)}
+.pro-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:0.5px solid var(--border)}
+.pro-kpi{padding:12px 14px;border-right:0.5px solid var(--border);transition:all var(--t)}
+.pro-kpi:last-child{border-right:none}
+.pro-kpi-v{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--text);transition:color var(--t)}
+.pro-kpi-n{font-size:11px;font-weight:500;color:var(--text);margin:3px 0 2px;transition:color var(--t)}
+.pro-kpi-d{font-size:9.5px;color:var(--text3);line-height:1.4;transition:color var(--t)}
+.pro-flujo{padding:14px 18px}
+.pro-flujo-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;font-family:var(--mono);transition:color var(--t)}
+.flujo-table{width:100%;border-collapse:collapse;font-size:11px}
+.flujo-table th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding:5px 8px;text-align:right;border-bottom:0.5px solid var(--border2);transition:all var(--t)}
+.flujo-table th:first-child{text-align:left}
+.flujo-table td{padding:6px 8px;border-bottom:0.5px solid var(--border);font-family:var(--mono);text-align:right;color:var(--text2);transition:all var(--t)}
+.flujo-table td:first-child{text-align:left;font-family:var(--sans);color:var(--text);font-weight:500}
+.flujo-table tr:last-child td{border-bottom:none;font-weight:600;color:var(--text)}
+.flujo-table .pos{color:var(--sem-v-txt)}.flujo-table .neg{color:var(--sem-r-txt)}
+
+/* Sensibilidad */
+.sens-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px 18px;border-top:0.5px solid var(--border)}
+.sens-card{background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:10px 12px;text-align:center;transition:all var(--t)}
+.sens-lbl{font-size:10px;color:var(--text3);margin-bottom:4px;transition:color var(--t)}
+.sens-val{font-family:var(--mono);font-size:14px;font-weight:600;transition:color var(--t)}
+.sens-sub{font-size:9px;color:var(--text3);margin-top:2px;transition:color var(--t)}
+
+/* Botones */
+.btn-primary{width:100%;background:var(--brand);color:#fff;border:none;border-radius:var(--r-md);padding:13px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity var(--t-fast)}
+.btn-primary:hover{opacity:.88}
+.btn-sec{background:var(--bg3);border:0.5px solid var(--border2);color:var(--text2);border-radius:var(--r-md);padding:10px 18px;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:all var(--t-fast)}
+.btn-sec:hover{border-color:var(--brand);color:var(--brand)}
+
+/* Disclaimer */
+.disclaimer{font-size:10px;color:var(--text3);background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);padding:10px 13px;line-height:1.6;transition:all var(--t)}
+
+/* Responsive */
+@media(max-width:660px){
+  .tipo-grid{grid-template-columns:1fr 1fr}
+  .f-grid-2,.f-grid-3,.res-kpis,.pro-kpi-grid,.sens-grid{grid-template-columns:1fr 1fr}
+  .res-kpis,.pro-kpi-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:420px){
+  .tipo-grid,.f-grid-3{grid-template-columns:1fr}
+  .mode-tabs{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="gu-nav">
+  <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+    <svg width="28" height="28" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="flex-shrink:0"><rect x="3" y="3" width="94" height="94" rx="16" fill="#C4D2E0"/><line x1="0" y1="22" x2="100" y2="22" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="44" x2="100" y2="44" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="66" x2="100" y2="66" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="88" x2="100" y2="88" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="22" y1="0" x2="22" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="44" y1="0" x2="44" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="66" y1="0" x2="66" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="88" y1="0" x2="88" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="-2" y1="20" x2="102" y2="80" stroke="#fff" stroke-width="5.5" opacity="0.55"/><rect x="27" y="27" width="14" height="14" fill="#D85A30"/><rect x="3" y="3" width="94" height="94" rx="16" fill="none" stroke="#14395C" stroke-width="3"/></svg>
+    <span style="font-family:var(--sans);line-height:1;letter-spacing:-.3px"><span style="font-weight:800;font-size:17px;color:var(--text)">Traza</span><span style="font-weight:300;font-size:17px;color:#D85A30">Urbana</span></span>
+  </div>
+  <span class="gu-nav-sep">/</span>
+  <span class="gu-nav-mod">M11 · Corrida Financiera</span>
+  <a href="index.html" class="gu-nav-back">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    Menú
+  </a>
+  <a href="GestorUrbano_M01_3.html" class="gu-nav-back" style="margin-left:4px">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 8L7 4.5v2.5h5.5v2H7v2.5L3.5 8z"/></svg>
+    M01 · Uso de suelo
+  </a>
+  <button class="gu-theme-btn" onclick="guToggleTheme()" aria-label="Cambiar tema" title="Cambiar tema">
+    <svg class="icon-sun" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2zm0 13.5a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 15.5zm7.5-5.5a.75.75 0 010 1.5h-1.5a.75.75 0 010-1.5h1.5zm-13.5 0a.75.75 0 010 1.5H2.5a.75.75 0 010-1.5h1.5zm10.773-5.027a.75.75 0 011.06 1.06l-1.06 1.061a.75.75 0 01-1.061-1.06l1.06-1.061zm-9.546 9.547a.75.75 0 011.06 1.06l-1.06 1.061a.75.75 0 01-1.061-1.06l1.06-1.061zm9.546 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 011.06-1.061l1.061 1.06zm-9.546-9.547a.75.75 0 01-1.06 1.06L3.666 6.033a.75.75 0 011.06-1.06l1.061 1.06zM10 6.5A3.5 3.5 0 1010 13.5 3.5 3.5 0 0010 6.5z"/></svg>
+    <svg class="icon-moon" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+  </button>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- Header card -->
+  <div class="m11-card">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div>
+        <h2 style="margin-bottom:4px">
+          <span style="font-family:var(--mono);font-size:11px;font-weight:400;color:var(--text3);background:var(--bg3);border:0.5px solid var(--border2);border-radius:4px;padding:2px 8px;margin-right:8px">M11</span>
+          Corrida Financiera de Inversión Inmobiliaria
+        </h2>
+        <div class="card-sub" style="margin-bottom:0">Evalúa la viabilidad financiera de edificios, casas, bodegas y parques industriales en el AMG.</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap">
+        <span style="font-size:10px;font-weight:600;background:var(--uso-p-bg);border:0.5px solid var(--uso-p-brd);color:var(--uso-p-txt);border-radius:4px;padding:3px 9px">TIR</span>
+        <span style="font-size:10px;font-weight:600;background:var(--uso-p-bg);border:0.5px solid var(--uso-p-brd);color:var(--uso-p-txt);border-radius:4px;padding:3px 9px">VPN</span>
+        <span style="font-size:10px;font-weight:600;background:var(--brand-pale);border:0.5px solid var(--brand-light);color:var(--brand);border-radius:4px;padding:3px 9px">Flujo de caja</span>
+        <span style="font-size:10px;font-weight:600;background:var(--bg3);border:0.5px solid var(--border2);color:var(--text2);border-radius:4px;padding:3px 9px">AMG 5 municipios</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mode tabs -->
+  <div class="mode-tabs">
+    <div class="mtab active" id="tab-express" onclick="setMode('express')">
+      <div class="mtab-ico">⚡</div>
+      <div class="mtab-info">
+        <span class="mtab-name">Modo Express</span>
+        <span class="mtab-desc">8 datos · factibilidad inmediata · ~2 min</span>
+      </div>
+    </div>
+    <div class="mtab" id="tab-pro" onclick="setMode('pro')">
+      <div class="mtab-ico">📊</div>
+      <div class="mtab-info">
+        <span class="mtab-name">Modo Pro</span>
+        <span class="mtab-desc">Modelo completo · flujo mensual · sensibilidad</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       PANEL EXPRESS
+       ════════════════════════════════ -->
+  <div class="m11-panel visible" id="panel-express">
+
+    <!-- Tipo de proyecto -->
+    <div class="m11-card">
+      <h2>Tipo de proyecto</h2>
+      <div class="tipo-grid">
+        <div class="tipo-btn sel" id="tipo-0" onclick="setTipo(0)">
+          <div class="tipo-ico">🏢</div>
+          <span class="tipo-name">Residencial</span>
+          <span class="tipo-rng">$12k–18k/m²</span>
+        </div>
+        <div class="tipo-btn" id="tipo-1" onclick="setTipo(1)">
+          <div class="tipo-ico">🏠</div>
+          <span class="tipo-name">Casa / Horizontal</span>
+          <span class="tipo-rng">$10k–15k/m²</span>
+        </div>
+        <div class="tipo-btn" id="tipo-2" onclick="setTipo(2)">
+          <div class="tipo-ico">🏭</div>
+          <span class="tipo-name">Bodega / Nave</span>
+          <span class="tipo-rng">$6.5k–9k/m²</span>
+        </div>
+        <div class="tipo-btn" id="tipo-3" onclick="setTipo(3)">
+          <div class="tipo-ico">🏗️</div>
+          <span class="tipo-name">Parque Industrial</span>
+          <span class="tipo-rng">$9k–12k/m²</span>
+        </div>
+      </div>
+
+      <!-- Form fields -->
+      <div class="f-grid-2">
+        <div class="f-group">
+          <label>Precio del terreno <span class="f-bench">MXN</span></label>
+          <input id="e-terreno" type="text" placeholder="Ej. 5,000,000" oninput="exRecalc()">
+        </div>
+        <div class="f-group">
+          <label>M² construidos totales <span class="f-bench">privativa + común</span></label>
+          <input id="e-m2" type="text" placeholder="Ej. 2,400" oninput="exRecalc()">
+        </div>
+      </div>
+      <div class="f-grid-2">
+        <div class="f-group">
+          <label>Número de unidades <span class="f-bench">deptos / naves</span></label>
+          <input id="e-unid" type="text" placeholder="Ej. 24" oninput="exRecalc()">
+        </div>
+        <div class="f-group">
+          <label>Costo construcción / m² <span class="f-bench" id="e-bench-c">benchmark AMG</span></label>
+          <input id="e-constr" type="text" placeholder="" oninput="exRecalc()">
+          <div class="f-note" id="e-note-c"></div>
+        </div>
+      </div>
+      <div class="f-grid-2">
+        <div class="f-group">
+          <label>Precio de venta / m² <span class="f-bench" id="e-bench-v">referencia</span></label>
+          <input id="e-venta" type="text" placeholder="" oninput="exRecalc()">
+          <div class="f-note" id="e-note-v"></div>
+        </div>
+        <div class="f-group">
+          <label>Plazo total del proyecto</label>
+          <div class="slider-wrap">
+            <input type="range" id="e-plazo" min="6" max="60" value="24" oninput="updSlider('e-plazo','e-plazo-v','m');exRecalc()">
+            <span class="slider-val" id="e-plazo-v">24 m</span>
+          </div>
+        </div>
+      </div>
+      <div class="f-single">
+        <div class="f-group">
+          <label>Financiamiento — % del costo total <span class="f-bench">0 = sin crédito · tasa: 14% anual</span></label>
+          <div class="slider-wrap">
+            <input type="range" id="e-fin" min="0" max="80" value="50" step="5" oninput="updSlider('e-fin','e-fin-v','%');exRecalc()">
+            <span class="slider-val" id="e-fin-v">50%</span>
+          </div>
+        </div>
+      </div>
+      <div class="soft-row">
+        <span>Soft costs estimados (honorarios, permisos, ventas)</span>
+        <span class="soft-val" id="e-soft-label">15% del costo de construcción</span>
+      </div>
+    </div>
+
+    <!-- Resultados Express -->
+    <div class="res-panel" id="ex-results">
+      <div class="res-empty">Ingresa precio del terreno y m² construidos para ver la corrida financiera.</div>
+    </div>
+
+    <div class="disclaimer">
+      <strong>Aviso:</strong> Modo Express usa supuestos simplificados: balance promedio del crédito al 50% del plazo (draw-down progresivo), m² vendibles = total × eficiencia por tipo (85–92%), ISR estimado al 30% de la utilidad bruta. Los resultados son orientativos para una evaluación rápida de factibilidad. Usa el Modo Pro para un modelo detallado.
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       PANEL PRO
+       ════════════════════════════════ -->
+  <div class="m11-panel" id="panel-pro">
+
+    <!-- Bloque 1 -->
+    <div class="blk-accordion open" id="blk1">
+      <div class="blk-head" onclick="toggleBlk('blk1')">
+        <div class="blk-dot" style="background:#2563EB"></div>
+        <span class="blk-title">Bloque 1 — Proyecto y terreno</span>
+        <span class="blk-desc">Base del análisis</span>
+        <span class="blk-chevron">▾</span>
+      </div>
+      <div class="blk-body">
+        <div class="f-grid-2">
+          <div class="f-group">
+            <label>Precio del terreno <span class="f-bench">MXN</span></label>
+            <input id="p-terreno" type="text" placeholder="Ej. 5,000,000" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Superficie del terreno <span class="f-bench">m²</span></label>
+            <input id="p-sup" type="text" placeholder="Ej. 800" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Tipo de proyecto</label>
+            <select id="p-tipo" onchange="proTipoChange()">
+              <option value="0">Edificio residencial</option>
+              <option value="1">Casa / desarrollo horizontal</option>
+              <option value="2">Bodega / nave industrial</option>
+              <option value="3">Parque industrial clase A</option>
+            </select>
+          </div>
+          <div class="f-group">
+            <label>Municipio / zona AMG</label>
+            <select id="p-muni">
+              <option value="gdl">Guadalajara (GDL)</option>
+              <option value="zpn">Zapopan (ZPN)</option>
+              <option value="tlq">Tlaquepaque (TLQ)</option>
+              <option value="tla">Tlajomulco de Zúñiga (TLA)</option>
+              <option value="ton">Tonalá (TON)</option>
+            </select>
+          </div>
+          <div class="f-group">
+            <label>COS aplicable <span class="f-bench">% ocupación suelo</span></label>
+            <input id="p-cos" type="text" placeholder="Ej. 0.60" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>CUS aplicable <span class="f-bench">× superficie terreno</span></label>
+            <input id="p-cus" type="text" placeholder="Ej. 4.0" oninput="proMark()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bloque 2 -->
+    <div class="blk-accordion" id="blk2">
+      <div class="blk-head" onclick="toggleBlk('blk2')">
+        <div class="blk-dot" style="background:#16A34A"></div>
+        <span class="blk-title">Bloque 2 — Construcción</span>
+        <span class="blk-desc">Costo directo</span>
+        <span class="blk-chevron">▾</span>
+      </div>
+      <div class="blk-body">
+        <div class="f-grid-2">
+          <div class="f-group">
+            <label>M² construidos totales <span class="f-bench">privativa + común</span></label>
+            <input id="p-m2" type="text" placeholder="Ej. 3,200" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Número de unidades <span class="f-bench">deptos / naves / lotes</span></label>
+            <input id="p-unid" type="text" placeholder="Ej. 32" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Costo construcción / m² <span class="f-bench" id="p-bench-c">benchmark AMG</span></label>
+            <input id="p-constr" type="text" placeholder="" oninput="proMark()">
+            <div class="f-note" id="p-note-c"></div>
+          </div>
+          <div class="f-group">
+            <label>Plazo de obra <span class="f-bench">meses</span></label>
+            <input id="p-plazo-obra" type="text" placeholder="Ej. 18" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Urbanización / infraestructura <span class="f-bench">% costo directo</span></label>
+            <input id="p-urba" type="text" placeholder="Ej. 5" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Contingencia <span class="f-bench">% costo directo</span></label>
+            <input id="p-conting" type="text" placeholder="Ej. 7" oninput="proMark()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bloque 3 -->
+    <div class="blk-accordion" id="blk3">
+      <div class="blk-head" onclick="toggleBlk('blk3')">
+        <div class="blk-dot" style="background:#EA580C"></div>
+        <span class="blk-title">Bloque 3 — Costos indirectos</span>
+        <span class="blk-desc">Soft costs</span>
+        <span class="blk-chevron">▾</span>
+      </div>
+      <div class="blk-body">
+        <div class="f-grid-2">
+          <div class="f-group">
+            <label>Honorarios de diseño <span class="f-bench">% costo directo</span></label>
+            <input id="p-honor" type="text" placeholder="Ej. 5" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Permisos y licencias <span class="f-bench">MXN</span></label>
+            <input id="p-permisos" type="text" placeholder="Ej. 250,000" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Estudios (suelo, vial, ambiental) <span class="f-bench">MXN</span></label>
+            <input id="p-estudios" type="text" placeholder="Ej. 120,000" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Costo de ventas <span class="f-bench">% sobre ingresos</span></label>
+            <input id="p-cvtas" type="text" placeholder="Ej. 6" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Gastos notariales <span class="f-bench">MXN estimado</span></label>
+            <input id="p-notarial" type="text" placeholder="Ej. 180,000" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>ISR estimado <span class="f-bench">% sobre utilidad bruta</span></label>
+            <input id="p-isr" type="text" placeholder="30" oninput="proMark()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bloque 4 -->
+    <div class="blk-accordion" id="blk4">
+      <div class="blk-head" onclick="toggleBlk('blk4')">
+        <div class="blk-dot" style="background:#9333EA"></div>
+        <span class="blk-title">Bloque 4 — Financiamiento</span>
+        <span class="blk-desc">Estructura de capital</span>
+        <span class="blk-chevron">▾</span>
+      </div>
+      <div class="blk-body">
+        <div class="f-grid-2">
+          <div class="f-group">
+            <label>Capital propio <span class="f-bench">MXN o deja vacío para calcular</span></label>
+            <input id="p-equity" type="text" placeholder="Auto desde % financiamiento" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>% Financiado (crédito puente) <span class="f-bench">0–80%</span></label>
+            <input id="p-pctfin" type="text" placeholder="Ej. 50" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Tasa de interés anual <span class="f-bench">% sobre saldo insoluto</span></label>
+            <input id="p-tasa" type="text" placeholder="Ej. 14" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Plazo del crédito <span class="f-bench">meses</span></label>
+            <input id="p-plazo-cred" type="text" placeholder="Ej. 24" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Período de gracia <span class="f-bench">meses solo intereses</span></label>
+            <input id="p-gracia" type="text" placeholder="Ej. 18" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Comisión de apertura <span class="f-bench">% sobre monto</span></label>
+            <input id="p-comision" type="text" placeholder="Ej. 1.5" oninput="proMark()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bloque 5 -->
+    <div class="blk-accordion" id="blk5">
+      <div class="blk-head" onclick="toggleBlk('blk5')">
+        <div class="blk-dot" style="background:#0891B2"></div>
+        <span class="blk-title">Bloque 5 — Ingresos proyectados</span>
+        <span class="blk-desc">Venta o renta</span>
+        <span class="blk-chevron">▾</span>
+      </div>
+      <div class="blk-body">
+        <div class="f-grid-2">
+          <div class="f-group">
+            <label>Precio de venta / m² <span class="f-bench" id="p-bench-v">referencia AMG</span></label>
+            <input id="p-pventa" type="text" placeholder="" oninput="proMark()">
+            <div class="f-note" id="p-note-v"></div>
+          </div>
+          <div class="f-group">
+            <label>Velocidad de ventas <span class="f-bench">unidades / mes</span></label>
+            <input id="p-veloc" type="text" placeholder="Ej. 3" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Renta mensual / m² <span class="f-bench">si aplica renta</span></label>
+            <input id="p-renta" type="text" placeholder="Ej. 110" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Ocupación estimada <span class="f-bench">% — para renta</span></label>
+            <input id="p-ocup" type="text" placeholder="Ej. 92" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Enganche / preventas <span class="f-bench">% del precio por unidad</span></label>
+            <input id="p-enganche" type="text" placeholder="Ej. 20" oninput="proMark()">
+          </div>
+          <div class="f-group">
+            <label>Escalación de precios <span class="f-bench">% anual</span></label>
+            <input id="p-escal" type="text" placeholder="Ej. 5" oninput="proMark()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botón calcular -->
+    <button class="btn-primary" id="pro-calc-btn" onclick="proCalcular()">
+      <span>Calcular corrida financiera</span>
+    </button>
+
+    <!-- Resultados Pro -->
+    <div class="pro-res" id="pro-results" style="display:none">
+      <div class="pro-res-head">
+        <span class="pro-res-title">Resultados del análisis</span>
+        <span id="pro-viab-badge" style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;border:0.5px solid"></span>
+      </div>
+      <div class="pro-kpi-grid" id="pro-kpi-grid"></div>
+      <div class="pro-flujo">
+        <div class="pro-flujo-title">Flujo de caja simplificado por fase</div>
+        <div style="overflow-x:auto">
+          <table class="flujo-table" id="pro-flujo-table"></table>
+        </div>
+      </div>
+      <div class="sens-grid" id="pro-sens"></div>
+    </div>
+
+    <div class="disclaimer">
+      <strong>Modo Pro:</strong> El flujo de caja asume desembolso lineal de construcción durante la obra, y ventas/rentas desde el inicio de comercialización. La TIR se calcula mediante Newton-Raphson sobre los flujos mensuales. Los valores son estimados de factibilidad — no reemplazan una auditoría financiera formal.
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+/* ══════════════════════════════════════════════════════
+   DATOS DE REFERENCIA
+   ══════════════════════════════════════════════════════ */
+const TIPOS = [
+  {n:'Residencial',  costoConstr:15000, precioVenta:38000, softPct:15, efic:0.85, tasaRenta:false, benchC:'$12,000–18,000/m²', benchV:'$25,000–55,000/m²'},
+  {n:'Horizontal',   costoConstr:12000, precioVenta:28000, softPct:14, efic:0.88, tasaRenta:false, benchC:'$10,000–15,000/m²', benchV:'$18,000–35,000/m²'},
+  {n:'Bodega',       costoConstr:7500,  precioVenta:260,   softPct:12, efic:0.95, tasaRenta:true,  benchC:'$6,500–9,000/m²',  benchV:'$220–380/m²/mes (renta)'},
+  {n:'P.Industrial', costoConstr:10500, precioVenta:380,   softPct:13, efic:0.95, tasaRenta:true,  benchC:'$9,000–12,000/m²', benchV:'$320–520/m²/mes (renta)'},
+];
+
+let tipoIdx = 0;
+
+/* ══════════════════════════════════════════════════════
+   HELPERS
+   ══════════════════════════════════════════════════════ */
+const fmt  = n => new Intl.NumberFormat('es-MX',{maximumFractionDigits:0}).format(n);
+const fmtM = n => Math.abs(n)>=1e6 ? (n<0?'-':'')+'$'+(Math.abs(n)/1e6).toFixed(2)+'M' : (n<0?'-':'')+'$'+fmt(Math.abs(n));
+const pct  = n => n.toFixed(1)+'%';
+const pN   = id => { const v=document.getElementById(id).value.replace(/[,$\s]/g,''); return parseFloat(v)||0; };
+
+function updSlider(rangeId, labelId, unit){
+  const v = document.getElementById(rangeId).value;
+  document.getElementById(labelId).textContent = v + (unit==='m'?' m':unit);
+}
+
+/* ══════════════════════════════════════════════════════
+   MODO TABS
+   ══════════════════════════════════════════════════════ */
+function setMode(m){
+  document.getElementById('tab-express').classList.toggle('active', m==='express');
+  document.getElementById('tab-pro').classList.toggle('active', m==='pro');
+  document.getElementById('panel-express').classList.toggle('visible', m==='express');
+  document.getElementById('panel-pro').classList.toggle('visible', m==='pro');
+}
+
+/* ══════════════════════════════════════════════════════
+   TIPO DE PROYECTO
+   ══════════════════════════════════════════════════════ */
+function setTipo(i){
+  tipoIdx = i;
+  document.querySelectorAll('.tipo-btn').forEach((b,j)=>b.classList.toggle('sel',j===i));
+  const t = TIPOS[i];
+  document.getElementById('e-constr').placeholder = fmt(t.costoConstr);
+  document.getElementById('e-venta').placeholder  = t.tasaRenta ? '— (usa renta)' : fmt(t.precioVenta);
+  document.getElementById('e-note-c').textContent = 'Benchmark AMG: ' + t.benchC;
+  document.getElementById('e-note-v').textContent = 'Referencia AMG: ' + t.benchV;
+  document.getElementById('e-soft-label').textContent = t.softPct + '% del costo de construcción';
+  exRecalc();
+}
+
+function proTipoChange(){
+  const i = parseInt(document.getElementById('p-tipo').value);
+  const t = TIPOS[i];
+  document.getElementById('p-constr').placeholder = fmt(t.costoConstr);
+  document.getElementById('p-pventa').placeholder = fmt(t.precioVenta);
+  document.getElementById('p-note-c').textContent = 'Benchmark AMG: ' + t.benchC;
+  document.getElementById('p-note-v').textContent = 'Referencia AMG: ' + t.benchV;
+  document.getElementById('p-bench-c').textContent = 'benchmark AMG';
+  document.getElementById('p-bench-v').textContent = 'referencia AMG';
+  proMark();
+}
+
+/* ══════════════════════════════════════════════════════
+   BLOQUE ACCORDION
+   ══════════════════════════════════════════════════════ */
+function toggleBlk(id){
+  document.getElementById(id).classList.toggle('open');
+}
+
+/* ══════════════════════════════════════════════════════
+   EXPRESS — CÁLCULO
+   ══════════════════════════════════════════════════════ */
+function exRecalc(){
+  const t      = TIPOS[tipoIdx];
+  const terr   = pN('e-terreno');
+  const m2     = pN('e-m2');
+  if(!terr||!m2){ showEmpty(); return; }
+
+  const constr   = pN('e-constr') || t.costoConstr;
+  const pventa   = pN('e-venta')  || t.precioVenta;
+  const plazo    = parseInt(document.getElementById('e-plazo').value)||24;
+  const pctFin   = parseInt(document.getElementById('e-fin').value)||0;
+  const tasa     = 0.14;
+
+  const costConstr  = m2 * constr;
+  const softCosts   = costConstr * (t.softPct/100);
+  const costoTotal  = terr + costConstr + softCosts;
+  const credito     = costoTotal * (pctFin/100);
+  const equity      = costoTotal - credito;
+  const costoFin    = credito * 0.50 * tasa * (plazo/12);
+  const invTotal    = costoTotal + costoFin;
+
+  const m2Vend  = m2 * t.efic;
+  const ingresos = t.tasaRenta
+    ? m2Vend * pventa * 12 * 10   // 10 años horizon para renta
+    : m2Vend * pventa;
+
+  const utilBruta  = ingresos - invTotal;
+  const isr        = Math.max(0, utilBruta * 0.30);
+  const utilNeta   = utilBruta - isr;
+  const margen     = ingresos > 0 ? (utilNeta/ingresos)*100 : 0;
+  const roi        = equity > 0 ? (utilNeta/equity)*100 : 0;
+
+  let TIR=0, VPN=0, payback=0;
+  if(equity>0 && utilNeta>-equity){
+    const totalRet = (equity+utilNeta)/equity;
+    if(totalRet>0){
+      const tirM = Math.pow(totalRet, 1/plazo)-1;
+      TIR = (Math.pow(1+tirM,12)-1)*100;
+    }
+    const WACC=0.12;
+    VPN = -equity + (equity+utilNeta)/Math.pow(1+WACC, plazo/12);
+    const mVentas = Math.max(1, plazo*0.4);
+    payback = equity / (ingresos/mVentas);
+  }
+
+  // Semáforo
+  let viabColor, viabTxt, viabSub;
+  if(TIR>=18){viabColor='var(--uso-p-txt)';viabTxt='Proyecto viable';viabSub='TIR por encima del umbral recomendado (18%)';}
+  else if(TIR>=10){viabColor='var(--sem-am-txt)';viabTxt='Revisar supuestos';viabSub='TIR aceptable pero con margen ajustado';}
+  else{viabColor='var(--sem-r-txt)';viabTxt='Proyecto comprometido';viabSub='TIR por debajo del mínimo sugerido — ajustar variables';}
+
+  // Barra de composición
+  const tot = Math.max(invTotal,1);
+  const pT  = Math.round(terr/tot*100);
+  const pC  = Math.round(costConstr/tot*100);
+  const pS  = Math.round(softCosts/tot*100);
+  const pF  = Math.max(0,100-pT-pC-pS);
+
+  const utilColor = utilNeta>=0 ? 'var(--uso-p-txt)' : 'var(--sem-r-txt)';
+
+  document.getElementById('ex-results').innerHTML = `
+    <div class="res-hero" style="background:${viabColor.includes('p-txt')?'var(--uso-p-bg)':viabColor.includes('am-txt')?'var(--sem-am-bg)':'var(--sem-r-bg)'}">
+      <div>
+        <div class="res-tir-big" style="color:${viabColor}">${TIR>0?pct(TIR):'—'}</div>
+        <div class="res-tir-lbl">TIR ANUAL</div>
+      </div>
+      <div class="res-viab">
+        <div class="res-viab-label" style="color:${viabColor}">
+          <div class="res-viab-dot" style="background:${viabColor}"></div>${viabTxt}
+        </div>
+        <div class="res-viab-sub">${viabSub}</div>
+      </div>
+    </div>
+    <div class="res-kpis">
+      <div class="res-kpi"><div class="res-kpi-v">${VPN>=0?fmtM(VPN):'-'+fmtM(-VPN)}</div><div class="res-kpi-l">VPN (tasa 12%)</div></div>
+      <div class="res-kpi"><div class="res-kpi-v">${margen>0?pct(margen):'—'}</div><div class="res-kpi-l">Margen neto</div></div>
+      <div class="res-kpi"><div class="res-kpi-v">${payback>0?Math.round(payback)+' m':'—'}</div><div class="res-kpi-l">Payback</div></div>
+      <div class="res-kpi"><div class="res-kpi-v">${roi>0?pct(roi):'—'}</div><div class="res-kpi-l">ROI</div></div>
+    </div>
+    <div class="res-util">
+      <span class="res-util-lbl">Utilidad neta estimada (post ISR 30%)</span>
+      <span class="res-util-v" style="color:${utilColor}">${fmtM(utilNeta)}</span>
+    </div>
+    <div class="res-bar">
+      <div class="res-bar-lbl">Composición inversión total · ${fmtM(invTotal)}</div>
+      <div class="res-bar-track">
+        <div class="res-bar-seg" style="width:${pT}%;background:#2563EB">${pT>9?pT+'%':''}</div>
+        <div class="res-bar-seg" style="width:${pC}%;background:#16A34A">${pC>9?pC+'%':''}</div>
+        <div class="res-bar-seg" style="width:${pS}%;background:#EA580C">${pS>9?pS+'%':''}</div>
+        <div class="res-bar-seg" style="width:${pF}%;background:#9333EA">${pF>9?pF+'%':''}</div>
+      </div>
+      <div class="res-bar-leg">
+        <div class="res-leg-item"><div class="res-leg-dot" style="background:#2563EB"></div>Terreno ${fmtM(terr)}</div>
+        <div class="res-leg-item"><div class="res-leg-dot" style="background:#16A34A"></div>Construcción ${fmtM(costConstr)}</div>
+        <div class="res-leg-item"><div class="res-leg-dot" style="background:#EA580C"></div>Soft costs ${fmtM(softCosts)}</div>
+        <div class="res-leg-item"><div class="res-leg-dot" style="background:#9333EA"></div>Costo financiero ${fmtM(costoFin)}</div>
+      </div>
+    </div>
+  `;
+}
+
+function showEmpty(){
+  document.getElementById('ex-results').innerHTML='<div class="res-empty">Ingresa precio del terreno y m² construidos para ver la corrida financiera.</div>';
+}
+
+/* ══════════════════════════════════════════════════════
+   PRO — MARCAR PENDIENTE DE CALCULAR
+   ══════════════════════════════════════════════════════ */
+function proMark(){
+  const btn = document.getElementById('pro-calc-btn');
+  btn.querySelector('span').textContent = 'Calcular corrida financiera ·  datos actualizados';
+}
+
+/* ══════════════════════════════════════════════════════
+   PRO — CÁLCULO COMPLETO
+   ══════════════════════════════════════════════════════ */
+function proCalcular(){
+  const ti = parseInt(document.getElementById('p-tipo').value)||0;
+  const t  = TIPOS[ti];
+
+  const terr       = pN('p-terreno');
+  const m2         = pN('p-m2');
+  if(!terr||!m2){ alert('Ingresa al menos precio del terreno y m² construidos.'); return; }
+
+  const constr     = pN('p-constr')     || t.costoConstr;
+  const pventa     = pN('p-pventa')     || t.precioVenta;
+  const unid       = pN('p-unid')       || 1;
+  const plazoObra  = pN('p-plazo-obra') || 18;
+  const urba       = (pN('p-urba')      || 5) /100;
+  const conting    = (pN('p-conting')   || 7) /100;
+  const honor      = (pN('p-honor')     || 5) /100;
+  const permisos   = pN('p-permisos')   || 0;
+  const estudios   = pN('p-estudios')   || 0;
+  const cvtas      = (pN('p-cvtas')     || 6) /100;
+  const notarial   = pN('p-notarial')   || 0;
+  const isrPct     = (pN('p-isr')       || 30)/100;
+  const pctFin     = (pN('p-pctfin')    || 50)/100;
+  const tasa       = (pN('p-tasa')      || 14)/100;
+  const plazoCred  = pN('p-plazo-cred') || plazoObra;
+  const gracia     = pN('p-gracia')     || Math.round(plazoObra*0.9);
+  const comision   = (pN('p-comision')  || 1.5)/100;
+  const enganche   = (pN('p-enganche')  || 20)/100;
+  const veloc      = pN('p-veloc')      || Math.max(1, Math.round(unid/12));
+  const escal      = (pN('p-escal')     || 5)/100;
+  const ocup       = (pN('p-ocup')      || 92)/100;
+  const renta      = pN('p-renta')      || t.precioVenta;
+
+  // Costos
+  const costDirec  = m2 * constr;
+  const costUrba   = costDirec * urba;
+  const costCont   = costDirec * conting;
+  const costHonor  = costDirec * honor;
+  const costPermisos = permisos + estudios + notarial;
+  const costTotal  = terr + costDirec + costUrba + costCont + costHonor + costPermisos;
+
+  // Financiamiento
+  const credito    = costTotal * pctFin;
+  const equity     = costTotal - credito;
+  const comisiónAp = credito * comision;
+  const tasaM      = tasa/12;
+
+  // Ingresos
+  const m2Vend = m2 * t.efic;
+  const ingBrutos = t.tasaRenta
+    ? m2Vend * renta * 12 * ocup  // anual × 10 años implícito en horizon
+    : unid * (m2Vend/unid) * pventa;
+  const costVentas = ingBrutos * cvtas;
+  const ingNetos   = ingBrutos - costVentas;
+
+  // Utilidad
+  const utilBruta  = ingNetos - costTotal - comisiónAp;
+  const isr        = Math.max(0, utilBruta * isrPct);
+  const utilNeta   = utilBruta - isr;
+  const margen     = ingNetos > 0 ? (utilNeta/ingNetos)*100 : 0;
+  const roi        = equity > 0 ? (utilNeta/equity)*100 : 0;
+
+  // TIR (Newton-Raphson sobre flujo simplificado)
+  const plazoTotal = plazoCred || (plazoObra + Math.ceil(unid/Math.max(veloc,1)));
+  // Flujo: -equity mes 0, -costoMensual durante obra, +ingresos durante ventas
+  const costoMens  = (costDirec + costUrba + costCont + costHonor) / plazoObra;
+  const intMens    = credito * tasaM;
+  const mVentas    = Math.max(1, t.tasaRenta ? 120 : Math.ceil(unid/Math.max(veloc,1)));
+  const ingMens    = ingNetos / mVentas;
+
+  // Build simple cash flow array
+  const flujos = [-equity - comisiónAp];
+  for(let m=1; m<=plazoTotal+mVentas; m++){
+    let cf = 0;
+    if(m<=plazoObra) cf -= costoMens;
+    if(m>gracia && m<=plazoCred) cf -= credito/Math.max(1,(plazoCred-gracia));
+    cf -= Math.min(m, plazoCred) <= gracia ? intMens : 0;
+    if(m > plazoObra && m <= plazoObra+mVentas) cf += ingMens;
+    flujos.push(cf);
+  }
+  flujos[flujos.length-1] += isr > 0 ? -isr : 0;
+
+  const TIR = calcTIR(flujos) * 100 * 12;
+  const WACC = 0.12;
+  const VPN  = flujos.reduce((acc,cf,i)=>acc+cf/Math.pow(1+WACC/12,i), 0);
+  const payback = calcPayback(flujos);
+
+  // DSCR simplificado
+  const servDeuda = credito * tasaM * 1.2;
+  const DSCR = servDeuda > 0 ? (ingMens / servDeuda) : 0;
+
+  // Punto de equilibrio (precio mínimo/m²)
+  const pEquil = (costTotal + comisiónAp + isr) / Math.max(m2Vend, 1);
+
+  // KPIs
+  const kpis = [
+    {v:TIR>0?pct(TIR):'—', n:'TIR anual', d:'Sobre capital propio invertido'},
+    {v:fmtM(VPN),          n:'VPN',        d:'Tasa descuento 12% anual'},
+    {v:pct(margen),        n:'Margen neto',d:'Post ISR / total ingresos'},
+    {v:pct(roi),           n:'ROI',        d:'Utilidad neta / equity'},
+    {v:payback>0?Math.round(payback)+' m':'—', n:'Payback', d:'Recuperación del equity'},
+    {v:fmtM(pEquil)+'/m²', n:'P. Equilibrio', d:'Precio mínimo de venta'},
+    {v:DSCR>0?DSCR.toFixed(2)+'x':'—',    n:'DSCR',       d:'Cobertura del servicio de deuda'},
+    {v:fmtM(utilNeta),     n:'Utilidad neta',d:'Post ISR estimado'},
+  ];
+
+  let grid = '';
+  kpis.forEach(k=>{
+    const isUtil = k.n==='Utilidad neta';
+    const color  = isUtil ? (utilNeta>=0?'var(--uso-p-txt)':'var(--sem-r-txt)') : 'var(--text)';
+    grid += `<div class="pro-kpi"><div class="pro-kpi-v" style="color:${color}">${k.v}</div><div class="pro-kpi-n">${k.n}</div><div class="pro-kpi-d">${k.d}</div></div>`;
+  });
+  document.getElementById('pro-kpi-grid').innerHTML = grid;
+
+  // Flujo por fases
+  const fases = [
+    {n:'Inversión inicial', egr: terr, ing: credito, net: credito - terr - comisiónAp},
+    {n:'Obra (construcción)', egr: costDirec+costUrba+costCont, ing: credito*0.5, net: credito*0.5-(costDirec+costUrba+costCont+costHonor+costPermisos)},
+    {n:'Ventas / comercialización', egr: costVentas+isr, ing: ingBrutos, net: utilNeta},
+    {n:'Liquidación crédito', egr: credito+credito*tasaM*plazoObra, ing: 0, net: -(credito+credito*tasaM*plazoObra)},
+  ];
+  let tblH = '<tr><th>Fase</th><th>Egresos</th><th>Ingresos</th><th>Flujo neto</th></tr>';
+  let tblB = '';
+  fases.forEach(f=>{
+    const nc = f.net>=0?'pos':'neg';
+    tblB += `<tr><td>${f.n}</td><td class="neg">${f.egr>0?fmtM(-f.egr):'—'}</td><td class="pos">${f.ing>0?fmtM(f.ing):'—'}</td><td class="${nc}">${fmtM(f.net)}</td></tr>`;
+  });
+  // Total row
+  const totalNet = fases.reduce((a,f)=>a+f.net,0);
+  tblB += `<tr><td>Total del proyecto</td><td class="neg">${fmtM(-(fases.reduce((a,f)=>a+f.egr,0)))}</td><td class="pos">${fmtM(fases.reduce((a,f)=>a+f.ing,0))}</td><td class="${totalNet>=0?'pos':'neg'}">${fmtM(totalNet)}</td></tr>`;
+  document.getElementById('pro-flujo-table').innerHTML = tblH + tblB;
+
+  // Sensibilidad
+  const scensTIR = [
+    {lbl:'Precio -10%', delta:-0.10},
+    {lbl:'Base',        delta:0},
+    {lbl:'Precio +10%', delta:+0.10},
+  ];
+  let sens = '';
+  scensTIR.forEach(s=>{
+    const scFlujos = flujos.map((cf,i)=> i===0 ? cf : cf * (1 + (cf>0?s.delta:0)));
+    const scTIR = calcTIR(scFlujos)*100*12;
+    const c = scTIR>=18?'var(--uso-p-txt)':scTIR>=10?'var(--sem-am-txt)':'var(--sem-r-txt)';
+    sens += `<div class="sens-card"><div class="sens-lbl">${s.lbl}</div><div class="sens-val" style="color:${c}">${scTIR>0?pct(scTIR):'—'}</div><div class="sens-sub">TIR anual</div></div>`;
+  });
+  document.getElementById('pro-sens').innerHTML = sens;
+
+  // Viabilidad badge
+  const badge = document.getElementById('pro-viab-badge');
+  if(TIR>=18){ badge.textContent='Viable'; badge.style.background='var(--uso-p-bg)'; badge.style.color='var(--uso-p-txt)'; badge.style.borderColor='var(--uso-p-brd)'; }
+  else if(TIR>=10){ badge.textContent='Revisar'; badge.style.background='var(--sem-am-bg)'; badge.style.color='var(--sem-am-txt)'; badge.style.borderColor='var(--sem-am-brd)'; }
+  else { badge.textContent='Comprometido'; badge.style.background='var(--sem-r-bg)'; badge.style.color='var(--sem-r-txt)'; badge.style.borderColor='var(--sem-r-brd)'; }
+
+  document.getElementById('pro-results').style.display='block';
+  document.getElementById('pro-calc-btn').querySelector('span').textContent='Recalcular';
+  document.getElementById('pro-results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ══════════════════════════════════════════════════════
+   MATH — TIR y PAYBACK
+   ══════════════════════════════════════════════════════ */
+function calcTIR(flujos, guess=0.01){
+  let r = guess;
+  for(let iter=0; iter<200; iter++){
+    let npv=0, dnpv=0;
+    flujos.forEach((cf,i)=>{
+      const d=Math.pow(1+r,i);
+      npv  += cf/d;
+      dnpv -= i*cf/Math.pow(1+r,i+1);
+    });
+    if(Math.abs(dnpv)<1e-12) break;
+    const rNew = r - npv/dnpv;
+    if(Math.abs(rNew-r)<1e-8){ r=rNew; break; }
+    r = rNew;
+    if(r<-0.999) r=-0.9;
+  }
+  return r;
+}
+
+function calcPayback(flujos){
+  let cum=0;
+  for(let i=0; i<flujos.length; i++){
+    const prev=cum;
+    cum+=flujos[i];
+    if(prev<0&&cum>=0) return i - prev/(cum-prev);
+  }
+  return -1;
+}
+
+/* ══════════════════════════════════════════════════════
+   THEME TOGGLE
+   ══════════════════════════════════════════════════════ */
+function guToggleTheme(){
+  const el=document.documentElement;
+  const cur=el.getAttribute('data-theme');
+  const next= cur==='dark'?'light':'dark';
+  el.setAttribute('data-theme',next);
+  localStorage.setItem('gu_theme',next);
+}
+
+/* ══════════════════════════════════════════════════════
+   INIT
+   ══════════════════════════════════════════════════════ */
+(function init(){
+  setTipo(0);
+  proTipoChange();
+  const t=TIPOS[0];
+  document.getElementById('p-constr').placeholder = fmt(t.costoConstr);
+  document.getElementById('p-pventa').placeholder = fmt(t.precioVenta);
+  document.getElementById('p-note-c').textContent = 'Benchmark AMG: ' + t.benchC;
+  document.getElementById('p-note-v').textContent = 'Referencia AMG: ' + t.benchV;
+})();
+</script>
+
+</body>
+</html>

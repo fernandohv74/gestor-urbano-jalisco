@@ -448,9 +448,9 @@
             <input id="p-notarial" type="text" placeholder="Ej. 180,000" oninput="proMark()">
           </div>
           <div class="f-group" id="p-icus-wrap" style="display:none">
-            <label>ICUS — contribución por densidad <span class="f-bench">ZPN · MXN</span></label>
+            <label>ICUS — contribución por densidad <span class="f-bench">GDL · MXN</span></label>
             <input id="p-icus" type="text" placeholder="Ej. 600,000" oninput="proMark()">
-            <div class="f-note">Aplica cuando CUS solicitado &gt; CUS base asignado por PDU Zapopan.</div>
+            <div class="f-note">Aplica cuando CUS solicitado &gt; CUS base asignado por PDU Guadalajara.</div>
           </div>
           <div class="f-group">
             <label>ISR estimado <span class="f-bench">% sobre utilidad bruta</span></label>
@@ -629,9 +629,11 @@ function proTipoChange(){
 }
 
 function proMuniChange(){
-  const isZPN = document.getElementById('p-muni').value === 'zpn';
+  const muni = document.getElementById('p-muni').value;
+  const isGDL = muni === 'gdl';
+  const isZPN = muni === 'zpn';
+  document.getElementById('p-icus-wrap').style.display    = isGDL ? '' : 'none';
   document.getElementById('p-cus-max-wrap').style.display = isZPN ? '' : 'none';
-  document.getElementById('p-icus-wrap').style.display    = isZPN ? '' : 'none';
   if(!isZPN){
     document.getElementById('p-cus-max-note').textContent = '';
   }
@@ -817,7 +819,7 @@ function proCalcular(){
   const costUrba   = costDirec * urba;
   const costCont   = costDirec * conting;
   const costHonor  = costDirec * honor;
-  const icus       = document.getElementById('p-muni').value === 'zpn' ? (pN('p-icus') || 0) : 0;
+  const icus       = document.getElementById('p-muni').value === 'gdl' ? (pN('p-icus') || 0) : 0;
   const costPermisos = permisos + estudios + notarial + icus;
   const costTotal  = terr + costDirec + costUrba + costCont + costHonor + costPermisos;
 

@@ -353,7 +353,7 @@
           </div>
           <div class="f-group">
             <label>Municipio / zona AMG</label>
-            <select id="p-muni">
+            <select id="p-muni" onchange="proMuniChange()">
               <option value="gdl">Guadalajara (GDL)</option>
               <option value="zpn">Zapopan (ZPN)</option>
               <option value="tlq">Tlaquepaque (TLQ)</option>
@@ -367,7 +367,12 @@
           </div>
           <div class="f-group">
             <label>CUS aplicable <span class="f-bench">× superficie terreno</span></label>
-            <input id="p-cus" type="text" placeholder="Ej. 4.0" oninput="proMark()">
+            <input id="p-cus" type="text" placeholder="Ej. 4.0" oninput="proMark();chkCusMax()">
+          </div>
+          <div class="f-group" id="p-cus-max-wrap" style="display:none">
+            <label>CUS máximo autorizado <span class="f-bench">ZPN · límite PDU</span></label>
+            <input id="p-cus-max" type="text" placeholder="Ej. 4.0" oninput="proMark();chkCusMax()">
+            <div class="f-note" id="p-cus-max-note" style="min-height:1.2em"></div>
           </div>
         </div>
       </div>
@@ -441,6 +446,11 @@
           <div class="f-group">
             <label>Gastos notariales <span class="f-bench">MXN estimado</span></label>
             <input id="p-notarial" type="text" placeholder="Ej. 180,000" oninput="proMark()">
+          </div>
+          <div class="f-group" id="p-icus-wrap" style="display:none">
+            <label>ICUS — contribución por densidad <span class="f-bench">ZPN · MXN</span></label>
+            <input id="p-icus" type="text" placeholder="Ej. 600,000" oninput="proMark()">
+            <div class="f-note">Aplica cuando CUS solicitado &gt; CUS base asignado por PDU Zapopan.</div>
           </div>
           <div class="f-group">
             <label>ISR estimado <span class="f-bench">% sobre utilidad bruta</span></label>
@@ -618,6 +628,34 @@ function proTipoChange(){
   proMark();
 }
 
+function proMuniChange(){
+  const isZPN = document.getElementById('p-muni').value === 'zpn';
+  document.getElementById('p-cus-max-wrap').style.display = isZPN ? '' : 'none';
+  document.getElementById('p-icus-wrap').style.display    = isZPN ? '' : 'none';
+  if(!isZPN){
+    document.getElementById('p-cus-max-note').textContent = '';
+  }
+  proMark();
+}
+
+function chkCusMax(){
+  const cus    = pN('p-cus');
+  const cusMax = pN('p-cus-max');
+  const note   = document.getElementById('p-cus-max-note');
+  if(!note) return;
+  if(cus && cusMax){
+    if(cus > cusMax){
+      note.style.color = '#DC2626';
+      note.textContent = '⚠ CUS ' + cus + ' supera máximo ' + cusMax + ' — el proyecto requiere excepción normativa.';
+    } else {
+      note.style.color = '#16A34A';
+      note.textContent = '✓ CUS dentro del límite normativo ZPN.';
+    }
+  } else {
+    note.textContent = '';
+  }
+}
+
 /* ══════════════════════════════════════════════════════
    BLOQUE ACCORDION
    ══════════════════════════════════════════════════════ */
@@ -779,7 +817,8 @@ function proCalcular(){
   const costUrba   = costDirec * urba;
   const costCont   = costDirec * conting;
   const costHonor  = costDirec * honor;
-  const costPermisos = permisos + estudios + notarial;
+  const icus       = document.getElementById('p-muni').value === 'zpn' ? (pN('p-icus') || 0) : 0;
+  const costPermisos = permisos + estudios + notarial + icus;
   const costTotal  = terr + costDirec + costUrba + costCont + costHonor + costPermisos;
 
   // Financiamiento

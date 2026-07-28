@@ -370,9 +370,11 @@
             <input id="p-cus" type="text" placeholder="Ej. 4.0" oninput="proMark();chkCusMax()">
           </div>
           <div class="f-group" id="p-cus-max-wrap" style="display:none">
-            <label>CUS máximo autorizado <span class="f-bench">ZPN · límite PDU</span></label>
-            <input id="p-cus-max" type="text" placeholder="Ej. 4.0" oninput="proMark();chkCusMax()">
+            <label>ICUS — coeficiente adicional <span class="f-bench">ZPN · CUS MAX 4.00</span></label>
+            <input id="p-cus-max" type="text" placeholder="Ej. 0.60" oninput="proMark();calcICUS();chkCusMax()">
+            <div class="f-note" id="p-cus-max-costo" style="min-height:1.2em"></div>
             <div class="f-note" id="p-cus-max-note" style="min-height:1.2em"></div>
+            <div class="f-note" style="opacity:0.6">$1,541/m² + $14,830 ECPD · Art. 93 Ley de Ingresos ZPN 2026 · Límite normativo: CUS 4.00</div>
           </div>
         </div>
       </div>
@@ -448,9 +450,10 @@
             <input id="p-notarial" type="text" placeholder="Ej. 180,000" oninput="proMark()">
           </div>
           <div class="f-group" id="p-icus-wrap" style="display:none">
-            <label>ICUS — contribución por densidad <span class="f-bench">GDL · MXN</span></label>
-            <input id="p-icus" type="text" placeholder="Ej. 600,000" oninput="proMark()">
-            <div class="f-note">Aplica cuando CUS solicitado &gt; CUS base asignado por PDU Guadalajara.</div>
+            <label>iCUS — coeficiente adicional <span class="f-bench">GDL · índice extra</span></label>
+            <input id="p-icus-coef" type="text" placeholder="Ej. 0.60" oninput="proMark();calcICUS()">
+            <div class="f-note" id="p-icus-costo" style="min-height:1.2em"></div>
+            <div class="f-note" style="opacity:0.6">$1,516/m² excedente · Art. 37 Ley de Ingresos GDL</div>
           </div>
           <div class="f-group">
             <label>ISR estimado <span class="f-bench">% sobre utilidad bruta</span></label>
@@ -629,29 +632,45 @@ function proTipoChange(){
 }
 
 function proMuniChange(){
-  const muni = document.getElementById('p-muni').value;
+  const muni  = document.getElementById('p-muni').value;
   const isGDL = muni === 'gdl';
   const isZPN = muni === 'zpn';
   document.getElementById('p-icus-wrap').style.display    = isGDL ? '' : 'none';
   document.getElementById('p-cus-max-wrap').style.display = isZPN ? '' : 'none';
-  if(!isZPN){
-    document.getElementById('p-cus-max-note').textContent = '';
-  }
+  if(!isZPN) document.getElementById('p-cus-max-note').textContent = '';
+  calcICUS();
   proMark();
 }
 
+function calcICUS(){
+  const muni = document.getElementById('p-muni').value;
+  const sup  = pN('p-sup') || 0;
+  if(muni === 'gdl'){
+    const coef  = pN('p-icus-coef') || 0;
+    const costo = coef * sup * 1516;
+    const el    = document.getElementById('p-icus-costo');
+    if(el) el.textContent = (coef && sup) ? 'Costo estimado: $' + fmt(Math.round(costo)) + ' MXN' : '';
+  } else if(muni === 'zpn'){
+    const coef  = pN('p-cus-max') || 0;
+    const costo = coef > 0 ? coef * sup * 1541 + 14830 : 0;
+    const el    = document.getElementById('p-cus-max-costo');
+    if(el) el.textContent = (coef && sup) ? 'Costo estimado: $' + fmt(Math.round(costo)) + ' MXN' : '';
+  }
+}
+
 function chkCusMax(){
-  const cus    = pN('p-cus');
-  const cusMax = pN('p-cus-max');
-  const note   = document.getElementById('p-cus-max-note');
+  const note = document.getElementById('p-cus-max-note');
   if(!note) return;
-  if(cus && cusMax){
-    if(cus > cusMax){
-      note.style.color = '#DC2626';
-      note.textContent = '⚠ CUS ' + cus + ' supera máximo ' + cusMax + ' — el proyecto requiere excepción normativa.';
+  const cus      = pN('p-cus')     || 0;
+  const icusCoef = pN('p-cus-max') || 0;
+  if(cus && icusCoef){
+    const total = cus + icusCoef;
+    if(total > 4.0){
+      note.style.color  = '#DC2626';
+      note.textContent  = '⚠ CUS ' + cus + ' + ICUS ' + icusCoef + ' = ' + total.toFixed(2) + ' — supera CUS MAX normativo ZPN (4.00).';
     } else {
-      note.style.color = '#16A34A';
-      note.textContent = '✓ CUS dentro del límite normativo ZPN.';
+      note.style.color  = '#16A34A';
+      note.textContent  = '✓ CUS total ' + total.toFixed(2) + ' dentro del límite normativo ZPN (4.00).';
     }
   } else {
     note.textContent = '';
@@ -819,7 +838,12 @@ function proCalcular(){
   const costUrba   = costDirec * urba;
   const costCont   = costDirec * conting;
   const costHonor  = costDirec * honor;
-  const icus       = document.getElementById('p-muni').value === 'gdl' ? (pN('p-icus') || 0) : 0;
+  const muni_    = document.getElementById('p-muni').value;
+  const supT     = pN('p-sup') || 0;
+  const icusCoef = muni_ === 'gdl' ? (pN('p-icus-coef')||0)
+                 : muni_ === 'zpn' ? (pN('p-cus-max')  ||0) : 0;
+  const icus     = muni_ === 'gdl' ? icusCoef * supT * 1516
+                 : muni_ === 'zpn' ? (icusCoef > 0 ? icusCoef * supT * 1541 + 14830 : 0) : 0;
   const costPermisos = permisos + estudios + notarial + icus;
   const costTotal  = terr + costDirec + costUrba + costCont + costHonor + costPermisos;
 

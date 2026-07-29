@@ -570,13 +570,6 @@
       <span>Calcular corrida financiera</span>
     </button>
 
-    <!-- Acciones post-cálculo -->
-    <div class="pro-action-row" id="pro-action-row" style="display:none">
-      <button class="pro-act-btn act-save" id="btn-guardar" onclick="guardarCorrida()">💾 Guardar corrida</button>
-      <button class="pro-act-btn" onclick="exportarJSON()">⬇ Exportar JSON</button>
-      <button class="pro-act-btn act-pdf" onclick="imprimirPDF()">🖨 Descargar PDF</button>
-    </div>
-
     <!-- Resultados Pro -->
     <div class="pro-res" id="pro-results" style="display:none">
       <div class="pro-res-head">
@@ -601,6 +594,13 @@
     <div class="m11-hist" id="pro-hist" style="display:none">
       <div class="m11-hist-hdr">Ingresos históricos — últimas 3 corridas</div>
       <div id="pro-hist-list"></div>
+    </div>
+
+    <!-- Acciones post-cálculo -->
+    <div class="pro-action-row" id="pro-action-row" style="display:none">
+      <button class="pro-act-btn act-save" id="btn-guardar" onclick="guardarCorrida()">💾 Guardar corrida</button>
+      <button class="pro-act-btn" onclick="exportarJSON()">⬇ Exportar JSON</button>
+      <button class="pro-act-btn act-pdf" onclick="imprimirPDF()">🖨 Descargar PDF</button>
     </div>
   </div>
 

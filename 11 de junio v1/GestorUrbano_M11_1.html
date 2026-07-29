@@ -161,6 +161,31 @@
   .tipo-grid,.f-grid-3{grid-template-columns:1fr}
   .mode-tabs{flex-direction:column}
 }
+
+/* Botones acción post-cálculo */
+.pro-action-row{display:flex;gap:8px}
+.pro-act-btn{flex:1;background:var(--bg3);border:0.5px solid var(--border2);color:var(--text2);border-radius:var(--r-md);padding:10px 8px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all var(--t-fast)}
+.pro-act-btn:hover{border-color:var(--brand);color:var(--brand)}
+.pro-act-btn.act-save:hover{border-color:var(--sem-v-brd);color:var(--sem-v-txt)}
+.pro-act-btn.act-pdf:hover{border-color:#7C3AED;color:#7C3AED}
+@media(max-width:520px){.pro-action-row{flex-wrap:wrap}.pro-act-btn{flex:1 1 40%}}
+
+/* Histórico */
+.m11-hist{background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:all var(--t)}
+.m11-hist-hdr{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:9px 16px;border-bottom:0.5px solid var(--border);font-family:var(--mono);transition:all var(--t)}
+.hist-card{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:0.5px solid var(--border);transition:background var(--t-fast)}
+.hist-card:last-child{border-bottom:none}
+.hist-card:hover{background:var(--bg3)}
+.hist-info{flex:1;min-width:0}
+.hist-nombre{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color var(--t)}
+.hist-meta{font-size:10px;color:var(--text3);margin-top:1px;transition:color var(--t)}
+.hist-kpis{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.hist-kpi{font-family:var(--mono);font-size:11px;font-weight:600}
+.hist-viab{font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px}
+.hist-btn{font-size:10px;padding:4px 10px;border-radius:4px;cursor:pointer;border:0.5px solid var(--border2);background:var(--bg3);color:var(--text2);font-family:var(--sans);transition:all var(--t-fast);flex-shrink:0}
+.hist-btn:hover{border-color:var(--brand);color:var(--brand)}
+.hist-del{color:var(--text3);border:none;background:none;cursor:pointer;font-size:16px;line-height:1;padding:0 2px;flex-shrink:0;transition:color var(--t-fast)}
+.hist-del:hover{color:var(--sem-r-txt)}
 </style>
 </head>
 <body>
@@ -545,6 +570,13 @@
       <span>Calcular corrida financiera</span>
     </button>
 
+    <!-- Acciones post-cálculo -->
+    <div class="pro-action-row" id="pro-action-row" style="display:none">
+      <button class="pro-act-btn act-save" id="btn-guardar" onclick="guardarCorrida()">💾 Guardar corrida</button>
+      <button class="pro-act-btn" onclick="exportarJSON()">⬇ Exportar JSON</button>
+      <button class="pro-act-btn act-pdf" onclick="imprimirPDF()">🖨 Descargar PDF</button>
+    </div>
+
     <!-- Resultados Pro -->
     <div class="pro-res" id="pro-results" style="display:none">
       <div class="pro-res-head">
@@ -563,6 +595,12 @@
 
     <div class="disclaimer">
       <strong>Modo Pro:</strong> El flujo de caja asume desembolso lineal de construcción durante la obra, y ventas/rentas desde el inicio de comercialización. La TIR se calcula mediante Newton-Raphson sobre los flujos mensuales. Los valores son estimados de factibilidad — no reemplazan una auditoría financiera formal.
+    </div>
+
+    <!-- Histórico — últimas 3 corridas guardadas -->
+    <div class="m11-hist" id="pro-hist" style="display:none">
+      <div class="m11-hist-hdr">Ingresos históricos — últimas 3 corridas</div>
+      <div id="pro-hist-list"></div>
     </div>
   </div>
 
@@ -960,7 +998,9 @@ function proCalcular(){
   else { badge.textContent='Comprometido'; badge.style.background='var(--sem-r-bg)'; badge.style.color='var(--sem-r-txt)'; badge.style.borderColor='var(--sem-r-brd)'; }
 
   document.getElementById('pro-results').style.display='block';
+  document.getElementById('pro-action-row').style.display='flex';
   document.getElementById('pro-calc-btn').querySelector('span').textContent='Recalcular';
+  renderHistorico();
   document.getElementById('pro-results').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
@@ -1007,6 +1047,175 @@ function guToggleTheme(){
 }
 
 /* ══════════════════════════════════════════════════════
+   GUARDAR / HISTÓRICO / EXPORTAR / PDF
+   ══════════════════════════════════════════════════════ */
+function proGetFields(){
+  const ids=['p-terreno','p-sup','p-tipo','p-muni','p-cos','p-cus',
+             'p-m2','p-unid','p-constr','p-plazo-obra','p-urba','p-conting',
+             'p-honor','p-permisos','p-estudios','p-cvtas','p-notarial','p-isr',
+             'p-equity','p-pctfin','p-tasa','p-plazo-cred','p-gracia','p-comision',
+             'p-pventa','p-veloc','p-renta','p-ocup','p-enganche','p-escal',
+             'p-icus-coef','p-cus-max'];
+  const d={};
+  ids.forEach(id=>{const el=document.getElementById(id);if(el)d[id]=el.value;});
+  return d;
+}
+
+function proSetFields(data){
+  Object.entries(data).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.value=val;});
+  proMuniChange(); proTipoChange();
+}
+
+function guardarCorrida(){
+  if(document.getElementById('pro-results').style.display==='none') return;
+  const fields=proGetFields();
+  const badge=document.getElementById('pro-viab-badge');
+  const kpis=[];
+  document.querySelectorAll('#pro-kpi-grid .pro-kpi').forEach(k=>{
+    kpis.push({v:k.querySelector('.pro-kpi-v')?.textContent||'',n:k.querySelector('.pro-kpi-n')?.textContent||''});
+  });
+  const corrida={
+    nombre:fields['p-terreno']||'Sin nombre',
+    muni:fields['p-muni']||'',
+    fecha:new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}),
+    viab:badge?badge.textContent:'',
+    viabBg:badge?badge.style.background:'',
+    viabClr:badge?badge.style.color:'',
+    kpis,fields
+  };
+  let arr=JSON.parse(localStorage.getItem('GU_m11_corridas')||'[]');
+  arr.unshift(corrida);
+  if(arr.length>3) arr=arr.slice(0,3);
+  localStorage.setItem('GU_m11_corridas',JSON.stringify(arr));
+  renderHistorico();
+  const btn=document.getElementById('btn-guardar');
+  if(btn){const o=btn.textContent;btn.textContent='✓ Guardado';setTimeout(()=>{btn.textContent=o;},1600);}
+}
+
+function exportarJSON(){
+  const fields=proGetFields();
+  const kpis=[];
+  document.querySelectorAll('#pro-kpi-grid .pro-kpi').forEach(k=>{
+    kpis.push({v:k.querySelector('.pro-kpi-v')?.textContent||'',n:k.querySelector('.pro-kpi-n')?.textContent||''});
+  });
+  const data={exportado:new Date().toISOString(),modulo:'M11 Corrida Financiera · Gestor Urbano AMG',campos:fields,kpis};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='corrida-'+(fields['p-terreno']||'sin-nombre').replace(/[\s/\\:*?"<>|]/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function imprimirPDF(){
+  if(document.getElementById('pro-results').style.display==='none') return;
+  const nombre=document.getElementById('p-terreno')?.value||'Corrida Financiera';
+  const badge=document.getElementById('pro-viab-badge');
+  const viab=badge?badge.textContent:'';
+  const viabBg=badge?badge.style.background:'';
+  const viabClr=badge?badge.style.color:'';
+  let kpiHtml='';
+  document.querySelectorAll('#pro-kpi-grid .pro-kpi').forEach(k=>{
+    const v=k.querySelector('.pro-kpi-v')?.textContent||'';
+    const n=k.querySelector('.pro-kpi-n')?.textContent||'';
+    const dd=k.querySelector('.pro-kpi-d')?.textContent||'';
+    kpiHtml+=`<div class="kpi"><div class="kv">${v}</div><div class="kn">${n}</div><div class="kd">${dd}</div></div>`;
+  });
+  const flujoTbl=document.getElementById('pro-flujo-table')?.outerHTML||'';
+  let sensHtml='';
+  document.querySelectorAll('#pro-sens .sens-card').forEach(s=>{
+    sensHtml+=`<div class="sc"><div class="sl">${s.querySelector('.sens-lbl')?.textContent||''}</div>`+
+              `<div class="sv">${s.querySelector('.sens-val')?.textContent||''}</div>`+
+              `<div class="ss">${s.querySelector('.sens-sub')?.textContent||''}</div></div>`;
+  });
+  const fechaStr=new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${nombre} \xB7 Corrida Financiera</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;font-size:11px;color:#111;padding:18mm;background:#fff;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+h1{font-size:20px;font-weight:700;color:#1E3A5F;margin-bottom:3px}
+.sub{font-size:11px;color:#6B7280;margin-bottom:12px}
+.badge{display:inline-block;padding:3px 12px;border-radius:4px;font-size:11px;font-weight:700;margin-bottom:14px;background:${viabBg};color:${viabClr};border:1px solid ${viabClr}}
+.sect{font-size:9px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.07em;margin:14px 0 7px;border-bottom:1px solid #E5E7EB;padding-bottom:4px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.kpi{background:#F3F4F6;border-radius:6px;padding:9px 11px}
+.kv{font-size:16px;font-weight:700;color:#1E3A5F;font-family:monospace}
+.kn{font-size:10px;font-weight:600;color:#374151;margin:3px 0 2px}
+.kd{font-size:9px;color:#6B7280;line-height:1.4}
+.flujo-table{width:100%;border-collapse:collapse;font-size:10px}
+.flujo-table th{background:#1E3A5F;color:#fff;padding:5px 8px;text-align:right;font-size:9px;font-weight:600}
+.flujo-table th:first-child{text-align:left}
+.flujo-table td{padding:4px 8px;border-bottom:1px solid #E5E7EB;text-align:right;font-family:monospace;color:#374151}
+.flujo-table td:first-child{text-align:left;font-family:system-ui;font-weight:500;color:#111}
+.flujo-table tr:last-child td{font-weight:700;background:#F9FAFB;color:#111}
+.pos{color:#16A34A!important}.neg{color:#DC2626!important}
+.sens-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sc{background:#F3F4F6;border-radius:6px;padding:9px 11px;text-align:center}
+.sl{font-size:9px;color:#6B7280;margin-bottom:4px}
+.sv{font-size:14px;font-weight:700;color:#1E3A5F;font-family:monospace}
+.ss{font-size:9px;color:#6B7280;margin-top:2px}
+.footer{margin-top:18px;padding-top:10px;border-top:1px solid #E5E7EB;font-size:9px;color:#9CA3AF;text-align:center}
+@media print{body{padding:10mm}@page{margin:10mm;size:A4}}
+<\/style><\/head><body>
+<h1>${nombre}<\/h1>
+<div class="sub">Corrida Financiera \xB7 Gestor Urbano Jalisco AMG \xB7 ${fechaStr}<\/div>
+<div class="badge">${viab}<\/div>
+<div class="sect">Indicadores clave<\/div>
+<div class="kpi-grid">${kpiHtml}<\/div>
+<div class="sect">Flujo de caja por fase<\/div>
+${flujoTbl}
+<div class="sect">An\xE1lisis de sensibilidad<\/div>
+<div class="sens-grid">${sensHtml}<\/div>
+<div class="footer">Generado con Gestor Urbano Jalisco AMG \xB7 gestorurbanoamg.vercel.app \xB7 Solo para an\xE1lisis de factibilidad.<\/div>
+<script>window.onload=function(){window.print();};<\/script>
+<\/body><\/html>`;
+  const w=window.open('','_blank','width=860,height=700');
+  if(w){w.document.write(html);w.document.close();}
+  else{alert('Permite ventanas emergentes en tu navegador para generar el PDF.');}
+}
+
+function renderHistorico(){
+  const arr=JSON.parse(localStorage.getItem('GU_m11_corridas')||'[]');
+  const hist=document.getElementById('pro-hist');
+  const list=document.getElementById('pro-hist-list');
+  if(!hist||!list) return;
+  if(arr.length===0){hist.style.display='none';return;}
+  hist.style.display='block';
+  const muniL={gdl:'GDL',zpn:'ZPN',tlq:'TLQ',tla:'TLA',ton:'TON'};
+  list.innerHTML=arr.map((c,i)=>{
+    const tir =c.kpis?.find(k=>k.n?.toLowerCase().includes('tir'));
+    const marg=c.kpis?.find(k=>k.n?.toLowerCase().includes('margen'));
+    return `<div class="hist-card">
+      <div class="hist-info">
+        <div class="hist-nombre">${c.nombre}</div>
+        <div class="hist-meta">${muniL[c.muni]||c.muni||'—'} \xB7 ${c.fecha}</div>
+      </div>
+      <div class="hist-kpis">
+        ${tir ?`<span class="hist-kpi" style="color:#1E3A5F">${tir.v}</span>`:''}
+        ${marg?`<span class="hist-kpi" style="color:#6B7280">${marg.v}</span>`:''}
+        <span class="hist-viab" style="background:${c.viabBg||'#F3F4F6'};color:${c.viabClr||'#374151'}">${c.viab||''}</span>
+      </div>
+      <button class="hist-btn" onclick="cargarCorrida(${i})">Cargar</button>
+      <button class="hist-del" onclick="borrarCorrida(${i})" title="Borrar">\xD7</button>
+    </div>`;
+  }).join('');
+}
+
+function cargarCorrida(idx){
+  const arr=JSON.parse(localStorage.getItem('GU_m11_corridas')||'[]');
+  if(!arr[idx]) return;
+  proSetFields(arr[idx].fields);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function borrarCorrida(idx){
+  let arr=JSON.parse(localStorage.getItem('GU_m11_corridas')||'[]');
+  arr.splice(idx,1);
+  localStorage.setItem('GU_m11_corridas',JSON.stringify(arr));
+  renderHistorico();
+}
+
+/* ══════════════════════════════════════════════════════
    INIT
    ══════════════════════════════════════════════════════ */
 (function init(){
@@ -1017,6 +1226,7 @@ function guToggleTheme(){
   document.getElementById('p-pventa').placeholder = fmt(t.precioVenta);
   document.getElementById('p-note-c').textContent = 'Benchmark AMG: ' + t.benchC;
   document.getElementById('p-note-v').textContent = 'Referencia AMG: ' + t.benchV;
+  renderHistorico();
 })();
 </script>
 

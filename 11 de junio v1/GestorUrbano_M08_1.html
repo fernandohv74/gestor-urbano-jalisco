@@ -653,6 +653,9 @@ const TARIFAS = {
     ],
     impactoAmbientalNoReq: 5877,
     impactoAmbientalArt: 'Art. 93 Fracc. XXX, Ley Ingresos ZPN 2026',
+    dtude: 1804,
+    dtudeArt: 'Trámite $1,495 + Formato oficial $309 · retys.zapopan.gob.mx/tramites/34 · Art. 93 Ley Ingresos ZPN',
+    dtudeExento: ['unifamiliar', 'plurifamiliar_h'],
   },
   TLQ: {
     nombre: 'Tlaquepaque',
@@ -687,6 +690,9 @@ const TARIFAS = {
       equipamiento:    { vecinal: 123.41, barrial: 126.08, distrital: 128.75, central: 131.46, regional: 134.14 },
     },
     siapaArt: 'Res. Tarifario SIAPA 2026 (intermunicipal)',
+    dtude: 1467,
+    dtudeArt: 'Art. XV Ley de Ingresos TLQ 2024 (est. — confirmar vigencia 2026 en ventanilla)',
+    dtudeExento: [],
   },
   TLA: {
     nombre: 'Tlajomulco',
@@ -721,6 +727,9 @@ const TARIFAS = {
       equipamiento:    { vecinal: 123.41, barrial: 126.08, distrital: 128.75, central: 131.46, regional: 134.14 },
     },
     siapaArt: 'Res. Tarifario SIAPA 2026 (intermunicipal)',
+    dtude: 2286,
+    dtudeArt: 'Trámite $2,100 + Formato $186 · Art. XVI Ley de Ingresos TLA 2025 (est. — confirmar vigencia 2026 en ventanilla)',
+    dtudeExento: [],
   },
   TON: {
     nombre: 'Tonalá',
@@ -755,6 +764,9 @@ const TARIFAS = {
       equipamiento:    { vecinal: 123.41, barrial: 126.08, distrital: 128.75, central: 131.46, regional: 134.14 },
     },
     siapaArt: 'Res. Tarifario SIAPA 2026 (intermunicipal)',
+    dtude: 1859,
+    dtudeArt: 'DTUDE $1,559 + Formato $300 · H. Ayuntamiento Tonalá (est. — confirmar vigencia 2026 en ventanilla)',
+    dtudeExento: [],
   },
 };
 
@@ -918,15 +930,22 @@ function calcular() {
       sub, art: t.licenciaArt + (tipoObra === 'remodelacion' && t.remodelacionArt ? ' · ' + t.remodelacionArt : tipoObra === 'demolicion' && t.demolicionArt ? ' · ' + t.demolicionArt : '')
     });
 
-    // ── GDL: DTUDE ──
-    if (munActual === 'GDL' && document.getElementById('chk-dtude').checked) {
-      const exento = t.dtudeExento.includes(uso);
+    // ── DTUDE (todos los municipios con tarifa registrada) ──
+    if (t.dtude && document.getElementById('chk-dtude').checked) {
+      const exento = Array.isArray(t.dtudeExento) && t.dtudeExento.includes(uso);
+      const exentoNota = exento
+        ? (' · Exento: ' + (munActual === 'GDL'
+            ? 'unifamiliar (Art. 157 Regl. Gestión Integral GDL)'
+            : munActual === 'ZPN'
+            ? 'unifamiliar y una vivienda plurifamiliar horizontal en condominio'
+            : 'confirmar exención en ventanilla'))
+        : '';
       rows.push({
         concepto: 'DTUDE — Dictamen de Trazo, Usos y Destinos Específicos',
         tarifa: exento ? 'Exento' : fmt(t.dtude),
         base: '—',
         sub: exento ? 0 : t.dtude,
-        art: t.dtudeArt + (exento ? ' · Exento para unifamiliar (Art. 157 Regl. Gestión Integral GDL)' : ''),
+        art: t.dtudeArt + exentoNota,
         exento
       });
       if (!exento) total += t.dtude;

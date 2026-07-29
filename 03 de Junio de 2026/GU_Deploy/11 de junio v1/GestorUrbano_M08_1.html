@@ -1,11 +1,4 @@
 <!DOCTYPE html>
-<!-- ==========================================================
-     GestorUrbano Jalisco AMG / TrazaUrbana
-     (c) 2026 Fernando H. - trazaurbana.mx
-     Todos los derechos reservados.
-     Reproduccion o uso no autorizado esta prohibido.
-     ========================================================== -->
-
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -204,7 +197,6 @@ function guToggleTheme(){
     <div class="gu-toggle-track"><div class="gu-toggle-thumb"></div></div>
     <span id="gu-toggle-label">Modo oscuro</span>
   </button>
-
   <span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.04em;flex-shrink:0;opacity:.55;margin-left:10px;transition:color var(--t)">&copy; 2026 TrazaUrbana</span>
 </nav>
 
@@ -317,6 +309,26 @@ function guToggleTheme(){
   </div>
   <div id="wrap-zpn-extras">
     <label class="chk-row"><input type="checkbox" id="chk-revision" checked onchange="onInputChange()"> Revisión de proyecto (por revisión)</label>
+  </div>
+
+  <!-- iCUS EXCEDENCIA — solo GDL y ZPN -->
+  <div id="wrap-icus-toggle" style="display:none">
+    <label class="chk-row"><input type="checkbox" id="chk-icus" onchange="toggleICUS();onInputChange()"> <span id="lbl-icus-toggle">Excedencia de iCUS</span> <span id="lbl-icus-sub" style="font-size:10px;color:var(--text3);margin-left:4px">&#8212; requiere coef. iCUS y sup. terreno</span></label>
+    <div id="wrap-icus-inputs" style="display:none;padding:4px 12px 4px 36px">
+      <div class="form-grid" style="margin-top:4px;max-width:440px">
+        <div class="field">
+          <label style="font-size:11px">Coef. iCUS <span style="color:var(--text3)">(ej. 0.7)</span></label>
+          <input type="number" id="inp-icus-coef" placeholder="0.7" min="0" step="0.01" oninput="onInputChange()">
+        </div>
+        <div class="field">
+          <label style="font-size:11px">Sup. terreno (m&#178;)</label>
+          <input type="number" id="inp-icus-sup" placeholder="ej. 300" min="0" step="0.01" oninput="onInputChange()">
+        </div>
+      </div>
+      <div id="wrap-zpn-ecpd" style="display:none;margin-top:2px">
+        <label class="chk-row" style="font-size:12px;padding-left:0"><input type="checkbox" id="chk-zpn-ecpd" onchange="onInputChange()"> Incluir ECPD fijo (solo si hay CUS m&#225;ximo) <span style="font-size:10px;color:var(--text3)">+$15,349</span></label>
+      </div>
+    </div>
   </div>
 
   <label class="chk-row"><input type="checkbox" id="chk-siapa" onchange="toggleSIAPADen();onInputChange()"> Factibilidad SIAPA (agua potable y drenaje) <span style="font-size:10px;color:var(--text3);margin-left:4px">&#8212; requiere sup. del predio</span></label>
@@ -641,6 +653,9 @@ const TARIFAS = {
     ],
     impactoAmbientalNoReq: 5877,
     impactoAmbientalArt: 'Art. 93 Fracc. XXX, Ley Ingresos ZPN 2026',
+    dtude: 1804,
+    dtudeArt: 'Trámite $1,495 + Formato oficial $309 · retys.zapopan.gob.mx/tramites/34 · Art. 93 Ley Ingresos ZPN',
+    dtudeExento: ['unifamiliar', 'plurifamiliar_h'],
   },
   TLQ: {
     nombre: 'Tlaquepaque',
@@ -675,6 +690,9 @@ const TARIFAS = {
       equipamiento:    { vecinal: 123.41, barrial: 126.08, distrital: 128.75, central: 131.46, regional: 134.14 },
     },
     siapaArt: 'Res. Tarifario SIAPA 2026 (intermunicipal)',
+    dtude: 1467,
+    dtudeArt: 'Art. XV Ley de Ingresos TLQ 2024 (est. — confirmar vigencia 2026 en ventanilla)',
+    dtudeExento: [],
   },
   TLA: {
     nombre: 'Tlajomulco',
@@ -709,6 +727,9 @@ const TARIFAS = {
       equipamiento:    { vecinal: 123.41, barrial: 126.08, distrital: 128.75, central: 131.46, regional: 134.14 },
     },
     siapaArt: 'Res. Tarifario SIAPA 2026 (intermunicipal)',
+    dtude: 2286,
+    dtudeArt: 'Trámite $2,100 + Formato $186 · Art. XVI Ley de Ingresos TLA 2025 (est. — confirmar vigencia 2026 en ventanilla)',
+    dtudeExento: [],
   },
   TON: {
     nombre: 'Tonalá',
@@ -743,6 +764,9 @@ const TARIFAS = {
       equipamiento:    { vecinal: 123.41, barrial: 126.08, distrital: 128.75, central: 131.46, regional: 134.14 },
     },
     siapaArt: 'Res. Tarifario SIAPA 2026 (intermunicipal)',
+    dtude: 1859,
+    dtudeArt: 'DTUDE $1,559 + Formato $300 · H. Ayuntamiento Tonalá (est. — confirmar vigencia 2026 en ventanilla)',
+    dtudeExento: [],
   },
 };
 
@@ -761,6 +785,23 @@ function selMun(mun, el) {
   // Aviso sin tarifas para TLQ/TLA/TON
   const banSinTar = document.getElementById('banner-sin-tarifas');
   if (banSinTar) banSinTar.style.display = TARIFAS[mun]?.sinTarifas ? '' : 'none';
+  // iCUS: solo GDL y ZPN tienen contribución por intensidad
+  const wrapICUS = document.getElementById('wrap-icus-toggle');
+  if (wrapICUS) {
+    const icusVisible = (mun === 'GDL' || mun === 'ZPN');
+    wrapICUS.style.display = icusVisible ? '' : 'none';
+    if (!icusVisible) {
+      const chkICUS = document.getElementById('chk-icus');
+      if (chkICUS) { chkICUS.checked = false; toggleICUS(); }
+    }
+    // Etiqueta dinámica según municipio
+    const lblTog = document.getElementById('lbl-icus-toggle');
+    const lblSub = document.getElementById('lbl-icus-sub');
+    if (lblTog) lblTog.textContent = mun === 'ZPN' ? 'Excedencia de CUS Máx' : 'Excedencia de iCUS';
+    if (lblSub) lblSub.innerHTML   = mun === 'ZPN'
+      ? '&#8212; requiere coef. CUS M&#225;x y sup. terreno'
+      : '&#8212; requiere coef. iCUS y sup. terreno';
+  }
   onUsoChange();
 }
 
@@ -785,6 +826,15 @@ function toggleSIAPADen() {
   var chk = document.getElementById('chk-siapa');
   var wrap = document.getElementById('wrap-siapa-den');
   wrap.style.display = chk && chk.checked ? 'block' : 'none';
+}
+
+function toggleICUS() {
+  const chk     = document.getElementById('chk-icus');
+  const wrap    = document.getElementById('wrap-icus-inputs');
+  const zpnEcpd = document.getElementById('wrap-zpn-ecpd');
+  const active  = chk && chk.checked;
+  if (wrap)    wrap.style.display    = active ? 'block' : 'none';
+  if (zpnEcpd) zpnEcpd.style.display = (active && munActual === 'ZPN') ? 'block' : 'none';
 }
 
 function onUsoChange() { /* live recalc si ya hay resultado */ }
@@ -880,15 +930,22 @@ function calcular() {
       sub, art: t.licenciaArt + (tipoObra === 'remodelacion' && t.remodelacionArt ? ' · ' + t.remodelacionArt : tipoObra === 'demolicion' && t.demolicionArt ? ' · ' + t.demolicionArt : '')
     });
 
-    // ── GDL: DTUDE ──
-    if (munActual === 'GDL' && document.getElementById('chk-dtude').checked) {
-      const exento = t.dtudeExento.includes(uso);
+    // ── DTUDE (todos los municipios con tarifa registrada) ──
+    if (t.dtude && document.getElementById('chk-dtude').checked) {
+      const exento = Array.isArray(t.dtudeExento) && t.dtudeExento.includes(uso);
+      const exentoNota = exento
+        ? (' · Exento: ' + (munActual === 'GDL'
+            ? 'unifamiliar (Art. 157 Regl. Gestión Integral GDL)'
+            : munActual === 'ZPN'
+            ? 'unifamiliar y una vivienda plurifamiliar horizontal en condominio'
+            : 'confirmar exención en ventanilla'))
+        : '';
       rows.push({
         concepto: 'DTUDE — Dictamen de Trazo, Usos y Destinos Específicos',
         tarifa: exento ? 'Exento' : fmt(t.dtude),
         base: '—',
         sub: exento ? 0 : t.dtude,
-        art: t.dtudeArt + (exento ? ' · Exento para unifamiliar (Art. 157 Regl. Gestión Integral GDL)' : ''),
+        art: t.dtudeArt + exentoNota,
         exento
       });
       if (!exento) total += t.dtude;
@@ -1011,6 +1068,61 @@ function calcular() {
     total += subAmb;
     const rangoLabel = sup <= 3400 ? 'hasta 3,400 m²' : sup <= 15000 ? '3,401-15,000 m²' : sup <= 30000 ? '15,001-30,000 m²' : 'mayor de 30,000 m²';
     rows.push({ concepto: 'Evaluación de Impacto Ambiental<br><span class="subtotal-badge">' + rangoLabel + '</span>', tarifa: fmt(subAmb), base: 'Por proyecto', sub: subAmb, art: t.impactoAmbientalArt });
+  }
+
+  // -- Excedencia iCUS (GDL y ZPN) --
+  const chkICUS = document.getElementById('chk-icus');
+  if (chkICUS && chkICUS.checked) {
+    const icusCoef = parseFloat(document.getElementById('inp-icus-coef').value) || 0;
+    const icusSup  = parseFloat(document.getElementById('inp-icus-sup').value)  || 0;
+    if (icusCoef > 0 && icusSup > 0) {
+      const mICUS = Math.round(icusCoef * icusSup * 100) / 100;
+      if (munActual === 'GDL') {
+        const T_GDL   = 1516;
+        const subICUS = Math.round(mICUS * T_GDL);
+        total += subICUS;
+        rows.push({
+          concepto: 'Contribuci&#243;n iCUS &#8212; excedencia de intensidad de construcci&#243;n'
+                  + '<br><span class="subtotal-badge">' + mICUS.toLocaleString('es-MX') + ' m&#178; &times; $1,516/m&#178;</span>',
+          tarifa: '$1,516/m²',
+          base:   mICUS.toLocaleString('es-MX') + ' m²',
+          sub:    subICUS,
+          art:    'Art. 37, Ley Ingresos GDL 2026'
+        });
+      } else if (munActual === 'ZPN') {
+        const T_ZPN   = 1595;
+        const T_ECPD  = 15349;
+        const subICUS = Math.round(mICUS * T_ZPN);
+        total += subICUS;
+        rows.push({
+          concepto: 'Excedencia de CUS M&#225;x &#8212; contribuci&#243;n por densificaci&#243;n'
+                  + '<br><span class="subtotal-badge">' + mICUS.toLocaleString('es-MX') + ' m&#178; &times; $1,595/m&#178;</span>',
+          tarifa: '$1,595/m²',
+          base:   mICUS.toLocaleString('es-MX') + ' m²',
+          sub:    subICUS,
+          art:    'Art. 62, Ley Ingresos ZPN 2026'
+        });
+        const chkECPD = document.getElementById('chk-zpn-ecpd');
+        if (chkECPD && chkECPD.checked) {
+          total += T_ECPD;
+          rows.push({
+            concepto: 'ECPD &#8212; Contribuci&#243;n por Densificaci&#243;n (cuota fija)'
+                    + '<br><span class="subtotal-badge">Solo cuando aplica CUS m&#225;ximo</span>',
+            tarifa: fmt(T_ECPD),
+            base:   'Cuota fija',
+            sub:    T_ECPD,
+            art:    'Art. 62, Ley Ingresos ZPN 2026'
+          });
+        }
+      }
+    } else {
+      rows.push({
+        concepto: 'Excedencia iCUS &#8212; ingresa coef. y sup. terreno',
+        tarifa: '&#8212;', base: '&#8212;', sub: null,
+        art: 'Ingresa coef. iCUS y sup. terreno para calcular el importe',
+        infoRow: true, infoVal: 'Sin datos'
+      });
+    }
   }
 
   // -- Filas informativas (sin costo) --
@@ -1189,6 +1301,142 @@ function calcularSoloSIAPA(t) {
   document.getElementById('result-panel').style.display = '';
 }
 
+// ── NUEVO ANÁLISIS ────────────────────────────────────────────────────────────
+function nuevoAnalisis() {
+  // Municipio y tipo de obra — vía las mismas funciones que usan los botones
+  selMun('GDL', document.getElementById('btn-mun-GDL'));
+  selTipo('nueva', document.querySelector('.tipo-btn[data-tipo="nueva"]'));
+
+  // Inputs numéricos y fecha
+  ['inp-uso','inp-sup','inp-frente','inp-ml','inp-sup-predio','inp-niveles','inp-fecha-inicio']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.tagName === 'SELECT' ? el.selectedIndex = 0 : el.value = '';
+    });
+
+  // Checkboxes — restaurar valores por defecto de carga
+  const defaults = {
+    'chk-alineamiento': true, 'chk-habitabilidad': true,
+    'chk-dtude': true, 'chk-planos': true,
+    'chk-bitacora': false, 'chk-patrimonio': false,
+    'chk-revision': true, 'chk-siapa': false,
+    'chk-eit': false, 'chk-int-vial': false,
+    'chk-imp-amb': false, 'chk-icus': false, 'chk-zpn-ecpd': false
+  };
+  Object.entries(defaults).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.checked = val;
+  });
+
+  // Paneles expandibles — cerrar
+  toggleSIAPADen();
+  toggleICUS();
+
+  // Resultado
+  costoLicenciaBase = 0;
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('btn-reset').style.display = 'none';
+  limpiarRefrendo();
+}
+
+// ── REFRENDO / PRÓRROGA ───────────────────────────────────────────────────────
+function calcularRefrendo() {
+  const meses = parseInt(document.getElementById('inp-refrendo').value) || 0;
+  const div   = document.getElementById('refrendo-result');
+  if (!meses || meses < 1) { div.style.display = 'none'; div.innerHTML = ''; return; }
+
+  const costo = costoLicenciaBase;
+  if (!costo || costo <= 0) {
+    div.innerHTML = '<span style="color:var(--text3);font-size:11px">Calcula primero la licencia para obtener el costo base.</span>';
+    div.style.display = 'block';
+    return;
+  }
+
+  let costoRefrendo = 0, detalle = '', artRef = '';
+
+  if (munActual === 'GDL') {
+    const limite5A   = 30; // meses adicionales hasta completar 5 años de vigencia total
+    const mesesBajos = Math.min(meses, limite5A);
+    const mesesAltos = Math.max(0, meses - limite5A);
+    const rf1 = mesesBajos > 0 ? costo * 0.025 * mesesBajos : 0;
+    const rf2 = mesesAltos > 0 ? costo * 0.050 * mesesAltos : 0;
+    costoRefrendo = rf1 + rf2;
+    if (mesesBajos > 0 && mesesAltos > 0) {
+      detalle = mesesBajos + ' mes' + (mesesBajos > 1 ? 'es' : '') + ' &times; 2.5% = ' + fmt(rf1)
+              + ' &nbsp;+&nbsp; '
+              + mesesAltos + ' mes' + (mesesAltos > 1 ? 'es' : '') + ' &times; 5.0% = ' + fmt(rf2);
+    } else if (mesesBajos > 0) {
+      detalle = mesesBajos + ' mes' + (mesesBajos > 1 ? 'es' : '') + ' &times; 2.5% sobre ' + fmt(costo);
+    } else {
+      detalle = mesesAltos + ' mes' + (mesesAltos > 1 ? 'es' : '') + ' &times; 5.0% sobre ' + fmt(costo);
+    }
+    artRef = 'Art. 49 Fracc. II &middot; Vigencia base: 30 meses';
+  } else if (munActual === 'ZPN') {
+    const bimestres = Math.ceil(meses / 2);
+    costoRefrendo = costo * 0.05 * bimestres;
+    detalle = bimestres + ' bimestre' + (bimestres > 1 ? 's' : '') + ' &times; 5% sobre ' + fmt(costo);
+    artRef = 'Art. 82, Ley Ingresos ZPN 2026 &middot; Vigencia base: 24 meses';
+  } else if (munActual === 'TLQ') {
+    const bimestres = Math.ceil(meses / 2);
+    costoRefrendo = costo * 0.10 * bimestres;
+    detalle = bimestres + ' bimestre' + (bimestres > 1 ? 's' : '') + ' &times; 10% sobre ' + fmt(costo);
+    artRef = 'Art. 63 Fracc. IV, Ley Ingresos TLQ 2026 &middot; Vigencia base: 24 meses';
+  } else {
+    const nombreMun = munActual === 'TLA' ? 'Tlajomulco' : 'Ton&#225;l&#225;';
+    div.innerHTML = '<span style="color:var(--sem-am-txt,#92400e);font-size:12px">'
+      + '&#9888; La tasa de pr&#243;rroga de ' + nombreMun + ' no est&#225; especificada en la Ley de Ingresos 2026 disponible. '
+      + 'Solicita la c&#233;dula de c&#225;lculo directamente en ventanilla.'
+      + '</span>';
+    div.style.display = 'block';
+    return;
+  }
+
+  const vigBase  = munActual === 'GDL' ? 30 : 24;
+  const vigTotal = vigBase + meses;
+  div.innerHTML = detalle
+    + '<br><span class="rf-detalle">'
+    + 'Vigencia total: <strong>' + vigTotal + ' meses</strong>'
+    + ' (' + Math.floor(vigTotal / 12) + ' a&ntilde;os ' + (vigTotal % 12) + ' meses)'
+    + ' &middot; ' + artRef
+    + '</span>'
+    + '<span class="rf-total">Refrendo estimado: ' + fmt(costoRefrendo) + '</span>';
+  div.style.display = 'block';
+}
+
+function limpiarRefrendo() {
+  document.getElementById('inp-refrendo').value = '';
+  const div = document.getElementById('refrendo-result');
+  div.style.display = 'none';
+  div.innerHTML = '';
+}
+
+// ── DEEP LINK M01 → M08 ───────────────────────────────────────────────────────
+(function leerDeepLinkM01(){
+  var raw = localStorage.getItem('GU_m01_a_m08');
+  if (!raw) return;
+  try {
+    var d = JSON.parse(raw);
+    if (!d || (Date.now() - d.ts) > 600000) { localStorage.removeItem('GU_m01_a_m08'); return; }
+
+    if (d.mun) {
+      var btnMun = document.getElementById('btn-mun-' + d.mun);
+      if (btnMun) selMun(d.mun, btnMun);
+    }
+    if (d.supPredio) { var el = document.getElementById('inp-sup-predio'); if (el) el.value = d.supPredio; }
+    if (d.niveles)   { var el = document.getElementById('inp-niveles');    if (el) el.value = d.niveles; }
+
+    localStorage.removeItem('GU_m01_a_m08');
+
+    var banner = document.createElement('div');
+    banner.style.cssText = 'background:rgba(26,39,68,.06);border:0.5px solid var(--brand);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text2);margin-bottom:12px';
+    banner.innerHTML = '&#9989; <strong>Datos recibidos desde M01</strong> &#8212; revisa los campos, ingresa la superficie de construcci&#243;n y presiona Calcular.';
+    var wrap = document.querySelector('.m08-wrap');
+    if (wrap) wrap.insertBefore(banner, wrap.firstChild);
+  } catch(e) {
+    localStorage.removeItem('GU_m01_a_m08');
+  }
+})();
+
 // ── DEEP LINK M05 → M08 ───────────────────────────────────────────────────────
 (function leerDeepLinkM05(){
   var raw = localStorage.getItem('GU_m05_a_m08');
@@ -1232,6 +1480,5 @@ function calcularSoloSIAPA(t) {
   }
 })();
 </script>
-
-</html
->
+</body>
+</html>

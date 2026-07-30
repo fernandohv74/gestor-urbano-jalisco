@@ -4008,7 +4008,7 @@ async function geocodificar(dir, colonia, cp, munForzado){
   if(GOOGLE_MAPS_KEY){
     try{
       const q = encodeURIComponent(dirCompleta);
-      const r = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${q}&bounds=${swStr}|${neStr}&region=mx&language=es&key=${GOOGLE_MAPS_KEY}`, {referrerPolicy:'no-referrer'});
+      const r = await fetch(`/api/maps-proxy?address=${q}&bounds=${encodeURIComponent(swStr+'|'+neStr)}&region=mx&language=es`);
       const d = await r.json();
       if(d.status!=='OK') console.warn('[GeocodGM]', d.status, d.error_message||'');
       if(d.status==='OK' && d.results.length){

@@ -1475,7 +1475,30 @@ const VUJ_BD_LOCAL = {
     { clave:'MB', descripcion_zona:'Mixto Barrial — Tlaquepaque', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'3.20', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'200', frente_minimo:'10', restriccion_frontal:'3', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'80', porcentaje_jardinado_restriccion_frontal:'20', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'⚠️ PDU San Pedro Tlaquepaque 2021. CUS 3.20 — PROPIO DE TLQ (≠ REZ 2.40 ≠ ZPN 2.40). COS 0.80.', uso_permitido:'Habitacional · Comercio Barrial · Servicios Barriales · Equipamiento', municipio_id:98 },
     { clave:'MD', descripcion_zona:'Mixto Distrital — Tlaquepaque', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'3.20', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'200', frente_minimo:'10', restriccion_frontal:'3', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'80', porcentaje_jardinado_restriccion_frontal:'20', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'⚠️ PDU San Pedro Tlaquepaque 2021. CUS 3.20 — PROPIO DE TLQ. COS 0.80.', uso_permitido:'Habitacional · Comercio Distrital · Servicios · Oficinas', municipio_id:98 },
     { clave:'MC', descripcion_zona:'Mixto Central — Tlaquepaque', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'3.20', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'200', frente_minimo:'10', restriccion_frontal:'3', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'80', porcentaje_jardinado_restriccion_frontal:'20', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'⚠️ PDU San Pedro Tlaquepaque 2021. CUS 3.20 — PROPIO DE TLQ. COS 0.80.', uso_permitido:'Habitacional · Comercio Central · Servicios · Hotelería · Oficinas', municipio_id:98 },
-    { clave:'MR', descripcion_zona:'Mixto Regional — Tlaquepaque. USO HABITACIONAL PROHIBIDO.', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'3.20', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'500', frente_minimo:'20', restriccion_frontal:'5', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'0', porcentaje_jardinado_restriccion_frontal:'20', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'⚠️ PDU San Pedro Tlaquepaque 2021. USO HABITACIONAL PROHIBIDO. CUS 3.20 — PROPIO DE TLQ. COS 0.80.', uso_permitido:'CS-R · I1/I2/I3 · SI — NO habitacional', municipio_id:98 },
+    { clave:'MR', descripcion_zona:'Mixto Regional — Tlaquepaque. USO HABITACIONAL PROHIBIDO.', coeficiente_ocupacion_suelo:'0.80', coeficiente_utilizacion_suelo:'3.20', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'500', frente_minimo:'20', restriccion_frontal:'5', restricciones_laterales:'Ver plano', restriccion_posterior:'3', indice_edificacion:'0', porcentaje_jardinado_restriccion_frontal:'20', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'⚠️ PDU San Pedro Tlaquepaque 2021. USO HABITACIONAL PROHIBIDO. CUS 3.20 — PROPIO DE TLQ. COS 0.80.', uso_permitido:'MR · I1/I2/I3 · SI', municipio_id:98 },
+  // ======================================================================
+  // VUJ_BD_LOCAL[97] -- Tlajomulco de Zúñiga
+  // Fuente: Reglamento Estatal de Zonificación (REZ) Jalisco
+  // TLA remite al REZ para zonas mixtas -- sin PDU propio con tabla de usos.
+  // uso_permitido: código de zona (para mapeado en ZAP_A_CS / calcularGirosZona).
+  // COS/CUS: se leen del VUJ API directamente (munId != 120).
+  // ======================================================================
+  97: [
+    { clave:'MB', descripcion_zona:'Mixto Barrial — Tlajomulco (REZ Jalisco). Habitacional con comercio y servicios de escala barrial.', coeficiente_ocupacion_suelo:'0', coeficiente_utilizacion_suelo:'0', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'', frente_minimo:'', restriccion_frontal:'', restricciones_laterales:'Ver PDU Tlajomulco', restriccion_posterior:'', indice_edificacion:'', porcentaje_jardinado_restriccion_frontal:'', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'REZ Jalisco. COS/CUS: consultar ficha VUJ o PDU Tlajomulco vigente.', uso_permitido:'MB', municipio_id:97 },
+    { clave:'MD', descripcion_zona:'Mixto Distrital — Tlajomulco (REZ Jalisco). Habitacional con comercio y servicios de escala distrital.', coeficiente_ocupacion_suelo:'0', coeficiente_utilizacion_suelo:'0', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'', frente_minimo:'', restriccion_frontal:'', restricciones_laterales:'Ver PDU Tlajomulco', restriccion_posterior:'', indice_edificacion:'', porcentaje_jardinado_restriccion_frontal:'', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'REZ Jalisco. COS/CUS: consultar ficha VUJ o PDU Tlajomulco vigente.', uso_permitido:'MD', municipio_id:97 },
+    { clave:'MC', descripcion_zona:'Mixto Central — Tlajomulco (REZ Jalisco). Habitacional con comercio y servicios de escala central.', coeficiente_ocupacion_suelo:'0', coeficiente_utilizacion_suelo:'0', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'', frente_minimo:'', restriccion_frontal:'', restricciones_laterales:'Ver PDU Tlajomulco', restriccion_posterior:'', indice_edificacion:'', porcentaje_jardinado_restriccion_frontal:'', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'REZ Jalisco. COS/CUS: consultar ficha VUJ o PDU Tlajomulco vigente.', uso_permitido:'MC', municipio_id:97 },
+    { clave:'MR', descripcion_zona:'Mixto Regional — Tlajomulco (REZ Jalisco). USO HABITACIONAL PROHIBIDO. Comercio e industria de escala regional.', coeficiente_ocupacion_suelo:'0', coeficiente_utilizacion_suelo:'0', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'', frente_minimo:'', restriccion_frontal:'', restricciones_laterales:'Ver PDU Tlajomulco', restriccion_posterior:'', indice_edificacion:'', porcentaje_jardinado_restriccion_frontal:'', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'REZ Jalisco. USO HABITACIONAL PROHIBIDO. COS/CUS: consultar ficha VUJ o PDU Tlajomulco vigente.', uso_permitido:'MR · I1/I2/I3 · SI', municipio_id:97 },
+  ],
+  // ======================================================================
+  // VUJ_BD_LOCAL[101] -- Tonalá
+  // Fuente: Reglamento Estatal de Zonificación (REZ) Jalisco
+  // TON remite al REZ para zonas mixtas -- sin PDU propio con tabla de usos.
+  // ======================================================================
+  101: [
+    { clave:'MB', descripcion_zona:'Mixto Barrial — Tonalá (REZ Jalisco). Habitacional con comercio y servicios de escala barrial.', coeficiente_ocupacion_suelo:'0', coeficiente_utilizacion_suelo:'0', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'', frente_minimo:'', restriccion_frontal:'', restricciones_laterales:'Ver PDU Tonalá', restriccion_posterior:'', indice_edificacion:'', porcentaje_jardinado_restriccion_frontal:'', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'REZ Jalisco. COS/CUS: consultar ficha VUJ o PDU Tonalá vigente.', uso_permitido:'MB', municipio_id:101 },
+    { clave:'MD', descripcion_zona:'Mixto Distrital — Tonalá (REZ Jalisco). Habitacional con comercio y servicios de escala distrital.', coeficiente_ocupacion_suelo:'0', coeficiente_utilizacion_suelo:'0', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'', frente_minimo:'', restriccion_frontal:'', restricciones_laterales:'Ver PDU Tonalá', restriccion_posterior:'', indice_edificacion:'', porcentaje_jardinado_restriccion_frontal:'', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'REZ Jalisco. COS/CUS: consultar ficha VUJ o PDU Tonalá vigente.', uso_permitido:'MD', municipio_id:101 },
+    { clave:'MC', descripcion_zona:'Mixto Central — Tonalá (REZ Jalisco). Habitacional con comercio y servicios de escala central.', coeficiente_ocupacion_suelo:'0', coeficiente_utilizacion_suelo:'0', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'', frente_minimo:'', restriccion_frontal:'', restricciones_laterales:'Ver PDU Tonalá', restriccion_posterior:'', indice_edificacion:'', porcentaje_jardinado_restriccion_frontal:'', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'REZ Jalisco. COS/CUS: consultar ficha VUJ o PDU Tonalá vigente.', uso_permitido:'MC', municipio_id:101 },
+    { clave:'MR', descripcion_zona:'Mixto Regional — Tonalá (REZ Jalisco). USO HABITACIONAL PROHIBIDO. Comercio e industria de escala regional.', coeficiente_ocupacion_suelo:'0', coeficiente_utilizacion_suelo:'0', icos:'0', icus:'0', altura_maxima_edificacion:'Resultante COS/CUS', modo_edificacion:'Variable', superficie_minima:'', frente_minimo:'', restriccion_frontal:'', restricciones_laterales:'Ver PDU Tonalá', restriccion_posterior:'', indice_edificacion:'', porcentaje_jardinado_restriccion_frontal:'', cajones_estacionamiento:'Ver Reglamento Municipal', observaciones:'REZ Jalisco. USO HABITACIONAL PROHIBIDO. COS/CUS: consultar ficha VUJ o PDU Tonalá vigente.', uso_permitido:'MR · I1/I2/I3 · SI', municipio_id:101 },
   ],
 };
 const VUJ_BD_FECHA = '2023-PDU-ZPN01a12-Zapopan-v60 | 2021-PDU-TLQ-v1';
@@ -2451,7 +2474,7 @@ function mostrarSelectorMunicipio(dir, colonia, cp, munActivo, munDetectado, loc
             zapopan:    {sw:'20.580,-103.500',ne:'20.820,-103.280'},
             tlajomulco: {sw:'20.440,-103.520',ne:'20.620,-103.280'},
             tlaquepaque:{sw:'20.570,-103.350',ne:'20.670,-103.240'},
-            tonala:     {sw:'20.580,-103.270',ne:'20.680,-103.160'},
+            tonala:     {sw:'20.580,-103.300',ne:'20.680,-103.160'},
           }[m]||{sw:'20.580,-103.500',ne:'20.820,-103.280'};
           const [swLat2,swLng2]=b2.sw.split(',').map(Number);
           const [neLat2,neLng2]=b2.ne.split(',').map(Number);
@@ -2506,7 +2529,7 @@ function detectarMunicipioPorCoords(lat, lng){
     zapopan:     {swLat:20.620,swLng:-103.500,neLat:20.820,neLng:-103.280},
     tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.680,neLng:-103.240},
     tlajomulco:  {swLat:20.300,swLng:-103.520,neLat:20.600,neLng:-103.280},
-    tonala:      {swLat:20.580,swLng:-103.270,neLat:20.680,neLng:-103.160},
+    tonala:      {swLat:20.580,swLng:-103.300,neLat:20.680,neLng:-103.160},
   };
   for(const [mun, b] of Object.entries(bounds)){
     if(lat>=b.swLat && lat<=b.neLat && lng>=b.swLng && lng<=b.neLng) return mun;
@@ -2585,7 +2608,7 @@ async function geocodificar(dir, colonia, cp, munForzado){
     zapopan:     {swLat:20.580,swLng:-103.500,neLat:20.820,neLng:-103.280},
     tlajomulco:  {swLat:20.300,swLng:-103.520,neLat:20.620,neLng:-103.280},
     tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.680,neLng:-103.240},
-    tonala:      {swLat:20.580,swLng:-103.270,neLat:20.680,neLng:-103.160},
+    tonala:      {swLat:20.580,swLng:-103.300,neLat:20.680,neLng:-103.160},
   };
   const b = munBounds[munActivo]||munBounds.guadalajara;
   // AMG completo para validación permisiva
@@ -2736,7 +2759,7 @@ async function procesarCoordenadas(lat,lng){
       zapopan:    {swLat:20.580,swLng:-103.500,neLat:20.820,neLng:-103.280},
       tlaquepaque:{swLat:20.570,swLng:-103.350,neLat:20.680,neLng:-103.240},
       tlajomulco: {swLat:20.300,swLng:-103.520,neLat:20.620,neLng:-103.280},
-      tonala:     {swLat:20.580,swLng:-103.270,neLat:20.680,neLng:-103.160},
+      tonala:     {swLat:20.580,swLng:-103.300,neLat:20.680,neLng:-103.160},
     }[municipioActual];
     const enActivo = bActivo && lat>=bActivo.swLat&&lat<=bActivo.neLat&&lng>=bActivo.swLng&&lng<=bActivo.neLng;
     if(!enActivo){
@@ -3825,7 +3848,7 @@ function detectarYActualizarMunicipio(lat, lng){
     guadalajara: {latMin:20.630,latMax:20.730,lngMin:-103.390,lngMax:-103.280},
     tlaquepaque: {latMin:20.570,latMax:20.650,lngMin:-103.340,lngMax:-103.240},
     tlajomulco:  {latMin:20.440,latMax:20.600,lngMin:-103.520,lngMax:-103.280},
-    tonala:      {latMin:20.580,latMax:20.670,lngMin:-103.270,lngMax:-103.160},
+    tonala:      {latMin:20.580,latMax:20.670,lngMin:-103.300,lngMax:-103.160},
     zapopan:     {latMin:20.580,latMax:20.820,lngMin:-103.500,lngMax:-103.280},
   };
   // Orden: municipios más pequeños/precisos primero, Zapopan al final (es muy grande)
@@ -5936,7 +5959,7 @@ function calcularGirosZona(clave){
     console.log('[ZAP] perPuros:', perPuros, 'perConds:', perConds);
 
     // Mapa Zapopan → nivel CS GDL
-    const ZAP_A_CS = {'CS-V':1,'MB':2,'MD':3,'MC':4,'MR':5,'CS1':1,'CS2':2,'CS3':3,'CS4':4,'CS5':5};
+    const ZAP_A_CS = {'CS-V':1,'CS-B':2,'CS-D':3,'CS-C':4,'CS-R':5,'MB':2,'MD':3,'MC':4,'MR':5,'CS1':1,'CS2':2,'CS3':3,'CS4':4,'CS5':5};
 
     // Nivel CS máximo permitido y condicionado
     let nivelCSPer = 0, nivelCSCon = 0;
@@ -6207,7 +6230,7 @@ function seleccionarUsoM02(event, usoKey, esCondicionado, familia, nivelMax){
   if(event && event.target) { event.target.classList.remove('uso-c','uso-p'); event.target.classList.add('gu-uso-sel'); }
 
   // Mapear uso Zapopan → nivel CS para filtrar giros
-  const ZAP_A_CS = {'CS-V':1,'MB':2,'MD':3,'MC':4,'MR':5,'CS1':1,'CS2':2,'CS3':3,'CS4':4,'CS5':5};
+  const ZAP_A_CS = {'CS-V':1,'CS-B':2,'CS-D':3,'CS-C':4,'CS-R':5,'MB':2,'MD':3,'MC':4,'MR':5,'CS1':1,'CS2':2,'CS3':3,'CS4':4,'CS5':5};
   // Mapa de usos industriales Zapopan → nivel I GDL
   const ZAP_A_I = {'MFD':0,'MFM':0,'SI':1,'IJ':1,'I1':1,'I2':2,'I3':3};
   const nivelUso = ZAP_A_CS[usoKey] || 0;

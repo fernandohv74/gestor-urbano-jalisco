@@ -3855,7 +3855,7 @@ function mostrarSelectorMunicipio(dir, colonia, cp, munActivo, munDetectado, loc
             zapopan:    {sw:'20.580,-103.500',ne:'20.820,-103.280'},
             tlajomulco: {sw:'20.440,-103.520',ne:'20.620,-103.280'},
             tlaquepaque:{sw:'20.570,-103.350',ne:'20.670,-103.240'},
-            tonala:     {sw:'20.580,-103.270',ne:'20.680,-103.160'},
+            tonala:     {sw:'20.580,-103.300',ne:'20.680,-103.160'},
           }[m]||{sw:'20.580,-103.500',ne:'20.820,-103.280'};
           const [swLat2,swLng2]=b2.sw.split(',').map(Number);
           const [neLat2,neLng2]=b2.ne.split(',').map(Number);
@@ -3908,9 +3908,9 @@ function detectarMunicipioPorCoords(lat, lng){
   const bounds = {
     guadalajara: {swLat:20.603,swLng:-103.407,neLat:20.752,neLng:-103.263},
     zapopan:     {swLat:20.620,swLng:-103.500,neLat:20.820,neLng:-103.280},
-    tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.650,neLng:-103.240},
     tlajomulco:  {swLat:20.440,swLng:-103.520,neLat:20.600,neLng:-103.280},
-    tonala:      {swLat:20.580,swLng:-103.270,neLat:20.680,neLng:-103.160},
+    tonala:      {swLat:20.580,swLng:-103.300,neLat:20.680,neLng:-103.160},
+    tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.650,neLng:-103.240},
   };
   for(const [mun, b] of Object.entries(bounds)){
     if(lat>=b.swLat && lat<=b.neLat && lng>=b.swLng && lng<=b.neLng) return mun;
@@ -3989,7 +3989,7 @@ async function geocodificar(dir, colonia, cp, munForzado){
     zapopan:     {swLat:20.580,swLng:-103.500,neLat:20.820,neLng:-103.280},
     tlajomulco:  {swLat:20.440,swLng:-103.520,neLat:20.620,neLng:-103.280},
     tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.670,neLng:-103.240},
-    tonala:      {swLat:20.580,swLng:-103.270,neLat:20.680,neLng:-103.160},
+    tonala:      {swLat:20.580,swLng:-103.300,neLat:20.680,neLng:-103.160},
   };
   const b = munBounds[munActivo]||munBounds.guadalajara;
   // AMG completo para validación permisiva
@@ -4126,7 +4126,7 @@ async function procesarCoordenadas(lat,lng){
       zapopan:    {swLat:20.580,swLng:-103.500,neLat:20.820,neLng:-103.280},
       tlaquepaque:{swLat:20.570,swLng:-103.350,neLat:20.670,neLng:-103.240},
       tlajomulco: {swLat:20.440,swLng:-103.520,neLat:20.620,neLng:-103.280},
-      tonala:     {swLat:20.580,swLng:-103.270,neLat:20.680,neLng:-103.160},
+      tonala:     {swLat:20.580,swLng:-103.300,neLat:20.680,neLng:-103.160},
     }[municipioActual];
     const enActivo = bActivo && lat>=bActivo.swLat&&lat<=bActivo.neLat&&lng>=bActivo.swLng&&lng<=bActivo.neLng;
     if(!enActivo){
@@ -5744,7 +5744,7 @@ function detectarYActualizarMunicipio(lat, lng){
     guadalajara: {latMin:20.630,latMax:20.730,lngMin:-103.390,lngMax:-103.280},
     tlaquepaque: {latMin:20.570,latMax:20.650,lngMin:-103.340,lngMax:-103.240},
     tlajomulco:  {latMin:20.440,latMax:20.600,lngMin:-103.520,lngMax:-103.280},
-    tonala:      {latMin:20.580,latMax:20.670,lngMin:-103.270,lngMax:-103.160},
+    tonala:      {latMin:20.580,latMax:20.670,lngMin:-103.300,lngMax:-103.160},
     zapopan:     {latMin:20.580,latMax:20.820,lngMin:-103.500,lngMax:-103.280},
   };
   // Orden: municipios más pequeños/precisos primero, Zapopan al final (es muy grande)

@@ -1646,9 +1646,9 @@ function detectarMunicipioPorCoords(lat, lng){
   const b={
     guadalajara:{swLat:20.603,swLng:-103.407,neLat:20.752,neLng:-103.263},
     zapopan:    {swLat:20.620,swLng:-103.500,neLat:20.820,neLng:-103.280},
-    tlajomulco: {swLat:20.300,swLng:-103.520,neLat:20.600,neLng:-103.280},
-    tonala:     {swLat:20.580,swLng:-103.300,neLat:20.680,neLng:-103.160},
     tlaquepaque:{swLat:20.570,swLng:-103.350,neLat:20.680,neLng:-103.240},
+    tlajomulco: {swLat:20.300,swLng:-103.520,neLat:20.600,neLng:-103.280},
+    tonala:     {swLat:20.580,swLng:-103.270,neLat:20.680,neLng:-103.160},
   };
   for(const [mun,bb] of Object.entries(b)){
     if(lat>=bb.swLat&&lat<=bb.neLat&&lng>=bb.swLng&&lng<=bb.neLng) return mun;
@@ -2627,7 +2627,7 @@ async function cargarDesdeM01(){
 
 
 async function geocodificarM03(dir,colonia,cp){
-  const bMap={guadalajara:'20.603,-103.407|20.752,-103.263',zapopan:'20.580,-103.500|20.820,-103.280',tlaquepaque:'20.570,-103.350|20.670,-103.240',tlajomulco:'20.440,-103.520|20.620,-103.280',tonala:'20.580,-103.300|20.680,-103.160'};
+  const bMap={guadalajara:'20.603,-103.407|20.752,-103.263',zapopan:'20.580,-103.500|20.820,-103.280',tlaquepaque:'20.570,-103.350|20.670,-103.240',tlajomulco:'20.440,-103.520|20.620,-103.280',tonala:'20.580,-103.270|20.680,-103.160'};
   // Nombre oficial para afinar geocodificación — evita ambigüedades (ej: "Zaragoza 90" sin municipio)
   const munNombre={guadalajara:'Guadalajara',zapopan:'Zapopan',tlaquepaque:'San Pedro Tlaquepaque',tlajomulco:'Tlajomulco de Zúñiga',tonala:'Tonalá'};
   const dirLow=(dir+' '+colonia).toLowerCase();
@@ -2635,9 +2635,8 @@ async function geocodificarM03(dir,colonia,cp){
   const munYaEscrito=Object.values(munNombre).some(n=>dirLow.includes(n.toLowerCase().split(' ')[0]));
   const sufijo=munYaEscrito?'Jalisco':(munNombre[munActual]||'')+', Jalisco';
   const q=[dir,colonia,cp,sufijo].filter(Boolean).join(', ');
-  const r=await fetch(`/api/maps-proxy?address=${encodeURIComponent(q)}&bounds=${encodeURIComponent(bMap[munActual]||'')}&region=mx&language=es`);
+  const r=await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(q)}&bounds=${bMap[munActual]||''}&region=mx&language=es&key=${MAPS_KEY}`);
   const d=await r.json();
-  if(d.status!=='OK') console.warn('[GeocodGM M03]', d.status, d.error_message||'');
   if(!d.results?.length) throw new Error('No se encontró la dirección. Agrega la colonia o el CP para afinar la búsqueda.');
   const loc=d.results[0].geometry.location;
   return {lat:loc.lat,lng:loc.lng,dir:d.results[0].formatted_address};

@@ -3908,9 +3908,9 @@ function detectarMunicipioPorCoords(lat, lng){
   const bounds = {
     guadalajara: {swLat:20.603,swLng:-103.407,neLat:20.752,neLng:-103.263},
     zapopan:     {swLat:20.620,swLng:-103.500,neLat:20.820,neLng:-103.280},
-    tlajomulco:  {swLat:20.440,swLng:-103.520,neLat:20.600,neLng:-103.280},
+    tlajomulco:  {swLat:20.300,swLng:-103.520,neLat:20.600,neLng:-103.280},
     tonala:      {swLat:20.580,swLng:-103.300,neLat:20.680,neLng:-103.160},
-    tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.650,neLng:-103.240},
+    tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.680,neLng:-103.240},
   };
   for(const [mun, b] of Object.entries(bounds)){
     if(lat>=b.swLat && lat<=b.neLat && lng>=b.swLng && lng<=b.neLng) return mun;
@@ -3987,8 +3987,8 @@ async function geocodificar(dir, colonia, cp, munForzado){
   const munBounds = {
     guadalajara: {swLat:20.603,swLng:-103.407,neLat:20.752,neLng:-103.263},
     zapopan:     {swLat:20.580,swLng:-103.500,neLat:20.820,neLng:-103.280},
-    tlajomulco:  {swLat:20.440,swLng:-103.520,neLat:20.620,neLng:-103.280},
-    tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.670,neLng:-103.240},
+    tlajomulco:  {swLat:20.300,swLng:-103.520,neLat:20.620,neLng:-103.280},
+    tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.680,neLng:-103.240},
     tonala:      {swLat:20.580,swLng:-103.300,neLat:20.680,neLng:-103.160},
   };
   const b = munBounds[munActivo]||munBounds.guadalajara;
@@ -4125,8 +4125,8 @@ async function procesarCoordenadas(lat,lng){
     const bActivo = {
       guadalajara:{swLat:20.603,swLng:-103.407,neLat:20.752,neLng:-103.263},
       zapopan:    {swLat:20.580,swLng:-103.500,neLat:20.820,neLng:-103.280},
-      tlaquepaque:{swLat:20.570,swLng:-103.350,neLat:20.670,neLng:-103.240},
-      tlajomulco: {swLat:20.440,swLng:-103.520,neLat:20.620,neLng:-103.280},
+      tlaquepaque:{swLat:20.570,swLng:-103.350,neLat:20.680,neLng:-103.240},
+      tlajomulco: {swLat:20.300,swLng:-103.520,neLat:20.620,neLng:-103.280},
       tonala:     {swLat:20.580,swLng:-103.300,neLat:20.680,neLng:-103.160},
     }[municipioActual];
     const enActivo = bActivo && lat>=bActivo.swLat&&lat<=bActivo.neLat&&lng>=bActivo.swLng&&lng<=bActivo.neLng;

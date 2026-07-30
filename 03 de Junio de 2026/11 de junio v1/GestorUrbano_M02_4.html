@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- ==========================================================
+     GestorUrbano Jalisco AMG / TrazaUrbana
+     (c) 2026 Fernando H. - trazaurbana.mx
+     Todos los derechos reservados.
+     Reproduccion o uso no autorizado esta prohibido.
+     ========================================================== -->
+
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -135,10 +142,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 
 <!-- ── NAVEGACIÓN ── -->
 <nav class="gu-nav">
-  <div class="gu-nav-logo">
-    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 1L1 5v9h5v-4h4v4h5V5L8 1z"/></svg>
+  <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+    <svg width="28" height="28" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="flex-shrink:0"><rect x="3" y="3" width="94" height="94" rx="16" fill="#C4D2E0"/><line x1="0" y1="22" x2="100" y2="22" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="44" x2="100" y2="44" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="66" x2="100" y2="66" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="0" y1="88" x2="100" y2="88" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="22" y1="0" x2="22" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="44" y1="0" x2="44" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="66" y1="0" x2="66" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="88" y1="0" x2="88" y2="100" stroke="#fff" stroke-width="2" opacity="0.7"/><line x1="-2" y1="20" x2="102" y2="80" stroke="#fff" stroke-width="5.5" opacity="0.55"/><rect x="27" y="27" width="14" height="14" fill="#D85A30"/><rect x="3" y="3" width="94" height="94" rx="16" fill="none" stroke="#14395C" stroke-width="3"/></svg>
+    <span style="font-family:var(--sans);line-height:1;letter-spacing:-.3px"><span style="font-weight:800;font-size:17px;color:var(--text)">Traza</span><span style="font-weight:300;font-size:17px;color:#D85A30">Urbana</span></span>
   </div>
-  <span class="gu-nav-name">Gestor Urbano Jalisco</span>
   <span class="gu-nav-sep">/</span>
   <span class="gu-nav-mod">M02 · Verificador de giro comercial</span>
   <a href="index.html" class="gu-nav-back">
@@ -153,6 +160,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
     <div class="gu-toggle-track"><div class="gu-toggle-thumb"></div></div>
     <span id="gu-toggle-label">Modo oscuro</span>
   </button>
+
+  <span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.04em;flex-shrink:0;opacity:.55;margin-left:10px;transition:color var(--t)">&copy; 2026 TrazaUrbana</span>
 </nav>
 
 <!-- ── LAYOUT PRINCIPAL ── -->
@@ -727,7 +736,7 @@ function actualizar3D(){
     'canvas.addEventListener("touchmove",function(e){e.preventDefault();if(e.touches.length===1&&drag){aY+=(e.touches[0].clientX-px)*.008;aX=Math.max(-.1,Math.min(1.2,aX-(e.touches[0].clientY-py)*.008));px=e.touches[0].clientX;py=e.touches[0].clientY;draw();}if(e.touches.length===2){var d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);sc=Math.max(4,Math.min(120,sc-(d-lt)*.1));lt=d;draw();}},{passive:false});',
     '})();',
     '</' + scriptTag + '>',
-    '</body></html>'
+    '</html>'
   ].join('\n');
 
   const blob = new Blob([html3d], {type: 'text/html'});
@@ -2495,8 +2504,8 @@ function detectarMunicipioPorCoords(lat, lng){
   const bounds = {
     guadalajara: {swLat:20.603,swLng:-103.407,neLat:20.752,neLng:-103.263},
     zapopan:     {swLat:20.620,swLng:-103.500,neLat:20.820,neLng:-103.280},
-    tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.650,neLng:-103.240},
-    tlajomulco:  {swLat:20.440,swLng:-103.520,neLat:20.600,neLng:-103.280},
+    tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.680,neLng:-103.240},
+    tlajomulco:  {swLat:20.300,swLng:-103.520,neLat:20.600,neLng:-103.280},
     tonala:      {swLat:20.580,swLng:-103.270,neLat:20.680,neLng:-103.160},
   };
   for(const [mun, b] of Object.entries(bounds)){
@@ -2574,8 +2583,8 @@ async function geocodificar(dir, colonia, cp, munForzado){
   const munBounds = {
     guadalajara: {swLat:20.603,swLng:-103.407,neLat:20.752,neLng:-103.263},
     zapopan:     {swLat:20.580,swLng:-103.500,neLat:20.820,neLng:-103.280},
-    tlajomulco:  {swLat:20.440,swLng:-103.520,neLat:20.620,neLng:-103.280},
-    tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.670,neLng:-103.240},
+    tlajomulco:  {swLat:20.300,swLng:-103.520,neLat:20.620,neLng:-103.280},
+    tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.680,neLng:-103.240},
     tonala:      {swLat:20.580,swLng:-103.270,neLat:20.680,neLng:-103.160},
   };
   const b = munBounds[munActivo]||munBounds.guadalajara;
@@ -2725,8 +2734,8 @@ async function procesarCoordenadas(lat,lng){
     const bActivo = {
       guadalajara:{swLat:20.603,swLng:-103.407,neLat:20.752,neLng:-103.263},
       zapopan:    {swLat:20.580,swLng:-103.500,neLat:20.820,neLng:-103.280},
-      tlaquepaque:{swLat:20.570,swLng:-103.350,neLat:20.670,neLng:-103.240},
-      tlajomulco: {swLat:20.440,swLng:-103.520,neLat:20.620,neLng:-103.280},
+      tlaquepaque:{swLat:20.570,swLng:-103.350,neLat:20.680,neLng:-103.240},
+      tlajomulco: {swLat:20.300,swLng:-103.520,neLat:20.620,neLng:-103.280},
       tonala:     {swLat:20.580,swLng:-103.270,neLat:20.680,neLng:-103.160},
     }[municipioActual];
     const enActivo = bActivo && lat>=bActivo.swLat&&lat<=bActivo.neLat&&lng>=bActivo.swLng&&lng<=bActivo.neLng;
@@ -6700,5 +6709,6 @@ function guToggleTheme(){
 }
 
 </script>
+
 </body>
 </html>

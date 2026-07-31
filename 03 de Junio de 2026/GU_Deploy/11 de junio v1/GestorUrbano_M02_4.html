@@ -6001,6 +6001,8 @@ function calcularGirosZona(clave){
     let nivelCSPer = 0, nivelCSCon = 0;
     perPuros.forEach(k => { const n=ZAP_A_CS[k]; if(n && n>nivelCSPer) nivelCSPer=n; });
     perConds.forEach(k => { const n=ZAP_A_CS[k]; if(n && n>nivelCSCon) nivelCSCon=n; });
+    // Fallback VUJ (TLJ/TON/TLQ): si uso_per vacio, inferir nivel CS desde clave de zona
+    if(nivelCSPer===0&&clave){const ck=clave.replace(/\s*\(.*?\)/g,'').replace(/\*$/,'').trim().toUpperCase();const nfb=ZAP_A_CS[ck];if(nfb)nivelCSPer=nfb;}
 
     // Industriales
     const perIZap = perPuros.filter(k => /^I\d+$/.test(k));

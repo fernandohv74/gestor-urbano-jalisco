@@ -4174,8 +4174,9 @@ async function procesarCoordenadas(lat,lng){
             'Puede estar temporalmente caído. Intenta más tarde o consulta por Coordenadas.');
           zonas.push(_fb);
           window._gdlUsandoFallback=true;
+        } else {
+          throw new Error('No se encontró zonificación. Verifica que la dirección esté en Guadalajara.');
         }
-        throw new Error('No se encontró zonificación. Verifica que la dirección esté en Guadalajara.');
       }
       todosPoligonos=zonas.map(f=>f.properties);
       _idxZonaGDLActivo=0;

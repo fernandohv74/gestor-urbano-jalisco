@@ -728,8 +728,7 @@ function actualizar3D(){
     'canvas.addEventListener("touchmove",function(e){e.preventDefault();if(e.touches.length===1&&drag){aY+=(e.touches[0].clientX-px)*.008;aX=Math.max(-.1,Math.min(1.2,aX-(e.touches[0].clientY-py)*.008));px=e.touches[0].clientX;py=e.touches[0].clientY;draw();}if(e.touches.length===2){var d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);sc=Math.max(4,Math.min(120,sc-(d-lt)*.1));lt=d;draw();}},{passive:false});',
     '})();',
     '</' + scriptTag + '>',
-    '
-</body></html>'
+    '</body></html>'
   ].join('\n');
 
   const blob = new Blob([html3d], {type: 'text/html'});

@@ -4398,7 +4398,7 @@ function cambiarPoligono(idx){
       <div class="gu-rest-box"><div class="gu-rest-val">${z.rest_l1||0} m</div><div class="gu-rest-lbl">Lateral</div></div>
       <div class="gu-rest-box"><div class="gu-rest-val">${z.rest_p1||0} m</div><div class="gu-rest-lbl">Posterior</div></div>
     </div>
-    ${z.c_otros?`<div class="gu-nota" style="margin-top:10px">📋 ${z.c_otros} — Reglamento de Gestión del Desarrollo Urbano para el Municipio de Guadalajara (reforma Abril 2025)</div>`:''}`;
+    ${z.c_otros?`<div class="gu-nota" style="margin-top:10px">📋 ${z.c_otros}${municipioActual==='guadalajara'?' — Reglamento de Gestión del Desarrollo Urbano para el Municipio de Guadalajara (reforma Abril 2025)':''}</div>`:''}`;
 
   // Actualizar usos dentro de la card de ubicación con flash
   const cu = document.getElementById('cardUbicacion');
@@ -4837,10 +4837,8 @@ function renderizar(zona,todos){
           <div class="gu-rest-box"><div class="gu-rest-val" id="dynRESTL">${zona.rest_l1||0} m</div><div class="gu-rest-lbl">Lateral</div></div>
           <div class="gu-rest-box"><div class="gu-rest-val" id="dynRESTp">${zona.rest_p1||0} m</div><div class="gu-rest-lbl">Posterior</div></div>
         </div>
-        <div style="font-size:10px;color:var(--text3);line-height:1.5;margin-top:8px;background:var(--bg3);border-left:2px solid var(--yellow);padding:5px 9px;border-radius:0 5px 5px 0">
-          ⚠️ <strong style="color:var(--yellow)">RP dinámica:</strong> Según el <em>Reglamento de Gestión Integral de GDL</em>, la restricción posterior efectiva es <strong>max(3 m, 25% de la altura total)</strong>. El valor mostrado se actualiza al ingresar la superficie en el simulador.
-        </div>
-        ${zona.c_otros?`<div class="gu-nota" style="margin-top:10px">📋 ${zona.c_otros} — Reglamento de Gestión del Desarrollo Urbano para el Municipio de Guadalajara (reforma Abril 2025)</div>`:''}
+        ${municipioActual==='guadalajara'?`<div style="font-size:10px;color:var(--text3);line-height:1.5;margin-top:8px;background:var(--bg3);border-left:2px solid var(--yellow);padding:5px 9px;border-radius:0 5px 5px 0">⚠️ <strong style="color:var(--yellow)">RP dinámica:</strong> Según el <em>Reglamento de Gestión Integral de GDL</em>, la restricción posterior efectiva es <strong>max(3 m, 25% de la altura total)</strong>. El valor mostrado se actualiza al ingresar la superficie en el simulador.</div>`:''}
+        ${zona.c_otros?`<div class="gu-nota" style="margin-top:10px">📋 ${zona.c_otros}${municipioActual==='guadalajara'?' — Reglamento de Gestión del Desarrollo Urbano para el Municipio de Guadalajara (reforma Abril 2025)':''}</div>`:''}
       </div>
     </div>
 

@@ -6824,6 +6824,15 @@ function generarPDFGiro(){
   const munN = {guadalajara:'Guadalajara',zapopan:'Zapopan',tlaquepaque:'Tlaquepaque',tlajomulco:'Tlajomulco de Zúñiga',tonala:'Tonalá'};
   const municipio = munN[municipioActual]||municipioActual||'';
   const fecha = new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
+  // Nombre del archivo: domicilio + municipio (el <title> es lo que el navegador sugiere al guardar)
+  const tituloArchivo = domicilio ? 'Giro — ' + domicilio + ' — ' + municipio : 'Giro — ' + municipio;
+  // Enlace a Google Maps
+  let mapsUrl;
+  if(latActual && lngActual){
+    mapsUrl = 'https://www.google.com/maps?q=' + latActual + ',' + lngActual;
+  } else {
+    mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((domicilio||municipio) + ', Jalisco, México');
+  }
   const C = {
     permitido:   {bg:'#F0FDF4',brd:'#16A34A',txt:'#15803D',lbl:'VIABLE — USO PERMITIDO'},
     condicionado:{bg:'#FFFBEB',brd:'#D97706',txt:'#B45309',lbl:'VIABLE CON CONDICIONANTES — USO CONDICIONADO'},
@@ -6836,8 +6845,11 @@ function generarPDFGiro(){
     ? '<div style="margin-top:12px"><div style="font-size:9pt;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748B;margin-bottom:6px">Condicionantes</div>'
       + r.conds.map(t=>'<div style="padding:7px 10px;background:#FAFAFA;border-left:3px solid '+c.brd+';font-size:10pt;color:#374151;line-height:1.5;margin-bottom:5px">'+strip(t)+'</div>').join('')+'</div>'
     : '';
+  const coordRow = (latActual && lngActual)
+    ? '<div class="row"><span class="lbl">Coordenadas<\/span><span class="val" style="font-family:monospace">'+latActual.toFixed(6)+', '+lngActual.toFixed(6)+'<\/span><\/div>'
+    : '';
   const html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">'
-    + '<title>Constancia Verificación de Giro</title>'
+    + '<title>' + tituloArchivo + '<\/title>'
     + '<style>'
     + '@page{size:Letter portrait;margin:2cm 2.5cm}'
     + 'body{font-family:"Helvetica Neue",Arial,sans-serif;font-size:11pt;color:#1E293B;margin:0}'
@@ -6850,22 +6862,26 @@ function generarPDFGiro(){
     + '.sem{padding:14px 18px;border-radius:8px;border:1.5px solid '+c.brd+';background:'+c.bg+';margin:14px 0}'
     + '.sem-lbl{font-size:9pt;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:'+c.txt+';margin-bottom:4px}'
     + '.sem-txt{font-size:10pt;color:#374151;line-height:1.5}'
+    + '.maps-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed #F1F5F9;align-items:center}'
+    + '.maps-link{font-size:9pt;color:#1A5676;word-break:break-all;text-align:right;flex:1}'
     + '.footer{margin-top:22px;padding-top:10px;border-top:1px solid #E2E8F0;font-size:8pt;color:#94A3B8;text-align:center}'
     + '<\/style><\/head><body>'
     + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid #1A5676">'
     + '<div><h1>Constancia de Verificación de Giro Comercial<\/h1><h2>M02 — Verificador de Giro Comercial · TrazaUrbana<\/h2><\/div>'
     + '<div style="text-align:right;font-size:9pt;color:#64748B">'+fecha+'<br><span style="font-size:8pt">Documento informativo — no oficial<\/span><\/div>'
     + '<\/div>'
-    + '<div class="sec">Datos del predio<\/div>'
+    + '<div class="sec">Ubicación del predio<\/div>'
     + '<div class="row"><span class="lbl">Domicilio<\/span><span class="val">'+(domicilio||'No especificado')+'<\/span><\/div>'
-    + '<div class="row"><span class="lbl">Municipio<\/span><span class="val">'+municipio+'<\/span><\/div>'
+    + '<div class="row"><span class="lbl">Municipio<\/span><span class="val">'+municipio+', Jalisco<\/span><\/div>'
     + '<div class="row"><span class="lbl">Zona de uso de suelo<\/span><span class="val">'+r.zona+' — '+r.zonaNombre+'<\/span><\/div>'
+    + coordRow
+    + '<div class="maps-row"><span class="lbl">Ver en Google Maps<\/span><span class="maps-link">'+mapsUrl+'<\/span><\/div>'
     + '<div class="sec">Giro comercial verificado<\/div>'
     + '<div class="row"><span class="lbl">Código SCIAN<\/span><span class="val" style="font-family:monospace">'+r.codigo+'<\/span><\/div>'
-    + '<div class="row"><span class="lbl">Descripción del giro<\/span><span class="val">'+r.nombre+'<\/span><\/div>'
-    + '<div class="sec">Resultado de la verificación<\/div>'
+    + '<div class="row"><span class="lbl">Descripción<\/span><span class="val">'+r.nombre+'<\/span><\/div>'
+    + '<div class="sec">Resultado<\/div>'
     + '<div class="sem"><div class="sem-lbl">'+c.lbl+'<\/div><div class="sem-txt">'+strip(r.razon)+'<\/div>'+condsHtml+'<\/div>'
-    + '<div class="footer">Esta constancia es de carácter informativo y no sustituye dictamen oficial de la autoridad municipal. · TrazaUrbana · trazaurbana.mx<\/div>'
+    + '<div class="footer">Esta constancia es informativa y no sustituye dictamen oficial de la autoridad municipal. · TrazaUrbana · trazaurbana.mx<\/div>'
     + '<script>window.onload=function(){window.print();}<\/script>'
     + '<\/body><\/html>';
   const w = window.open('','_blank','width=820,height=960');

@@ -6824,15 +6824,28 @@ function generarPDFGiro(){
   const munN = {guadalajara:'Guadalajara',zapopan:'Zapopan',tlaquepaque:'Tlaquepaque',tlajomulco:'Tlajomulco de Zúñiga',tonala:'Tonalá'};
   const municipio = munN[municipioActual]||municipioActual||'';
   const fecha = new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
-  // Nombre del archivo: domicilio + municipio (el <title> es lo que el navegador sugiere al guardar)
   const tituloArchivo = domicilio ? 'Giro — ' + domicilio + ' — ' + municipio : 'Giro — ' + municipio;
-  // Enlace a Google Maps
-  let mapsUrl;
+  // Google Maps URLs
+  let mapsUrl, mapImgUrl;
   if(latActual && lngActual){
     mapsUrl = 'https://www.google.com/maps?q=' + latActual + ',' + lngActual;
+    const k = typeof GOOGLE_MAPS_KEY !== 'undefined' ? GOOGLE_MAPS_KEY : '';
+    if(k){
+      mapImgUrl = 'https://maps.googleapis.com/maps/api/staticmap'
+        + '?center=' + latActual + ',' + lngActual
+        + '&zoom=16&size=580x260&maptype=roadmap'
+        + '&markers=color:red%7C' + latActual + ',' + lngActual
+        + '&key=' + k;
+    }
   } else {
     mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((domicilio||municipio) + ', Jalisco, México');
   }
+  const mapSection = mapImgUrl
+    ? '<div class="sec">Mapa de ubicación<\/div>'
+      + '<div style="margin:8px 0 4px;border-radius:6px;overflow:hidden;border:1px solid #E2E8F0">'
+      + '<img src="' + mapImgUrl + '" style="width:100%;display:block" alt="Mapa">'
+      + '<\/div>'
+    : '';
   const C = {
     permitido:   {bg:'#F0FDF4',brd:'#16A34A',txt:'#15803D',lbl:'VIABLE — USO PERMITIDO'},
     condicionado:{bg:'#FFFBEB',brd:'#D97706',txt:'#B45309',lbl:'VIABLE CON CONDICIONANTES — USO CONDICIONADO'},
@@ -6842,8 +6855,8 @@ function generarPDFGiro(){
   const c = C[r.tipo]||C.sin_datos;
   const strip = s => s.replace(/<[^>]*>/g,'');
   const condsHtml = r.conds.length
-    ? '<div style="margin-top:12px"><div style="font-size:9pt;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748B;margin-bottom:6px">Condicionantes</div>'
-      + r.conds.map(t=>'<div style="padding:7px 10px;background:#FAFAFA;border-left:3px solid '+c.brd+';font-size:10pt;color:#374151;line-height:1.5;margin-bottom:5px">'+strip(t)+'</div>').join('')+'</div>'
+    ? '<div style="margin-top:12px"><div style="font-size:9pt;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748B;margin-bottom:6px">Condicionantes<\/div>'
+      + r.conds.map(t=>'<div style="padding:7px 10px;background:#FAFAFA;border-left:3px solid '+c.brd+';font-size:10pt;color:#374151;line-height:1.5;margin-bottom:5px">'+strip(t)+'<\/div>').join('')+'<\/div>'
     : '';
   const coordRow = (latActual && lngActual)
     ? '<div class="row"><span class="lbl">Coordenadas<\/span><span class="val" style="font-family:monospace">'+latActual.toFixed(6)+', '+lngActual.toFixed(6)+'<\/span><\/div>'
@@ -6851,22 +6864,22 @@ function generarPDFGiro(){
   const html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">'
     + '<title>' + tituloArchivo + '<\/title>'
     + '<style>'
-    + '@page{size:Letter portrait;margin:2cm 2.5cm}'
+    + '@page{size:Letter portrait;margin:1.8cm 2.2cm}'
     + 'body{font-family:"Helvetica Neue",Arial,sans-serif;font-size:11pt;color:#1E293B;margin:0}'
     + 'h1{font-size:15pt;font-weight:700;margin:0 0 2px}'
     + 'h2{font-size:10pt;font-weight:400;color:#64748B;margin:0 0 20px}'
-    + '.sec{font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#94A3B8;margin:16px 0 6px;border-top:1px solid #E2E8F0;padding-top:10px}'
+    + '.sec{font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#94A3B8;margin:14px 0 5px;border-top:1px solid #E2E8F0;padding-top:9px}'
     + '.row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed #F1F5F9}'
     + '.lbl{font-size:10pt;color:#64748B;flex:0 0 160px}'
     + '.val{font-size:10pt;color:#1E293B;font-weight:500;flex:1;text-align:right}'
-    + '.sem{padding:14px 18px;border-radius:8px;border:1.5px solid '+c.brd+';background:'+c.bg+';margin:14px 0}'
+    + '.sem{padding:13px 16px;border-radius:8px;border:1.5px solid '+c.brd+';background:'+c.bg+';margin:12px 0}'
     + '.sem-lbl{font-size:9pt;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:'+c.txt+';margin-bottom:4px}'
     + '.sem-txt{font-size:10pt;color:#374151;line-height:1.5}'
     + '.maps-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed #F1F5F9;align-items:center}'
     + '.maps-link{font-size:9pt;color:#1A5676;word-break:break-all;text-align:right;flex:1}'
-    + '.footer{margin-top:22px;padding-top:10px;border-top:1px solid #E2E8F0;font-size:8pt;color:#94A3B8;text-align:center}'
+    + '.footer{margin-top:18px;padding-top:9px;border-top:1px solid #E2E8F0;font-size:8pt;color:#94A3B8;text-align:center}'
     + '<\/style><\/head><body>'
-    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid #1A5676">'
+    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid #1A5676">'
     + '<div><h1>Constancia de Verificación de Giro Comercial<\/h1><h2>M02 — Verificador de Giro Comercial · TrazaUrbana<\/h2><\/div>'
     + '<div style="text-align:right;font-size:9pt;color:#64748B">'+fecha+'<br><span style="font-size:8pt">Documento informativo — no oficial<\/span><\/div>'
     + '<\/div>'
@@ -6876,6 +6889,7 @@ function generarPDFGiro(){
     + '<div class="row"><span class="lbl">Zona de uso de suelo<\/span><span class="val">'+r.zona+' — '+r.zonaNombre+'<\/span><\/div>'
     + coordRow
     + '<div class="maps-row"><span class="lbl">Ver en Google Maps<\/span><span class="maps-link">'+mapsUrl+'<\/span><\/div>'
+    + mapSection
     + '<div class="sec">Giro comercial verificado<\/div>'
     + '<div class="row"><span class="lbl">Código SCIAN<\/span><span class="val" style="font-family:monospace">'+r.codigo+'<\/span><\/div>'
     + '<div class="row"><span class="lbl">Descripción<\/span><span class="val">'+r.nombre+'<\/span><\/div>'

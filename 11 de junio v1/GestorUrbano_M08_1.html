@@ -394,6 +394,12 @@ function guToggleTheme(){
             <input type="number" id="inp-refrendo" min="1" max="120" placeholder="ej. 6" oninput="calcularRefrendo()" style="flex:1">
             <button class="btn-clear-rf" onclick="limpiarRefrendo()" title="Limpiar refrendo">✕ Limpiar</button>
           </div>
+          <div id="ref-art9-row" style="display:none;margin-top:8px">
+            <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text2);cursor:pointer">
+              <input type="checkbox" id="inp-refrendo-5a" onchange="calcularRefrendo()" style="cursor:pointer">
+              Licencia con m&aacute;s de 5 a&ntilde;os &mdash; Art.&nbsp;9 Fracc.&nbsp;II (tasa 5%/mes en todo el per&iacute;odo)
+            </label>
+          </div>
         </div>
         <div class="refrendo-result" id="refrendo-result" style="display:none"></div>
       </div>
@@ -425,7 +431,7 @@ function guToggleTheme(){
     <div class="rf-quick-grid">
       <div class="rf-quick-field">
         <label>Municipio</label>
-        <select id="rq-mun">
+        <select id="rq-mun" onchange="var r=document.getElementById('rq-art9-row');r.style.display=this.value==='GDL'?'block':'none';document.getElementById('rq-5a').checked=false;">
           <option value="GDL">Guadalajara</option>
           <option value="ZPN">Zapopan</option>
           <option value="TLQ">Tlaquepaque</option>
@@ -441,6 +447,12 @@ function guToggleTheme(){
         <label>Meses de pr&#243;rroga</label>
         <input type="number" id="rq-meses" placeholder="ej. 6" min="1" max="120">
       </div>
+    </div>
+    <div id="rq-art9-row" style="margin-top:8px;display:block">
+      <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text2);cursor:pointer">
+        <input type="checkbox" id="rq-5a" style="cursor:pointer">
+        Licencia con m&aacute;s de 5 a&ntilde;os &mdash; aplica Art.&nbsp;9 Fracc.&nbsp;II (tasa 5%/mes en todo el per&iacute;odo)
+      </label>
     </div>
     <div style="display:flex;gap:8px;margin-top:10px">
       <button id="btn-rq-calc" style="flex:1;background:var(--brand);color:#fff;border:none;border-radius:var(--r-md);padding:13px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer">Calcular refrendo</button>
@@ -474,22 +486,29 @@ function guToggleTheme(){
     var artRef  = '';
 
     if (mun === 'GDL') {
-      var limite5A   = 30;
-      var mesesBajos = Math.min(meses, limite5A);
-      var mesesAltos = Math.max(0, meses - limite5A);
-      var rf1 = mesesBajos > 0 ? costo * 0.025 * mesesBajos : 0;
-      var rf2 = mesesAltos > 0 ? costo * 0.050 * mesesAltos : 0;
-      costoRefrendo = rf1 + rf2;
-      if (mesesBajos > 0 && mesesAltos > 0) {
-        detalle = mesesBajos + ' mes' + (mesesBajos > 1 ? 'es' : '') + ' &times; 2.5% = ' + fmtRQ(rf1)
-                + '&nbsp;+&nbsp;'
-                + mesesAltos + ' mes' + (mesesAltos > 1 ? 'es' : '') + ' &times; 5.0% = ' + fmtRQ(rf2);
-      } else if (mesesBajos > 0) {
-        detalle = mesesBajos + ' mes' + (mesesBajos > 1 ? 'es' : '') + ' &times; 2.5% sobre ' + fmtRQ(costo);
+      var es5A = document.getElementById('rq-5a').checked;
+      if (es5A) {
+        costoRefrendo = costo * 0.05 * meses;
+        detalle = meses + ' mes' + (meses > 1 ? 'es' : '') + ' &times; 5% sobre ' + fmtRQ(costo);
+        artRef = 'Art. 9 Fracc. II &middot; Licencia mayor a 5 a&ntilde;os';
       } else {
-        detalle = mesesAltos + ' mes' + (mesesAltos > 1 ? 'es' : '') + ' &times; 5.0% sobre ' + fmtRQ(costo);
+        var limite5A   = 30;
+        var mesesBajos = Math.min(meses, limite5A);
+        var mesesAltos = Math.max(0, meses - limite5A);
+        var rf1 = mesesBajos > 0 ? costo * 0.025 * mesesBajos : 0;
+        var rf2 = mesesAltos > 0 ? costo * 0.050 * mesesAltos : 0;
+        costoRefrendo = rf1 + rf2;
+        if (mesesBajos > 0 && mesesAltos > 0) {
+          detalle = mesesBajos + ' mes' + (mesesBajos > 1 ? 'es' : '') + ' &times; 2.5% = ' + fmtRQ(rf1)
+                  + '&nbsp;+&nbsp;'
+                  + mesesAltos + ' mes' + (mesesAltos > 1 ? 'es' : '') + ' &times; 5.0% = ' + fmtRQ(rf2);
+        } else if (mesesBajos > 0) {
+          detalle = mesesBajos + ' mes' + (mesesBajos > 1 ? 'es' : '') + ' &times; 2.5% sobre ' + fmtRQ(costo);
+        } else {
+          detalle = mesesAltos + ' mes' + (mesesAltos > 1 ? 'es' : '') + ' &times; 5.0% sobre ' + fmtRQ(costo);
+        }
+        artRef = 'Art. 49 Fracc. II &middot; Vigencia base: 30 meses';
       }
-      artRef = 'Art. 49 Fracc. II &middot; Vigencia base: 30 meses';
     } else if (mun === 'ZPN') {
       var bimestres = Math.ceil(meses / 2);
       costoRefrendo = costo * 0.05 * bimestres;
@@ -1207,6 +1226,8 @@ function calcular() {
   rPanel.style.display = '';
   document.getElementById('inp-refrendo').value = '';
   document.getElementById('refrendo-result').style.display = 'none';
+  document.getElementById('ref-art9-row').style.display = munActual === 'GDL' ? '' : 'none';
+  document.getElementById('inp-refrendo-5a').checked = false;
   const vigBase = munActual === 'GDL' ? 30 : 24;
   const tasa1Map = {
     GDL: '2.5%/mes (hasta 5 años) / 5%/mes (más de 5 años)',
@@ -1355,22 +1376,29 @@ function calcularRefrendo() {
   let costoRefrendo = 0, detalle = '', artRef = '';
 
   if (munActual === 'GDL') {
-    const limite5A   = 30; // meses adicionales hasta completar 5 años de vigencia total
-    const mesesBajos = Math.min(meses, limite5A);
-    const mesesAltos = Math.max(0, meses - limite5A);
-    const rf1 = mesesBajos > 0 ? costo * 0.025 * mesesBajos : 0;
-    const rf2 = mesesAltos > 0 ? costo * 0.050 * mesesAltos : 0;
-    costoRefrendo = rf1 + rf2;
-    if (mesesBajos > 0 && mesesAltos > 0) {
-      detalle = mesesBajos + ' mes' + (mesesBajos > 1 ? 'es' : '') + ' &times; 2.5% = ' + fmt(rf1)
-              + ' &nbsp;+&nbsp; '
-              + mesesAltos + ' mes' + (mesesAltos > 1 ? 'es' : '') + ' &times; 5.0% = ' + fmt(rf2);
-    } else if (mesesBajos > 0) {
-      detalle = mesesBajos + ' mes' + (mesesBajos > 1 ? 'es' : '') + ' &times; 2.5% sobre ' + fmt(costo);
+    const es5A = document.getElementById('inp-refrendo-5a').checked;
+    if (es5A) {
+      costoRefrendo = costo * 0.05 * meses;
+      detalle = meses + ' mes' + (meses > 1 ? 'es' : '') + ' &times; 5% sobre ' + fmt(costo);
+      artRef = 'Art. 9 Fracc. II &middot; Licencia mayor a 5 a&ntilde;os';
     } else {
-      detalle = mesesAltos + ' mes' + (mesesAltos > 1 ? 'es' : '') + ' &times; 5.0% sobre ' + fmt(costo);
+      const limite5A   = 30;
+      const mesesBajos = Math.min(meses, limite5A);
+      const mesesAltos = Math.max(0, meses - limite5A);
+      const rf1 = mesesBajos > 0 ? costo * 0.025 * mesesBajos : 0;
+      const rf2 = mesesAltos > 0 ? costo * 0.050 * mesesAltos : 0;
+      costoRefrendo = rf1 + rf2;
+      if (mesesBajos > 0 && mesesAltos > 0) {
+        detalle = mesesBajos + ' mes' + (mesesBajos > 1 ? 'es' : '') + ' &times; 2.5% = ' + fmt(rf1)
+                + ' &nbsp;+&nbsp; '
+                + mesesAltos + ' mes' + (mesesAltos > 1 ? 'es' : '') + ' &times; 5.0% = ' + fmt(rf2);
+      } else if (mesesBajos > 0) {
+        detalle = mesesBajos + ' mes' + (mesesBajos > 1 ? 'es' : '') + ' &times; 2.5% sobre ' + fmt(costo);
+      } else {
+        detalle = mesesAltos + ' mes' + (mesesAltos > 1 ? 'es' : '') + ' &times; 5.0% sobre ' + fmt(costo);
+      }
+      artRef = 'Art. 49 Fracc. II &middot; Vigencia base: 30 meses';
     }
-    artRef = 'Art. 49 Fracc. II &middot; Vigencia base: 30 meses';
   } else if (munActual === 'ZPN') {
     const bimestres = Math.ceil(meses / 2);
     costoRefrendo = costo * 0.05 * bimestres;
@@ -1405,6 +1433,7 @@ function calcularRefrendo() {
 
 function limpiarRefrendo() {
   document.getElementById('inp-refrendo').value = '';
+  document.getElementById('inp-refrendo-5a').checked = false;
   const div = document.getElementById('refrendo-result');
   div.style.display = 'none';
   div.innerHTML = '';

@@ -6715,7 +6715,8 @@ function verificarGiro(){
     const bgs    = {permitido:'#031A0F',condicionado:'#1A0F00',prohibido:'#110202',sin_datos:'var(--bg3)'};
     const bords  = {permitido:'#166534',condicionado:'#92400E',prohibido:'#991B1B',sin_datos:'var(--border)'};
     const tc     = {permitido:'var(--uso-p-txt)',condicionado:'var(--sem-am-txt)',prohibido:'var(--sem-r-txt)',sin_datos:'var(--text3)'};
-    let ov=document.getElementById('m02Ov');
+    window._lastGiroResult={tipo,codigo:g.codigo||'',nombre:g.nombre||'',zona:clave,zonaNombre:infoZona.n||clave,razon,conds:conds.slice()};
+  let ov=document.getElementById('m02Ov');
     if(!ov){ov=document.createElement('div');ov.id='m02Ov';ov.style.cssText='position:fixed;top:70px;right:20px;width:400px;max-width:calc(100vw-340px);z-index:9000;max-height:calc(100vh-90px);overflow-y:auto';document.body.appendChild(ov);}
     ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.6)">
     <div style="background:${bgs[tipo]};border-bottom:2px solid ${bords[tipo]};padding:16px 20px;display:flex;gap:12px;align-items:flex-start">
@@ -6733,6 +6734,7 @@ function verificarGiro(){
     </div>
     ${(()=>{const msg=getMensajeM2(clave,g.cond);if(!msg)return '';return `<div style="margin:0 16px 12px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.6"><span style="font-size:13px;margin-right:6px">${msg.icon}</span>${msg.texto}</div>`;})()} 
     <div style="padding:0 16px 14px;display:flex;gap:8px">
+      <button onclick="generarPDFGiro()" style="flex:1;background:#1A5676;border:none;border-radius:7px;padding:9px;color:#fff;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer">&#128196; PDF</button>
       <button onclick="document.getElementById('m02Ov').remove()" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px;color:var(--text2);font-family:var(--sans);font-size:12px;cursor:pointer">Cerrar</button>
       <button onclick="const _ov=document.getElementById('m02Ov');if(_ov)_ov.remove();clearGiroM02();setTimeout(()=>{const f=document.getElementById('giroFiltro');if(f){f.value='';f.focus();}filtrarGirosM02('');},50);" style="flex:1;background:var(--brand);border:none;border-radius:7px;padding:9px;color:#fff;font-family:var(--sans);font-size:12px;cursor:pointer">Otro giro</button>
     </div>
@@ -6779,6 +6781,7 @@ function verificarGiro(){
   const bords  = {permitido:'#166534',condicionado:'#92400E',prohibido:'#991B1B',sin_datos:'var(--border)'};
   const tc     = {permitido:'var(--uso-p-txt)',condicionado:'var(--sem-am-txt)',prohibido:'var(--sem-r-txt)',sin_datos:'var(--text3)'};
 
+  window._lastGiroResult={tipo,codigo:g.codigo||'',nombre:g.nombre||'',zona:clave,zonaNombre:infoZona.n||clave,razon,conds:conds.slice()};
   let ov=document.getElementById('m02Ov');
   if(!ov){ov=document.createElement('div');ov.id='m02Ov';ov.style.cssText='position:fixed;top:70px;right:20px;width:400px;max-width:calc(100vw-340px);z-index:9000;max-height:calc(100vh-90px);overflow-y:auto';document.body.appendChild(ov);}
   ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.6)">
@@ -6803,12 +6806,71 @@ function verificarGiro(){
       </div>`;
     })()}
     <div style="padding:0 16px 14px;display:flex;gap:8px">
+      <button onclick="generarPDFGiro()" style="flex:1;background:#1A5676;border:none;border-radius:7px;padding:9px;color:#fff;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer">&#128196; PDF</button>
       <button onclick="document.getElementById('m02Ov').remove()" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px;color:var(--text2);font-family:var(--sans);font-size:12px;cursor:pointer">Cerrar</button>
       <button onclick="const _ov=document.getElementById('m02Ov');if(_ov)_ov.remove();clearGiroM02();setTimeout(()=>{const f=document.getElementById('giroFiltro');if(f){f.value='';f.focus();}filtrarGirosM02('');},50);" style="flex:1;background:var(--brand);border:none;border-radius:7px;padding:9px;color:#fff;font-family:var(--sans);font-size:12px;cursor:pointer">Otro giro</button>
     </div>
   </div>`;
 }
 
+
+function generarPDFGiro(){
+  const r = window._lastGiroResult;
+  if(!r) return;
+  const dom = (document.getElementById('inCalle')?.value||'').trim();
+  const col = (document.getElementById('inColonia')?.value||'').trim();
+  const cp  = (document.getElementById('inCP')?.value||'').trim();
+  const domicilio = [dom,col,cp].filter(Boolean).join(', ');
+  const munN = {guadalajara:'Guadalajara',zapopan:'Zapopan',tlaquepaque:'Tlaquepaque',tlajomulco:'Tlajomulco de Zúñiga',tonala:'Tonalá'};
+  const municipio = munN[municipioActual]||municipioActual||'';
+  const fecha = new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
+  const C = {
+    permitido:   {bg:'#F0FDF4',brd:'#16A34A',txt:'#15803D',lbl:'VIABLE — USO PERMITIDO'},
+    condicionado:{bg:'#FFFBEB',brd:'#D97706',txt:'#B45309',lbl:'VIABLE CON CONDICIONANTES — USO CONDICIONADO'},
+    prohibido:   {bg:'#FEF2F2',brd:'#DC2626',txt:'#B91C1C',lbl:'NO VIABLE — USO PROHIBIDO'},
+    sin_datos:   {bg:'#F8FAFC',brd:'#94A3B8',txt:'#64748B',lbl:'SIN DATOS SUFICIENTES'}
+  };
+  const c = C[r.tipo]||C.sin_datos;
+  const strip = s => s.replace(/<[^>]*>/g,'');
+  const condsHtml = r.conds.length
+    ? '<div style="margin-top:12px"><div style="font-size:9pt;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748B;margin-bottom:6px">Condicionantes</div>'
+      + r.conds.map(t=>'<div style="padding:7px 10px;background:#FAFAFA;border-left:3px solid '+c.brd+';font-size:10pt;color:#374151;line-height:1.5;margin-bottom:5px">'+strip(t)+'</div>').join('')+'</div>'
+    : '';
+  const html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">'
+    + '<title>Constancia Verificación de Giro</title>'
+    + '<style>'
+    + '@page{size:Letter portrait;margin:2cm 2.5cm}'
+    + 'body{font-family:"Helvetica Neue",Arial,sans-serif;font-size:11pt;color:#1E293B;margin:0}'
+    + 'h1{font-size:15pt;font-weight:700;margin:0 0 2px}'
+    + 'h2{font-size:10pt;font-weight:400;color:#64748B;margin:0 0 20px}'
+    + '.sec{font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#94A3B8;margin:16px 0 6px;border-top:1px solid #E2E8F0;padding-top:10px}'
+    + '.row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed #F1F5F9}'
+    + '.lbl{font-size:10pt;color:#64748B;flex:0 0 160px}'
+    + '.val{font-size:10pt;color:#1E293B;font-weight:500;flex:1;text-align:right}'
+    + '.sem{padding:14px 18px;border-radius:8px;border:1.5px solid '+c.brd+';background:'+c.bg+';margin:14px 0}'
+    + '.sem-lbl{font-size:9pt;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:'+c.txt+';margin-bottom:4px}'
+    + '.sem-txt{font-size:10pt;color:#374151;line-height:1.5}'
+    + '.footer{margin-top:22px;padding-top:10px;border-top:1px solid #E2E8F0;font-size:8pt;color:#94A3B8;text-align:center}'
+    + '<\/style><\/head><body>'
+    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid #1A5676">'
+    + '<div><h1>Constancia de Verificación de Giro Comercial<\/h1><h2>M02 — Verificador de Giro Comercial · TrazaUrbana<\/h2><\/div>'
+    + '<div style="text-align:right;font-size:9pt;color:#64748B">'+fecha+'<br><span style="font-size:8pt">Documento informativo — no oficial<\/span><\/div>'
+    + '<\/div>'
+    + '<div class="sec">Datos del predio<\/div>'
+    + '<div class="row"><span class="lbl">Domicilio<\/span><span class="val">'+(domicilio||'No especificado')+'<\/span><\/div>'
+    + '<div class="row"><span class="lbl">Municipio<\/span><span class="val">'+municipio+'<\/span><\/div>'
+    + '<div class="row"><span class="lbl">Zona de uso de suelo<\/span><span class="val">'+r.zona+' — '+r.zonaNombre+'<\/span><\/div>'
+    + '<div class="sec">Giro comercial verificado<\/div>'
+    + '<div class="row"><span class="lbl">Código SCIAN<\/span><span class="val" style="font-family:monospace">'+r.codigo+'<\/span><\/div>'
+    + '<div class="row"><span class="lbl">Descripción del giro<\/span><span class="val">'+r.nombre+'<\/span><\/div>'
+    + '<div class="sec">Resultado de la verificación<\/div>'
+    + '<div class="sem"><div class="sem-lbl">'+c.lbl+'<\/div><div class="sem-txt">'+strip(r.razon)+'<\/div>'+condsHtml+'<\/div>'
+    + '<div class="footer">Esta constancia es de carácter informativo y no sustituye dictamen oficial de la autoridad municipal. · TrazaUrbana · trazaurbana.mx<\/div>'
+    + '<script>window.onload=function(){window.print();}<\/script>'
+    + '<\/body><\/html>';
+  const w = window.open('','_blank','width=820,height=960');
+  if(w){w.document.write(html);w.document.close();}
+}
 
 function limpiarBusquedaGiro(){
   const input = document.getElementById('giroFiltro');

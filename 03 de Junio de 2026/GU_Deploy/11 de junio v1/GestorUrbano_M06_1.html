@@ -1945,16 +1945,25 @@ function renderResultado(giro, mun, sup, tramiteLabel) {
       + '<span style="display:block;margin-top:4px;">&#9888; <strong>Condicionantes de superficie (Art. 7 bis, párr. 3, Reglamento de Giros GDL — reforma 2019):</strong> aplica únicamente a giros con clasificación de uso de suelo I2/I3 o CS2–CS5. Para esos giros, si la superficie excede 100 m² la zona requerida puede reclasificarse (I3, CS3 o CS5). No aplica a todos los giros — verifica compatibilidad de uso de suelo en M02 antes del trámite.</span>'
       + '</div>';
   }
+  if (mun==='ZPN') {
+    dHtml += '<div style="margin-top:10px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.78rem;color:var(--text);opacity:.85;">'
+      + '&#128218; <strong>Base normativa ZPN:</strong> Reglamento para el Comercio, la Industria y la Prestación de Servicios en el Municipio de Zapopan, Jalisco (última reforma nov 2024). '
+      + '<span style="display:block;margin-top:4px;">&#9888; <strong>Superficie en giros industriales (Art. 307):</strong> la industria ligera se define como la que no excede <strong>100 m²</strong> de superficie de trabajo y puede colindar con zonas habitacionales. Si el establecimiento supera ese umbral, se clasifica como industria mediana o pesada, con mayores requisitos de compatibilidad de uso de suelo — verificar en Padrón y Licencias.</span>'
+      + '<span style="display:block;margin-top:4px;">&#9888; <strong>Gimnasios y clubes deportivos (Art. 63):</strong> si la superficie excede 100 m², se requiere presentar plano de distribución con medidas como requisito adicional de licencia.</span>'
+      + '</div>';
+  }
   if (mun==='TLA') {
     dHtml += '<div style="margin-top:10px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.78rem;color:var(--text);opacity:.85;">'
       + '&#128218; <strong>Base normativa TLA:</strong> Reglamento para el Funcionamiento de Giros Comerciales, Industriales y de Prestación de Servicios del Municipio de Tlajomulco de Zúñiga (aprobado 2014, últ. reforma 4 jun 2021). '
       + '<span style="display:block;margin-top:4px;">Ventanilla: <strong>Oficialía Mayor de Padrón y Licencias</strong>. Vigencia: <strong>enero–diciembre del ejercicio fiscal</strong>; refrendo en enero–febrero (Art. 15). SARE: giros de bajo riesgo en <strong>3 días hábiles</strong> con Afirmativa Ficta (Art. 13 Ter).</span>'
+      + '<span style="display:block;margin-top:4px;">&#9888; <strong>Modificación de superficie:</strong> cualquier cambio en la superficie del establecimiento requiere un nuevo Dictamen de Uso de Suelo (DTUDE o equivalente) que contemple el giro y la superficie actualizada — no aplica si la superficie disminuye.</span>'
       + '</div>';
   }
   if (mun==='TLQ') {
     dHtml += '<div style="margin-top:10px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.78rem;color:var(--text);opacity:.85;">'
       + '&#128218; <strong>Base normativa TLQ:</strong> Reglamento para el Funcionamiento de Establecimientos Comerciales, Industriales y de Prestación de Servicios, Municipio de San Pedro Tlaquepaque (aprobado 11 abr 2019, últ. reforma 31 oct 2023). '
       + '<span style="display:block;margin-top:4px;">Ventanilla: <strong>Dirección de Padrón y Licencias, H. Ayuntamiento de San Pedro Tlaquepaque</strong>.</span>'
+      + '<span style="display:block;margin-top:4px;">&#9888; <strong>Ampliación de superficie (Art. 16, Fracc. III):</strong> cualquier aumento en los metros cuadrados del establecimiento requiere trámite de <strong>modificación de licencia</strong> ante Padrón y Licencias — no se puede operar con más superficie sin actualizar la licencia.</span>'
       + '</div>';
   }
   if (mun==='TON') {

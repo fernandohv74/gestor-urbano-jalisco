@@ -1,0 +1,702 @@
+{
+  "115119": {
+    "desc": "Otros servicios relacionados con la agricultura",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "115210": {
+    "desc": "Servicios relacionados con la cría y explotación de animales",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "115310": {
+    "desc": "Servicios relacionados con el aprovechamiento forestal",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "311350": {
+    "desc": "Elaboración de chocolate y productos de chocolate",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "311611": {
+    "desc": "Matanza de ganado, aves y otros animales comestibles",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "311820": {
+    "desc": "Elaboración de galletas y pastas para sopa",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "311930": {
+    "desc": "Elaboración de concentrados, polvos, jarabes y esencias de sabor para bebidas",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "312120": {
+    "desc": "Elaboración de cerveza",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "312132": {
+    "desc": "Elaboración de pulque",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "314999": {
+    "desc": "Fabricación de banderas y otros productos textiles no clasificados en otra parte",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "316211": {
+    "desc": "Fabricación de calzado con corte de piel y cuero",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "316212": {
+    "desc": "Fabricación de calzado con corte de tela",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "316991": {
+    "desc": "Fabricación de bolsos de mano, maletas y similares",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "323111": {
+    "desc": "Impresión de libros, periódicos y revistas",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "323119": {
+    "desc": "Impresión de formas continuas y otros impresos",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "325412": {
+    "desc": "Fabricación de preparaciones farmacéuticas",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "325610": {
+    "desc": "Fabricación de jabones, limpiadores y dentífricos",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "325620": {
+    "desc": "Fabricación de cosméticos, perfumes y otras preparaciones de tocador",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "327111": {
+    "desc": "Fabricación de artículos de alfarería, porcelana y loza",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "332710": {
+    "desc": "Maquinado de piezas metálicas para maquinaria y equipo en general",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "336992": {
+    "desc": "Fabricación de bicicletas y triciclos",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "337920": {
+    "desc": "Fabricación de persianas y cortineros",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "339912": {
+    "desc": "Orfebrería y joyería de metales y piedras preciosos",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "339914": {
+    "desc": "Metalistería de metales no preciosos",
+    "uso": "I2-I3",
+    "cond": "1"
+  },
+  "431110": {
+    "desc": "Comercio al por mayor de abarrotes",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431121": {
+    "desc": "Comercio al por mayor de carnes rojas",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431122": {
+    "desc": "Comercio al por mayor de carne de aves",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431123": {
+    "desc": "Comercio al por mayor de pescados y mariscos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431130": {
+    "desc": "Comercio al por mayor de frutas y verduras frescas",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431140": {
+    "desc": "Comercio al por mayor de huevo",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431150": {
+    "desc": "Comercio al por mayor de semillas y granos alimenticios, especias y chiles secos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431160": {
+    "desc": "Comercio al por mayor de leche y otros productos lácteos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431170": {
+    "desc": "Comercio al por mayor de embutidos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431180": {
+    "desc": "Comercio al por mayor de dulces y materias primas para repostería",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431191": {
+    "desc": "Comercio al por mayor de pan y pasteles",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431192": {
+    "desc": "Comercio al por mayor de botanas y frituras",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431193": {
+    "desc": "Comercio al por mayor de conservas alimenticias",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431194": {
+    "desc": "Comercio al por mayor de miel",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431199": {
+    "desc": "Comercio al por mayor de otros alimentos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431211": {
+    "desc": "Comercio al por mayor de bebidas no alcohólicas y hielo",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431212": {
+    "desc": "Comercio al por mayor de vinos y licores",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431213": {
+    "desc": "Comercio al por mayor de cerveza",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "431220": {
+    "desc": "Comercio al por mayor de cigarros, puros y tabaco",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "432111": {
+    "desc": "Comercio al por mayor de fibras, hilos y telas",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "432112": {
+    "desc": "Comercio al por mayor de blancos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "432113": {
+    "desc": "Comercio al por mayor de cueros y pieles",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "432119": {
+    "desc": "Comercio al por mayor de otros productos textiles",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "432120": {
+    "desc": "Comercio al por mayor de ropa, bisutería y accesorios de vestir",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "432130": {
+    "desc": "Comercio al por mayor de calzado",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "433110": {
+    "desc": "Comercio al por mayor de productos farmacéuticos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "433210": {
+    "desc": "Comercio al por mayor de artículos de perfumería y cosméticos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "433220": {
+    "desc": "Comercio al por mayor de artículos de joyería y relojes",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "433311": {
+    "desc": "Comercio al por mayor de discos y casetes",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "433312": {
+    "desc": "Comercio al por mayor de juguetes y bicicletas",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "433313": {
+    "desc": "Comercio al por mayor de artículos y aparatos deportivos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "433410": {
+    "desc": "Comercio al por mayor de artículos de papelería",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "433420": {
+    "desc": "Comercio al por mayor de libros",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "433430": {
+    "desc": "Comercio al por mayor de revistas y periódicos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "433510": {
+    "desc": "Comercio al por mayor de electrodomésticos menores y aparatos de línea blanca",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "434111": {
+    "desc": "Comercio al por mayor de fertilizantes, plaguicidas y semillas para siembra",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "434112": {
+    "desc": "Comercio al por mayor de medicamentos veterinarios y alimentos para animales, excepto mascotas",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "434211": {
+    "desc": "Comercio al por mayor de cemento, tabique y grava",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "434219": {
+    "desc": "Comercio al por mayor de otros materiales para la construcción, excepto de madera y metálicos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "434221": {
+    "desc": "Comercio al por mayor de materiales metálicos para la construcción y la manufactura",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "434222": {
+    "desc": "Comercio al por mayor de productos químicos para la industria farmacéutica y para otro uso industrial",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "434223": {
+    "desc": "Comercio al por mayor de envases en general, papel y cartón para la industria",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "434224": {
+    "desc": "Comercio al por mayor de madera para la construcción y la industria",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "434225": {
+    "desc": "Comercio al por mayor de equipo y material eléctrico",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "434226": {
+    "desc": "Comercio al por mayor de pintura",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "434227": {
+    "desc": "Comercio al por mayor de vidrios y espejos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "434228": {
+    "desc": "Comercio al por mayor de ganado y aves en pie",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "434229": {
+    "desc": "Comercio al por mayor de otras materias primas para otras industrias",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "434230": {
+    "desc": "Comercio al por mayor de combustibles de uso industrial",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "434240": {
+    "desc": "Comercio al por mayor de artículos desechables",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "434311": {
+    "desc": "Comercio al por mayor de desechos metálicos",
+    "uso": "CS4",
+    "cond": "5"
+  },
+  "434312": {
+    "desc": "Comercio al por mayor de desechos de papel y de cartón",
+    "uso": "CS4",
+    "cond": "5"
+  },
+  "434313": {
+    "desc": "Comercio al por mayor de desechos de vidrio",
+    "uso": "CS4",
+    "cond": "5"
+  },
+  "434314": {
+    "desc": "Comercio al por mayor de desechos de plástico",
+    "uso": "CS4",
+    "cond": "5"
+  },
+  "434319": {
+    "desc": "Comercio al por mayor de otros materiales de desecho",
+    "uso": "CS4",
+    "cond": "5"
+  },
+  "435110": {
+    "desc": "Comercio al por mayor de maquinaria y equipo agropecuario, forestal y para la pesca",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "435210": {
+    "desc": "Comercio al por mayor de maquinaria y equipo para la construcción y la minería",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "435220": {
+    "desc": "Comercio al por mayor de maquinaria y equipo para la industria manufacturera",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "435311": {
+    "desc": "Comercio al por mayor de equipo de telecomunicaciones, fotografía y cinematografía",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "435411": {
+    "desc": "Comercio al por mayor de mobiliario, equipo, y accesorios de cómputo",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "435412": {
+    "desc": "Comercio al por mayor de mobiliario y equipo de oficina",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "435419": {
+    "desc": "Comercio al por mayor de otra maquinaria y equipo de uso general",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "436111": {
+    "desc": "Comercio al por mayor de camiones",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "436112": {
+    "desc": "Comercio al por mayor de partes y refacciones nuevas para automóviles, camionetas y camiones",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "437111": {
+    "desc": "Intermediación de comercio al por mayor de productos agropecuarios, excepto a través de Internet y de otros medios electrónicos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "437112": {
+    "desc": "Intermediación de comercio al por mayor de productos para la industria, el comercio y los servicios, excepto a través de Internet y de otros medios electrónicos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "437113": {
+    "desc": "Intermediación de comercio al por mayor para productos de uso doméstico y personal, excepto a través de Internet y de otros medios electrónicos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "437210": {
+    "desc": "Intermediación de comercio al por mayor exclusivamente a través de Internet y otros medios electrónicos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "465911": {
+    "desc": "Comercio al por menor de mascotas",
+    "uso": "CS2-CS3",
+    "cond": "2"
+  },
+  "465919": {
+    "desc": "Comercio al por menor de otros artículos de uso personal",
+    "uso": "CS2-CS3",
+    "cond": "2"
+  },
+  "468213": {
+    "desc": "Comercio al por menor de llantas y cámaras para automóviles, camionetas y camiones",
+    "uso": "CS2-CS3",
+    "cond": "2"
+  },
+  "484111": {
+    "desc": "Autotransporte local de productos agrícolas sin refrigeración",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "484119": {
+    "desc": "Otro autotransporte local de carga general",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "484121": {
+    "desc": "Autotransporte foráneo de productos agrícolas sin refrigeración",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "484129": {
+    "desc": "Otro autotransporte foráneo de carga general",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "484221": {
+    "desc": "Autotransporte local de materiales para la construcción",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "484223": {
+    "desc": "Autotransporte local con refrigeración",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "484224": {
+    "desc": "Autotransporte local de madera",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "484229": {
+    "desc": "Otro autotransporte local de carga especializado",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "484231": {
+    "desc": "Autotransporte foráneo de materiales para la construcción",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "484233": {
+    "desc": "Autotransporte foráneo con refrigeración",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "484234": {
+    "desc": "Autotransporte foráneo de madera",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "484239": {
+    "desc": "Otro autotransporte foráneo de carga especializado",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "488112": {
+    "desc": "Administración de aeropuertos y helipuertos",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "488190": {
+    "desc": "Otros servicios relacionados con el transporte aéreo",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "488493": {
+    "desc": "Servicios de báscula para el transporte y otros servicios relacionados con el transporte por carretera",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "488519": {
+    "desc": "Otros servicios de intermediación para el transporte de carga",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "488990": {
+    "desc": "Otros servicios relacionados con el transporte",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "493120": {
+    "desc": "Almacenamiento con refrigeración",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "493130": {
+    "desc": "Almacenamiento de productos agrícolas que no requieren refrigeración",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "493190": {
+    "desc": "Otros servicios de almacenamiento con instalaciones especializadas",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "532121": {
+    "desc": "Alquiler de camiones de carga sin chofer",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "532122": {
+    "desc": "Alquiler de autobuses, minibuses y remolques sin chofer",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "532411": {
+    "desc": "Alquiler de maquinaria y equipo para construcción, minería y actividades forestales",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "532412": {
+    "desc": "Alquiler de equipo de transporte, excepto terrestre",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "532491": {
+    "desc": "Alquiler de maquinaria y equipo agropecuario, pesquero y para la industria manufacturera",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "532492": {
+    "desc": "Alquiler de maquinaria y equipo para mover, levantar y acomodar materiales",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "541943": {
+    "desc": "Servicios veterinarios para la ganadería prestados por el sector privado",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "562111": {
+    "desc": "Manejo de residuos peligrosos y servicios de remediación a zonas dañadas por materiales o residuos peligrosos",
+    "uso": "CS4",
+    "cond": "5"
+  },
+  "562112": {
+    "desc": "Manejo de desechos no peligrosos y servicios de remediación a zonas dañadas por desechos no peligrosos",
+    "uso": "CS4",
+    "cond": "5"
+  },
+  "712131": {
+    "desc": "Jardines botánicos y zoológicos del sector privado",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "722511": {
+    "desc": "Restaurantes con servicio de preparación de alimentos a la carta o de comida corrida",
+    "uso": "CS2",
+    "cond": "4"
+  },
+  "722512": {
+    "desc": "Restaurantes con servicio de preparación de pescados y mariscos",
+    "uso": "CS2",
+    "cond": "4"
+  },
+  "722513": {
+    "desc": "Restaurantes con servicio de preparación de antojitos",
+    "uso": "CS2",
+    "cond": "4"
+  },
+  "722514": {
+    "desc": "Restaurantes con servicio de preparación de tacos y tortas",
+    "uso": "CS2",
+    "cond": "4"
+  },
+  "722515": {
+    "desc": "Cafeterías, fuentes de sodas, neverías, refresquerías y similares",
+    "uso": "CS2",
+    "cond": "4"
+  },
+  "722516": {
+    "desc": "Restaurantes de autoservicio",
+    "uso": "CS2",
+    "cond": "4"
+  },
+  "811121": {
+    "desc": "Hojalatería y pintura de automóviles y camiones",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "811311": {
+    "desc": "Reparación y mantenimiento de maquinaria y equipo agropecuario y forestal",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "811313": {
+    "desc": "Reparación y mantenimiento de maquinaria y equipo para mover, levantar y acomodar materiales",
+    "uso": "CS4",
+    "cond": "3"
+  },
+  "813110": {
+    "desc": "Asociaciones, organizaciones y cámaras de productores, comerciantes y prestadores de servicios",
+    "uso": "CS2-CS3",
+    "cond": "2"
+  },
+  "813120": {
+    "desc": "Asociaciones y organizaciones laborales y sindicales",
+    "uso": "CS2-CS3",
+    "cond": "2"
+  },
+  "813130": {
+    "desc": "Asociaciones y organizaciones de profesionistas",
+    "uso": "CS2-CS3",
+    "cond": "2"
+  },
+  "813140": {
+    "desc": "Asociaciones regulatorias de actividades recreativas",
+    "uso": "CS2-CS3",
+    "cond": "2"
+  },
+  "813210": {
+    "desc": "Asociaciones y organizaciones religiosas",
+    "uso": "CS2-CS3",
+    "cond": "2"
+  },
+  "813220": {
+    "desc": "Asociaciones y organizaciones políticas",
+    "uso": "CS2-CS3",
+    "cond": "2"
+  }
+}

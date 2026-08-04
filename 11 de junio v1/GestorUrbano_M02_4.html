@@ -6354,50 +6354,25 @@ function seleccionarUsoM02(event, usoKey, esCondicionado, familia, nivelMax){
 }
 
 
+function _activarBotonZona(idActivo){
+  ['btnZonaPermitido','btnZonaCondicionado','btnZonaIndPer','btnZonaIndCond'].forEach(function(id){
+    var b=document.getElementById(id);
+    if(b) b.style.opacity = id===idActivo ? '1' : '0.35';
+  });
+}
 function mostrarGirosPermitidos(){
   window._mostrandoCondicionado = false;
-  const bp = document.getElementById('btnZonaPermitido');
-  const bc = document.getElementById('btnZonaCondicionado');
-  if(bp){ bp.style.background='var(--brand-pale)'; bp.style.borderColor='var(--brand)'; bp.style.color='var(--brand-light)'; }
-  if(bc){ bc.style.background='var(--bg3)'; bc.style.borderColor='var(--border)'; bc.style.color='var(--text2)'; }
+  _activarBotonZona('btnZonaPermitido');
   window._girosActivos = window._girosP || [];
   filtrarGirosM02(document.getElementById('giroFiltro')?.value||'');
 }
-
 function mostrarGirosCondicionados(){
   window._mostrandoCondicionado = true;
-  const bp = document.getElementById('btnZonaPermitido');
-  const bc = document.getElementById('btnZonaCondicionado');
-  if(bp){ bp.style.background='var(--bg3)'; bp.style.borderColor='var(--border)'; bp.style.color='var(--text2)'; }
-  if(bc){ bc.style.background='var(--sem-am-bg)'; bc.style.borderColor='#78350F'; bc.style.color='var(--yellowD)'; }
+  _activarBotonZona('btnZonaCondicionado');
   window._girosActivos = window._girosC || [];
   filtrarGirosM02(document.getElementById('giroFiltro')?.value||'');
 }
 
-
-function mostrarGirosPermitidos(){
-  window._mostrandoCondicionado = false;
-  // Resaltar botón
-  const bp = document.getElementById('btnPermitidos');
-  const bc = document.getElementById('btnCondicionados');
-  if(bp){ bp.style.background='var(--uso-p-bg)'; bp.style.borderColor='#065F46'; bp.style.color='var(--uso-p-txt)'; }
-  if(bc){ bc.style.background='var(--bg3)'; bc.style.borderColor='var(--border)'; bc.style.color='var(--text2)'; }
-  // Mostrar giros permitidos
-  window._girosActivos = window._girosP || [];
-  filtrarGirosM02(document.getElementById('giroFiltro')?.value||'');
-}
-
-function mostrarGirosCondicionados(){
-  window._mostrandoCondicionado = true;
-  // Resaltar botón
-  const bp = document.getElementById('btnPermitidos');
-  const bc = document.getElementById('btnCondicionados');
-  if(bp){ bp.style.background='var(--bg3)'; bp.style.borderColor='var(--border)'; bp.style.color='var(--text2)'; }
-  if(bc){ bc.style.background='var(--sem-am-bg)'; bc.style.borderColor='#78350F'; bc.style.color='var(--yellowD)'; }
-  // Mostrar giros condicionados
-  window._girosActivos = window._girosC || [];
-  filtrarGirosM02(document.getElementById('giroFiltro')?.value||'');
-}
 
 
 function filtrarGirosM02(q){
@@ -6947,29 +6922,14 @@ const GDL_USOS_CONDICIONADOS = {
 function mostrarGirosIndustrialesPermitidos(){
   window._mostrandoCondicionado = false;
   window._tipoGiroActivo = 'industrial';
-  const bp  = document.getElementById('btnZonaPermitido');
-  const bc  = document.getElementById('btnZonaCondicionado');
-  const bip = document.getElementById('btnZonaIndPer');
-  const bic = document.getElementById('btnZonaIndCond');
-  if(bp)  { bp.style.borderColor='var(--border)';  bp.style.background='var(--bg3)'; }
-  if(bc)  { bc.style.borderColor='#78350F';        bc.style.background='var(--sem-am-bg)'; }
-  if(bip) { bip.style.borderColor='#166534';       bip.style.background='var(--uso-p-bg)'; }
-  if(bic) { bic.style.borderColor='#78350F';       bic.style.background='var(--sem-am-bg)'; }
+  _activarBotonZona('btnZonaIndPer');
   window._girosActivos = window._girosIP || [];
   filtrarGirosM02(document.getElementById('giroFiltro')?.value||'');
 }
-
 function mostrarGirosIndustrialesCondicionados(){
   window._mostrandoCondicionado = true;
   window._tipoGiroActivo = 'industrial-cond';
-  const bp  = document.getElementById('btnZonaPermitido');
-  const bc  = document.getElementById('btnZonaCondicionado');
-  const bip = document.getElementById('btnZonaIndPer');
-  const bic = document.getElementById('btnZonaIndCond');
-  if(bp)  { bp.style.borderColor='var(--border)';  bp.style.background='var(--bg3)'; }
-  if(bc)  { bc.style.borderColor='#78350F';        bc.style.background='var(--sem-am-bg)'; }
-  if(bip) { bip.style.borderColor='#065F46';       bip.style.background='var(--uso-p-bg)'; }
-  if(bic) { bic.style.borderColor='#92400E';       bic.style.background='#2D1A00'; }
+  _activarBotonZona('btnZonaIndCond');
   window._girosActivos = window._girosIC || [];
   filtrarGirosM02(document.getElementById('giroFiltro')?.value||'');
 }

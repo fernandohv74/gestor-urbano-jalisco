@@ -1,11 +1,4 @@
 <!DOCTYPE html>
-<!-- ==========================================================
-     GestorUrbano Jalisco AMG / TrazaUrbana
-     (c) 2026 Fernando H. - trazaurbana.mx
-     Todos los derechos reservados.
-     Reproduccion o uso no autorizado esta prohibido.
-     ========================================================== -->
-
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -140,7 +133,6 @@
     <div class="gu-toggle-track"><div class="gu-toggle-thumb"></div></div>
     <span id="gu-toggle-label">Modo oscuro</span>
   </button>
-
   <span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.04em;flex-shrink:0;opacity:.55;margin-left:10px;transition:color var(--t)">&copy; 2026 TrazaUrbana</span>
 </nav>
 
@@ -170,7 +162,7 @@
   <!-- Municipio -->
   <div class="section-hdr">Municipio</div>
   <div class="muni-row">
-    <button class="muni-btn active" onclick="selMun('GDL',this)">Guadalajara</button>
+    <button class="muni-btn" onclick="selMun('GDL',this)">Guadalajara</button>
     <button class="muni-btn" onclick="selMun('ZPN',this)">Zapopan</button>
     <button class="muni-btn" onclick="selMun('TLQ',this)">Tlaquepaque</button>
     <button class="muni-btn" onclick="selMun('TLA',this)">Tlajomulco</button>
@@ -668,17 +660,29 @@ function generarChecklist() {
     } else if (esUnifamiliar && numViv >= 10) {
       movilidadReq = true;
       movilidadMotivo = `${numViv} unidades unifamiliares (≥10) — Art. 73-I Regl. Movilidad GDL`;
+    } else if (['comercio','oficinas','industria','mixto'].includes(tipoUso)) {
+      movilidadReq = true;
+      movilidadMotivo = `Uso ${tipoUso} — usos no habitacionales sin excepción · Art. 73 Regl. Movilidad GDL`;
     }
   } else if (munActual === 'ZPN') {
     if (numViv >= 15) {
       movilidadReq = true;
       movilidadMotivo = `${numViv} viviendas (umbral ≥15) — Art. 35 Regl. Movilidad ZPN`;
+    } else if (['comercio','oficinas','industria','mixto'].includes(tipoUso)) {
+      movilidadReq = true;
+      movilidadMotivo = `Uso ${tipoUso} — Dictamen de Integración Vial requerido por DTUDE · Art. 45 Regl. Movilidad ZPN`;
     }
   } else if (['TLQ','TLA','TON'].includes(munActual)) {
+    const munNMov = {TLQ:'Tlaquepaque',TLA:'Tlajomulco',TON:'Tonalá'}[munActual];
+    const artMovRef = {TLQ:'Art. 28 Regl. Movilidad Tlaquepaque',TLA:'Art. 56 Regl. Movilidad Tlajomulco',TON:'Art. 31 Fracc. III Regl. Movilidad Tonalá'}[munActual];
     if (numViv >= 15) {
       movilidadReq = true;
-      const munN = {TLQ:'Tlaquepaque',TLA:'Tlajomulco',TON:'Tonalá'}[munActual];
-      movilidadMotivo = `${numViv} viviendas — verificar umbral aplicable con Dirección de Movilidad ${munN} (referencia supletoria: ≥15 viviendas)`;
+      movilidadMotivo = `${numViv} viviendas — umbral ≥15 · verificar con Dirección de Movilidad ${munNMov} · ref: ${artMovRef}`;
+    } else if (['comercio','oficinas','industria','mixto'].includes(tipoUso)) {
+      movilidadReq = true;
+      movilidadMotivo = munActual === 'TON'
+        ? `Uso ${tipoUso} — verificar requisito de dictamen de movilidad con Dirección de Movilidad ${munNMov} · ${artMovRef}`
+        : `Uso ${tipoUso} — Dictamen de integración vial y/o impacto al tránsito · ${artMovRef}`;
     }
   }
 
@@ -729,21 +733,40 @@ function generarChecklist() {
     titulo: `Punto Limpio requerido — superficie ${sup.toLocaleString()} m²`,
     texto: 'Proyectos ≥1,000 m² deben instalar Punto Limpio para residuos de construcción. Solicitar ante Dirección de Medio Ambiente GDL.'
   });
+  if (munActual === 'GDL' && (sup > 3500 || niveles > 6)) alertas.push({
+    tipo: 'warn',
+    titulo: 'Evaluación de Impacto Ambiental — GDL',
+    texto: `${sup > 3500 ? `Superficie ${sup.toLocaleString()} m² de construcción` : `${niveles} niveles`} — requiere autorización de impacto ambiental de la Dirección de Medio Ambiente GDL como prerrequisito de la licencia · Art. 183 Fracc. II y Art. 184 bis Regl. Medio Ambiente GDL.`
+  });
   if (esHistorico) alertas.push({
     tipo: 'danger',
     titulo: 'Zona patrimonial / Centro Histórico',
     texto: 'Se requiere Dictamen Técnico favorable de INAH, INBA o Secretaría de Cultura del Estado de Jalisco, según la catalogación del inmueble, previo a cualquier intervención.'
   });
-  if (munActual === 'ZPN' && esCambioUso) alertas.push({
+  if (munActual === 'ZPN' && (esCambioUso || tipoUso === 'industria')) alertas.push({
     tipo: 'warn',
     titulo: 'Evaluación de Impacto Ambiental — ZPN',
-    texto: 'Cambio de uso de suelo requiere autorización de la Dirección de Medio Ambiente de Zapopan (Arts. 20-25 Código Ambiental ZPN) como prerequisito de la licencia de construcción.'
+    texto: esCambioUso
+      ? 'Cambio de uso de suelo requiere autorización de la Dirección de Medio Ambiente de Zapopan (Arts. 20-25 Código Ambiental ZPN) como prerequisito de la licencia de construcción.'
+      : 'Uso industrial requiere estudio de impacto ambiental preventivo (Art. 54 Fracc. IV Regl. Urbanización ZPN) · Obtener autorización de la Dirección de Medio Ambiente ZPN como prerequisito de la licencia de construcción.'
   });
-  if (['TLQ','TLA','TON'].includes(munActual) && esCambioUso) alertas.push({
-    tipo: 'warn',
-    titulo: `Impacto Ambiental — ${munN3}`,
-    texto: `Cambio de uso de suelo puede requerir dictamen ambiental previo de la Dirección de Medio Ambiente de ${munN3}. Verificar con la dependencia antes de iniciar trámite.`
-  });
+  const _esUsNoHab3 = ['comercio','oficinas','industria','mixto'].includes(tipoUso);
+  const _eiaReqTLA = munActual === 'TLA' && _esUsNoHab3 && sup > 500;
+  if (['TLQ','TLA','TON'].includes(munActual) && (esCambioUso || tipoUso === 'industria' || sup > 3500 || niveles > 6 || _eiaReqTLA)) {
+    const _artEiaMun = munActual === 'TLA'
+      ? (_eiaReqTLA ? 'Art. 27 Fracc. I Regl. Protección Ambiental Tlajomulco (uso no habitacional >500 m²)' : 'Regl. Protección Ambiental Tlajomulco')
+      : munActual === 'TLQ' ? 'Art. 20 Regl. MA Tlaquepaque (desarrollos inmobiliarios / cambio de uso)'
+      : 'Art. 77 Fracc. IV Regl. Construcción Tonalá (por remisión a ley estatal)';
+    alertas.push({
+      tipo: 'warn',
+      titulo: `Evaluación de Impacto Ambiental — ${munN3}`,
+      texto: esCambioUso
+        ? `Cambio de uso de suelo requiere dictamen ambiental previo · ${_artEiaMun} · Tramitar con Dirección de Medio Ambiente de ${munN3} antes de iniciar trámite.`
+        : _eiaReqTLA
+          ? `Uso no habitacional con ${sup.toLocaleString()} m² de construcción — requiere dictamen de impacto ambiental en sentido favorable o condicionado · ${_artEiaMun} · Tramitar con Dirección de Medio Ambiente Tlajomulco antes de la licencia de construcción.`
+          : `Uso ${tipoUso}${sup > 3500 ? ` · ${sup.toLocaleString()} m²` : ''}${niveles > 6 ? ` · ${niveles} niveles` : ''} — puede requerir evaluación de impacto ambiental · ${_artEiaMun} · Verificar con la Dirección de Medio Ambiente de ${munN3} antes de iniciar trámite.`
+    });
+  }
 
   // ── Documentos base ──
   const isMun3 = ['TLQ','TLA','TON'].includes(munActual);
@@ -761,9 +784,9 @@ function generarChecklist() {
         tipoObra, niveles, numViv })
     : isMun3
       ? docsCondMun({ esMoral, esPromotorFisico, esCondominio, esArrendamiento,
-          movilidadReq, esCambioUso, esHistorico, numViv, mun: munActual })
+          movilidadReq, esCambioUso, esHistorico, numViv, tipoUso, sup, niveles, mun: munActual })
       : docsCondZPN({ esMoral, esPromotorFisico, esCondominio, esArrendamiento,
-          movilidadReq, esCambioUso, esHistorico, numViv });
+          movilidadReq, esCambioUso, esHistorico, numViv, tipoUso });
 
   // Renderizar
   renderSecuencia(esUnifamiliar, esCondominio);
@@ -935,6 +958,11 @@ function docsCondGDL(ctx) {
     docs.push({ nombre: 'Solicitud de instalación de Punto Limpio', detalle: `Proyectos ≥1,000 m² (${ctx.sup.toLocaleString()} m²) · Dirección de Medio Ambiente GDL · Para gestión de residuos de construcción y demolición · Art. 36 Regl. Gestión Integral GDL`, pres: 'Copia' });
   }
 
+  // Evaluación de Impacto Ambiental por tamaño — Art. 183 Fracc. II Regl. MA GDL
+  if (ctx.sup > 3500 || ctx.niveles > 6) {
+    docs.push({ nombre: 'Autorización de Impacto Ambiental — Dirección de Medio Ambiente GDL', detalle: `${ctx.sup > 3500 ? `Superficie ${ctx.sup.toLocaleString()} m² de construcción` : `${ctx.niveles} niveles`} · Art. 183 Fracc. II Regl. de Protección del Medio Ambiente GDL · Requisito PREVIO a la licencia de construcción (Art. 184 bis) · Tramitar ante Dirección de Medio Ambiente GDL`, pres: 'Copia' });
+  }
+
   return docs;
 }
 
@@ -1012,14 +1040,25 @@ function docsCondZPN(ctx) {
     docs.push({ nombre: 'Contrato de arrendamiento vigente', detalle: 'Con autorización expresa del propietario para realizar las modificaciones · Art. 47 Regl. Construcción ZPN', pres: 'Original + 1 copia' });
   }
 
-  // Movilidad ≥15 viviendas — Art. 35 Regl. Movilidad ZPN
+  // Movilidad — Art. 35 (habitacional ≥15) o Art. 45 (usos no habitacionales) Regl. Movilidad ZPN
   if (ctx.movilidadReq) {
-    docs.push({ nombre: 'Dictamen de Impacto Vial', detalle: `${ctx.numViv} viviendas — umbral ≥15 · Dirección de Movilidad y Transporte ZPN · Art. 35 Regl. Movilidad Zapopan · Tramitar ANTES de la licencia de construcción`, pres: 'Copia' });
+    const detMov = (ctx.numViv >= 15)
+      ? `${ctx.numViv} viviendas — umbral ≥15 · Dirección de Movilidad y Transporte ZPN · Art. 35 Regl. Movilidad Zapopan · Tramitar ANTES de la licencia de construcción`
+      : `Uso ${ctx.tipoUso} — Dictamen de entradas, salidas e integración vial · Dirección de Movilidad y Transporte ZPN · Art. 45 Regl. Movilidad Zapopan · Tramitar ANTES de la licencia de construcción`;
+    docs.push({ nombre: 'Dictamen de Integración Vial / Impacto al Tránsito', detalle: detMov, pres: 'Copia' });
   }
 
-  // Cambio de uso — Art. 20 y 25 Código Ambiental ZPN
-  if (ctx.esCambioUso) {
-    docs.push({ nombre: 'Evaluación de Impacto Ambiental', detalle: 'Dirección de Medio Ambiente Zapopan · Arts. 20 y 25 Código Ambiental ZPN · La autorización ambiental es PRERREQUISITO de la licencia de construcción — debe obtenerse antes de solicitarla', pres: 'Copia' });
+  // Impacto Ambiental: cambio de uso (Art. 20-25 Código Ambiental ZPN) o uso industrial (Art. 54 Fracc. IV Regl. Urbanización ZPN)
+  if (ctx.esCambioUso || ctx.tipoUso === 'industria') {
+    const detAmb = ctx.esCambioUso
+      ? 'Dirección de Medio Ambiente Zapopan · Arts. 20 y 25 Código Ambiental ZPN · La autorización ambiental es PRERREQUISITO de la licencia de construcción — debe obtenerse antes de solicitarla'
+      : 'Uso industrial · Art. 54 Fracc. IV Regl. Urbanización ZPN · Estudio de impacto ambiental preventivo · Dirección de Medio Ambiente Zapopan · La autorización ambiental es PRERREQUISITO de la licencia de construcción';
+    docs.push({ nombre: 'Evaluación de Impacto Ambiental', detalle: detAmb, pres: 'Copia' });
+  }
+
+  // Drenaje separado — usos no habitacionales — condición DTUDE ZPN
+  if (['comercio','oficinas','industria','mixto'].includes(ctx.tipoUso)) {
+    docs.push({ nombre: 'Memoria técnica: drenaje separado y pozo de absorción', detalle: 'Sistema de drenaje separado (aguas negras / pluviales) · Pozo de absorción · Línea de demasías · Requerido por DTUDE conforme al Regl. Urbanización ZPN · Incluir en planos ejecutivos y memoria técnica del proyecto', pres: 'Incluido en planos ejecutivos' });
   }
 
   // Zona patrimonial
@@ -1094,11 +1133,28 @@ function docsCondMun(ctx) {
   }
 
   if (ctx.movilidadReq) {
-    docs.push({ nombre: 'Dictamen de Impacto Vial o Movilidad', detalle: `${ctx.numViv} viviendas · Verificar umbral y dependencia responsable con la ${dep} · Tramitar ANTES de la licencia de construcción`, pres: 'Copia' });
+    const _artMovMun = {TLQ:'Art. 28 Regl. Movilidad Tlaquepaque',TLA:'Art. 56 Regl. Movilidad Tlajomulco',TON:'Art. 31 Fracc. III Regl. Movilidad Tonalá'}[ctx.mun];
+    const detMovMun = (ctx.numViv >= 15)
+      ? `${ctx.numViv} viviendas — umbral ≥15 · ${_artMovMun} · Dirección de Movilidad ${munN} · Tramitar ANTES de la licencia de construcción`
+      : ctx.mun === 'TON'
+        ? `Uso ${ctx.tipoUso} — verificar con Dirección de Movilidad Tonalá · ${_artMovMun} · Tramitar ANTES de la licencia de construcción`
+        : `Uso ${ctx.tipoUso} — Dictamen de integración vial y/o impacto al tránsito · ${_artMovMun} · Dirección de Movilidad ${munN} · Tramitar ANTES de la licencia de construcción`;
+    docs.push({ nombre: 'Dictamen de Integración Vial / Impacto al Tránsito', detalle: detMovMun, pres: 'Copia' });
   }
 
-  if (ctx.esCambioUso) {
-    docs.push({ nombre: 'Dictamen / Evaluación ambiental', detalle: `Cambio de uso de suelo puede requerir autorización de la Dirección de Medio Ambiente de ${munN} como prerequisito · Verificar con la ${dep}`, pres: 'Copia' });
+  const _esUsNoHabMun = ['comercio','oficinas','industria','mixto'].includes(ctx.tipoUso);
+  const _eiaReqTLADoc = ctx.mun === 'TLA' && _esUsNoHabMun && ctx.sup > 500;
+  if (ctx.esCambioUso || ctx.tipoUso === 'industria' || ctx.sup > 3500 || ctx.niveles > 6 || _eiaReqTLADoc) {
+    const _artEiaMunDoc = ctx.mun === 'TLA'
+      ? (_eiaReqTLADoc ? 'Art. 27 Fracc. I Regl. Protección Ambiental Tlajomulco (uso no habitacional >500 m²)' : 'Regl. Protección Ambiental Tlajomulco')
+      : ctx.mun === 'TLQ' ? 'Art. 20 Regl. MA Tlaquepaque'
+      : 'Art. 77 Fracc. IV Regl. Construcción Tonalá';
+    const detAmbMun = ctx.esCambioUso
+      ? `Cambio de uso de suelo requiere dictamen ambiental previo · ${_artEiaMunDoc} · Dirección de Medio Ambiente ${munN}`
+      : _eiaReqTLADoc
+        ? `Uso no habitacional con ${(ctx.sup||0).toLocaleString()} m² — requiere dictamen de impacto ambiental favorable o condicionado · ${_artEiaMunDoc} · Dirección de Medio Ambiente Tlajomulco · Tramitar antes de la licencia de construcción`
+        : `Uso ${ctx.tipoUso}${ctx.sup > 3500 ? ` · ${(ctx.sup||0).toLocaleString()} m²` : ''}${ctx.niveles > 6 ? ` · ${ctx.niveles} niveles` : ''} — puede requerir evaluación de impacto ambiental · ${_artEiaMunDoc} · Verificar con la Dirección de Medio Ambiente de ${munN}`;
+    docs.push({ nombre: 'Dictamen / Evaluación ambiental', detalle: detAmbMun, pres: 'Copia' });
   }
 
   if (ctx.esHistorico) {
@@ -1285,7 +1341,7 @@ function renderCostosRef() {
   } else if (munActual === 'ZPN') {
     const items = [
       { label:'Licencia de edificación', detalle:'Unifamiliar $95/m² · Plurifamiliar H $177/m² · Vertical $136/m² · Comercio $262/m²', nota:'GMZ 120/2024' },
-      { label:'DTUDE', detalle:'$1,495 · Art. 39 Regl. Construcción ZPN', nota:'Exento: unifamiliar y una vivienda plurifamiliar horizontal' },
+      { label:'DTUDE', detalle:'$1,804 total ($1,495 trámite + $309 formato) · retys.zapopan.gob.mx/tramites/34', nota:'Exento: unifamiliar y una vivienda plurifamiliar horizontal' },
       { label:'Derechos + Imp. Negocios Jurídicos', detalle:'Dos conceptos distintos · Art. 47-X Regl. Construcción ZPN', nota:'' },
       { label:'Vigencia', detalle:'24 meses · Arts. 43-52 Regl. Construcción ZPN', nota:'' },
     ];
@@ -1676,6 +1732,5 @@ function guToggleTheme() {
   localStorage.setItem('gu_theme', next);
 }
 </script>
-
-</html
->
+</body>
+</html>

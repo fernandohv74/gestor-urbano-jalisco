@@ -409,7 +409,7 @@ input[type=range]::-webkit-slider-thumb{
     <div>
       <div class="gu-field-label" style="margin-bottom:8px">Municipio</div>
       <div class="gu-muni-grid">
-        <button class="gu-muni-btn active" onclick="selMunicipio('guadalajara',this)">Guadalajara</button>
+        <button class="gu-muni-btn" onclick="selMunicipio('guadalajara',this)">Guadalajara</button>
         <button class="gu-muni-btn" onclick="selMunicipio('zapopan',this)">Zapopan</button>
         <button class="gu-muni-btn" onclick="selMunicipio('tlajomulco',this)">Tlajomulco</button>
         <button class="gu-muni-btn" onclick="selMunicipio('tlaquepaque',this)">Tlaquepaque</button>
@@ -960,7 +960,7 @@ function recargarHistorial(idx){
     municipioActual = munHistorial;
     limpiarMedicion56(); // Limpiar medición 56° al cargar historial
     _syncBotonesGDL();   // Mostrar/ocultar controles exclusivos GDL
-    document.querySelectorAll('.muni-btn').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.gu-muni-btn').forEach(x=>x.classList.remove('active'));
     const btnM = document.querySelector(`[onclick*="selMunicipio('${munHistorial}'"]`);
     if(btnM) btnM.classList.add('active');
     const msgs={guadalajara:'✅ Guadalajara — API Visor Urbano GDL activa',zapopan:'✅ Zapopan — Mapa Urbano Zapopan activo · BD local PDU ZPN-01 2023 (respaldo)',tlajomulco:'✅ Tlajomulco de Zúñiga — API Visor Urbano Jalisco activa',tlaquepaque:'✅ San Pedro Tlaquepaque — API Visor Urbano Jalisco activa',tonala:'✅ Tonalá — API Visor Urbano Jalisco activa'};
@@ -3642,7 +3642,7 @@ function mostrarSelectorMunicipioError(dir, colonia, cp){
       sel.style.display = 'none';
       // Cambiar municipio y re-buscar
       municipioActual = m;
-      document.querySelectorAll('.muni-btn').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.gu-muni-btn').forEach(x=>x.classList.remove('active'));
       const btnMun = document.querySelector(`[onclick*="selMunicipio('${m}'"]`);
       if(btnMun) btnMun.classList.add('active');
       const msgs={guadalajara:'✅ Guadalajara — API Visor Urbano GDL activa',zapopan:'✅ Zapopan — Mapa Urbano Zapopan activo · BD local PDU ZPN-01 2023 (respaldo)',tlajomulco:'✅ Tlajomulco de Zúñiga — API Visor Urbano Jalisco activa',tlaquepaque:'✅ San Pedro Tlaquepaque — API Visor Urbano Jalisco activa',tonala:'✅ Tonalá — API Visor Urbano Jalisco activa'};
@@ -3837,7 +3837,7 @@ function mostrarSelectorMunicipio(dir, colonia, cp, munActivo, munDetectado, loc
         // Cambiar municipio si es diferente al activo
         if(m !== municipioActual){
           municipioActual = m;
-          document.querySelectorAll('.muni-btn').forEach(x=>x.classList.remove('active'));
+          document.querySelectorAll('.gu-muni-btn').forEach(x=>x.classList.remove('active'));
           const btnMun = document.querySelector(`[onclick*="selMunicipio('${m}'"]`);
           if(btnMun) btnMun.classList.add('active');
           const msgs={guadalajara:'✅ Guadalajara — API Visor Urbano GDL activa',zapopan:'✅ Zapopan — Mapa Urbano Zapopan activo · BD local PDU ZPN-01 2023 (respaldo)',tlajomulco:'✅ Tlajomulco de Zúñiga — API Visor Urbano Jalisco activa',tlaquepaque:'✅ San Pedro Tlaquepaque — API Visor Urbano Jalisco activa',tonala:'✅ Tonalá — API Visor Urbano Jalisco activa'};
@@ -3908,9 +3908,9 @@ function detectarMunicipioPorCoords(lat, lng){
   const bounds = {
     guadalajara: {swLat:20.603,swLng:-103.407,neLat:20.752,neLng:-103.263},
     zapopan:     {swLat:20.620,swLng:-103.500,neLat:20.820,neLng:-103.280},
-    tlajomulco:  {swLat:20.300,swLng:-103.520,neLat:20.600,neLng:-103.280},
+    tlajomulco:  {swLat:20.440,swLng:-103.520,neLat:20.600,neLng:-103.280},
     tonala:      {swLat:20.580,swLng:-103.300,neLat:20.680,neLng:-103.160},
-    tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.680,neLng:-103.240},
+    tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.650,neLng:-103.240},
   };
   for(const [mun, b] of Object.entries(bounds)){
     if(lat>=b.swLat && lat<=b.neLat && lng>=b.swLng && lng<=b.neLng) return mun;
@@ -3987,8 +3987,8 @@ async function geocodificar(dir, colonia, cp, munForzado){
   const munBounds = {
     guadalajara: {swLat:20.603,swLng:-103.407,neLat:20.752,neLng:-103.263},
     zapopan:     {swLat:20.580,swLng:-103.500,neLat:20.820,neLng:-103.280},
-    tlajomulco:  {swLat:20.300,swLng:-103.520,neLat:20.620,neLng:-103.280},
-    tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.680,neLng:-103.240},
+    tlajomulco:  {swLat:20.440,swLng:-103.520,neLat:20.620,neLng:-103.280},
+    tlaquepaque: {swLat:20.570,swLng:-103.350,neLat:20.670,neLng:-103.240},
     tonala:      {swLat:20.580,swLng:-103.300,neLat:20.680,neLng:-103.160},
   };
   const b = munBounds[munActivo]||munBounds.guadalajara;
@@ -4008,7 +4008,7 @@ async function geocodificar(dir, colonia, cp, munForzado){
   if(GOOGLE_MAPS_KEY){
     try{
       const q = encodeURIComponent(dirCompleta);
-      const r = await fetch(`/api/maps-proxy?address=${q}&bounds=${encodeURIComponent(swStr+'|'+neStr)}&region=mx&language=es`);
+      const r = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${q}&bounds=${swStr}|${neStr}&region=mx&language=es&key=${GOOGLE_MAPS_KEY}`, {referrerPolicy:'no-referrer'});
       const d = await r.json();
       if(d.status!=='OK') console.warn('[GeocodGM]', d.status, d.error_message||'');
       if(d.status==='OK' && d.results.length){
@@ -4125,15 +4125,15 @@ async function procesarCoordenadas(lat,lng){
     const bActivo = {
       guadalajara:{swLat:20.603,swLng:-103.407,neLat:20.752,neLng:-103.263},
       zapopan:    {swLat:20.580,swLng:-103.500,neLat:20.820,neLng:-103.280},
-      tlaquepaque:{swLat:20.570,swLng:-103.350,neLat:20.680,neLng:-103.240},
-      tlajomulco: {swLat:20.300,swLng:-103.520,neLat:20.620,neLng:-103.280},
+      tlaquepaque:{swLat:20.570,swLng:-103.350,neLat:20.670,neLng:-103.240},
+      tlajomulco: {swLat:20.440,swLng:-103.520,neLat:20.620,neLng:-103.280},
       tonala:     {swLat:20.580,swLng:-103.300,neLat:20.680,neLng:-103.160},
     }[municipioActual];
     const enActivo = bActivo && lat>=bActivo.swLat&&lat<=bActivo.neLat&&lng>=bActivo.swLng&&lng<=bActivo.neLng;
     if(!enActivo){
       // Coords claramente fuera del municipio activo → actualizar badge
       municipioActual = munReal;
-      document.querySelectorAll('.muni-btn').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.gu-muni-btn').forEach(x=>x.classList.remove('active'));
       const btnM = document.querySelector(`[onclick*="selMunicipio('${munReal}'"]`);
       if(btnM) btnM.classList.add('active');
       const msgs={guadalajara:'✅ Guadalajara — API Visor Urbano GDL activa',zapopan:'✅ Zapopan — Mapa Urbano Zapopan activo · BD local PDU ZPN-01 2023 (respaldo)',tlajomulco:'✅ Tlajomulco de Zúñiga — API Visor Urbano Jalisco activa',tlaquepaque:'✅ San Pedro Tlaquepaque — API Visor Urbano Jalisco activa',tonala:'✅ Tonalá — API Visor Urbano Jalisco activa'};
@@ -4244,7 +4244,7 @@ async function buscar(){
     if(aliases.some(a => dirLower.includes(a)) && munKey !== municipioActual){
       // Cambiar municipio automáticamente
       municipioActual = munKey;
-      document.querySelectorAll('.muni-btn').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.gu-muni-btn').forEach(x=>x.classList.remove('active'));
       const btnM = document.querySelector(`[onclick*="selMunicipio('${munKey}'"]`);
       if(btnM) btnM.classList.add('active');
       const msgs={guadalajara:'✅ Guadalajara — API Visor Urbano GDL activa',zapopan:'✅ Zapopan — Mapa Urbano Zapopan activo · BD local PDU ZPN-01 2023 (respaldo)',tlajomulco:'✅ Tlajomulco de Zúñiga — API Visor Urbano Jalisco activa',tlaquepaque:'✅ San Pedro Tlaquepaque — API Visor Urbano Jalisco activa',tonala:'✅ Tonalá — API Visor Urbano Jalisco activa'};
@@ -5755,7 +5755,7 @@ function detectarYActualizarMunicipio(lat, lng){
     if(lat>=l.latMin&&lat<=l.latMax&&lng>=l.lngMin&&lng<=l.lngMax){
       if(mun !== municipioActual){
         municipioActual = mun;
-        document.querySelectorAll('.muni-btn').forEach(b=>{
+        document.querySelectorAll('.gu-muni-btn').forEach(b=>{
           const onclick = b.getAttribute('onclick')||'';
           b.classList.toggle('active', onclick.includes(`'${mun}'`));
         });
@@ -5989,10 +5989,13 @@ function descargarFicha(){
   const _cp      = document.getElementById('inCP')?.value.trim()||'';
   const _domicilio = [_calle,_colonia,_cp].filter(Boolean).join(', ')
     || (latActual&&lngActual ? latActual.toFixed(5)+', '+lngActual.toFixed(5) : '');
+  const _munN = {guadalajara:'Guadalajara',zapopan:'Zapopan',tlaquepaque:'Tlaquepaque',tlajomulco:'Tlajomulco de Z\u00faniga',tonala:'Tonal\u00e1'};
+  const _municipio = _munN[municipioActual]||municipioActual||'';
+  const _tituloFicha = _domicilio ? 'Ficha \u2014 '+_domicilio+' \u2014 '+_municipio : 'Ficha \u2014 '+_municipio;
 
   const w=window.open('','_blank');
   w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
-  <title>Ficha Normativa — Gestor Urbano Jalisco</title>
+  <title>${_tituloFicha}</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Helvetica Neue',Arial,sans-serif;font-size:10px;color:#1a1a2e;background:#fff;padding:12px;max-width:1020px;margin:0 auto}

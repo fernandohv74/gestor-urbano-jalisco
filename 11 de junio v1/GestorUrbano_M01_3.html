@@ -6004,10 +6004,13 @@ function descargarFicha(){
   const _cp      = document.getElementById('inCP')?.value.trim()||'';
   const _domicilio = [_calle,_colonia,_cp].filter(Boolean).join(', ')
     || (latActual&&lngActual ? latActual.toFixed(5)+', '+lngActual.toFixed(5) : '');
+  const _munN = {guadalajara:'Guadalajara',zapopan:'Zapopan',tlaquepaque:'Tlaquepaque',tlajomulco:'Tlajomulco de Z\u00faniga',tonala:'Tonal\u00e1'};
+  const _municipio = _munN[municipioActual]||municipioActual||'';
+  const _tituloFicha = _domicilio ? 'Ficha \u2014 '+_domicilio+' \u2014 '+_municipio : 'Ficha \u2014 '+_municipio;
 
   const w=window.open('','_blank');
   w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
-  <title>Ficha Normativa — Gestor Urbano Jalisco</title>
+  <title>${_tituloFicha}</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Helvetica Neue',Arial,sans-serif;font-size:10px;color:#1a1a2e;background:#fff;padding:12px;max-width:1020px;margin:0 auto}

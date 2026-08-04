@@ -4117,10 +4117,18 @@ function descargarFicha(){
   const permitidos=splitUsos2(z.uso_per);
   const condicionados=splitUsos2(z.uso_con);
   const fecha=new Date().toLocaleDateString('es-MX',{year:'numeric',month:'long',day:'numeric'});
+  const _munNM02 = {guadalajara:'Guadalajara',zapopan:'Zapopan',tlaquepaque:'Tlaquepaque',tlajomulco:'Tlajomulco de Zúniga',tonala:'Tonalá'};
+  const _munM02 = _munNM02[municipioActual]||municipioActual||'';
+  const _calleM02 = (document.getElementById('inCalle')?.value||'').trim();
+  const _coloniaM02 = (document.getElementById('inColonia')?.value||'').trim();
+  const _domM02 = [_calleM02,_coloniaM02].filter(Boolean).join(', ');
+  const _usoM02 = _usoSeleccionado || '';
+  const _partsM02 = ['Constancia',_usoM02,_domM02,_munM02].filter(Boolean);
+  const _tituloFichaM02 = _partsM02.join(' — ');
 
   const w=window.open('','_blank');
   w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
-  <title>Ficha Normativa — Gestor Urbano Jalisco</title>
+  <title>${_tituloFichaM02}</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Helvetica Neue',Arial,sans-serif;font-size:10px;color:#1a1a2e;background:#fff;padding:12px;max-width:1020px;margin:0 auto}

@@ -6659,7 +6659,7 @@ function verificarGiro(){
       razon='Este giro no tiene uso de suelo urbano asignado. Consultar en Padrón y Licencias.';
     } else if(enPermitidos){
       tipo = g.cond ? 'condicionado' : 'permitido';
-      razon = g.cond ? `Permitido con condicionante [${g.cond}].` : `Compatible con zona ${clave}.`;
+      razon = g.cond ? `Permitido con condicionante.` : `Compatible con zona ${clave}.`;
       const cTextos={
         '1':'⚠️ Si la superficie supera <strong>100 m²</strong>, este giro se reclasifica como <strong>Industrial Impacto Medio (I3)</strong>. Verifica que la zona lo permita. <em>(Art. 7 frac. 3-I, Reg. Giros GDL)</em>',
         '2':'⚠️ Si la superficie supera <strong>100 m²</strong>, este giro se reclasifica como <strong>Comercial Impacto Medio (CS3)</strong>. Verifica que la zona lo permita. <em>(Art. 7 frac. 3-II, Reg. Giros GDL)</em>',
@@ -6674,7 +6674,7 @@ function verificarGiro(){
       conds.push('Solicitar Dictamen de Compatibilidad de Uso de Suelo en la Dirección de Ordenamiento del Territorio de Zapopan.');
     } else if(enIndPermitidos){
       tipo = g.cond ? 'condicionado' : 'permitido';
-      razon = g.cond ? `Giro industrial permitido con condicionante [${g.cond}].` : `Giro industrial compatible con zona ${clave}.`;
+      razon = g.cond ? `Giro industrial permitido con condicionante.` : `Giro industrial compatible con zona ${clave}.`;
     } else if(enIndCond){
       tipo='condicionado';
       razon=`Giro industrial condicionado en zona ${clave}. Requiere trámite especial.`;
@@ -6684,7 +6684,7 @@ function verificarGiro(){
       tipo = window._mostrandoCondicionado ? 'condicionado' : (g.cond ? 'condicionado' : 'permitido');
       razon = window._mostrandoCondicionado
         ? `Uso condicionado en zona ${clave}. Requiere dictamen de compatibilidad.`
-        : (g.cond ? `Permitido con condicionante [${g.cond}].` : `Compatible con zona ${clave}.`);
+        : (g.cond ? `Permitido con condicionante.` : `Compatible con zona ${clave}.`);
       if(g.cond){ const cTextos={'1':'⚠️ Si la superficie supera <strong>100 m²</strong>, este giro se reclasifica como <strong>Industrial Impacto Medio (I3)</strong>. <em>(Art. 7 frac. 3-I, Reg. Giros GDL)</em>','2':'⚠️ Si la superficie supera <strong>100 m²</strong>, este giro se reclasifica como <strong>Comercial Impacto Medio (CS3)</strong>. <em>(Art. 7 frac. 3-II, Reg. Giros GDL)</em>','3':'🚫 Este giro está <strong>prohibido</strong> en zonas con uso predominante CS3. <em>(Art. 7 frac. 3-III, Reg. Giros GDL)</em>','4':'ℹ️ Se permite venta de bebidas alcohólicas de baja graduación como <strong>giro anexo</strong>. <em>(Art. 7 frac. 3-IV, Reg. Giros GDL)</em>','5':'⚠️ Si la superficie supera <strong>100 m²</strong>, este giro se reclasifica como <strong>Comercial Impacto Máximo (CS5)</strong>. <em>(Art. 7 frac. 3-V, Reg. Giros GDL)</em>'}; if(cTextos[g.cond]) conds.push(cTextos[g.cond]); }
       if(window._mostrandoCondicionado) conds.push('Solicitar Dictamen de Compatibilidad de Uso de Suelo en la Dirección de Ordenamiento del Territorio de Zapopan.');
     } else if(window._mostrandoCondicionado){
@@ -6739,7 +6739,7 @@ function verificarGiro(){
   } else if(famGiro===familia && nivelZona>=nivelGiro){
     // Permitido
     tipo = g.cond ? 'condicionado' : 'permitido';
-    razon = g.cond ? `Permitido con condicionante [${g.cond}].` : `Compatible con zona ${clave}.`;
+    razon = g.cond ? `Permitido con condicionante.` : `Compatible con zona ${clave}.`;
     const cTextos={
       '1':'⚠️ Si la superficie supera <strong>100 m²</strong>, este giro se reclasifica como <strong>Industrial Impacto Medio (I3)</strong>. Verifica que la zona lo permita. <em>(Art. 7 frac. 3-I, Reg. Giros GDL)</em>',
       '2':'⚠️ Si la superficie supera <strong>100 m²</strong>, este giro se reclasifica como <strong>Comercial Impacto Medio (CS3)</strong>. Verifica que la zona lo permita. <em>(Art. 7 frac. 3-II, Reg. Giros GDL)</em>',

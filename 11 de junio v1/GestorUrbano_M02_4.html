@@ -6451,20 +6451,23 @@ function filtrarGirosM02(q){
   lista.innerHTML = fil.length === 0
     ? _sinResultadosHTML
     : fil.map(g=>`
-      <div onclick="seleccionarGiroM02('${g.codigo}','${(g.nombre||'').replace(/'/g,"\'")}')"
+      <div onclick="seleccionarGiroM02('${g.codigo}','${(g.nombre||'').replace(/'/g,"\'")}',this)" data-giro-codigo="${g.codigo}"
         style="padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer;
                display:flex;gap:8px;align-items:center;font-size:12px"
-        onmouseover="this.style.background='var(--bg3)'"
-        onmouseout="this.style.background=''">
+        onmouseover="if(window._giroSelEl!==this)this.style.background='var(--bg3)'"
+        onmouseout="if(window._giroSelEl!==this)this.style.background=''">
         <span style="font-family:var(--mono);font-size:10px;
           color:${window._mostrandoCondicionado?'var(--yellowD)':'var(--uso-p-txt)'};
           min-width:54px;flex-shrink:0">${g.codigo||''}</span>
         <span style="flex:1"><span style="display:block">${g.nombre||''}</span>${g.ns&&g.ns!==g.nombre?`<span style="display:block;font-size:10px;color:var(--text3);margin-top:1px">${g.ns}</span>`:''}</span>
       </div>`).join('');
+  if(_giroSeleccionado){const _sEl=lista.querySelector('[data-giro-codigo="'+_giroSeleccionado.codigo+'"]');if(_sEl){window._giroSelEl=_sEl;_sEl.style.background='var(--brand-pale)';_sEl.style.color='var(--brand)';_sEl.style.borderLeft='3px solid var(--brand)';_sEl.style.fontWeight='500';}}
 }
 
-function seleccionarGiroM02(codigo, nombre){
+function seleccionarGiroM02(codigo, nombre, el){
+  if(window._giroSelEl){window._giroSelEl.style.background='';window._giroSelEl.style.color='';window._giroSelEl.style.borderLeft='';window._giroSelEl.style.fontWeight='';}
   _giroSeleccionado={codigo,nombre};
+  if(el){window._giroSelEl=el;el.style.background='var(--brand-pale)';el.style.color='var(--brand)';el.style.borderLeft='3px solid var(--brand)';el.style.fontWeight='500';}
   const b=document.getElementById('giroBadge'); if(b) b.style.display='block';
   document.getElementById('giroBadgeClave').textContent=codigo;
   document.getElementById('giroBadgeNombre').textContent=nombre;
@@ -6472,6 +6475,7 @@ function seleccionarGiroM02(codigo, nombre){
 }
 
 function clearGiroM02(){
+  if(window._giroSelEl){window._giroSelEl.style.background='';window._giroSelEl.style.color='';window._giroSelEl.style.borderLeft='';window._giroSelEl.style.fontWeight='';window._giroSelEl=null;}
   _giroSeleccionado=null;
   const b=document.getElementById('giroBadge'); if(b) b.style.display='none';
   const btn=document.getElementById('btnVerifGiro'); if(btn){btn.disabled=true;btn.style.opacity='.5';}
@@ -6533,7 +6537,7 @@ async function detectarGiroIA(){
     return fil.map(function(g){
       const nombre=g.nombre.replace(/'/g,"\\'");
       const ns=g.ns&&g.ns!==g.nombre?'<span style="display:block;font-size:10px;color:var(--text3);margin-top:1px">'+g.ns+'</span>':'';
-      return '<div onclick="seleccionarGiroM02(\''+g.codigo+'\',\''+nombre+'\');verificarGiro()" style="padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px;align-items:center;font-size:12px" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\'\'"><span style="font-family:var(--mono);font-size:10px;color:var(--uso-p-txt);min-width:54px;flex-shrink:0">'+g.codigo+'</span><span style="flex:1"><span style="display:block">'+g.nombre+'</span>'+ns+'</span></div>';
+      return '<div onclick="seleccionarGiroM02(\''+g.codigo+'\',\''+nombre+'\',this);verificarGiro()" data-giro-codigo="'+g.codigo+'" style="padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px;align-items:center;font-size:12px" onmouseover="if(window._giroSelEl!==this)this.style.background=\'var(--bg2)\'" onmouseout="if(window._giroSelEl!==this)this.style.background=\'\'"><span style="font-family:var(--mono);font-size:10px;color:var(--uso-p-txt);min-width:54px;flex-shrink:0">'+g.codigo+'</span><span style="flex:1"><span style="display:block">'+g.nombre+'</span>'+ns+'</span></div>';
     }).join('');
   };
   let fil=palabras.length>0?_filDirecto(palabras):[];

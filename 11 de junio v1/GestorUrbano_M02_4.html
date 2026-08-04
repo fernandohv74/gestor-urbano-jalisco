@@ -6811,7 +6811,9 @@ function generarPDFGiro(){
   const munN = {guadalajara:'Guadalajara',zapopan:'Zapopan',tlaquepaque:'Tlaquepaque',tlajomulco:'Tlajomulco de Zúñiga',tonala:'Tonalá'};
   const municipio = munN[municipioActual]||municipioActual||'';
   const fecha = new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
-  const tituloArchivo = domicilio ? 'Giro — ' + domicilio + ' — ' + municipio : 'Giro — ' + municipio;
+  const _g2 = (typeof GU_SCIAN!=='undefined') ? (GU_SCIAN.find(x=>x.codigo===r.codigo)||{}) : {};
+  const _usoGiro = _g2.uso_gdl || '';
+  const tituloArchivo = 'Giro' + (_usoGiro ? ' ' + _usoGiro : '') + (domicilio ? ' — ' + domicilio : '') + ' — ' + municipio;
   // Google Maps URLs
   let mapsUrl, mapImgUrl;
   if(latActual && lngActual){

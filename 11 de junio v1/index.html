@@ -82,9 +82,36 @@ body.light .mod-card:hover{box-shadow:0 8px 32px rgba(37,99,235,.12)}
 body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--bg2) 100%)}
 .theme-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:11px;padding:5px 12px;border-radius:20px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;margin-left:10px}
 .theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+#tu-splash{position:fixed;inset:0;background:#F6F3EC;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s ease}
+#tu-splash.out{opacity:0;pointer-events:none}
+#tu-splash .s-box{stroke-dasharray:336;stroke-dashoffset:336;animation:sBox .6s cubic-bezier(.4,0,.2,1) .1s forwards}
+#tu-splash .s-line{stroke-dasharray:100;stroke-dashoffset:100;animation:sLine .5s ease .6s forwards}
+#tu-splash .s-rect{transform:scale(0);transform-origin:34px 34px;animation:sRect .35s cubic-bezier(.34,1.56,.64,1) .95s forwards}
+#tu-splash .s-word{opacity:0;transform:translateY(6px);animation:sWord .4s ease 1s forwards;font-family:'Outfit','Helvetica Neue',Arial,sans-serif;font-size:28px;letter-spacing:-.3px;margin-top:18px}
+#tu-splash .s-tag{opacity:0;animation:sTag .4s ease 1.5s forwards;font-family:var(--sans);font-size:9px;letter-spacing:.18em;color:#5A7794;font-weight:500;margin-top:10px}
+#tu-splash .s-bar{position:absolute;bottom:0;left:0;height:2px;background:#D85A30;width:0;animation:sBar 1.8s cubic-bezier(.4,0,.6,1) .6s forwards}
+@keyframes sBox{to{stroke-dashoffset:0}}
+@keyframes sLine{to{stroke-dashoffset:0}}
+@keyframes sRect{to{transform:scale(1)}}
+@keyframes sWord{to{opacity:1;transform:translateY(0)}}
+@keyframes sTag{to{opacity:1}}
+@keyframes sBar{to{width:100%}}
 </style>
 </head>
 <body>
+<div id="tu-splash" role="status" aria-label="Cargando TrazaUrbana">
+  <svg viewBox="0 0 100 100" width="80" height="80" aria-hidden="true">
+    <defs><clipPath id="tu-spl-c"><rect x="10" y="10" width="80" height="80"/></clipPath></defs>
+    <rect class="s-box" x="8" y="8" width="84" height="84" fill="none" stroke="#14395C" stroke-width="2"/>
+    <g clip-path="url(#tu-spl-c)">
+      <line class="s-line" x1="6" y1="26" x2="94" y2="74" stroke="#14395C" stroke-width="4"/>
+      <rect class="s-rect" x="28" y="28" width="12" height="12" fill="#D85A30"/>
+    </g>
+  </svg>
+  <div class="s-word"><span style="font-weight:800;color:#14395C">Traza</span><span style="font-weight:300;color:#D85A30">Urbana</span></div>
+  <div class="s-tag">DATO PÚBLICO, CIUDAD LEGIBLE</div>
+  <div class="s-bar"></div>
+</div>
 
 <header>
   <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
@@ -400,5 +427,19 @@ function toggleTheme() {
 (function(){var form=document.getElementById('gu-fb-form');if(!form)return;form.addEventListener('submit',function(e){e.preventDefault();var btn=document.getElementById('gu-fb-send');btn.disabled=true;btn.textContent='Enviando...';document.getElementById('gu-fb-err').style.display='none';fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}}).then(function(r){if(r.ok){form.style.display='none';document.getElementById('gu-fb-ok').style.display='block';setTimeout(function(){document.getElementById('gu-fb-overlay').style.display='none';form.style.display='block';form.reset();document.getElementById('gu-fb-ok').style.display='none';btn.disabled=false;btn.textContent='Enviar comentario';},3000);}else{document.getElementById('gu-fb-err').style.display='block';btn.disabled=false;btn.textContent='Enviar comentario';}}).catch(function(){document.getElementById('gu-fb-err').style.display='block';btn.disabled=false;btn.textContent='Enviar comentario';});});})();
 </script>
 <!-- /WIDGET FEEDBACK -->
+<script>
+(function(){
+  var s=document.getElementById('tu-splash');
+  if(!s)return;
+  var done=false;
+  function dismiss(){if(done)return;done=true;s.classList.add('out');setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},600);}
+  var minOk=false,loadOk=false;
+  function check(){if(minOk&&loadOk)dismiss();}
+  setTimeout(function(){minOk=true;check();},2200);
+  if(document.readyState==='complete'){loadOk=true;}
+  else{window.addEventListener('load',function(){loadOk=true;check();});}
+  check();
+})();
+</script>
 </body>
 </html>

@@ -3356,6 +3356,21 @@ function renderizar(zona,todos){
             <div id="giroBadgeClave" style="font-family:var(--mono);font-size:11px;color:var(--brand-light);margin-bottom:3px"></div>
             <div id="giroBadgeNombre" style="font-size:13px;font-weight:500"></div>
           </div>
+          <div style="margin-bottom:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);margin-bottom:1px">Datos del predio — para calcular m² máx. (Art. 29 RGIM)</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <label style="font-size:12px;color:var(--text2);min-width:108px">Sup. del lote</label>
+              <input id="m02InpLote" type="number" min="1" max="9999" placeholder="m²"
+                style="font-family:var(--mono);font-size:13px;font-weight:700;width:76px;padding:5px 8px;border-radius:6px;border:1.5px solid var(--border2);background:var(--bg2);color:var(--text);text-align:right;outline:none">
+              <span style="font-size:12px;color:var(--text3)">m²</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <label style="font-size:12px;color:var(--text2);min-width:108px">CUS de la zona</label>
+              <input id="m02InpCUS" type="number" min="0.1" max="10" step="0.1" placeholder="ej. 2.4"
+                style="font-family:var(--mono);font-size:13px;font-weight:700;width:76px;padding:5px 8px;border-radius:6px;border:1.5px solid var(--border2);background:var(--bg2);color:var(--text);text-align:right;outline:none">
+              <span style="font-size:11px;color:var(--text3)">aplica en CS3</span>
+            </div>
+          </div>
           <button id="btnVerifGiro" onclick="verificarGiro()" disabled
             style="width:100%;background:var(--brand);color:#fff;border:none;border-radius:7px;
                    padding:12px;font-family:var(--sans);font-size:14px;font-weight:500;
@@ -6606,6 +6621,49 @@ function getMensajeM2(clave, condGiro, zonaActual){
       const famGiro = uGiro.replace(/\d+$/,'');
       if(famGiro==='I')
         return {icon:'📐', texto:'Giro industrial en zona de Comercios y Servicios: superficie máxima de operación <strong>250 m²</strong>. Por encima de ese límite, debe ubicarse en una zona de uso Industrial. <em>(Art. 96 Numeral 3 Inciso b, Plan Parcial de Desarrollo Urbano GDL)</em>'};
+    }
+    // Art. 29 RGIM — superficie máxima según nivel de impacto CS
+    if(municipioActual !== 'zapopan'){
+      const _lote = parseFloat((document.getElementById('m02InpLote')||{}).value)||0;
+      const _cus  = parseFloat((document.getElementById('m02InpCUS')||{}).value)||2.4;
+      const _aviso29 = '<div style="margin-top:8px;padding:7px 10px;background:var(--sem-am-bg,#FBF3DB);border:1px solid var(--sem-am-brd,#F0E0A0);border-radius:6px;font-size:11px;color:var(--sem-am-txt,#956400);line-height:1.5">'+'⚠️ <strong>Estimado orientativo.</strong> El valor exacto depende del Plan Parcial del Subdistrito. Verificar con la <strong>Dirección de Ordenamiento del Territorio</strong> del municipio antes de tomar decisiones.</div>';
+      const _cverde29 = (num, formula, frac) => !num ? '' :
+        '<div style="margin-top:8px;padding:10px 12px;background:var(--sem-v-bg,#EDF3EC);border:1.5px solid var(--sem-v-brd,#C5DFC4);border-radius:7px;display:flex;align-items:flex-start;gap:10px">'
+        +'<span style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--sem-v-txt,#346538);flex-shrink:0;line-height:1.1">'+num+' m²</span>'
+        +'<div><div style="font-size:12px;font-weight:700;color:var(--sem-v-txt,#346538)">Superficie máxima de locales</div>'
+        +'<div style="font-family:var(--mono);font-size:10px;color:var(--sem-v-txt,#346538);opacity:.8">'+formula+'</div>'
+        +'<div style="font-size:10px;color:var(--sem-v-txt,#346538);opacity:.7">'+frac+', RGIM GDL</div></div></div>';
+      if(base==='CS1'){
+        const _ms1 = _lote<100?75:_lote<=250?150:200;
+        const _rng1 = _lote<100?'&lt;100':_lote<=250?'100–250':'&gt;250';
+        const _tbl1 = '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:6px">'
+          +[['&lt; 100 m²','75 m²'],['100–250 m²','150 m²'],['&gt; 250 m²','200 m²']]
+          .map(([r,m])=>'<tr style="border-top:1px solid var(--border)"><td style="padding:3px 4px;color:var(--text2)">Lote '+r+'</td><td style="padding:3px 4px;text-align:right;font-family:var(--mono);font-weight:700;color:var(--text)">'+m+'</td></tr>').join('')
+          +'</table>';
+        return {icon:'📐', texto:'<strong>Tamaño máximo de locales y circulaciones</strong> según tamaño del lote:'+_tbl1
+          +(_lote?_cverde29(_ms1,'Lote '+_lote+' m² → rango '+_rng1,'Art. 29 Frac. I'):'')
+          +_aviso29+'<div style="font-size:10px;color:var(--text3);margin-top:4px">Art. 29 Frac. I, RGIM GDL · Impacto Mínimo</div>'};
+      }
+      if(base==='CS2'){
+        return {icon:'📐', texto:'La superficie máxima del conjunto de locales equivale a la <strong>superficie total del lote</strong>.'
+          +(_lote?_cverde29(_lote,'= superficie del lote ('+_lote+' m²)','Art. 29 Frac. II + Art. 30'):'')
+          +_aviso29+'<div style="font-size:10px;color:var(--text3);margin-top:4px">Art. 29 Frac. II + Art. 30, RGIM GDL · Impacto Bajo</div>'};
+      }
+      if(base==='CS3'){
+        const _edif = (_lote&&_cus)?Math.round(_lote*_cus):0;
+        const _mx3  = _edif?Math.round(_edif*0.6):0;
+        return {icon:'📐', texto:'La superficie máxima del conjunto de locales no excederá el <strong>60% del potencial edificable del lote</strong> (CUS × sup. lote).'
+          +(_mx3?_cverde29(_mx3,'60% × CUS('+_cus+') × '+_lote+' m² = 60% de '+_edif+' m²','Art. 29 Frac. III'):'')
+          +_aviso29+'<div style="font-size:10px;color:var(--text3);margin-top:4px">Art. 29 Frac. III, RGIM GDL · Impacto Medio — ingresa CUS del Plan Parcial</div>'};
+      }
+      if(base==='CS4'){
+        return {icon:'✅', texto:'<strong>Sin límite de superficie</strong> para la operación del giro. Las condicionantes aplicables son de carácter ambiental y de movilidad.'
+          +'<div style="font-size:10px;color:var(--text3);margin-top:4px">Art. 29 Frac. IV, RGIM GDL · Impacto Alto</div>'};
+      }
+      if(base==='CS5'){
+        return {icon:'✅', texto:'<strong>Sin límite de superficie</strong> para la operación del giro. Las restricciones son de carácter ambiental y de riesgo.'
+          +'<div style="font-size:10px;color:var(--text3);margin-top:4px">Art. 29 Frac. V, RGIM GDL · Impacto Máximo</div>'};
+      }
     }
     return null;
   }

@@ -3361,12 +3361,14 @@ function renderizar(zona,todos){
             <div style="display:flex;align-items:center;gap:8px">
               <label style="font-size:12px;color:var(--text2);min-width:108px">Sup. del lote</label>
               <input id="m02InpLote" type="number" min="1" max="9999" placeholder="m²"
+                oninput="_recalcM02()"
                 style="font-family:var(--mono);font-size:13px;font-weight:700;width:76px;padding:5px 8px;border-radius:6px;border:1.5px solid var(--border2);background:var(--bg2);color:var(--text);text-align:right;outline:none">
               <span style="font-size:12px;color:var(--text3)">m²</span>
             </div>
-            <div style="display:flex;align-items:center;gap:8px">
+            <div id="m02CUSRow" style="display:none;align-items:center;gap:8px">
               <label style="font-size:12px;color:var(--text2);min-width:108px">CUS de la zona</label>
-              <input id="m02InpCUS" type="number" min="0.1" max="10" step="0.1" placeholder="ej. 2.4"
+              <input id="m02InpCUS" type="number" min="0.1" max="10" step="0.1" value="2.4"
+                oninput="_recalcM02()"
                 style="font-family:var(--mono);font-size:13px;font-weight:700;width:76px;padding:5px 8px;border-radius:6px;border:1.5px solid var(--border2);background:var(--bg2);color:var(--text);text-align:right;outline:none">
               <span style="font-size:11px;color:var(--text3)">aplica en CS3</span>
             </div>
@@ -6579,6 +6581,13 @@ function cancelarGiroIA(){
   const lg=document.getElementById('iaListaGiros'); if(lg) lg.style.display='none';
   const inp=document.getElementById('iaDescInput'); if(inp){inp.value='';inp.focus();}
 }
+function _recalcM02(){
+  const _zb = (_zonaActualM02||'').toUpperCase().replace(/-.*$/,'');
+  const _cr = document.getElementById('m02CUSRow');
+  if(_cr) _cr.style.display = _zb==='CS3' ? 'flex' : 'none';
+  if(_giroSeleccionado && _zonaActualM02 && document.getElementById('m02Ov'))
+    verificarGiro();
+}
 function getMensajeM2(clave, condGiro, zonaActual){
   const c = (clave||'').toUpperCase();
   const base = c.replace(/-.*$/,'');
@@ -6626,6 +6635,8 @@ function getMensajeM2(clave, condGiro, zonaActual){
     if(municipioActual !== 'zapopan'){
       const _lote = parseFloat((document.getElementById('m02InpLote')||{}).value)||0;
       const _cus  = parseFloat((document.getElementById('m02InpCUS')||{}).value)||2.4;
+      const _cr29 = document.getElementById('m02CUSRow');
+      if(_cr29) _cr29.style.display = base==='CS3' ? 'flex' : 'none';
       const _aviso29 = '<div style="margin-top:8px;padding:7px 10px;background:var(--sem-am-bg,#FBF3DB);border:1px solid var(--sem-am-brd,#F0E0A0);border-radius:6px;font-size:11px;color:var(--sem-am-txt,#956400);line-height:1.5">'+'⚠️ <strong>Estimado orientativo.</strong> El valor exacto depende del Plan Parcial del Subdistrito. Verificar con la <strong>Dirección de Ordenamiento del Territorio</strong> del municipio antes de tomar decisiones.</div>';
       const _cverde29 = (num, formula, frac) => !num ? '' :
         '<div style="margin-top:8px;padding:10px 12px;background:var(--sem-v-bg,#EDF3EC);border:1.5px solid var(--sem-v-brd,#C5DFC4);border-radius:7px;display:flex;align-items:flex-start;gap:10px">'

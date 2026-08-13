@@ -3356,6 +3356,23 @@ function renderizar(zona,todos){
             <div id="giroBadgeClave" style="font-family:var(--mono);font-size:11px;color:var(--brand-light);margin-bottom:3px"></div>
             <div id="giroBadgeNombre" style="font-size:13px;font-weight:500"></div>
           </div>
+          <div style="margin-bottom:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);margin-bottom:1px">Datos del predio — para calcular m² máx. (Art. 29 RGIM)</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <label style="font-size:12px;color:var(--text2);min-width:108px">Sup. del lote</label>
+              <input id="m02InpLote" type="number" min="1" max="9999" placeholder="m²"
+                oninput="_recalcM02()"
+                style="font-family:var(--mono);font-size:13px;font-weight:700;width:76px;padding:5px 8px;border-radius:6px;border:1.5px solid var(--border2);background:var(--bg2);color:var(--text);text-align:right;outline:none">
+              <span style="font-size:12px;color:var(--text3)">m²</span>
+            </div>
+            <div id="m02CUSRow" style="display:none;align-items:center;gap:8px">
+              <label style="font-size:12px;color:var(--text2);min-width:108px">CUS de la zona</label>
+              <input id="m02InpCUS" type="number" min="0.1" max="10" step="0.1" value="2.4"
+                oninput="_recalcM02()"
+                style="font-family:var(--mono);font-size:13px;font-weight:700;width:76px;padding:5px 8px;border-radius:6px;border:1.5px solid var(--border2);background:var(--bg2);color:var(--text);text-align:right;outline:none">
+              <span style="font-size:11px;color:var(--text3)">aplica en CS3</span>
+            </div>
+          </div>
           <button id="btnVerifGiro" onclick="verificarGiro()" disabled
             style="width:100%;background:var(--brand);color:#fff;border:none;border-radius:7px;
                    padding:12px;font-family:var(--sans);font-size:14px;font-weight:500;
@@ -5409,7 +5426,7 @@ const GU_SCIAN_ZAP = [
   {c:'561620',n:'Accesorios para seguridad industrial y domestica',ns:'Servicios de protección y custodia mediante el monitoreo de sistemas de segurida',u:'CS3'},
   {c:'468212',n:'Accesorios y autopartes seminuevas',ns:'Comercio  al  por  menor  de  partes  y  refacciones  usadas para automóviles, c',u:'CS4'},
   {c:'468420',n:'Aceites y lubricantes',ns:'Comercio  al  por  menor  de  aceites  y  grasas  lubricantes, aditivos y simila',u:'CS3'},
-  {c:'112515',n:'Acuario',ns:'Piscicultura y otra acuicultura, excepto camaronicultura',u:''},
+  {c:'112515',n:'Acuario',ns:'Piscicultura y otra acuicultura, excepto camaronicultura',u:'ARN'},
   {c:'468111',n:'Agen. De autos nuevos',ns:'Comercio al por menor de automóviles y camionetas nuevos',u:'CS4'},
   {c:'468112',n:'Agen. De autos seminuevos',ns:'Comercio al por menor de automóviles y camionetas usados',u:'CS4'},
   {c:'484210',n:'Agen. De autotransportes',ns:'Servicios de mudanzas',u:'CS4'},
@@ -5421,7 +5438,7 @@ const GU_SCIAN_ZAP = [
   {c:'561320',n:'Agencias de empleo temporal',ns:'Agencias de empleo temporal',u:'CS3'},
   {c:'541820',n:'Agencias de relaciones publicas',ns:'Agencias de relaciones públicas',u:'CS2'},
   {c:'541840',n:'Agencias de representación en medios',ns:'Agencias de representación de medios',u:'CS2'},
-  {c:'516210',n:'Agencias noticiosas',ns:'Servicios de distribución de audio y video en tiempo real (streaming), redes soc',u:''},
+  {c:'516210',n:'Agencias noticiosas',ns:'Servicios de distribución de audio y video en tiempo real (streaming), redes soc',u:'CS2'},
   {c:'466311',n:'Alfombras',ns:'Comercio al por menor de alfombras, cortinas, tapices y similares',u:'CS2'},
   {c:'311993',n:'Alimentos',ns:'Elaboración de alimentos frescos para consumo inmediato',u:'I1'},
   {c:'311211',n:'Alimentos',ns:'Beneficios del arroz',u:'I3'},
@@ -5438,7 +5455,7 @@ const GU_SCIAN_ZAP = [
   {c:'532210',n:'Alquiler de aparatos eléctricos y electrónicos',ns:'Alquiler de aparatos eléctricos y electrónicos para el hogar y personales',u:'CS3'},
   {c:'532420',n:'Alquiler de art. De oficina',ns:'Alquiler  de  equipo  de  cómputo  y  de  otras  máquinas  y mobiliario de ofici',u:'CS3'},
   {c:'485320',n:'Alquiler de automóviles con chofer',ns:'*Alquiler de automóviles con chofer',u:'CS3'},
-  {c:'532281',n:'Alquiler de ropa',ns:'Alquiler de prendas de vestir',u:''},
+  {c:'532281',n:'Alquiler de ropa',ns:'Alquiler de prendas de vestir',u:'CS2'},
   {c:'531114',n:'Alquiler sin intermediación de oficinas y locales comerciales',ns:'*Alquiler    sin    intermediación    de    oficinas    y    locales comerciales',u:'CS1'},
   {c:'531111',n:'Alquiler sin intermediación de viviendas amuebladas',ns:'*Alquiler sin intermediación de viviendas amuebladas',u:'CS1'},
   {c:'531112',n:'Alquiler sin intermediación de viviendas no amuebladas',ns:'*Alquiler sin intermediación de viviendas no amuebladas',u:'CS1'},
@@ -5555,13 +5572,13 @@ const GU_SCIAN_ZAP = [
   {c:'541420',n:'Diseño industrial',ns:'Diseño industrial',u:'CS2'},
   {c:'512120',n:'Distribución de películas y audiovisuales',ns:'Distribución de películas y de otros materiales audiovisuales',u:'CS2'},
   {c:'461160',n:'Dulcería',ns:'Comercio al por menor de dulces y materias  primas para repostería',u:'CS1'},
-  {c:'513141',n:'Edición de directorios y de listas de correo',ns:'Edición de directorios y listas de correo en formato electrónico',u:''},
-  {c:'513131',n:'Edición de libros',ns:'Edición de libros en formato electrónico',u:''},
-  {c:'513132',n:'Edición de libros integrada con la impresión',ns:'Edición de libros integrada con la impresión',u:''},
-  {c:'513111',n:'Edición de periódicos',ns:'Edición de periódicos en formato electrónico',u:''},
-  {c:'513112',n:'Edición de periódicos integrada con la edición',ns:'Edición de periódicos integrada con la impresión',u:''},
-  {c:'513122',n:'Edición de revistas y otras publicaciones periódicas',ns:'Edición de revistas y otras publicaciones periódicas integradas con la impresión',u:''},
-  {c:'238290',n:'Elevadores',ns:'Otras instalaciones y equipamiento en construcciones',u:''},
+  {c:'513141',n:'Edición de directorios y de listas de correo',ns:'Edición de directorios y listas de correo en formato electrónico',u:'CS2'},
+  {c:'513131',n:'Edición de libros',ns:'Edición de libros en formato electrónico',u:'CS2'},
+  {c:'513132',n:'Edición de libros integrada con la impresión',ns:'Edición de libros integrada con la impresión',u:'CS2'},
+  {c:'513111',n:'Edición de periódicos',ns:'Edición de periódicos en formato electrónico',u:'CS2'},
+  {c:'513112',n:'Edición de periódicos integrada con la edición',ns:'Edición de periódicos integrada con la impresión',u:'CS2'},
+  {c:'513122',n:'Edición de revistas y otras publicaciones periódicas',ns:'Edición de revistas y otras publicaciones periódicas integradas con la impresión',u:'CS2'},
+  {c:'238290',n:'Elevadores',ns:'Otras instalaciones y equipamiento en construcciones',u:'I2'},
   {c:'467116',n:'Empaques en general',ns:'Comercio al por menor de materiales para la construcción en tiendas de autoservi',u:'CS3'},
   {c:'434225',n:'Equipo de iluminación',ns:'Comercio al por mayor de equipo y material eléctrico',u:'CS5'},
   {c:'435313',n:'Equipo medico',ns:'Comercio al por mayor de mobiliario, equipo e instrumental médico y de laborator',u:'CS4'},
@@ -5616,13 +5633,13 @@ const GU_SCIAN_ZAP = [
   {c:'339999',n:'Manufactura domiciliaria',ns:'Otras industrias manufactureras',u:'I3'},
   {c:'332710',n:'Maquinaria en general',ns:'Maquinado de piezas para maquinaria y equipo en general',u:'I4'},
   {c:'435319',n:'Maquinas tragamonedas',ns:'Comercio al por mayor de maquinaria de equipo para otros servicios y para activi',u:'CS3'},
-  {c:'2338350',n:'Marcos y molduras',ns:'Realización de trabajos de carpintería en el lugar de la construcción',u:''},
+  {c:'238350',n:'Marcos y molduras',ns:'Realización de trabajos de carpintería en el lugar de la construcción',u:'I2'},
   {c:'431123',n:'Mariscos en estado natural',ns:'Comercio al por mayor de pescados y mariscos',u:'CS5'},
-  {c:'112513',n:'Mariscos en estado natural',ns:'Camaronicultura y acuicultura de otros crustáceos en agua salada',u:''},
-  {c:'112514',n:'Mariscos en estado natural',ns:'Camaronicultura y acuicultura de otros crustáceos en agua dulce',u:''},
-  {c:'112515',n:'Mariscos en estado natural',ns:'Piscicultura en agua dulce',u:''},
-  {c:'112516',n:'Mariscos en estado natural',ns:'Piscicultura en agua dulce',u:''},
-  {c:'112519',n:'Mariscos en estado natural',ns:'Otra acuicultura',u:''},
+  {c:'112513',n:'Mariscos en estado natural',ns:'Camaronicultura y acuicultura de otros crustáceos en agua salada',u:'ARN'},
+  {c:'112514',n:'Mariscos en estado natural',ns:'Camaronicultura y acuicultura de otros crustáceos en agua dulce',u:'ARN'},
+  {c:'112515',n:'Mariscos en estado natural',ns:'Piscicultura en agua dulce',u:'ARN'},
+  {c:'112516',n:'Mariscos en estado natural',ns:'Piscicultura en agua dulce',u:'ARN'},
+  {c:'112519',n:'Mariscos en estado natural',ns:'Otra acuicultura',u:'ARN'},
   {c:'431123',n:'Mariscos procesados para consumo humano',ns:'Comercio al por mayor de pescados y mariscos',u:'CS5'},
   {c:'311710',n:'Mariscos procesados para consumos',ns:'Preparación y envasado de pescados y mariscos',u:'I3'},
   {c:'311830',n:'Masa y tortillas',ns:'Elaboración de tortillas de maíz y molienda de nixtamal',u:'CS2'},
@@ -5631,7 +5648,7 @@ const GU_SCIAN_ZAP = [
   {c:'311230',n:'Materia prima',ns:'Elaboración de cereales par el desayuno',u:'I3'},
   {c:'311311',n:'Materia prima',ns:'Elaboración de azúcar de caña',u:'I4'},
   {c:'311319',n:'Materia prima',ns:'Elaboración de otros azúcares',u:'I4'},
-  {c:'311140',n:'Materia prima',ns:'Elaboración de dulces, chicles, y productos de confitería que no sean de chocola',u:''},
+  {c:'311140',n:'Materia prima',ns:'Elaboración de dulces, chicles, y productos de confitería que no sean de chocola',u:'I1'},
   {c:'311350',n:'Materia prima',ns:'Elaboración de chocolate y productos de chocolate',u:'I3'},
   {c:'465211',n:'Material discográfico',ns:'Comercio al por menor de grabaciones de audio y video en medios físicos',u:'CS2'},
   {c:'434225',n:'Material eléctrico',ns:'Comercio al por mayor de equipo y material eléctrico',u:'CS5'},
@@ -5645,7 +5662,7 @@ const GU_SCIAN_ZAP = [
   {c:'711131',n:'Músicos y cancioneros',ns:'Cantantes y grupos musicales del sector privado',u:'CS2'},
   {c:'461170',n:'Nevería',ns:'Comercio al por menor de paletas de hielo y helados',u:'CS1'},
   {c:'541120',n:'Notarias publicas',ns:'Notarías Públicas',u:'CS3'},
-  {c:'517312',n:'Oficina virtual',ns:'Operadores de servicios de telecomunicaciones inalámbricas',u:''},
+  {c:'517312',n:'Oficina virtual',ns:'Operadores de servicios de telecomunicaciones inalámbricas',u:'CS2'},
   {c:'464121',n:'Óptica',ns:'Comercio al por menor de lentes',u:'CS2'},
   {c:'561920',n:'Organizadores  de  convenciones  y  ferias  comerciales  e industriales',ns:'Organizadores de convenciones y ferias comerciales e industriales',u:'CS3'},
   {c:'541711',n:'Otros servicios de consultoría científica y técnica',ns:'Servicios de investigación científica y desarrollo en ciencias naturales y exact',u:'CS2'},
@@ -5654,15 +5671,15 @@ const GU_SCIAN_ZAP = [
   {c:'431199',n:'Paletería',ns:'Comercio al por mayor de otros alimentos',u:'CS5'},
   {c:'311520',n:'Paletería',ns:'Elaboración de helados y paletas',u:'I1'},
   {c:'311812',n:'Panadería',ns:'Panificación tradicional',u:'I1'},
-  {c:'422111',n:'Pañales',ns:'Comercio al por menor en supermercados',u:''},
+  {c:'422111',n:'Pañales',ns:'Comercio al por menor en supermercados',u:'CS4'},
   {c:'433410',n:'Papelería',ns:'Comercio al por mayor de artículos de papelería',u:'CS5'},
   {c:'431180',n:'Pastelería y postres',ns:'Comercio al por mayor de dulces y materias primas para repostería',u:'CS5'},
   {c:'311991',n:'Pastelería y Postres',ns:'Elaboración de gelatinas y otros postres en polvo',u:'I1'},
   {c:'311992',n:'Pastelería y Postres',ns:'Elaboración de levadura',u:'I3'},
   {c:'467113',n:'Pinturas',ns:'Comercio al por menor de pintura',u:'CS3'},
   {c:'467112',n:'Pisos',ns:'Comercio al por menor de pisos y recubrimientos cerámicos',u:'CS3'},
-  {c:'238330',n:'Pisos',ns:'Colocación de pisos flexibles y de madera',u:''},
-  {c:'238340',n:'Pisos',ns:'Colocación de pisos cerámicos y azulejos',u:''},
+  {c:'238330',n:'Pisos',ns:'Colocación de pisos flexibles y de madera',u:'I2'},
+  {c:'238340',n:'Pisos',ns:'Colocación de pisos cerámicos y azulejos',u:'I2'},
   {c:'434211',n:'Pisos, azulejos y accesorios para baño',ns:'Comercio al por mayor de cemento, tabique y grava',u:'CS5'},
   {c:'713943',n:'Pista de patinaje (hielo)',ns:'Centros de acondicionamiento físico del sector privado',u:'CS2'},
   {c:'713944',n:'Pistas de actividades deportivas y de esparcimiento',ns:'Centros de acondicionamiento físico del sector público',u:'E2'},
@@ -5671,7 +5688,7 @@ const GU_SCIAN_ZAP = [
   {c:'611211',n:'Podología',ns:'Escuelas de educación técnica superior del sector privado',u:'CS3'},
   {c:'523910',n:'Prestación de servicios',ns:'Asesoría en inversiones',u:'CS3'},
   {c:'522320',n:'Prestamos',ns:'Cajas, cooperativas y sociedades financieras de ahorro y préstamo popular',u:'CS2'},
-  {c:'5232110',n:'Prestamos prendarios',ns:'Banca múltiple',u:''},
+  {c:'523211',n:'Prestamos prendarios',ns:'Banca múltiple',u:'CS2'},
   {c:'111110',n:'Producto agropecuario',ns:'Cultivo de Soya',u:'ARN'},
   {c:'111121',n:'Producto agropecuario',ns:'Cultivo de Cártamo',u:'ARN'},
   {c:'111122',n:'Producto agropecuario',ns:'Cultivo de Girasol',u:'ARN'},
@@ -5710,13 +5727,13 @@ const GU_SCIAN_ZAP = [
   {c:'111337',n:'Producto agropecuario',ns:'Cultivo de cacao',u:'ARN'},
   {c:'111338',n:'Producto agropecuario',ns:'Cultivo de coco',u:'ARN'},
   {c:'111339',n:'Producto agropecuario',ns:'Cultivo de otros frutales no cítricos y de nueces',u:'ARN'},
-  {c:'111411',n:'Producto agropecuario',ns:'Cultivo de jitomate en invernaderos y otras estructuras agrícolas protegidas',u:''},
-  {c:'111412',n:'Producto agropecuario',ns:'Cultivo de fresa en invernaderos y otras estructuras agrícolas protegidas',u:''},
-  {c:'111413',n:'Producto agropecuario',ns:'Cultivo de bayas (berries) e invernaderos y otras estructuras agrícolas protegid',u:''},
-  {c:'111414',n:'Producto agropecuario',ns:'Cultivo de chile en invernadero y otras estructuras agrícolas protegidas',u:''},
-  {c:'111415',n:'Producto agropecuario',ns:'Cultivo de manzana en invernaderos y otras estructuras agrícolas protegidas',u:''},
-  {c:'111416',n:'Producto agropecuario',ns:'Cultivo de pepino en invernaderos y otras estructuras agrícolas protegidas',u:''},
-  {c:'111419',n:'Producto agropecuario',ns:'Cultivo de otros productos alimenticios en invernaderos y otras estructuras agrí',u:''},
+  {c:'111411',n:'Producto agropecuario',ns:'Cultivo de jitomate en invernaderos y otras estructuras agrícolas protegidas',u:'ARN'},
+  {c:'111412',n:'Producto agropecuario',ns:'Cultivo de fresa en invernaderos y otras estructuras agrícolas protegidas',u:'ARN'},
+  {c:'111413',n:'Producto agropecuario',ns:'Cultivo de bayas (berries) e invernaderos y otras estructuras agrícolas protegid',u:'ARN'},
+  {c:'111414',n:'Producto agropecuario',ns:'Cultivo de chile en invernadero y otras estructuras agrícolas protegidas',u:'ARN'},
+  {c:'111415',n:'Producto agropecuario',ns:'Cultivo de manzana en invernaderos y otras estructuras agrícolas protegidas',u:'ARN'},
+  {c:'111416',n:'Producto agropecuario',ns:'Cultivo de pepino en invernaderos y otras estructuras agrícolas protegidas',u:'ARN'},
+  {c:'111419',n:'Producto agropecuario',ns:'Cultivo de otros productos alimenticios en invernaderos y otras estructuras agrí',u:'ARN'},
   {c:'111421',n:'Producto agropecuario',ns:'Floricultura a cielo abierto',u:'ARN'},
   {c:'111422',n:'Producto agropecuario',ns:'Floricultura en invernaderos y otras estructuras agrícolas protegidas',u:'ARN'},
   {c:'111423',n:'Producto agropecuario',ns:'Cultivo de árboles de ciclo productivo de 10 años o menos',u:'ARN'},
@@ -5787,7 +5804,7 @@ const GU_SCIAN_ZAP = [
   {c:'462111',n:'Tienda de autoservicio',ns:'Comercio al por menor de supermercados',u:'CS3'},
   {c:'467111',n:'Tlapalería',ns:'Comercio al por menor en ferreterías y tlapalerías',u:'CS2'},
   {c:'311999',n:'Transformación de alimentos',ns:'Elaboración de otros alimentos procesados y envasados',u:'I1'},
-  {c:'455919',n:'Venta de artículos eróticos-sexuales (sex shop)',ns:'Comercio al por menor de otros artículos de uso personal',u:''},
+  {c:'455919',n:'Venta de artículos eróticos-sexuales (sex shop)',ns:'Comercio al por menor de otros artículos de uso personal',u:'CS5'},
   {c:'463214',n:'Venta de disfraces vestimenta regional y vestidos de novia',ns:'Comercio al por menor de disfraces, trajes típicos y vestidos de novia',u:'CS2'},
   {c:'434221',n:'Venta de herrajes en general',ns:'Comercio al por mayor de materiales metálicos para la construcción y la manufact',u:'CS5'},
   {c:'541941',n:'Veterinaria',ns:'Servicios veterinarios para mascotas prestados por el sector privado',u:'CS2'},
@@ -6564,6 +6581,29 @@ function cancelarGiroIA(){
   const lg=document.getElementById('iaListaGiros'); if(lg) lg.style.display='none';
   const inp=document.getElementById('iaDescInput'); if(inp){inp.value='';inp.focus();}
 }
+function _recalcM02(){
+  const _zb = (_zonaActualM02||'').toUpperCase().replace(/-.*$/,'');
+  const _cr = document.getElementById('m02CUSRow');
+  if(_cr) _cr.style.display = _zb==='CS3' ? 'flex' : 'none';
+  if(_giroSeleccionado && _zonaActualM02 && document.getElementById('m02Ov'))
+    verificarGiro();
+}
+function getMensajeDistancia(codigo){
+  if(municipioActual !== 'zapopan') return null;
+  const D = {
+    '461121':{dist:'300 m',desc:'entre establecimientos similares (carnicería / carne empacada)',ref:'Art. 45'},
+    '461122':{dist:'300 m',desc:'entre establecimientos similares (expendio de carne de aves)',ref:'Art. 45'},
+    '431121':{dist:'300 m',desc:'entre establecimientos similares (carnicería mayoreo / obrador)',ref:'Art. 45'},
+    '812310':{dist:'500 m',desc:'entre establecimientos similares (servicios funerarios)',ref:'Art. 136'}
+  };
+  const r = D[codigo];
+  if(!r) return null;
+  return {
+    icon:'📏',
+    texto:'<strong>Distancia mínima: '+r.dist+'</strong> '+r.desc+'. No se autoriza licencia si existe un establecimiento similar dentro de ese radio.'
+      +'<div style="font-size:10px;color:var(--text3);margin-top:4px">'+r.ref+', Reglamento para el Ejercicio de Giros Comerciales y de Prestación de Servicios — Zapopan. Verificar con Padrón y Licencias antes de solicitar licencia.</div>'
+  };
+}
 function getMensajeM2(clave, condGiro, zonaActual){
   const c = (clave||'').toUpperCase();
   const base = c.replace(/-.*$/,'');
@@ -6606,6 +6646,51 @@ function getMensajeM2(clave, condGiro, zonaActual){
       const famGiro = uGiro.replace(/\d+$/,'');
       if(famGiro==='I')
         return {icon:'📐', texto:'Giro industrial en zona de Comercios y Servicios: superficie máxima de operación <strong>250 m²</strong>. Por encima de ese límite, debe ubicarse en una zona de uso Industrial. <em>(Art. 96 Numeral 3 Inciso b, Plan Parcial de Desarrollo Urbano GDL)</em>'};
+    }
+    // Art. 29 RGIM — superficie máxima según nivel de impacto CS
+    if(municipioActual !== 'zapopan'){
+      const _lote = parseFloat((document.getElementById('m02InpLote')||{}).value)||0;
+      const _cus  = parseFloat((document.getElementById('m02InpCUS')||{}).value)||2.4;
+      const _cr29 = document.getElementById('m02CUSRow');
+      if(_cr29) _cr29.style.display = base==='CS3' ? 'flex' : 'none';
+      const _aviso29 = '<div style="margin-top:8px;padding:7px 10px;background:var(--sem-am-bg,#FBF3DB);border:1px solid var(--sem-am-brd,#F0E0A0);border-radius:6px;font-size:11px;color:var(--sem-am-txt,#956400);line-height:1.5">'+'⚠️ <strong>Estimado orientativo.</strong> El valor exacto depende del Plan Parcial del Subdistrito. Verificar con la <strong>Dirección de Ordenamiento del Territorio</strong> del municipio antes de tomar decisiones.</div>';
+      const _cverde29 = (num, formula, frac) => !num ? '' :
+        '<div style="margin-top:8px;padding:10px 12px;background:var(--sem-v-bg,#EDF3EC);border:1.5px solid var(--sem-v-brd,#C5DFC4);border-radius:7px;display:flex;align-items:flex-start;gap:10px">'
+        +'<span style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--sem-v-txt,#346538);flex-shrink:0;line-height:1.1">'+num+' m²</span>'
+        +'<div><div style="font-size:12px;font-weight:700;color:var(--sem-v-txt,#346538)">Superficie máxima de locales</div>'
+        +'<div style="font-family:var(--mono);font-size:10px;color:var(--sem-v-txt,#346538);opacity:.8">'+formula+'</div>'
+        +'<div style="font-size:10px;color:var(--sem-v-txt,#346538);opacity:.7">'+frac+', RGIM GDL</div></div></div>';
+      if(base==='CS1'){
+        const _ms1 = _lote<100?75:_lote<=250?150:200;
+        const _rng1 = _lote<100?'&lt;100':_lote<=250?'100–250':'&gt;250';
+        const _tbl1 = '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:6px">'
+          +[['&lt; 100 m²','75 m²'],['100–250 m²','150 m²'],['&gt; 250 m²','200 m²']]
+          .map(([r,m])=>'<tr style="border-top:1px solid var(--border)"><td style="padding:3px 4px;color:var(--text2)">Lote '+r+'</td><td style="padding:3px 4px;text-align:right;font-family:var(--mono);font-weight:700;color:var(--text)">'+m+'</td></tr>').join('')
+          +'</table>';
+        return {icon:'📐', texto:'<strong>Tamaño máximo de locales y circulaciones</strong> según tamaño del lote:'+_tbl1
+          +(_lote?_cverde29(_ms1,'Lote '+_lote+' m² → rango '+_rng1,'Art. 29 Frac. I'):'')
+          +_aviso29+'<div style="font-size:10px;color:var(--text3);margin-top:4px">Art. 29 Frac. I, RGIM GDL · Impacto Mínimo</div>'};
+      }
+      if(base==='CS2'){
+        return {icon:'📐', texto:'La superficie máxima del conjunto de locales equivale a la <strong>superficie total del lote</strong>.'
+          +(_lote?_cverde29(_lote,'= superficie del lote ('+_lote+' m²)','Art. 29 Frac. II + Art. 30'):'')
+          +_aviso29+'<div style="font-size:10px;color:var(--text3);margin-top:4px">Art. 29 Frac. II + Art. 30, RGIM GDL · Impacto Bajo</div>'};
+      }
+      if(base==='CS3'){
+        const _edif = (_lote&&_cus)?Math.round(_lote*_cus):0;
+        const _mx3  = _edif?Math.round(_edif*0.6):0;
+        return {icon:'📐', texto:'La superficie máxima del conjunto de locales no excederá el <strong>60% del potencial edificable del lote</strong> (CUS × sup. lote).'
+          +(_mx3?_cverde29(_mx3,'60% × CUS('+_cus+') × '+_lote+' m² = 60% de '+_edif+' m²','Art. 29 Frac. III'):'')
+          +_aviso29+'<div style="font-size:10px;color:var(--text3);margin-top:4px">Art. 29 Frac. III, RGIM GDL · Impacto Medio — ingresa CUS del Plan Parcial</div>'};
+      }
+      if(base==='CS4'){
+        return {icon:'✅', texto:'<strong>Sin límite de superficie</strong> para la operación del giro. Las condicionantes aplicables son de carácter ambiental y de movilidad.'
+          +'<div style="font-size:10px;color:var(--text3);margin-top:4px">Art. 29 Frac. IV, RGIM GDL · Impacto Alto</div>'};
+      }
+      if(base==='CS5'){
+        return {icon:'✅', texto:'<strong>Sin límite de superficie</strong> para la operación del giro. Las restricciones son de carácter ambiental y de riesgo.'
+          +'<div style="font-size:10px;color:var(--text3);margin-top:4px">Art. 29 Frac. V, RGIM GDL · Impacto Máximo</div>'};
+      }
     }
     return null;
   }
@@ -6719,6 +6804,7 @@ function verificarGiro(){
       <span style="font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:4px;background:var(--bg3);color:var(--text2);border:1px solid var(--border)">Zona ${clave} · ${infoZona.n||clave}</span>
     </div>
     ${(()=>{const msg=getMensajeM2(clave,g.cond);if(!msg)return '';return `<div style="margin:0 16px 12px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.6"><span style="font-size:13px;margin-right:6px">${msg.icon}</span>${msg.texto}</div>`;})()} 
+    ${(()=>{const dm=getMensajeDistancia(g.codigo||'');if(!dm)return '';return `<div style="margin:0 16px 12px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.6"><span style="font-size:13px;margin-right:6px">${dm.icon}</span>${dm.texto}</div>`;})()} 
     <div style="padding:0 16px 14px;display:flex;gap:8px">
       <button onclick="generarPDFGiro()" style="flex:1;background:#1A5676;border:none;border-radius:7px;padding:9px;color:#fff;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer">&#128196; PDF</button>
       <button onclick="document.getElementById('m02Ov').remove()" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px;color:var(--text2);font-family:var(--sans);font-size:12px;cursor:pointer">Cerrar</button>
@@ -6791,6 +6877,7 @@ function verificarGiro(){
         <span style="font-size:13px;margin-right:6px">${msg.icon}</span>${msg.texto}
       </div>`;
     })()}
+    ${(()=>{const dm=getMensajeDistancia(g.codigo||'');if(!dm)return '';return `<div style="margin:0 16px 12px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.6"><span style="font-size:13px;margin-right:6px">${dm.icon}</span>${dm.texto}</div>`;})()} 
     <div style="padding:0 16px 14px;display:flex;gap:8px">
       <button onclick="generarPDFGiro()" style="flex:1;background:#1A5676;border:none;border-radius:7px;padding:9px;color:#fff;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer">&#128196; PDF</button>
       <button onclick="document.getElementById('m02Ov').remove()" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px;color:var(--text2);font-family:var(--sans);font-size:12px;cursor:pointer">Cerrar</button>

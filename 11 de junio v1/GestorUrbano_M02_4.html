@@ -6588,6 +6588,22 @@ function _recalcM02(){
   if(_giroSeleccionado && _zonaActualM02 && document.getElementById('m02Ov'))
     verificarGiro();
 }
+function getMensajeDistancia(codigo){
+  if(municipioActual !== 'zapopan') return null;
+  const D = {
+    '461121':{dist:'300 m',desc:'entre establecimientos similares (carnicería / carne empacada)',ref:'Art. 45'},
+    '461122':{dist:'300 m',desc:'entre establecimientos similares (expendio de carne de aves)',ref:'Art. 45'},
+    '431121':{dist:'300 m',desc:'entre establecimientos similares (carnicería mayoreo / obrador)',ref:'Art. 45'},
+    '812310':{dist:'500 m',desc:'entre establecimientos similares (servicios funerarios)',ref:'Art. 136'}
+  };
+  const r = D[codigo];
+  if(!r) return null;
+  return {
+    icon:'📏',
+    texto:'<strong>Distancia mínima: '+r.dist+'</strong> '+r.desc+'. No se autoriza licencia si existe un establecimiento similar dentro de ese radio.'
+      +'<div style="font-size:10px;color:var(--text3);margin-top:4px">'+r.ref+', Reglamento para el Ejercicio de Giros Comerciales y de Prestación de Servicios — Zapopan. Verificar con Padrón y Licencias antes de solicitar licencia.</div>'
+  };
+}
 function getMensajeM2(clave, condGiro, zonaActual){
   const c = (clave||'').toUpperCase();
   const base = c.replace(/-.*$/,'');
@@ -6788,6 +6804,7 @@ function verificarGiro(){
       <span style="font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:4px;background:var(--bg3);color:var(--text2);border:1px solid var(--border)">Zona ${clave} · ${infoZona.n||clave}</span>
     </div>
     ${(()=>{const msg=getMensajeM2(clave,g.cond);if(!msg)return '';return `<div style="margin:0 16px 12px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.6"><span style="font-size:13px;margin-right:6px">${msg.icon}</span>${msg.texto}</div>`;})()} 
+    ${(()=>{const dm=getMensajeDistancia(g.codigo||'');if(!dm)return '';return `<div style="margin:0 16px 12px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.6"><span style="font-size:13px;margin-right:6px">${dm.icon}</span>${dm.texto}</div>`;})()} 
     <div style="padding:0 16px 14px;display:flex;gap:8px">
       <button onclick="generarPDFGiro()" style="flex:1;background:#1A5676;border:none;border-radius:7px;padding:9px;color:#fff;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer">&#128196; PDF</button>
       <button onclick="document.getElementById('m02Ov').remove()" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px;color:var(--text2);font-family:var(--sans);font-size:12px;cursor:pointer">Cerrar</button>
@@ -6860,6 +6877,7 @@ function verificarGiro(){
         <span style="font-size:13px;margin-right:6px">${msg.icon}</span>${msg.texto}
       </div>`;
     })()}
+    ${(()=>{const dm=getMensajeDistancia(g.codigo||'');if(!dm)return '';return `<div style="margin:0 16px 12px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.6"><span style="font-size:13px;margin-right:6px">${dm.icon}</span>${dm.texto}</div>`;})()} 
     <div style="padding:0 16px 14px;display:flex;gap:8px">
       <button onclick="generarPDFGiro()" style="flex:1;background:#1A5676;border:none;border-radius:7px;padding:9px;color:#fff;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer">&#128196; PDF</button>
       <button onclick="document.getElementById('m02Ov').remove()" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px;color:var(--text2);font-family:var(--sans);font-size:12px;cursor:pointer">Cerrar</button>

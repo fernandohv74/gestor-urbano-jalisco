@@ -258,12 +258,80 @@ Los códigos SCIAN de gasolineras/gaseras (468411, 468412, 468413, 468419) está
 | `eb9d84e` | feat M07: mejorar descripciones CS1/CS4/CS5 en Art. 29 |
 | `111a70c` | feat M07: reglamentos ZPN a Fuentes + URL Estatal Zonificación al PDF directo |
 | `fe1b329` | feat M02: distancias mínimas entre giros similares — Zapopan (Arts. 45, 136) |
+| `c6e6f29` | docs: bitácora v38.0 (.md + .docx) |
+| `ad7427c` | feat index: transiciones suaves de tema + animación de logo al cargar menú |
+| `efb22b4` | fix index: splash adapta colores al tema oscuro guardado en localStorage |
 
-**Total:** 5 commits · sesión 12 ago 2026
+**Total:** 8 commits · sesión 12 ago 2026
 
 ---
 
-## 10. Parámetros de la sesión
+## 10. Animaciones y transiciones — index.html (Bloque C)
+
+### 10.1 Contexto
+
+Al final de la sesión Fernando solicitó tres mejoras visuales al menú principal (`index.html`):
+1. Transición suave al cambiar entre modo oscuro y modo claro.
+2. Que el splash (intro) respete el tema guardado (no mostrarse blanco si el usuario tiene modo oscuro).
+3. Que el logo "TrazaUrbana" en el header aparezca con animación de entrada cada vez que el usuario llega al menú (desde un módulo o carga directa).
+
+### 10.2 Transición dark↔light
+
+Se agregaron reglas CSS de `transition` a los elementos que cambian al alternar tema:
+
+```css
+body { transition: background-color .4s ease, color .3s ease }
+header { transition: background-color .4s ease, border-color .35s ease }
+.mod-card { transition: background-color .4s ease, border-color .25s ease, color .3s ease, transform .15s, box-shadow .2s }
+.stat-box { transition: background-color .4s ease, border-color .35s ease }
+.hero-eyebrow, .tag, .stack-tag, .hbadge, .mod-card-top, .mod-card-body
+footer { transition: background-color .4s ease, border-color .35s ease }
+```
+
+El cambio de tema pasa de ser instantáneo a un fade suave de ~0.35–0.4s.
+
+### 10.3 Animación del logo en el header
+
+El `div` que contiene el isotipo SVG y el wordmark "TrazaUrbana" recibió `id="hdr-brand"` y un CSS de entrada:
+
+```css
+#hdr-brand { opacity: 0; transform: translateY(-6px) scale(.92);
+             transition: opacity .5s ease .1s, transform .55s cubic-bezier(.34,1.56,.64,1) .1s }
+#hdr-brand.live { opacity: 1; transform: none }
+```
+
+El logo empieza invisible. Cuando el splash termina (`dismiss()`), el script activa la clase `.live` con 120ms de delay — el isotipo y wordmark aparecen con un spring suave desde arriba.
+
+Adicionalmente, al hacer `dismiss()` el SVG del splash ejecuta una animación de contracción hacia arriba antes del fade-out, dando la ilusión de que el isotipo "vuela" hacia el header:
+
+```javascript
+_sv.style.transform = 'translateY(-32px) scale(.28)';
+_sv.style.opacity = '.08';
+```
+
+### 10.4 Splash adaptado al tema guardado
+
+**Problema:** `#tu-splash` tenía `background:#F6F3EC` (crema) hardcoded. Al cargar en modo oscuro, el splash aparecía blanco sobre lo que debería ser una interfaz oscura.
+
+**Solución:** Al inicio del script del splash, se lee `localStorage.getItem('gu_theme')`. Si el valor no es `'light'` (incluye el caso sin valor guardado, ya que el default es oscuro), se aplica:
+
+```javascript
+s.classList.add('dk');                                    // background #0B0F1A via CSS
+_b1.setAttribute('stroke', '#3D7BFF');                    // SVG caja → azul accent
+_l1.setAttribute('stroke', '#3D7BFF');                    // SVG línea diagonal → azul accent
+_wt.style.color = '#C4D2E0';                              // "Traza" wordmark → gris claro
+_tg.style.color = '#4B5563';                              // tagline → gris tenue
+```
+
+El naranja `#D85A30` (cuadro del isotipo, "Urbana", barra de progreso) se mantiene igual en ambos temas.
+
+**Resultado:** el splash ahora coincide con el tema del usuario desde el primer frame.
+
+**Commits:** `ad7427c` · `efb22b4`
+
+---
+
+## 11. Parámetros de la sesión
 
 | Parámetro | Valor |
 |-----------|-------|
@@ -272,13 +340,13 @@ Los códigos SCIAN de gasolineras/gaseras (468411, 468412, 468413, 468419) está
 | Período cubierto | 12 ago 2026 (+ compactado de sesión misma fecha) |
 | Sesión previa | v37.0 (3–4 ago 2026) |
 | Rama | master + sincronización a main (Vercel) |
-| Archivos modificados | GestorUrbano_M02_4.html · GestorUrbano_M07_1.html |
+| Archivos modificados | GestorUrbano_M02_4.html · GestorUrbano_M07_1.html · index.html |
 | Python disponible | Python 3.14.5 ✓ |
 | M02 tamaño final | ~508 KB (>300 KB → scripts Python atómicos obligatorios) |
 
 ---
 
-## 11. Estado de módulos al 12 ago 2026
+## 12. Estado de módulos al 12 ago 2026
 
 | Mód | Estado | Notas |
 |-----|--------|-------|
@@ -295,7 +363,7 @@ Los códigos SCIAN de gasolineras/gaseras (468411, 468412, 468413, 468419) está
 
 ---
 
-## 12. Pendientes arrastrados
+## 13. Pendientes arrastrados
 
 - **`gu-freemium.js`**: Integrar en M04, M05, M06, M08 y M10 — pendiente desde 08-jul
 - **Custom domain `trazaurbana.mx`**: Configurar en Vercel (acción de Fernando)

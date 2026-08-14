@@ -10,7 +10,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gestor Urbano Jalisco — Potencial Constructivo</title>
+<title>TrazaUrbana — Potencial Constructivo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="gu-design-system.css">
@@ -2464,7 +2464,7 @@ function descargarComparativa(){
   // Encabezado de título
   const titleRow = `<Row ss:Height="28">
     <Cell ss:StyleID="titulo" ss:MergeAcross="${nPredios}">
-      <Data ss:Type="String">Gestor Urbano Jalisco AMG — Comparativa de Potencial Constructivo · ${fecha}</Data>
+      <Data ss:Type="String">TrazaUrbana — Comparativa de Potencial Constructivo · ${fecha}</Data>
     </Cell>
   </Row>`;
 
@@ -2505,7 +2505,7 @@ function descargarComparativa(){
     row(cL('Departamentos escenario máximo') + esc.map(e=>e.ide>0?cNb(e.depMax):cN('—')).join('')),
     // Nota
     `<Row ss:Height="6"></Row>`,
-    row(cInfo(`Generado por Gestor Urbano Jalisco AMG · ${fecha} · Tarifa GDL $1,516/m² · ZPN $1,595/m² + $15,349 ECPD · Estimaciones orientativas. Verificar con la dirección municipal.`)),
+    row(cInfo(`Generado por TrazaUrbana · ${fecha} · Tarifa GDL $1,516/m² · ZPN $1,595/m² + $15,349 ECPD · Estimaciones orientativas. Verificar con la dirección municipal.`)),
   ].join('');
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -2515,7 +2515,7 @@ function descargarComparativa(){
   xmlns:x="urn:schemas-microsoft-com:office:excel">
   <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
     <Title>Comparativa Potencial Constructivo</Title>
-    <Author>Gestor Urbano Jalisco AMG</Author>
+    <Author>TrazaUrbana</Author>
     <Created>${new Date().toISOString()}</Created>
   </DocumentProperties>
   <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
@@ -2536,7 +2536,7 @@ function descargarComparativa(){
   const blob = new Blob([xml], {type:'application/vnd.ms-excel;charset=utf-8'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `GestorUrbano_Comparativa_${fecha}.xls`;
+  a.download = `TrazaUrbana_Comparativa_${fecha}.xls`;
   a.click();
   URL.revokeObjectURL(a.href);
 }

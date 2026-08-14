@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M05 — Requisitos Licencia de Construcción · Gestor Urbano Jalisco AMG</title>
+<title>M05 — Requisitos de Licencia de Construcción · TrazaUrbana</title>
 <link rel="stylesheet" href="gu-design-system.css">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1418,7 +1418,7 @@ function copiarLista() {
     lineas.push('');
   }
 
-  lineas.push('Generado por Gestor Urbano Jalisco AMG · gestor-urbano-jalisco.netlify.app');
+  lineas.push('Generado por TrazaUrbana · gestorurbanoamg.vercel.app');
 
   navigator.clipboard.writeText(lineas.join('\n')).then(() => {
     const btn = document.querySelector('.footer-btns .btn-secondary:last-child');
@@ -1671,7 +1671,7 @@ function exportarExcel() {
 
   // Encabezado informativo
   const meta = [
-    ['Gestor Urbano Jalisco AMG — M05: Requisitos Licencia de Construcción'],
+    ['TrazaUrbana — M05: Requisitos de Licencia de Construcción'],
     [],
     ['Municipio:', mun],
     ['Tipo de obra:', obra],

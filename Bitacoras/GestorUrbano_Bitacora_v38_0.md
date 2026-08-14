@@ -22,6 +22,10 @@ Trabajo realizado en dos bloques:
 2. Lectura completa del Reglamento de Giros ZPN (44 págs, 2016).
 3. Implementar distancias mínimas entre giros similares en M02 para Zapopan.
 
+**Bloque D — sesión 14 ago 2026:**
+1. M04: banner amber prominente al detectar análisis guardado en localStorage (reemplaza auto-restore).
+2. M01–M11: renombrar marca "Gestor Urbano" → "TrazaUrbana" en títulos de página, nombres de archivo descargados y cabeceras de documentos impresos (24 reemplazos, todos los módulos).
+
 ---
 
 ## 2. M02 — Fix bugs Art. 29 (Bloque A)
@@ -261,8 +265,10 @@ Los códigos SCIAN de gasolineras/gaseras (468411, 468412, 468413, 468419) está
 | `c6e6f29` | docs: bitácora v38.0 (.md + .docx) |
 | `ad7427c` | feat index: transiciones suaves de tema + animación de logo al cargar menú |
 | `efb22b4` | fix index: splash adapta colores al tema oscuro guardado en localStorage |
+| `d6d887c` | feat M04: banner prominente al detectar sesión guardada al entrar |
+| `fb68c63` | feat M01-M11: renombrar marca Gestor Urbano a TrazaUrbana en títulos y docs generados |
 
-**Total:** 8 commits · sesión 12 ago 2026
+**Total:** 10 commits · sesiones 12–14 ago 2026
 
 ---
 
@@ -331,22 +337,102 @@ El naranja `#D85A30` (cuadro del isotipo, "Urbana", barra de progreso) se mantie
 
 ---
 
-## 11. Parámetros de la sesión
+## 11. M04 — Banner de sesión guardada (Bloque D)
+
+### 11.1 Contexto
+
+Al cargar M04 desde otro módulo o desde index, se detectaba un análisis previo en `localStorage` (clave `gu_m04_sesion_actual`) y se restauraba automáticamente sin aviso. Esto sorprendía al usuario.
+
+Fernando solicitó: en lugar de auto-restaurar, mostrar un aviso prominente con dos opciones.
+
+### 11.2 Implementación
+
+**CSS nuevo** — banner amber con borde izquierdo de acento `#D97706`:
+
+```css
+#m04-sesion-banner { display:none; border-left:4px solid #D97706;
+  background:#FFFBEB; border-radius:8px; padding:16px 20px;
+  margin-bottom:20px; gap:12px; align-items:flex-start; }
+```
+
+Clases adicionales: `.msb-icon` (emoji 📋), `.msb-body`, `.msb-title`, `.msb-meta`, `.msb-btns`, `.msb-btn-c` (continuar — amber), `.msb-btn-n` (nueva consulta — ghost rojo).
+
+**HTML** insertado después de `<div class="main">`:
+
+```html
+<div id="m04-sesion-banner" role="alert">
+  <div class="msb-icon">📋</div>
+  <div class="msb-body">
+    <div class="msb-title">Tienes un análisis guardado de tu sesión anterior</div>
+    <div class="msb-meta" id="m04-banner-meta">Cargando datos…</div>
+    <div class="msb-btns">
+      <button class="msb-btn-c" id="m04-banner-continuar">Ver análisis anterior →</button>
+      <button class="msb-btn-n" id="m04-banner-nueva">Nueva consulta (descartar)</button>
+    </div>
+  </div>
+</div>
+```
+
+**JS en DOMContentLoaded** — reemplaza el auto-restore anterior:
+- Lee `gu_m04_sesion_actual` del localStorage.
+- Si existe: formatea fecha y municipio, los muestra en `#m04-banner-meta`, hace `display:flex` al banner.
+- Botón "Ver análisis anterior": llama `renderResultado(sesion.r, sesion.config, { guardarHistorial: false })`, oculta banner.
+- Botón "Nueva consulta": borra la clave del localStorage, oculta banner.
+
+**Commit:** `d6d887c`
+
+---
+
+## 12. M01–M11 — Renombrar marca Gestor Urbano → TrazaUrbana (Bloque D)
+
+### 12.1 Alcance
+
+Fernando solicitó que los archivos generados por la app (PDFs vía `window.print()`, XLS vía `a.download`, documentos de impresión) mostraran "TrazaUrbana" en lugar de "Gestor Urbano". El nombre del archivo sugerido en Chrome al imprimir a PDF proviene del `<title>` de la página.
+
+### 12.2 Cambios por módulo
+
+| Módulo | Elementos modificados |
+|--------|----------------------|
+| M01 | `<title>` principal |
+| M02 | `<title>` principal · `hdr-title` del overlay de impresión |
+| M03 | `<title>` · `a.download` (`TrazaUrbana_Comparativa_…xls`) · cabecera XLS · `<Author>` · "Generado por" |
+| M04 | `<title>` · `print-header-sub` · "Documento generado por" |
+| M05 | `<title>` · "Generado por" (URL netlify obsoleta → vercel) · título descarga TXT |
+| M06 | `<title>` · `content:` de cabecera y pie `@media print` (CSS) |
+| M07 | `<title>` · descripción de sección de fuentes |
+| M08 | `<title>` |
+| M09 | `<title>` |
+| M10 | `<title>` principal · `<title>` del popup Ficha Normativa |
+| M11 | `<title>` |
+
+**Total:** 24 reemplazos · 0 WARNs · script Python atómico `rename_brand.py`.
+
+### 12.3 Lo que NO se cambió
+
+- Nombres de archivo HTML (hrefs entre módulos permanecen como `GestorUrbano_M0X_N.html`).
+- Lógica funcional, constantes internas, comentarios de código.
+- Navegación y enlaces entre módulos.
+
+**Commit:** `fb68c63`
+
+---
+
+## 13. Parámetros de la sesión
 
 | Parámetro | Valor |
 |-----------|-------|
 | Versión | v38.0 |
-| Fecha | 12 ago 2026 |
-| Período cubierto | 12 ago 2026 (+ compactado de sesión misma fecha) |
+| Fecha | 12–14 ago 2026 |
+| Período cubierto | 12 ago 2026 (sesión original) + 14 ago 2026 (sesión continuación) |
 | Sesión previa | v37.0 (3–4 ago 2026) |
 | Rama | master + sincronización a main (Vercel) |
-| Archivos modificados | GestorUrbano_M02_4.html · GestorUrbano_M07_1.html · index.html |
+| Archivos modificados | GestorUrbano_M01_3.html · M02_4.html · M03_3.html · M04_3.html · M05_2.html · M06_1.html · M07_1.html · M08_1.html · M09_1.html · M10_1.html · M11_1.html · index.html |
 | Python disponible | Python 3.14.5 ✓ |
-| M02 tamaño final | ~508 KB (>300 KB → scripts Python atómicos obligatorios) |
+| M02 tamaño final | ~517 KB (>300 KB → scripts Python atómicos obligatorios) |
 
 ---
 
-## 12. Estado de módulos al 12 ago 2026
+## 14. Estado de módulos al 14 ago 2026
 
 | Mód | Estado | Notas |
 |-----|--------|-------|
@@ -360,10 +446,11 @@ El naranja `#D85A30` (cuadro del isotipo, "Urbana", barra de progreso) se mantie
 | M08 | ✅ Producción | Sin cambios |
 | M09 | ✅ Producción | Sin cambios |
 | M10 | ✅ Producción | Sin cambios |
+| M11 | ✅ Producción | Sin cambios |
 
 ---
 
-## 13. Pendientes arrastrados
+## 15. Pendientes arrastrados
 
 - **`gu-freemium.js`**: Integrar en M04, M05, M06, M08 y M10 — pendiente desde 08-jul
 - **Custom domain `trazaurbana.mx`**: Configurar en Vercel (acción de Fernando)
@@ -375,4 +462,4 @@ El naranja `#D85A30` (cuadro del isotipo, "Urbana", barra de progreso) se mantie
 
 ---
 
-*Bitácora generada: 12 ago 2026 · Fernando H.*
+*Bitácora generada: 12 ago 2026 · Actualizada: 14 ago 2026 · Fernando H.*

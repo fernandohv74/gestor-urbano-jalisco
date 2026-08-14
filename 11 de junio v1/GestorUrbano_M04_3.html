@@ -234,6 +234,16 @@
 .cmp-delta-mejora{font-size:11px;font-weight:500;color:var(--uso-p-txt)}
 .cmp-delta-empeora{font-size:11px;font-weight:500;color:var(--sem-r-txt)}
 .cmp-delta-igual{font-size:11px;color:var(--text3)}
+#m04-sesion-banner{display:none;align-items:flex-start;gap:16px;background:var(--bg2);border:1px solid #D97706;border-left:5px solid #D97706;border-radius:12px;padding:22px 26px;margin:0 0 24px;box-shadow:0 2px 12px rgba(217,119,6,.15)}
+#m04-sesion-banner .msb-icon{font-size:32px;flex-shrink:0;line-height:1;margin-top:2px}
+#m04-sesion-banner .msb-body{flex:1}
+#m04-sesion-banner .msb-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:5px}
+#m04-sesion-banner .msb-meta{font-size:12px;color:var(--text2);margin-bottom:18px;font-family:var(--mono)}
+#m04-sesion-banner .msb-btns{display:flex;gap:10px;flex-wrap:wrap}
+#m04-sesion-banner .msb-btn-c{padding:10px 22px;background:var(--accent,#2563EB);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:opacity .15s}
+#m04-sesion-banner .msb-btn-c:hover{opacity:.85}
+#m04-sesion-banner .msb-btn-n{padding:10px 22px;background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:border-color .15s,color .15s}
+#m04-sesion-banner .msb-btn-n:hover{border-color:var(--text);color:var(--text)}
 </style>
 <script src="gu-freemium.js"></script>
 </head>
@@ -267,6 +277,19 @@
 </nav>
 
 <div class="main">
+
+<div id="m04-sesion-banner" role="alert">
+  <div class="msb-icon">📋</div>
+  <div class="msb-body">
+    <div class="msb-title">Tienes un análisis guardado de tu sesión anterior</div>
+    <div class="msb-meta" id="m04-banner-meta">Cargando datos…</div>
+    <div class="msb-btns">
+      <button class="msb-btn-c" id="m04-banner-continuar">Ver análisis anterior →</button>
+      <button class="msb-btn-n" id="m04-banner-nueva">Nueva consulta (descartar)</button>
+    </div>
+  </div>
+</div>
+
 
   <!-- API Key -->
   <div class="apikey-panel" id="apikey-panel">
@@ -3530,13 +3553,35 @@ document.addEventListener('DOMContentLoaded', function() {
     if (ap) ap.style.display = 'none';
   }
   renderHistorialPanel();
-  // Restaurar el último resultado mostrado si el usuario navegó a otro módulo y regresó
+  // Mostrar banner si hay sesión guardada (no restaurar automáticamente)
   try {
     const raw = localStorage.getItem('gu_m04_sesion_actual');
     if (raw) {
       const sesion = JSON.parse(raw);
       if (sesion && sesion.r && sesion.config) {
-        renderResultado(sesion.r, sesion.config, { guardarHistorial: false });
+        const banner = document.getElementById('m04-sesion-banner');
+        const meta   = document.getElementById('m04-banner-meta');
+        if (banner) {
+          if (meta) {
+            let txt = '';
+            if (sesion.ts) {
+              const d = new Date(sesion.ts);
+              txt = 'Guardado el ' + d.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'})
+                  + ' a las ' + d.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+            }
+            if (sesion.config && sesion.config.municipio) txt += (txt?' · ':'') + sesion.config.municipio.toUpperCase();
+            meta.textContent = txt || 'Análisis disponible';
+          }
+          banner.style.display = 'flex';
+          document.getElementById('m04-banner-continuar').onclick = function() {
+            banner.style.display = 'none';
+            renderResultado(sesion.r, sesion.config, { guardarHistorial: false });
+          };
+          document.getElementById('m04-banner-nueva').onclick = function() {
+            banner.style.display = 'none';
+            try { localStorage.removeItem('gu_m04_sesion_actual'); } catch(e) {}
+          };
+        }
       }
     }
   } catch(e) { /* silencioso */ }

@@ -408,6 +408,15 @@ input[type=range]::-webkit-slider-thumb{
   border-color: var(--brand);
   background: var(--brand-pale);
 }
+/* M10 multi-file */
+.m10-files-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px;margin-bottom:6px}
+.m10-fthumb{position:relative;border-radius:7px;overflow:hidden;background:var(--bg2);border:1px solid var(--border2);aspect-ratio:1;display:flex;align-items:center;justify-content:center}
+.m10-fthumb img{width:100%;height:100%;object-fit:cover}
+.m10-fthumb-del{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.65);border:none;color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.m10-fcount{font-size:11px;color:var(--text3);margin-bottom:6px}
+.m10-btn-analizar{width:100%;background:var(--brand);color:#fff;border:none;border-radius:8px;padding:12px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;transition:opacity .15s}
+.m10-btn-analizar:hover:not(:disabled){opacity:.88}
+.m10-btn-analizar:disabled{opacity:.4;cursor:not-allowed}
 
 /* Tabla de cumplimiento */
 .m10-tabla { width: 100%; border-collapse: collapse; }
@@ -708,22 +717,26 @@ input[type=range]::-webkit-slider-thumb{
           <div style="font-size:10px;color:var(--text3);margin-top:4px">Según escrituras o recibo predial — para cruzar con el plano</div>
         </div>
 
-        <!-- Zona de carga -->
+        <!-- Zona de carga multi-archivo -->
         <div id="m10UploadZone"
              onclick="document.getElementById('m10InputPlano').click()"
              ondragover="m10DragOver(event)"
              ondragleave="m10DragLeave(event)"
              ondrop="m10Drop(event)">
           <input type="file" id="m10InputPlano"
-                 accept=".pdf,.jpg,.jpeg,.png,.gif"
+                 accept=".pdf,.jpg,.jpeg,.png"
+                 multiple
                  style="display:none"
-                 onchange="m10ProcessFile(this.files[0])">
-          <div style="font-size:32px;margin-bottom:8px">📁</div>
-          <div style="font-size:13px;color:var(--text2);font-weight:600">Arrastra el plano aquí</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px">
-            PDF o imagen (JPG, PNG) — el análisis se ejecuta automáticamente
-          </div>
+                 onchange="m10AgregarDesdeInput(this)">
+          <div style="font-size:28px;margin-bottom:6px">📁</div>
+          <div style="font-size:13px;color:var(--text2);font-weight:600">Arrastra el plano aquí o haz clic</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF o imagen (JPG, PNG) · varios archivos a la vez</div>
         </div>
+        <div class="m10-fcount" id="m10FilesCount" style="display:none"></div>
+        <div class="m10-files-grid" id="m10FilesGrid"></div>
+        <button class="m10-btn-analizar" id="m10BtnAnalizar" disabled onclick="m10Analizar()">
+          <span>🔍</span><span id="m10BtnLabel">Analizar plano con IA normativa</span>
+        </button>
 
         <!-- Estado del análisis -->
         <div id="m10AnalisisStatus" style="display:none"></div>
@@ -6556,7 +6569,7 @@ function m10GuardarEnHistorial(r){
       uso_identificado: r.uso_identificado||'',
       uso_permitido:  r.uso_permitido,
       resultado:      r.resultado||'',
-      superficie_cuadra: r.superficie_cuadra||'no_disponible',
+      sup_disc: (()=>{ const sp=typeof r.superficie_plano==='number'?r.superficie_plano:null; if(!sp||!r._superficie_real) return null; return Math.abs(sp-r._superficie_real)<=0.5?'ok':'warn'; })(),
       r_completo:     r,
       zona_guardada:  zona,
     };
@@ -6577,7 +6590,7 @@ function m10RenderHistorial(){
 
   const icoUso  = v => v===true?'✅':v===false?'🚫':'⚠️';
   const icoRes  = v => ({cuadra:'✅',parcialmente:'⚠️',no_cuadra:'🚫'}[v]||'⚠️');
-  const icoSup  = v => ({si:'✅',no:'🚫',no_disponible:'—'}[v]||'—');
+  const icoSup  = v => v==='ok'?'✅':v==='warn'?'⚠️':'—';
 
   lista.innerHTML = hist.map((h,i)=>{
     const fecha = new Date(h.ts).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
@@ -6585,7 +6598,7 @@ function m10RenderHistorial(){
     return `<div class="m10-hist-item">
       <div class="m10-hist-info" onclick="m10ReabrirHistEntry(${i})" title="Clic para ver el resultado">
         <div class="m10-hist-nombre">${h.nombreProyecto}</div>
-        <div class="m10-hist-meta">${fecha} · ${mun} · ${h.zona} · Uso ${icoUso(h.uso_permitido)} · Params ${icoRes(h.resultado)} · Sup ${icoSup(h.superficie_cuadra)}</div>
+        <div class="m10-hist-meta">${fecha} · ${mun} · ${h.zona} · Uso ${icoUso(h.uso_permitido)} · Params ${icoRes(h.resultado)} · Sup ${icoSup(h.sup_disc)}</div>
       </div>
       <button class="m10-hist-btn" onclick="m10BorrarHistEntry(${i})" title="Eliminar">✕</button>
     </div>`;
@@ -6651,6 +6664,9 @@ function m10MostrarUpload(){
   if(msg) msg.style.display='none';
 }
 
+const M10_MAX = 8;
+let m10Archivos = [];
+
 function m10DragOver(e){
   e.preventDefault();
   document.getElementById('m10UploadZone').classList.add('drag-over');
@@ -6661,8 +6677,89 @@ function m10DragLeave(e){
 function m10Drop(e){
   e.preventDefault();
   m10DragLeave(e);
-  const file=e.dataTransfer?.files?.[0];
-  if(file) m10ProcessFile(file);
+  const files=Array.from(e.dataTransfer?.files||[]).filter(f=>f.type.startsWith('image/')||f.type==='application/pdf');
+  if(files.length) m10AgregarArchivos(files);
+}
+function m10AgregarDesdeInput(input){
+  const files=Array.from(input.files);
+  input.value='';
+  if(files.length) m10AgregarArchivos(files);
+}
+async function m10AgregarArchivos(files){
+  const status=document.getElementById('m10AnalisisStatus');
+  status.style.display='block';
+  status.innerHTML='<div class="gu-loading"><div class="gu-spinner"></div>Procesando archivos...</div>';
+  const errores=[];
+  let limiteAlcanzado=false;
+  for(const file of files){
+    if(m10Archivos.length>=M10_MAX){limiteAlcanzado=true;break;}
+    if(file.size>30*1024*1024){errores.push(file.name+': muy grande (máx 30 MB)');continue;}
+    try{
+      if(file.type==='application/pdf'){
+        const pags=await m10PdfARasterizado(file);
+        for(const p of pags){
+          if(m10Archivos.length>=M10_MAX){limiteAlcanzado=true;break;}
+          m10Archivos.push({base64:p.base64,mime:p.mime,nombre:p.nombre,thumb:'data:'+p.mime+';base64,'+p.base64});
+        }
+      } else {
+        const b64=await m10FileToBase64(file);
+        m10Archivos.push({base64:b64,mime:file.type,nombre:file.name,thumb:'data:'+file.type+';base64,'+b64});
+      }
+    }catch(e2){errores.push(file.name+': '+e2.message);}
+  }
+  status.style.display='none';
+  if(limiteAlcanzado) errores.unshift('Máximo '+M10_MAX+' láminas. Se cargaron las primeras '+M10_MAX+'.');
+  if(errores.length){status.style.display='block';status.innerHTML='<div class="gu-error">'+errores.join('<br>')+'</div>';}
+  m10ActualizarUI();
+}
+function m10ActualizarUI(){
+  const grid=document.getElementById('m10FilesGrid');
+  const count=document.getElementById('m10FilesCount');
+  const btn=document.getElementById('m10BtnAnalizar');
+  const label=document.getElementById('m10BtnLabel');
+  const n=m10Archivos.length;
+  if(n===0){
+    grid.innerHTML='';count.style.display='none';
+    btn.disabled=true;label.textContent='Analizar plano con IA normativa';
+    return;
+  }
+  count.style.display='';
+  count.textContent=n+' lámina'+(n>1?'s':'')+' cargada'+(n>1?'s':'');
+  grid.innerHTML=m10Archivos.map((a,i)=>
+    '<div class="m10-fthumb">'
+    +'<img src="'+a.thumb+'" alt="'+a.nombre+'" title="'+a.nombre+'">'
+    +'<button class="m10-fthumb-del" onclick="m10EliminarArchivo('+i+')" title="Quitar">\xd7</button>'
+    +'</div>'
+  ).join('');
+  btn.disabled=false;
+  label.textContent=n===1?'Analizar plano con IA normativa':'Analizar '+n+' láminas con IA normativa';
+}
+function m10EliminarArchivo(i){
+  m10Archivos.splice(i,1);
+  m10ActualizarUI();
+}
+async function m10Analizar(){
+  if(!m10Archivos.length) return;
+  if(typeof guVerificarLimite==='function'&&!guVerificarLimite('gu_m10_usos_mes')){
+    if(typeof guMostrarModalLimite==='function') guMostrarModalLimite('PreDictamen IA');
+    return;
+  }
+  const btn=document.getElementById('m10BtnAnalizar');
+  const status=document.getElementById('m10AnalisisStatus');
+  const veredictoEl=document.getElementById('m10Veredicto');
+  btn.disabled=true;
+  status.style.display='block';
+  status.innerHTML='<div class="gu-loading"><div class="gu-spinner"></div>Cruzando con normativa PDU...</div>';
+  veredictoEl.style.display='none';
+  try{
+    const resultado=await m10LlamarClaude();
+    m10RenderizarVeredicto(resultado);
+    if(typeof guRegistrarUso==='function') guRegistrarUso('gu_m10_usos_mes');
+  }catch(e){
+    btn.disabled=false;
+    status.style.display='block';
+    status.innerHTML='<div class="gu-error">\u274c '+e.message+'<br><button onclick="m10ResetUpload()" style="margin-top:8px;padding:6px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text2);font-family:var(--sans);font-size:12px;cursor:pointer">Intentar de nuevo</button></div>';
+  }
 }
 
 
@@ -6698,68 +6795,7 @@ async function m10PdfARasterizado(file){
   }
   return paginas;
 }
-async function m10ProcessFile(file){
-  if(!file) return;
-
-  if(typeof guVerificarLimite==='function' && !guVerificarLimite('gu_m10_usos_mes')){
-    if(typeof guMostrarModalLimite==='function') guMostrarModalLimite('PreDictamen IA');
-    return;
-  }
-
-  const upZone      = document.getElementById('m10UploadZone');
-  const status      = document.getElementById('m10AnalisisStatus');
-  const veredictoEl = document.getElementById('m10Veredicto');
-
-  upZone.style.pointerEvents = 'none';
-  upZone.innerHTML = `
-    <div style="font-size:22px;margin-bottom:7px">📄</div>
-    <div style="font-size:13px;color:var(--text2);font-weight:600">${file.name}</div>
-    <div style="font-size:11px;color:var(--text3);margin-top:4px">Analizando con IA...</div>
-  `;
-  status.style.display = 'block';
-  status.innerHTML = '<div class="gu-loading"><div class="gu-spinner"></div>Procesando plano...</div>';
-  veredictoEl.style.display = 'none';
-
-  try{
-    if(!file.type.startsWith('image/') && file.type!=='application/pdf'){
-      throw new Error('Formato no compatible. Usa PDF, JPG o PNG.');
-    }
-    if(file.size > 30*1024*1024){
-      throw new Error('Archivo muy grande ('+Math.round(file.size/1024/1024)+' MB). Máx 30 MB — reduce resolución o usa JPG.');
-    }
-
-    let base64, mimeType;
-    if(file.type === 'application/pdf'){
-      // Rasterizar con pdf.js — mismo enfoque que M04
-      status.innerHTML = '<div class="gu-loading"><div class="gu-spinner"></div>Convirtiendo PDF a imagen...</div>';
-      const paginas = await m10PdfARasterizado(file);
-      // Usar la primera página (donde está la solapa con datos del proyecto)
-      base64   = paginas[0].base64;
-      mimeType = paginas[0].mime;
-    } else {
-      base64   = await m10FileToBase64(file);
-      mimeType = file.type;
-    }
-
-    status.innerHTML = '<div class="gu-loading"><div class="gu-spinner"></div>Cruzando con normativa PDU...</div>';
-    const resultado = await m10LlamarClaude(base64, mimeType, file.name);
-    m10RenderizarVeredicto(resultado);
-    if(typeof guRegistrarUso==='function') guRegistrarUso('gu_m10_usos_mes');
-
-  }catch(e){
-    upZone.style.pointerEvents = '';
-    upZone.innerHTML = `
-      <div style="font-size:22px;margin-bottom:6px">⚠️</div>
-      <div style="font-size:12px;color:var(--sem-r-txt);font-weight:600">No se pudo analizar</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:4px;padding:0 10px;line-height:1.5">${e.message}</div>
-    `;
-    status.innerHTML = `
-      <div class="gu-error" style="margin-bottom:8px">❌ ${e.message}</div>
-      <button onclick="m10ResetUpload()" style="width:100%;padding:7px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text2);font-family:var(--sans);font-size:12px;cursor:pointer">
-        Intentar de nuevo con otro archivo
-      </button>
-    `;
-  }
+// m10ProcessFile reemplazado por m10AgregarArchivos + m10Analizar
 }
 
 function m10FileToBase64(file){
@@ -6771,7 +6807,7 @@ function m10FileToBase64(file){
   });
 }
 
-async function m10LlamarClaude(base64, mimeType, nombre){
+async function m10LlamarClaude(){
   const zona = datosZona;
   const MUN_NOMBRES = {
     guadalajara:'Guadalajara', zapopan:'Zapopan',
@@ -6853,16 +6889,17 @@ Responde ÚNICAMENTE con JSON puro, sin markdown ni texto adicional:
   "desplante_pb_m2": null,
   "total_construido_m2": null,
   "niveles_plano": null,
-  "superficie_cuadra": "si|no|no_disponible",
   "nota_superficie": ""
 }
-Reglas: superficie_cuadra "si" si terreno plano ≈ real ±5%, "no" si difiere, "no_disponible" si sin terreno real o ilegible.`;
+Reglas: superficie_plano debe ser el número leído del cuadro de áreas, null si ilegible o ausente.`;
 
-  const userMsg = `Normativa:\n${normaLineas}${usosContexto}${supInstruccion}\n\nAnaliza el plano "${nombre}".`;
+  const _noms=m10Archivos.map(a=>a.nombre).join(', ');
+  const userMsg = `Normativa:\n${normaLineas}${usosContexto}${supInstruccion}\n\nAnaliza el/los plano(s): ${_noms}.${m10Archivos.length>1?' ('+m10Archivos.length+' láminas — analiza todas y combina la información)':''}`;
+
 
   const content = [
     { type:'text', text: userMsg },
-    { type:'image', source:{ type:'base64', media_type: mimeType||'image/jpeg', data:base64 } }
+    ...m10Archivos.map(a=>({ type:'image', source:{ type:'base64', media_type: a.mime||'image/jpeg', data:a.base64 } }))
   ];
 
   const endpoint = ES_LOCALHOST_M10 ? 'https://api.anthropic.com/v1/messages' : '/api/claude-proxy';
@@ -7073,23 +7110,33 @@ function m10RenderizarVeredicto(r, esReapertura){
   let chip3HTML = '';
   if(r._superficie_real){
     const supPlano = typeof r.superficie_plano === 'number' ? r.superficie_plano : null;
-    const scRes  = r.superficie_cuadra;
-    const scIco  = scRes==='si' ? '✅' : (scRes==='no' ? '🚫' : '⚠️');
-    const scTxt  = scRes==='si' ? 'COINCIDE con lo declarado en el plano'
-                 : scRes==='no' ? 'NO coincide — verificar escrituras y plano'
-                 : 'No disponible en este plano';
-    const scBg   = scRes==='si' ? 'var(--sem-v-bg)' : (scRes==='no' ? 'var(--sem-r-bg)' : 'var(--sem-am-bg)');
-    const scBd   = scRes==='si' ? '#16A34A44' : (scRes==='no' ? '#DC262644' : '#D9770644');
-    const scClr  = scRes==='si' ? 'var(--sem-v-txt)' : (scRes==='no' ? 'var(--sem-r-txt)' : 'var(--yellow)');
+    let scIco, scTxt, scBg, scBd, scClr, scNota;
+    if(supPlano === null){
+      scIco='\u26a0\ufe0f'; scTxt='Superficie no identificada en el plano';
+      scBg='var(--sem-am-bg)'; scBd='#D9770644'; scClr='var(--yellow)';
+      scNota='Verifica que el plano tenga cuadro de áreas legible.';
+    } else {
+      const _diff = Math.abs(supPlano - r._superficie_real);
+      const _pct  = (_diff / r._superficie_real * 100).toFixed(1);
+      if(_diff <= 0.5){
+        scIco='\u2705'; scTxt='Coincide con las escrituras';
+        scBg='var(--sem-v-bg)'; scBd='#16A34A44'; scClr='var(--sem-v-txt)';
+        scNota=null;
+      } else {
+        scIco='\u26a0\ufe0f'; scTxt='Discrepancia — requiere verificación catastral';
+        scBg='var(--sem-am-bg)'; scBd='#D9770644'; scClr='var(--yellow)';
+        scNota='Diferencia: '+_diff.toFixed(1)+' m² ('+_pct+'%). Para tramitar licencia de construcción esta discrepancia debe resolverse con Catastro Municipal (levantamiento topográfico certificado o rectificación de escritura) antes de presentar el plano.';
+      }
+    }
     chip3HTML = `
     <div style="margin-top:10px;padding:12px 14px;background:${scBg};border:1.5px solid ${scBd};border-radius:10px">
       <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px">Superficie del terreno</div>
       <div style="font-size:13px;font-weight:500;color:${scClr};margin-bottom:6px">${scIco} ${scTxt}</div>
       <div style="font-size:12px;color:var(--text2)">
-        Real (escrituras/predial): <b>${r._superficie_real} m²</b>
-        ${supPlano !== null ? ' · Plano: <b>'+supPlano+' m²</b>' : ''}
+        Real (escrituras/predial): <b>${r._superficie_real} m\xb2</b>
+        ${supPlano !== null ? ' \xb7 Plano: <b>'+supPlano+' m\xb2</b>' : ''}
       </div>
-      ${r.nota_superficie ? '<div style="font-size:11px;color:var(--text3);margin-top:4px">'+r.nota_superficie+'</div>' : ''}
+      ${scNota ? '<div style="font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5">'+scNota+'</div>' : ''}
     </div>`;
   }
 
@@ -7139,6 +7186,7 @@ function m10RenderizarVeredicto(r, esReapertura){
 }
 
 function m10ResetUpload(){
+  m10Archivos=[];
   const _btnR2 = document.getElementById('m10BtnRecalc');
   if(_btnR2) _btnR2.style.display='none';
   document.getElementById('m10Veredicto').style.display='none';
@@ -7147,13 +7195,7 @@ function m10ResetUpload(){
   if(np) np.style.display='none';
   const z = document.getElementById('m10UploadZone');
   z.style.pointerEvents='';
-  z.onclick = ()=>document.getElementById('m10InputPlano').click();
-  z.innerHTML=`
-    <input type="file" id="m10InputPlano" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="m10ProcessFile(this.files[0])">
-    <div style="font-size:32px;margin-bottom:8px">📁</div>
-    <div style="font-size:13px;color:var(--text2);font-weight:600">Arrastra el plano aquí</div>
-    <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF o imagen (JPG, PNG) — el análisis se ejecuta automáticamente</div>
-  `;
+  m10ActualizarUI();
 }
 
 function m10RecalcularSuperficie(){
@@ -7263,19 +7305,22 @@ function m10ExportarVeredicto(){
 
   // Sección superficie
   let supSection = '';
-  if(supReal && r.superficie_cuadra){
+  if(supReal && typeof r.superficie_plano !== 'undefined'){
     const sp = typeof r.superficie_plano==='number' ? r.superficie_plano : null;
-    const scClass = r.superficie_cuadra==='si' ? 'ok' : (r.superficie_cuadra==='no' ? 'bad' : 'warn');
-    const scIcon  = r.superficie_cuadra==='si' ? '✅' : (r.superficie_cuadra==='no' ? '🚫' : '⚠️');
-    const scTxt   = r.superficie_cuadra==='si' ? 'COINCIDE con el plano'
-                  : r.superficie_cuadra==='no' ? 'NO COINCIDE — verificar escrituras y plano'
-                  : 'No disponible en este plano';
+    let scClass, scIcon, scTxt, scNota2;
+    if(sp===null){
+      scClass='warn'; scIcon='\u26a0\ufe0f'; scTxt='Superficie no identificada en el plano'; scNota2=null;
+    } else {
+      const _d2=Math.abs(sp-supReal), _p2=(_d2/supReal*100).toFixed(1);
+      if(_d2<=0.5){scClass='ok';scIcon='\u2705';scTxt='Coincide con las escrituras';scNota2=null;}
+      else{scClass='warn';scIcon='\u26a0\ufe0f';scTxt='Discrepancia '+_d2.toFixed(1)+' m\xb2 ('+_p2+'%) — requiere verificación catastral';scNota2='Resolver con Catastro Municipal antes del trámite de licencia.';}
+    }
     supSection = `
     <h2>3. Superficie del terreno</h2>
     <div class="chip chip-${scClass}">
       <div class="chip-title ${scClass}">${scIcon} ${scTxt}</div>
-      <p style="margin-top:4px;font-size:10pt">Real: <b>${fmt(supReal)} m²</b>${sp!==null?' &middot; Plano: <b>'+fmt(sp)+' m²</b>':''}</p>
-      ${r.nota_superficie?'<p style="font-size:9pt;color:#666;margin-top:3px">'+r.nota_superficie+'</p>':''}
+      <p style="margin-top:4px;font-size:10pt">Real: <b>${fmt(supReal)} m\xb2</b>${sp!==null?' &middot; Plano: <b>'+fmt(sp)+' m\xb2</b>':''}</p>
+      ${scNota2?'<p style="font-size:9pt;color:#666;margin-top:3px">'+scNota2+'</p>':''}
     </div>`;
   }
 

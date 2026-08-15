@@ -1418,6 +1418,18 @@ async function consultarVisorJalisco(lat, lng, munId){
   icos = parseNum(n.icos)||0;
   icus = parseNum(n.icus)||0;
 
+  // GDL: usar GeoServer propio (PDU 2030 GDL) — el VUJ tiene CUS/ICUS incorrectos para GDL
+  if(munId === 39){
+    const _gsFeats = await wmsZonificacion(lat, lng);
+    if(_gsFeats.length){
+      const _gp = _gsFeats[0].properties;
+      if(_gp.cos) cos  = parseNum(_gp.cos);
+      if(_gp.cus) cus  = parseCus(_gp.cus);
+      if(_gp.icos !== undefined) icos = parseNum(_gp.icos)||0;
+      if(_gp.icus !== undefined) icus = parseNum(_gp.icus)||0;
+    }
+  }
+
   // ── ENRIQUECIMIENTO CON BD LOCAL ──────────────────────────────────────────
   // El VUJ devuelve COS/CUS como "*" para zonas mixtas (MB, MD, MC, MR, APD).
   // Para zonas habitacionales devuelve la clave VUJ (H1-H, H2-H, etc.)

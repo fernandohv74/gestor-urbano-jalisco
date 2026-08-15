@@ -4186,7 +4186,7 @@ async function procesarCoordenadas(lat,lng){
       const uso=(zonaRef.uso||'').toUpperCase();
       const codigoUso=uso.split('/').pop().split('-')[0];
       const esIndustrial=codigoUso.startsWith('I');
-      const esCentroHist=sub==='05'||sub2.includes('centro hist');
+      const esCentroHist=sub2.includes('centro hist');
 
       let patrimonios=[],piues=[];
       if(!esIndustrial){

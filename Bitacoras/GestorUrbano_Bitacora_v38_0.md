@@ -267,8 +267,9 @@ Los códigos SCIAN de gasolineras/gaseras (468411, 468412, 468413, 468419) está
 | `efb22b4` | fix index: splash adapta colores al tema oscuro guardado en localStorage |
 | `d6d887c` | feat M04: banner prominente al detectar sesión guardada al entrar |
 | `fb68c63` | feat M01-M11: renombrar marca Gestor Urbano a TrazaUrbana en títulos y docs generados |
+| `c927da6` | fix M01/M10: detección patrimonial — eliminar sub1==='05' del esCentroHist (falso positivo en D3/D4/D7-SD05) |
 
-**Total:** 10 commits · sesiones 12–14 ago 2026
+**Total:** 11 commits · sesiones 12–15 ago 2026
 
 ---
 
@@ -417,13 +418,103 @@ Fernando solicitó que los archivos generados por la app (PDFs vía `window.prin
 
 ---
 
-## 13. Parámetros de la sesión
+## 13. Fix bug detección patrimonial — M01 y M10 (sesión 15 ago 2026)
+
+### 13.1 Contexto
+
+Se detectó que el predio Alpes 2937 (Expediente 039/D3/2024/0364) aparecía en M01 y M10 con restricción patrimonial "Monumento Histórico por Determinación de Ley". El DTUD oficial (Dictamen de Trazo, Usos y Destinos Específicos) adjunto declaraba explícitamente:
+
+> **"EL PREDIO NO FORMA PARTE DEL PATRIMONIO HISTÓRICO Y/O CULTURAL DEL ESTADO DE JALISCO"**
+
+El predio pertenece a D3-SD05 La Federacha — no al D1-SD05 Centro Histórico.
+
+### 13.2 Causa raíz
+
+En M01 (línea 4189) y M10 (línea 4325) existía:
+
+```javascript
+// BUG — activa esCentroHist en CUALQUIER subdistrito con sub1='05'
+const esCentroHist = sub === '05' || sub2.includes('centro hist');
+```
+
+El campo `sub1` es el número de subdistrito dentro del distrito, no único a nivel ciudad. Todos los distritos (D1–D7) tienen un subdistrito `05`, y D3-SD05 (La Federacha), D2-SD05 (Colinas de San Javier), D4-SD05 (Oriente) y D7-SD05 (Álamo - La Nogalera) activaban incorrectamente el fallback patrimonial.
+
+### 13.3 Fix aplicado
+
+```javascript
+// FIX — solo activa si el nombre del subdistrito contiene 'centro hist'
+const esCentroHist = sub2.includes('centro hist');
+```
+
+El Centro Histórico real (D1-SD05) tiene `sub2='CENTRO HISTORICO'` → pasa el filtro. Además, en predios del Centro Histórico la capa `PatrimonioLevantamiento` siempre devuelve features (rama directa), por lo que el fallback de `esCentroHist` es redundante pero correcto como respaldo.
+
+Scripts: `fix_centro_hist_m01.py` · `fix_centro_hist_m10.py`
+
+**Commit:** `c927da6`
+
+---
+
+## 14. Auditoría completa de subdistritos GDL (sesión 15 ago 2026)
+
+### 14.1 Metodología
+
+Script `audit_subdistritos.py`: cuadrícula 15×15 sobre GDL (lat 20.605–20.745, lng -103.405 a -103.265, paso 0.010°). Para cada `dis_sub` único encontrado, se consultaron `PatrimonioLevantamiento` y `PIUESyBarrios` (delta 0.003°).
+
+**Total subdistritos escaneados: 51** (7 distritos × 7–10 subdistritos cada uno).
+
+### 14.2 Falsos positivos corregidos (lógica vieja → lógica nueva)
+
+| dis_sub | Nombre | Pat | PIUE | Resultado corregido |
+|---------|--------|-----|------|---------------------|
+| D2SD05 | COLINAS DE SAN JAVIER | 0 | 0 | ⚪ Sin restricción |
+| D3SD05 | LA FEDERACHA | 0 | 0 | ⚪ Sin restricción |
+| D4SD05 | ORIENTE | 0 | 0 | ⚪ Sin restricción |
+| D7SD05 | ÁLAMO - LA NOGALERA | 0 | 0 | ⚪ Sin restricción |
+
+### 14.3 Subdistritos con patrimonio real detectado correctamente
+
+| dis_sub | Nombre | Clasificación / PIUE |
+|---------|--------|----------------------|
+| D1SD02 | Colinas de la Normal | inmueble de valor artístico relevante · 4. La Normal Perímetro B |
+| D1SD03 | Centro Médico | 5. Distrito Salud |
+| D1SD04 | Santa Teresita | artístico relevante + no armónica · 18. Chapultepec Perímetro B |
+| D1SD05 | Centro Histórico | múltiples · 6. Corredor Alcalde - Centro Histórico Perímetro A |
+| D1SD06 | Analco | armónica + ambiental · 8. Analco Perímetro B |
+| D1SD07 | La Moderna | armónica + ambiental · 18. Chapultepec Perímetro B |
+| D1SD08 | Agua Azul | 12. Agua Azul - Central camionera |
+| D2SD03 | Country | 22. Corredor Ávila Camacho |
+| D2SD04 | Jardines del Country - Atemajac | monumento histórico civil · Atemajac |
+| D2SD07 | Arcos - Ladrón de Guevara | armónica · 19. Minerva Perímetro B |
+| D2SD08 | Chapalita | 21. Corredor Mariano Otero - Plaza del Sol |
+| D2SD09 | Jardines del Bosque | armónica · Jardines del Bosque |
+| D3SD01 | Huentitán el Bajo | 1. Huentitán |
+| D3SD02 | Zoológico | 1. Huentitán |
+| D3SD03 | Lomas del Paraíso | 2. Canal de Atemajac |
+| D3SD04 | Rancho Nuevo | 2. Canal de Atemajac |
+| D4SD02 | Panteón Nuevo | inmueble de valor artístico relevante |
+| D5SD04 | San Andrés | artístico relevante + armónica · San Andrés |
+| D5SD05 | Tecnológico | artístico relevante · 11. Revolución - Tecnológico |
+| D5SD06 | Medrano | 11. Revolución - Tecnológico |
+| D5SD07 | González Gallo | artístico relevante · 12. Agua Azul - Central camionera |
+| D6SD03 | San Rafael | 11. Revolución - Tecnológico |
+| D7SD04 | Zona Industrial - El Dean | 13. Industrial |
+| D7SD10 | Miravalle | 15. Miravalle - Cerro del Cuatro |
+
+### 14.4 Conclusión
+
+- **No hay falsos negativos**: todos los subdistritos con restricción real son detectados por WMS (`PatrimonioLevantamiento` o `PIUESyBarrios`) en la rama directa, antes de llegar al fallback `esCentroHist`.
+- **El fix es correcto y suficiente**: la lógica basada en nombre (`sub2.includes('centro hist')`) elimina los 4 falsos positivos sin afectar ningún caso real.
+- **D5SD05 Tecnológico** (también tiene `sub1='05'`): no es falso positivo porque el WMS devuelve features reales; el fix no lo afecta.
+
+---
+
+## 15. Parámetros de la sesión
 
 | Parámetro | Valor |
 |-----------|-------|
 | Versión | v38.0 |
-| Fecha | 12–14 ago 2026 |
-| Período cubierto | 12 ago 2026 (sesión original) + 14 ago 2026 (sesión continuación) |
+| Fecha | 12–15 ago 2026 |
+| Período cubierto | 12 ago 2026 (sesión original) + 14 ago 2026 (sesión continuación) + 15 ago 2026 (bug patrimonial + auditoría) |
 | Sesión previa | v37.0 (3–4 ago 2026) |
 | Rama | master + sincronización a main (Vercel) |
 | Archivos modificados | GestorUrbano_M01_3.html · M02_4.html · M03_3.html · M04_3.html · M05_2.html · M06_1.html · M07_1.html · M08_1.html · M09_1.html · M10_1.html · M11_1.html · index.html |
@@ -432,11 +523,11 @@ Fernando solicitó que los archivos generados por la app (PDFs vía `window.prin
 
 ---
 
-## 14. Estado de módulos al 14 ago 2026
+## 16. Estado de módulos al 15 ago 2026
 
 | Mód | Estado | Notas |
 |-----|--------|-------|
-| M01 | ✅ Producción | Sin cambios |
+| M01 | ✅ Producción | Fix patrimonial (c927da6) |
 | M02 | ✅ Producción | Art. 29 completo + distancias ZPN |
 | M03 | ✅ Producción | Sin cambios |
 | M04 | ✅ Producción | `guVerificarLimite()` comentado intencionalmente |
@@ -445,12 +536,12 @@ Fernando solicitó que los archivos generados por la app (PDFs vía `window.prin
 | M07 | ✅ Producción | Glosario Art. 29 + Fuentes ZPN actualizadas |
 | M08 | ✅ Producción | Sin cambios |
 | M09 | ✅ Producción | Sin cambios |
-| M10 | ✅ Producción | Sin cambios |
+| M10 | ✅ Producción | Fix patrimonial (c927da6) |
 | M11 | ✅ Producción | Sin cambios |
 
 ---
 
-## 15. Pendientes arrastrados
+## 17. Pendientes arrastrados
 
 - **`gu-freemium.js`**: Integrar en M04, M05, M06, M08 y M10 — pendiente desde 08-jul
 - **Custom domain `trazaurbana.mx`**: Configurar en Vercel (acción de Fernando)
@@ -462,4 +553,4 @@ Fernando solicitó que los archivos generados por la app (PDFs vía `window.prin
 
 ---
 
-*Bitácora generada: 12 ago 2026 · Actualizada: 14 ago 2026 · Fernando H.*
+*Bitácora generada: 12 ago 2026 · Actualizada: 15 ago 2026 · Fernando H.*

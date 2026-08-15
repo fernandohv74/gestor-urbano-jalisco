@@ -1238,18 +1238,10 @@ function construirResultadoBDLocal(b, clave, lat, lng, fuente){
 
 async function consultarArcGISZapopan(lat, lng){
   try{
-    const base = 'https://mapa.zapopan.gob.mx/arcgis/rest/services/PPDU/PPDU_estrategias/MapServer/identify';
-    const params = new URLSearchParams({
-      geometry: JSON.stringify({x: lng, y: lat}),
-      geometryType: 'esriGeometryPoint',
-      layers: 'all',
-      tolerance: '2',
-      mapExtent: `${lng-0.001},${lat-0.001},${lng+0.001},${lat+0.001}`,
-      imageDisplay: '800,600,96',
-      returnGeometry: 'false',
-      f: 'json'
-    });
-    const r = await fetch(`${base}?${params}`, {signal: AbortSignal.timeout(6000)});
+    // Proxy serverless evita CORS — mismo endpoint que M01/M10
+    // El proxy consulta GeoServer Zapopan (WFS zpn_e3_utilizacion_suelo, EPSG:4326)
+    // y devuelve results[].attributes.CLAVE con la clave de zonificación
+    const r = await fetch(`/api/arcgis-zapopan-proxy?lat=${lat}&lng=${lng}`, {signal: AbortSignal.timeout(8000)});
     if(!r.ok) return null;
     const data = await r.json();
     const resultados = data.results||[];

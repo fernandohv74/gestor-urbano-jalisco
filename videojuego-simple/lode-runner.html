@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cavador de Oro - estilo Lode Runner</title>
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: #0d0d17;
+    font-family: system-ui, sans-serif;
+    color: #eee;
+    padding: 16px;
+  }
+  h1 { font-size: 1.4rem; letter-spacing: 1px; color: #ffd166; }
+  #game-container {
+    border: 4px solid #ffd166;
+    border-radius: 8px;
+    overflow: hidden;
+    line-height: 0;
+  }
+  #hint {
+    font-size: 0.85rem;
+    color: #999;
+    text-align: center;
+    max-width: 640px;
+  }
+  #hint b { color: #ffd166; }
+</style>
+</head>
+<body>
+  <h1>⛏️ Cavador de Oro</h1>
+  <div id="game-container"></div>
+  <div id="hint">
+    <b>Flechas</b> mover/subir escaleras/colgar de cuerdas &nbsp;|&nbsp;
+    <b>Z</b> cavar a la izquierda &nbsp;|&nbsp; <b>X</b> cavar a la derecha &nbsp;|&nbsp;
+    Junta todo el oro y sube hasta arriba para ganar &nbsp;|&nbsp; <b>R</b> reiniciar
+  </div>
+
+<script>
+// ---------- Configuración del nivel ----------
+const TILE = 40;
+const COLS = 16;
+const ROWS = 10;
+const HUD_H = 48;
+const WIDTH = COLS * TILE;
+const HEIGHT = ROWS * TILE + HUD_H;
+
+const EMPTY = 0, BRICK = 1, STEEL = 2, LADDER = 3, ROPE = 4;
+
+const LADDER_COLS = [2, 8, 13];
+const BRICK_ROWS = [7, 5, 3];
+const GAP_ROW = 5, GAP_COLS = [6, 7];
+const ROPE_ROW = 4, ROPE_COLS = [6, 7];
+const GROUND_ROW = 9;
+
+const GOLD_CELLS = [
+  [1, 2], [1, 13], [2, 4], [4, 5], [4, 10],
+  [6, 3], [6, 8], [6, 12], [8, 6], [8, 9],
+];
+
+const PLAYER_START = { row: 8, col: 1 };
+const ENEMY_STARTS = [
+  { row: 8, col: 14 },
+  { row: 6, col: 13 },
+];
+
+const EXIT_CELL = { row: 1, col: 2 };
+const MOVE_DURATION = 140;
+const ENEMY_MOVE_DURATION = 210;
+const ENEMY_DECISION_INTERVAL = 520;
+const ENEMY_START_DELAY = 1800;
+const HOLE_DURATION = 3500;
+const RESPAWN_DELAY = 2000;
+const INVULN_DURATION = 1400;
+
+function buildGrid() {
+  const grid = [];
+  for (let r = 0; r < ROWS; r++) grid.push(new Array(COLS).fill(EMPTY));
+
+  for (let c = 0; c < COLS; c++) grid[GROUND_ROW][c] = STEEL;
+
+  for (const row of BRICK_ROWS) {
+    for (let c = 0; c < COLS; c++) {
+      if (row === GAP_ROW && GAP_COLS.includes(c)) continue;
+      grid[row][c] = BRICK;
+    }
+  }
+
+  for (let r = 1; r <= 8; r++) {
+    for (const c of LADDER_COLS) grid[r][c] = LADDER;
+  }
+
+  for (const c of ROPE_COLS) grid[ROPE_ROW][c] = ROPE;
+
+  return grid;
+}
+
+function colToPx(col) { return col * TILE + TILE / 2; }
+function rowToPx(row) { return row * TILE + TILE / 2 + HUD_H; }
+function isSolid(t) { return t === BRICK || t === STEEL; }
+
+// ---------- Escena principal ----------
+class MainScene extends Phaser.Scene {
+  constructor() { super('main'); }
+
+  preload() {
+    this.makeTextures();
+  }
+
+  makeTextures() {
+    const g = this.add.graphics();
+
+    // Brick
+    g.clear();
+    g.fillStyle(0x8a5a3b, 1).fillRect(0, 0, TILE, TILE);
+    g.lineStyle(2, 0x5c3a24, 1);
+    g.strokeRect(1, 1, TILE - 2, TILE - 2);
+    g.lineBetween(0, TILE / 2, TILE, TILE / 2);
+    g.lineBetween(TILE / 2, 0, TILE / 2, TILE / 2);
+    g.generateTexture('brick', TILE, TILE);
+
+    // Steel
+    g.clear();
+    g.fillStyle(0x4b5563, 1).fillRect(0, 0, TILE, TILE);
+    g.lineStyle(2, 0x2b3038, 1);
+    g.strokeRect(1, 1, TILE - 2, TILE - 2);
+    g.fillStyle(0x9ca3af, 1);
+    g.fillCircle(6, 6, 2.5); g.fillCircle(TILE - 6, 6, 2.5);
+    g.fillCircle(6, TILE - 6, 2.5); g.fillCircle(TILE - 6, TILE - 6, 2.5);
+    g.generateTexture('steel', TILE, TILE);
+
+    // Ladder
+    g.clear();
+    g.fillStyle(0xf2c14e, 1);
+    g.fillRect(6, 0, 5, TILE);
+    g.fillRect(TILE - 11, 0, 5, TILE);
+    for (let y = 4; y < TILE; y += 10) g.fillRect(6, y, TILE - 12, 4);
+    g.generateTexture('ladder', TILE, TILE);
+
+    // Rope
+    g.clear();
+    g.fillStyle(0xa9744f, 1);
+    g.fillRect(0, TILE / 2 - 3, TILE, 6);
+    g.generateTexture('rope', TILE, TILE);
+
+    // Gold
+    g.clear();
+    g.fillStyle(0xffd166, 1);
+    g.fillTriangle(TILE / 2, 4, TILE - 6, TILE / 2, TILE / 2, TILE - 4);
+    g.fillTriangle(TILE / 2, 4, 6, TILE / 2, TILE / 2, TILE - 4);
+    g.fillStyle(0xfff3c4, 1);
+    g.fillTriangle(TILE / 2, 8, TILE / 2 + 6, TILE / 2, TILE / 2, TILE / 2 + 6);
+    g.generateTexture('gold', TILE, TILE);
+
+    // Player
+    g.clear();
+    g.fillStyle(0x38bdf8, 1).fillRoundedRect(8, 12, TILE - 16, TILE - 16, 6);
+    g.fillStyle(0xe0f2fe, 1).fillCircle(TILE / 2, 12, 8);
+    g.fillStyle(0x0369a1, 1).fillRect(6, 10, TILE - 12, 5);
+    g.generateTexture('player', TILE, TILE);
+
+    // Enemy
+    g.clear();
+    g.fillStyle(0xef4444, 1).fillRoundedRect(8, 12, TILE - 16, TILE - 16, 6);
+    g.fillStyle(0xfecaca, 1).fillCircle(TILE / 2, 12, 8);
+    g.fillStyle(0x7f1d1d, 1).fillRect(6, 10, TILE - 12, 5);
+    g.generateTexture('enemy', TILE, TILE);
+
+    g.destroy();
+  }
+
+  create() {
+    this.cameras.main.setBackgroundColor('#0d0d17');
+    this.state = 'playing';
+    this.score = 0;
+    this.lives = 3;
+    this.goldTotal = GOLD_CELLS.length;
+    this.goldCollected = 0;
+    this.allGold = false;
+
+    this.grid = buildGrid();
+    this.tileSprites = [];
+    for (let r = 0; r < ROWS; r++) {
+      this.tileSprites.push(new Array(COLS).fill(null));
+      for (let c = 0; c < COLS; c++) {
+        const t = this.grid[r][c];
+        if (t === EMPTY) continue;
+        const key = t === BRICK ? 'brick' : t === STEEL ? 'steel' : t === LADDER ? 'ladder' : 'rope';
+        const spr = this.add.image(colToPx(c), rowToPx(r), key);
+        if (t === LADDER || t === ROPE) spr.setDepth(1);
+        this.tileSprites[r][c] = spr;
+      }
+    }
+
+    this.goldSprites = {};
+    GOLD_CELLS.forEach(([r, c]) => {
+      const spr = this.add.image(colToPx(c), rowToPx(r), 'gold').setDepth(2);
+      this.tweens.add({ targets: spr, y: spr.y - 5, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      this.goldSprites[`${r},${c}`] = spr;
+    });
+
+    this.player = this.makeEntity(PLAYER_START, 'player', 3);
+    this.player.lastDir = 1;
+    this.player.invulnerable = false;
+    this.player.moveDuration = MOVE_DURATION;
+
+    this.enemies = ENEMY_STARTS.map((pos) => {
+      const e = this.makeEntity(pos, 'enemy', 3);
+      e.alive = true;
+      e.moveDuration = ENEMY_MOVE_DURATION;
+      e.decisionAt = ENEMY_START_DELAY;
+      return e;
+    });
+
+    this.cursors = this.input.keyboard.createCursorKeys();
+    this.keys = this.input.keyboard.addKeys('W,A,S,D,Z,X,R');
+
+    this.buildHUD();
+
+    this.overlay = this.add.text(WIDTH / 2, HEIGHT / 2, '', {
+      fontFamily: 'system-ui', fontSize: '28px', color: '#ffd166', align: 'center',
+      backgroundColor: '#0d0d17cc', padding: { x: 20, y: 16 },
+    }).setOrigin(0.5).setDepth(10).setVisible(false);
+  }
+
+  buildHUD() {
+    this.add.rectangle(0, 0, WIDTH, HUD_H, 0x14141f).setOrigin(0, 0).setDepth(5);
+    this.scoreText = this.add.text(12, 13, 'Puntos: 0', { fontFamily: 'system-ui', fontSize: '18px', color: '#ffd166' }).setDepth(6);
+    this.livesText = this.add.text(230, 13, '', { fontFamily: 'system-ui', fontSize: '18px', color: '#f87171' }).setDepth(6);
+    this.goldText = this.add.text(400, 13, '', { fontFamily: 'system-ui', fontSize: '18px', color: '#fde68a' }).setDepth(6);
+    this.updateHUD();
+  }
+
+  updateHUD() {
+    this.scoreText.setText('Puntos: ' + this.score);
+    this.livesText.setText('Vidas: ' + '❤'.repeat(Math.max(this.lives, 0)));
+    this.goldText.setText(`Oro: ${this.goldCollected}/${this.goldTotal}`);
+  }
+
+  makeEntity(pos, textureKey, depth) {
+    const sprite = this.add.image(colToPx(pos.col), rowToPx(pos.row), textureKey).setDepth(depth);
+    return { row: pos.row, col: pos.col, sprite, isMoving: false, startRow: pos.row, startCol: pos.col };
+  }
+
+  tileAt(row, col) {
+    if (row < 0 || row >= ROWS || col < 0 || col >= COLS) return STEEL;
+    return this.grid[row][col];
+  }
+
+  tweenTo(entity, row, col, onArrive) {
+    entity.isMoving = true;
+    this.tweens.add({
+      targets: entity.sprite,
+      x: colToPx(col),
+      y: rowToPx(row),
+      duration: entity.moveDuration || MOVE_DURATION,
+      onComplete: () => {
+        entity.row = row;
+        entity.col = col;
+        entity.isMoving = false;
+        if (onArrive) onArrive();
+      },
+    });
+  }
+
+  tryMove(entity, dRow, dCol, onArrive) {
+    if (entity.isMoving) return false;
+    const targetRow = entity.row + dRow;
+    const targetCol = entity.col + dCol;
+    if (targetRow < 0 || targetRow >= ROWS || targetCol < 0 || targetCol >= COLS) return false;
+    const target = this.tileAt(targetRow, targetCol);
+    if (isSolid(target)) return false;
+    if (dRow !== 0) {
+      const current = this.tileAt(entity.row, entity.col);
+      const onLadderNow = current === LADDER;
+      const climbingIntoLadder = target === LADDER;
+      if (!onLadderNow && !climbingIntoLadder) return false;
+    }
+    this.tweenTo(entity, targetRow, targetCol, onArrive);
+    return true;
+  }
+
+  applyGravity(entity) {
+    if (entity.isMoving) return;
+    const current = this.tileAt(entity.row, entity.col);
+    if (current === LADDER || current === ROPE) return;
+    const belowRow = entity.row + 1;
+    if (belowRow >= ROWS) return;
+    const below = this.tileAt(belowRow, entity.col);
+    const supported = below === BRICK || below === STEEL || below === LADDER || below === ROPE;
+    if (!supported) this.tweenTo(entity, belowRow, entity.col);
+  }
+
+  onPlayerArrive() {
+    const key = `${this.player.row},${this.player.col}`;
+    const goldSpr = this.goldSprites[key];
+    if (goldSpr) {
+      delete this.goldSprites[key];
+      this.tweens.add({
+        targets: goldSpr, scale: 1.6, alpha: 0, duration: 250,
+        onComplete: () => goldSpr.destroy(),
+      });
+      this.score += 10;
+      this.goldCollected += 1;
+      if (this.goldCollected >= this.goldTotal) this.allGold = true;
+      this.updateHUD();
+    }
+
+    if (this.allGold && this.player.row === EXIT_CELL.row && this.player.col === EXIT_CELL.col) {
+      this.triggerWin();
+    }
+
+    for (const enemy of this.enemies) {
+      if (enemy.alive && enemy.row === this.player.row && enemy.col === this.player.col) {
+        this.hitPlayer();
+        break;
+      }
+    }
+  }
+
+  hitPlayer() {
+    if (this.player.invulnerable || this.state !== 'playing') return;
+    this.lives -= 1;
+    this.updateHUD();
+    this.cameras.main.shake(200, 0.01);
+    this.cameras.main.flash(150, 200, 40, 40);
+    if (this.lives <= 0) {
+      this.gameOver();
+      return;
+    }
+    this.player.invulnerable = true;
+    this.player.row = PLAYER_START.row;
+    this.player.col = PLAYER_START.col;
+    this.player.sprite.setPosition(colToPx(this.player.col), rowToPx(this.player.row));
+    this.tweens.add({
+      targets: this.player.sprite, alpha: 0.2, duration: 120, yoyo: true, repeat: 5,
+      onComplete: () => { this.player.sprite.setAlpha(1); this.player.invulnerable = false; },
+    });
+  }
+
+  dig(dir) {
+    if (this.state !== 'playing' || this.player.isMoving) return;
+    const below = this.tileAt(this.player.row + 1, this.player.col);
+    if (below !== BRICK && below !== STEEL) return;
+    const targetRow = this.player.row + 1;
+    const targetCol = this.player.col + dir;
+    if (targetCol < 0 || targetCol >= COLS) return;
+    if (this.tileAt(targetRow, targetCol) !== BRICK) return;
+
+    this.grid[targetRow][targetCol] = EMPTY;
+    const spr = this.tileSprites[targetRow][targetCol];
+    if (spr) spr.setVisible(false);
+
+    const dust = this.add.rectangle(colToPx(targetCol), rowToPx(targetRow), TILE - 8, TILE - 8, 0x000000, 0.5).setDepth(1);
+    this.tweens.add({ targets: dust, alpha: 0, duration: 400, onComplete: () => dust.destroy() });
+
+    this.time.delayedCall(HOLE_DURATION, () => this.refillHole(targetRow, targetCol));
+  }
+
+  refillHole(row, col) {
+    if (this.state !== 'playing') { this.grid[row][col] = BRICK; if (this.tileSprites[row][col]) this.tileSprites[row][col].setVisible(true); return; }
+
+    if (!this.player.isMoving && this.player.row === row && this.player.col === col && !this.player.invulnerable) {
+      this.hitPlayer();
+    }
+    for (const enemy of this.enemies) {
+      if (enemy.alive && !enemy.isMoving && enemy.row === row && enemy.col === col) {
+        enemy.alive = false;
+        this.tweens.add({ targets: enemy.sprite, alpha: 0, scale: 0.4, duration: 300, onComplete: () => enemy.sprite.setVisible(false) });
+        this.score += 50;
+        this.updateHUD();
+        this.time.delayedCall(RESPAWN_DELAY, () => this.respawnEnemy(enemy));
+      }
+    }
+    this.grid[row][col] = BRICK;
+    if (this.tileSprites[row][col]) this.tileSprites[row][col].setVisible(true);
+  }
+
+  respawnEnemy(enemy) {
+    enemy.row = enemy.startRow;
+    enemy.col = enemy.startCol;
+    enemy.sprite.setPosition(colToPx(enemy.col), rowToPx(enemy.row));
+    enemy.sprite.setAlpha(1).setScale(1).setVisible(true);
+    enemy.alive = true;
+  }
+
+  updateEnemyAI(enemy, time) {
+    if (!enemy.alive || enemy.isMoving || this.state !== 'playing') return;
+    if (time < enemy.decisionAt) return;
+    enemy.decisionAt = time + ENEMY_DECISION_INTERVAL;
+
+    const rowDiff = this.player.row - enemy.row;
+    const colDiff = this.player.col - enemy.col;
+    const current = this.tileAt(enemy.row, enemy.col);
+
+    if (current === LADDER && rowDiff !== 0) {
+      if (this.tryMove(enemy, rowDiff > 0 ? 1 : -1, 0)) return;
+    }
+    if (colDiff !== 0) {
+      const dir = colDiff > 0 ? 1 : -1;
+      if (this.tryMove(enemy, 0, dir)) { enemy.lastDir = dir; return; }
+    }
+    if (current === LADDER) {
+      const dir = rowDiff >= 0 ? 1 : -1;
+      if (this.tryMove(enemy, dir, 0)) return;
+    }
+    const fallback = enemy.lastDir || 1;
+    if (!this.tryMove(enemy, 0, fallback)) {
+      enemy.lastDir = -fallback;
+      this.tryMove(enemy, 0, -fallback);
+    }
+  }
+
+  triggerWin() {
+    if (this.state !== 'playing') return;
+    this.state = 'won';
+    this.overlay.setText('¡NIVEL COMPLETADO!\nPuntos: ' + this.score + '\n\nPresiona R para reiniciar').setVisible(true);
+  }
+
+  gameOver() {
+    this.state = 'lost';
+    this.overlay.setText('GAME OVER\nPuntos: ' + this.score + '\n\nPresiona R para reiniciar').setVisible(true);
+  }
+
+  update(time) {
+    if (Phaser.Input.Keyboard.JustDown(this.keys.R) && this.state !== 'playing') {
+      this.scene.restart();
+      return;
+    }
+    if (this.state !== 'playing') return;
+
+    const left = this.cursors.left.isDown || this.keys.A.isDown;
+    const right = this.cursors.right.isDown || this.keys.D.isDown;
+    const up = this.cursors.up.isDown || this.keys.W.isDown;
+    const down = this.cursors.down.isDown || this.keys.S.isDown;
+
+    if (!this.player.isMoving) {
+      const current = this.tileAt(this.player.row, this.player.col);
+      if (left) { this.player.lastDir = -1; this.tryMove(this.player, 0, -1, () => this.onPlayerArrive()); }
+      else if (right) { this.player.lastDir = 1; this.tryMove(this.player, 0, 1, () => this.onPlayerArrive()); }
+      else if (up) { this.tryMove(this.player, -1, 0, () => this.onPlayerArrive()); }
+      else if (down) {
+        if (current === LADDER || current === ROPE) this.tryMove(this.player, 1, 0, () => this.onPlayerArrive());
+      }
+    }
+
+    if (Phaser.Input.Keyboard.JustDown(this.keys.Z)) this.dig(-1);
+    if (Phaser.Input.Keyboard.JustDown(this.keys.X)) this.dig(1);
+
+    this.applyGravity(this.player);
+    for (const enemy of this.enemies) {
+      this.applyGravity(enemy);
+      this.updateEnemyAI(enemy, time);
+    }
+
+    for (const enemy of this.enemies) {
+      if (enemy.alive && !enemy.isMoving && !this.player.isMoving &&
+          enemy.row === this.player.row && enemy.col === this.player.col) {
+        this.hitPlayer();
+      }
+    }
+  }
+}
+
+new Phaser.Game({
+  type: Phaser.AUTO,
+  parent: 'game-container',
+  width: WIDTH,
+  height: HEIGHT,
+  backgroundColor: '#0d0d17',
+  scene: [MainScene],
+});
+</script>
+</body>
+</html>

@@ -6510,6 +6510,20 @@ async function detectarGiroIA(){
   const STOP=new Set(['venta','vende','vender','vendo','compra','comprar','servicio','servicios','articulo','articulos','producto','productos','otro','otros','otra','otras','menor','mayor','comercio','negocio','los','las','con','sin','por','que','del','una','uno','sus','les']);
   const palabras=norm(desc).split(/\s+/).filter(function(p){return p.length>2&&!STOP.has(p);});
   const _stem=function(w){if(w.length>=6&&w.endsWith('eria'))return w.slice(0,-4);return w.length>=6?w.slice(0,-2):w.length===5?w.slice(0,-1):w;};
+  const _rankear=function(lista,kws){
+    return lista.slice().sort(function(a,b){
+      var na=norm(a.nombre||''),nb=norm(b.nombre||'');
+      var allA=kws.every(function(k){return na.includes(k);});
+      var allB=kws.every(function(k){return nb.includes(k);});
+      if(allA&&!allB)return -1;
+      if(!allA&&allB)return 1;
+      var anyA=kws.some(function(k){return na.includes(k);});
+      var anyB=kws.some(function(k){return nb.includes(k);});
+      if(anyA&&!anyB)return -1;
+      if(!anyA&&anyB)return 1;
+      return 0;
+    });
+  };
   const _filDirecto=function(kws){
     return activos.filter(function(g){
       const n=norm(g.nombre);
@@ -6533,6 +6547,7 @@ async function detectarGiroIA(){
   };
   let fil=palabras.length>0?_filDirecto(palabras):[];
   if(fil.length>=4){
+    fil=_rankear(fil,palabras);
     if(lc) lc.textContent=fil.length+' giro'+(fil.length!==1?'s':'')+' encontrados';
     if(li) li.innerHTML=_renderLista(fil);
     if(lg) lg.style.display='block';
@@ -6564,6 +6579,7 @@ async function detectarGiroIA(){
       const vistos=new Set(fil.map(function(g){return g.codigo;}));
       filIA.forEach(function(g){if(!vistos.has(g.codigo)){fil.push(g);vistos.add(g.codigo);}});
     }
+    if(fil.length>0) fil=_rankear(fil,palabras);
     if(lc) lc.textContent=fil.length>0?fil.length+' giro'+(fil.length!==1?'s':'')+' encontrados':'Sin resultados para "'+desc+'"';
     if(li){
       li.innerHTML=fil.length>0?_renderLista(fil):'<div style="padding:12px;font-size:12px;color:var(--text3)">No hay giros en esta zona para esa descripción. Prueba con otra palabra o usa "Buscar manual".</div>';

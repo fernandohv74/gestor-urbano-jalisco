@@ -539,7 +539,8 @@ input[type=range]::-webkit-slider-thumb{
       </div>
     </div>
 
-    <!-- Panel de resultados -->
+    <!-- Panel de resultados + Simulador: grid 2 col -->
+    <div id="bottomSplit" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
     <div id="resultPanel">
       <div class="gu-empty gu-anim-fadeUp">
         <div class="gu-empty-icon">
@@ -553,9 +554,9 @@ input[type=range]::-webkit-slider-thumb{
     <!-- Simulador de potencial -->
     <div class="gu-sim" id="simPanel" style="display:none">
       <div style="height:0.5px;background:var(--border);margin:0 0 12px"></div>
-      <div class="gu-field-label" style="margin-bottom:10px">Simulador de potencial constructivo</div>
+      <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)">Simulador de potencial constructivo</div>
       <div class="gu-sim-slider-row">
-        <label>Superficie del terreno
+        <label style="font-size:13px;text-transform:none;letter-spacing:0;color:var(--text);font-family:var(--sans);font-weight:500">Ingresa la superficie del terreno
           <div class="gu-sim-num">
             <input id="simInput" type="number" min="0" max="99999" step="0.01" value="0" oninput="sinInput(this.value)" placeholder="Ingresa m²">
             <span style="font-size:11px;color:var(--text2)">m²</span>
@@ -571,10 +572,10 @@ input[type=range]::-webkit-slider-thumb{
       </div>
       <div id="simCajones" style="margin-top:8px"></div>
       <div id="bloque56" style="display:none"></div>
-      <div style="display:flex;align-items:center;gap:6px;margin-top:4px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:6px;padding:5px 10px">
-        <span style="font-size:11px;color:var(--text2);white-space:nowrap">↕ Entrepiso</span>
-        <input type="number" id="inputEntrepiso" value="3.0" min="2.0" max="6.0" step="0.1" style="flex:1;min-width:0;background:var(--bg2);border:0.5px solid var(--border2);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:2px 5px;text-align:center">
-        <span style="font-size:11px;color:var(--text3)">m/niv</span>
+      <div style="display:inline-flex;align-items:center;gap:8px;margin-top:6px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:6px;padding:6px 12px">
+        <span style="font-size:13px;color:var(--text2);white-space:nowrap">↕ Altura por nivel</span>
+        <input type="number" id="inputEntrepiso" value="3.0" min="2.0" max="6.0" step="0.1" style="width:72px;background:var(--bg2);border:0.5px solid var(--border2);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:15px;font-weight:600;padding:3px 7px;text-align:center">
+        <span style="font-size:13px;color:var(--text3)">m/nivel</span>
       </div>
       <div id="grid3DBtns" style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
         <button class="gu-btn-download" onclick="abrir3D()" style="margin-top:0">
@@ -607,6 +608,7 @@ input[type=range]::-webkit-slider-thumb{
         Calcular derechos de licencia en M08
       </button>
     </div>
+    </div><!-- /bottomSplit -->
 
   </div><!-- /panel-right -->
 
@@ -5043,8 +5045,8 @@ function actualizar56(){
       <div style="background:rgba(251,191,36,.08);border:1px dashed #D97706;border-radius:8px;padding:10px 12px;margin-top:10px;display:flex;align-items:center;gap:10px">
         <span style="font-size:20px;flex-shrink:0">📏</span>
         <div>
-          <div style="font-size:11px;font-weight:700;color:#D97706;margin-bottom:3px">Calcular altura máxima por criterio de 56°</div>
-          <div style="font-size:10px;color:var(--text2);line-height:1.5">Usa el botón <strong style="color:#D97706">Medir vialidad</strong> en el mapa para obtener el ancho de la calle y calcular automáticamente la altura máxima permitida — <em>Norma Urbana N°3, PDUCP GDL</em>.</div>
+          <div style="font-size:14px;font-weight:700;color:#D97706;margin-bottom:4px">Calcular altura máxima por criterio de 56°</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">Usa el botón <strong style="color:#D97706">Medir vialidad</strong> en el mapa para obtener el ancho de la calle y calcular automáticamente la altura máxima permitida — <em>Norma Urbana N°3, PDUCP GDL</em>.</div>
         </div>
       </div>`;
     return;
@@ -5067,9 +5069,9 @@ function actualizar56(){
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px">
         <div style="background:rgba(255,255,255,.7);border:1px solid #FDE68A;border-radius:5px;padding:5px 7px;text-align:center">
-          <div style="font-size:8px;color:#92400E;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Ancho vialidad</div>
-          <div style="font-family:monospace;font-size:16px;font-weight:700;color:#78350F">${_anchoCalle56.toFixed(1)} m</div>
-          <div style="font-size:7px;color:#92400E">lindero a lindero</div>
+          <div style="font-size:10px;color:#92400E;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Ancho vialidad</div>
+          <div style="font-family:monospace;font-size:18px;font-weight:700;color:#78350F">${_anchoCalle56.toFixed(1)} m</div>
+          <div style="font-size:10px;color:#92400E">lindero a lindero</div>
         </div>
         <div style="background:rgba(255,255,255,.7);border:1px solid #FDE68A;border-radius:5px;padding:5px 7px;text-align:center">
           <div style="font-size:8px;color:#92400E;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Dist. total al paramento</div>

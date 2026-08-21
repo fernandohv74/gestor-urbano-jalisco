@@ -501,6 +501,55 @@ input[type=range]::-webkit-slider-thumb{
       <div id="historialLista"></div>
     </div>
 
+
+  </div><!-- /panel-left -->
+
+  <!-- ═══════════════════ PANEL DERECHO ═══════════════════ -->
+  <div class="gu-panel-right">
+
+    <!-- Mapa resultado — FIJO, no se destruye con innerHTML -->
+    <div id="mapaContainer" style="display:none">
+      <div class="gu-mapa-card">
+        <div class="gu-rcard-hdr">Ubicación del predio</div>
+        <div id="mapaResultado" style="height:260px;width:100%"></div>
+        <div class="gu-mapa-foot">
+          <button id="btnAjustarPin" style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);color:var(--text2);padding:6px 12px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--t-fast)" onmouseover="this.style.borderColor='var(--brand)'" onmouseout="this.style.borderColor='var(--border2)'">
+            Ajustar posición del pin
+          </button>
+          <button id="btnMedir56" title="Mide el ancho de la vialidad para calcular la altura máxima por criterio de 56°" style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);color:var(--text2);padding:6px 12px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--t-fast)">
+            📏 Medir vialidad
+          </button>
+          <button id="btnMapaBase" title="Mostrar capa catastral GDL con linderos precisos de predio" style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);color:var(--text2);padding:6px 12px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--t-fast)">
+            🏘️ Ver catastro
+          </button>
+          <div id="medir56Result" style="display:none;font-size:11px;font-family:monospace;color:#D97706;background:#FFFBEB;border:1px solid #FDE68A;border-radius:5px;padding:3px 8px;font-weight:600"></div>
+          <input type="number" id="anchoManual56" min="0.5" max="150" step="0.1" placeholder="✏️ m manual" title="Escribe el ancho de la vialidad en metros" style="width:110px;padding:4px 8px;font-size:12px;font-family:var(--sans);border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg3);color:var(--text1);outline:none;font-weight:500">
+          <div id="vialidentInfo" style="display:none;font-size:11px;font-family:var(--sans);color:var(--text2);background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:3px 8px"></div>
+          <div id="pinMovidoBadge" class="gu-pin-badge">
+            Pin ajustado manualmente — resultado actualizado
+          </div>
+          <span class="gu-mapa-note">Arrastra el pin al interior del predio si el resultado es una vialidad</span>
+        </div>
+        <div id="vialidadAviso" class="gu-vialidad-warn">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--sem-am-txt);margin-bottom:2px">Tu domicilio cayó sobre una vialidad</div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.5">El resultado muestra la zonificación de la calle. <strong>Haz clic en "Ajustar posición del pin"</strong> y arrástralo al interior del predio.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel de resultados -->
+    <div id="resultPanel">
+      <div class="gu-empty gu-anim-fadeUp">
+        <div class="gu-empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        </div>
+        <div class="gu-empty-title">Consulta un predio del AMG</div>
+        <div class="gu-empty-sub">Ingresa una dirección, clave del predial o coordenadas para obtener la información normativa completa.</div>
+      </div>
+    </div>
+
     <!-- Simulador de potencial -->
     <div class="gu-sim" id="simPanel" style="display:none">
       <div style="height:0.5px;background:var(--border);margin:0 0 12px"></div>
@@ -557,54 +606,6 @@ input[type=range]::-webkit-slider-thumb{
         <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M13 2H3a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1V3a1 1 0 00-1-1zM6 11H4V9h2v2zm0-4H4V5h2v2zm3 4H7V9h2v2zm0-4H7V5h2v2zm3 4h-2V9h2v2zm0-4h-2V5h2v2z"/></svg>
         Calcular derechos de licencia en M08
       </button>
-    </div>
-
-  </div><!-- /panel-left -->
-
-  <!-- ═══════════════════ PANEL DERECHO ═══════════════════ -->
-  <div class="gu-panel-right">
-
-    <!-- Mapa resultado — FIJO, no se destruye con innerHTML -->
-    <div id="mapaContainer" style="display:none">
-      <div class="gu-mapa-card">
-        <div class="gu-rcard-hdr">Ubicación del predio</div>
-        <div id="mapaResultado" style="height:260px;width:100%"></div>
-        <div class="gu-mapa-foot">
-          <button id="btnAjustarPin" style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);color:var(--text2);padding:6px 12px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--t-fast)" onmouseover="this.style.borderColor='var(--brand)'" onmouseout="this.style.borderColor='var(--border2)'">
-            Ajustar posición del pin
-          </button>
-          <button id="btnMedir56" title="Mide el ancho de la vialidad para calcular la altura máxima por criterio de 56°" style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);color:var(--text2);padding:6px 12px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--t-fast)">
-            📏 Medir vialidad
-          </button>
-          <button id="btnMapaBase" title="Mostrar capa catastral GDL con linderos precisos de predio" style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);color:var(--text2);padding:6px 12px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--t-fast)">
-            🏘️ Ver catastro
-          </button>
-          <div id="medir56Result" style="display:none;font-size:11px;font-family:monospace;color:#D97706;background:#FFFBEB;border:1px solid #FDE68A;border-radius:5px;padding:3px 8px;font-weight:600"></div>
-          <input type="number" id="anchoManual56" min="0.5" max="150" step="0.1" placeholder="✏️ m manual" title="Escribe el ancho de la vialidad en metros" style="width:110px;padding:4px 8px;font-size:12px;font-family:var(--sans);border:0.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg3);color:var(--text1);outline:none;font-weight:500">
-          <div id="vialidentInfo" style="display:none;font-size:11px;font-family:var(--sans);color:var(--text2);background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:3px 8px"></div>
-          <div id="pinMovidoBadge" class="gu-pin-badge">
-            Pin ajustado manualmente — resultado actualizado
-          </div>
-          <span class="gu-mapa-note">Arrastra el pin al interior del predio si el resultado es una vialidad</span>
-        </div>
-        <div id="vialidadAviso" class="gu-vialidad-warn">
-          <div>
-            <div style="font-size:12px;font-weight:600;color:var(--sem-am-txt);margin-bottom:2px">Tu domicilio cayó sobre una vialidad</div>
-            <div style="font-size:11px;color:var(--text2);line-height:1.5">El resultado muestra la zonificación de la calle. <strong>Haz clic en "Ajustar posición del pin"</strong> y arrástralo al interior del predio.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Panel de resultados -->
-    <div id="resultPanel">
-      <div class="gu-empty gu-anim-fadeUp">
-        <div class="gu-empty-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-        </div>
-        <div class="gu-empty-title">Consulta un predio del AMG</div>
-        <div class="gu-empty-sub">Ingresa una dirección, clave del predial o coordenadas para obtener la información normativa completa.</div>
-      </div>
     </div>
 
   </div><!-- /panel-right -->

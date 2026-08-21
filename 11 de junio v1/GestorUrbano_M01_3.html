@@ -4742,7 +4742,7 @@ function renderizar(zona,todos){
          ? fraseBDHTML + `
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;margin-bottom:6px">
               <div style="font-size:11px;color:var(--text2)">✅ Usos permitidos según PDU</div>
-              <div style="font-size:10px;color:var(--text3)">👈 Haz clic en un uso para ver su definición</div>
+              <div style="font-size:12px;font-weight:600;color:var(--text2)">👈 Haz clic en un uso para ver coeficientes y definición</div>
             </div>
             <div id="usosPermitidosPanel" style="margin-bottom:10px">${permitidos.map(u=>`<span class="gu-uso-badge gu-uso-p" onclick="seleccionarUso(event,'${u}',false)" title="${(USO_INFO[u]||{}).n||u}">${u}</span>`).join('')}</div>
             ${condicionados.length?`<div style="font-size:11px;color:var(--text2);margin-bottom:6px">⚠️ Condicionados (${condicionados.length}) — requieren dictamen adicional</div>

@@ -415,7 +415,7 @@ input[type=range]::-webkit-slider-thumb{
         <button class="gu-muni-btn" onclick="selMunicipio('tlaquepaque',this)">Tlaquepaque</button>
         <button class="gu-muni-btn" onclick="selMunicipio('tonala',this)">Tonalá</button>
       </div>
-      <div id="muniNota" class="gu-nota" style="margin-top:8px">Guadalajara — API Visor Urbano activa</div>
+      <div id="muniNota" class="gu-nota" style="margin-top:8px">Selecciona un municipio para empezar</div>
     </div>
 
     <!-- Divider -->
@@ -728,7 +728,7 @@ const RETRANQUEO = {
 // ══════════════════════════════════════════════════
 // ESTADO GLOBAL
 // ══════════════════════════════════════════════════
-let municipioActual = 'guadalajara';
+let municipioActual = '';
 let datosZona = null;
 let _restaurandoHistorial = null;
 let todosPoligonos = [];
@@ -4269,6 +4269,7 @@ async function buscar(){
   const cp      = document.getElementById('inCP').value.trim();
 
   if(!dir){ setStatus('error','Escribe la dirección'); return; }
+  if(!municipioActual){ setStatus('error','⚠️ Selecciona primero el municipio donde está el domicilio'); return; }
 
   // ── DETECTAR MUNICIPIO EN LA DIRECCIÓN ESCRITA ──────────────────────────
   // Si el usuario escribe "Pedro Moreno 516 Zapopan", detectar "Zapopan" y activarlo
@@ -4788,7 +4789,7 @@ function renderizar(zona,todos){
 
     <div class="gu-sem gu-sem-${semaforo}">
       <div class="gu-sem-dot"></div>
-      <div><div class="gu-sem-label">Estado normativo</div><div class="gu-sem-val">${semTxt}</div></div>
+      <div><div class="gu-sem-label">Restricción patrimonial</div><div class="gu-sem-val">${semTxt}</div></div>
     </div>
 
     ${(()=>{
@@ -4848,7 +4849,7 @@ function renderizar(zona,todos){
           <div class="gu-field"><div class="gu-field-lbl">Superficie mínima de lote</div><div class="gu-field-val" id="dynSUP" style="font-size:15px">${zona.sup_min||'No aplica'} ${zona.sup_min?'m²':''}</div><div class="gu-field-sub">Tamaño mínimo requerido del terreno</div></div>
           <div class="gu-field"><div class="gu-field-lbl">Frente mínimo de lote</div><div class="gu-field-val" id="dynFRENTE" style="font-size:15px">${zona.fre_min||'No aplica'} ${zona.fre_min?'m':''}</div><div class="gu-field-sub">Ancho mínimo del terreno sobre la calle</div></div>
           <div class="gu-field"><div class="gu-field-lbl">Frente ajardinado</div><div class="gu-field-val" id="dynJARD" style="font-size:15px">${(zona.fre_aj!=null&&zona.fre_aj!=='')?(()=>{const v=parseFloat(zona.fre_aj);return (v>0&&v<=1?(v*100):v)+'%';})():'No aplica'}</div><div class="gu-field-sub">% del frente que debe ser área verde</div></div>
-          <div class="gu-field"><div class="gu-field-lbl">Índice de edificación (IDE)</div><div class="gu-field-val" id="dynIDE" style="font-size:15px">${zona.ide||'No aplica'} ${zona.ide?'m²':''}</div><div class="gu-field-sub">Superficie mínima por vivienda</div></div>
+          <div class="gu-field" onclick="mostrarInfo('ide','${zona.ide||''}',event)"><div class="gu-field-lbl">Índice de edificación (IDE) <span class="gu-coef-tag">ⓘ</span></div><div class="gu-field-val" id="dynIDE" style="font-size:15px">${zona.ide||'No aplica'} ${zona.ide?'m²':''}</div><div class="gu-field-sub">Superficie mínima por vivienda</div></div>
         </div>
       </div>
     </div>
@@ -5185,7 +5186,7 @@ function _renderCajones(supConst, supConstIcus, sup, cajonesTexto, uso){
       <div style="font-size:10px;color:var(--uso-p-txt);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">🅿️ Cajones de estacionamiento requeridos — 🏠 Vivienda</div>
       ${park.esHabEnCS ? `
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:5px 10px;background:rgba(255,255,255,.04);border-radius:5px;border:1px solid var(--border)">
-        <span style="font-size:11px;color:var(--text2);font-weight:500">m² de la vivienda más grande:</span>
+        <span style="font-size:11px;color:var(--text2);font-weight:500">m² por vivienda (necesario para calcular cajones):</span>
         <input type="number" id="inpSupViv" value="${_supPorVivienda}" min="20" max="500" step="10"
           style="width:64px;padding:2px 6px;border-radius:4px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);font-size:12px;font-family:var(--mono)"
           onchange="_supPorVivienda=Math.max(20,parseInt(this.value)||80);setCajonesMode('hab')">
@@ -5972,6 +5973,7 @@ function mostrarInfo(tipo,valor,event){
     icus:['iCUS — Índice de Construcción Indirecta',`Superficie adicional para usos de servicio.\n\nCUS ${cus} + iCUS ${valor} = ${Math.round((parseFloat(cus)+parseFloat(valor))*100)/100} construcción total permitida.`,'Sótanos de estacionamiento, cuartos de máquinas, cisternas techadas.'],
     altura:['Altura Máxima Permitida',`Altura total desde banqueta hasta la parte más alta.\n\nResulta de dividir CUS ${cus} ÷ COS ${cos} = ${cos>0?Math.round(parseFloat(cus)/parseFloat(cos)*10)/10:'—'} niveles teóricos${cos>0&&cus>0?' (~'+(Math.round(parseFloat(cus)/parseFloat(cos)*35)/10).toFixed(1)+' m a 3.5 m/nivel)':''}.\n\nPDU ZPN-01 (Zapopan): La Norma General 5 NO fija un límite de metros para MB/MC/MD. La altura queda como resultante de los coeficientes. Si el proyecto tiene ≥6 niveles, la restricción posterior se amplía al 20% de la profundidad del lote.`,valor?`Nivel/metros orientativo: CUS ${cus} ÷ COS ${cos} = ${cos>0?Math.round(parseFloat(cus)/parseFloat(cos)*10)/10:'—'} niv. teóricos. Siempre validar con NG5 y criterio de 56°.`:'La altura queda sujeta a validación de la Dirección de Ordenamiento del Territorio del municipio.'],
     retranqueo:['Retranqueo — Separación Obligatoria de la Edificación',retDesc(valor)+'\n\nTipos: A=sin separación, B=solo frontal, C=frontal y lateral, D=todos los lados.','Tipo A: el edificio puede llegar hasta la banqueta. Tipo B: debe retirarse del frente.'],
+    ide:['IDE — Índice de Edificación','Superficie mínima requerida por cada vivienda en el proyecto.\n\nEjemplo: predio de 500 m² con IDE '+valor+' m² por vivienda → máximo '+(parseInt(valor)>0?Math.floor(500/parseInt(valor)):0)+' viviendas como máximo (500 ÷ IDE).','Si aparece “No aplica”, esta zona no fija superficie mínima por vivienda. El IDE aplica principalmente a usos habitacionales y limita cuántas viviendas caben en el terreno.'],
   };
   const info=infos[tipo];if(!info)return;
   const tt=document.getElementById('tooltip');

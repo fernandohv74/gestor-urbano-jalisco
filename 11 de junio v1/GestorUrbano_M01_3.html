@@ -5496,6 +5496,8 @@ function actualizarSim(sup, _cosOverride, _cusOverride){
         🏗️ <strong>En términos simples:</strong> En un terreno de <strong>${fmt(sup)} m²</strong> puedes construir una huella máxima de <strong>${supDesplante} m²</strong> por nivel, y hasta <strong>${supConstrBase} m²</strong> totales de construcción sumando todos los niveles.
         ${niv?` Eso equivale aproximadamente a <strong>${niv} niveles</strong>.`:''}
         ${cusOpt>0?`<br>💡 Si el predio se destina a uso mixto (vivienda + comercio), el máximo sube a <strong>${fmt(sup*cusOpt)} m²</strong> totales.`:''}
+        ${icus>0?`<br>🔵 Además, la zona permite <strong>${fmt(sup*icus)} m²</strong> de construcción indirecta (iCUS ${icus}) — sótanos, estacionamientos o cuartos de servicio que no se contabilizan como área habitable.`:''}
+        ${icos>0?`<br>🔵 Más <strong>${fmt(sup*icos)} m²</strong> de construcción abierta (iCOS ${icos}) — terrazas cubiertas o áreas techadas sin cerramiento.`:''}
       </div>`
     : '';
   const simNotaEl = document.getElementById('simNota');

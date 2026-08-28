@@ -3152,7 +3152,7 @@ async function consultarVisorJalisco(lat, lng, munId){
     const _arcgisRes = await consultarArcGISZapopan(lat, lng);
     claveArcGIS = _arcgisRes?.clave || null;
     if(claveArcGIS){
-      const _zpnN = {'1':'ZPN-01 “Zapopan Centro”','2':'ZPN-02 “Arroyo Hondo”','3':'ZPN-03 “Los Robles”','4':'ZPN-04 “La Tuzanía”','5':'ZPN-05 “Vallarta-Patria”','6':'ZPN-06 “Atemajac”','7':'ZPN-07 “El Collí”','8':'ZPN-08 “Santa Ana Tepetitlán”','9':'ZPN-09 “Base Aérea - El Bajío”','10':'ZPN-10 “Cópala”','11':'ZPN-11 “Tesistán”','12':'ZPN-12 “El Nixticuil”'};
+      const _zpnN = {'1':'ZPN-01 “Zapopan Centro”','2':'ZPN-02 “Arroyo Hondo”','3':'ZPN-03 “Los Robles”','4':'ZPN-04 “La Tuzanía”','5':'ZPN-05 “Vallarta-Patria”','6':'ZPN-06 “Atemajac”','7':'ZPN-07 “El Collí”','8':'ZPN-08 “Santa Ana Tepetitlán”','9':'ZPN-09 “Base Aérea - El Bajío”','10':'ZPN-10 “Cópala”','11':'ZPN-11 “Tesistán”','12':'ZPN-12 “El Nixticuil”','9A':'ZPN-09A “Base Aérea - El Bajío”'};
       const _dN = String(_arcgisRes?.distrito||'').replace(/^ZPN-?0*/i,'').replace(/^0+/,'').trim();
       const _dis = _dN ? {dis1:_dN, dis2:_zpnN[_dN]||`ZPN-${_dN.padStart(2,'0')}`} : {dis1:'—',dis2:''};
       // 2a. BD local con clave ArcGIS exacta
@@ -3388,6 +3388,7 @@ async function consultarVisorJalisco(lat, lng, munId){
     '10':'ZPN-10 "Cópala"',
     '11':'ZPN-11 "Tesistán"',
     '12':'ZPN-12 "El Nixticuil"',
+    '9A':'ZPN-09A "Base Aérea - El Bajío"',
   };
   const distNum = String(z.distrito||'').replace(/^D/i,'').trim();
   // Nombres de distritos por municipio

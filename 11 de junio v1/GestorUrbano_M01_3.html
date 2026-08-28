@@ -3062,7 +3062,7 @@ function irAM08(){
 }
 
 // Construye el objeto resultado directamente desde la BD local (sin VUJ)
-function construirResultadoBDLocal(b, clave, lat, lng, fuente){
+function construirResultadoBDLocal(b, clave, lat, lng, fuente, dis){
   const parseNum = v => { if(!v||v==='*') return 0; return parseFloat(String(v).replace(',','.'))||0; };
   const parseCus = v => { if(!v||v==='*') return 0; const m = String(v).replace(',','.').match(/^[\s]*([\d.]+)/); return m ? parseFloat(m[1])||0 : 0; };
   const splitUsos = s => s ? s.split(/[·\|]/).map(u=>u.trim().replace(/\(condicionado\)/i,'').trim()).filter(Boolean) : [];
@@ -3091,7 +3091,7 @@ function construirResultadoBDLocal(b, clave, lat, lng, fuente){
     rest_p1: b.restriccion_posterior||'',
     jar:   b.porcentaje_jardinado_restriccion_frontal||'',
     pdc:   'No aplica',
-    dis1:  '—', dis2:'', sub1:'—', sub2:'',
+    dis1:  (dis&&dis.dis1)||'—', dis2: (dis&&dis.dis2)||'', sub1:'—', sub2:'',
     ide:   b.indice_edificacion||'',
     uso_per: b.uso_permitido||'',
     uso_con: b.uso_condicionado||'',
@@ -3124,7 +3124,9 @@ async function consultarArcGISZapopan(lat, lng){
                   uso.attributes?.USO   || uso.attributes?.uso   || null;
     if(!clave) return null;
     // Normalizar asterisco: "MV2*H" → "MV2-H", "MV4*PPE" → "MV4-PPE"
-    return clave.trim().toUpperCase().replace(/\*/g, '-');
+    const claveNorm = clave.trim().toUpperCase().replace(/\*/g, '-');
+    const distrRaw = String(uso.attributes?.DISTRITO||'').replace(/^ZPN-?0*/i,'').replace(/^0+/,'').trim();
+    return { clave: claveNorm, distrito: distrRaw||null };
   }catch(e){
     return null; // Silencioso — cae en fallback VUJ
   }
@@ -3147,16 +3149,20 @@ async function consultarVisorJalisco(lat, lng, munId){
     // el resultado real de ArcGIS nunca llegaba al resto de la función y se
     // perdía en silencio, cayendo siempre al respaldo VUJ aunque ArcGIS
     // hubiera respondido bien.
-    claveArcGIS = await consultarArcGISZapopan(lat, lng);
+    const _arcgisRes = await consultarArcGISZapopan(lat, lng);
+    claveArcGIS = _arcgisRes?.clave || null;
     if(claveArcGIS){
+      const _zpnN = {'1':'ZPN-01 “Zapopan Centro”','2':'ZPN-02 “Arroyo Hondo”','3':'ZPN-03 “Los Robles”','4':'ZPN-04 “La Tuzanía”','5':'ZPN-05 “Vallarta-Patria”','6':'ZPN-06 “Atemajac”','7':'ZPN-07 “El Collí”','8':'ZPN-08 “Santa Ana Tepetitlán”','9':'ZPN-09 “Base Aérea - El Bajío”','10':'ZPN-10 “Cópala”','11':'ZPN-11 “Tesistán”','12':'ZPN-12 “El Nixticuil”'};
+      const _dN = String(_arcgisRes?.distrito||'').replace(/^ZPN-?0*/i,'').replace(/^0+/,'').trim();
+      const _dis = _dN ? {dis1:_dN, dis2:_zpnN[_dN]||`ZPN-${_dN.padStart(2,'0')}`} : {dis1:'—',dis2:''};
       // 2a. BD local con clave ArcGIS exacta
       const bdRes = vujBDLocalNormas(`municipio_id=120 AND clave LIKE '%${claveArcGIS}%'`);
-      if(bdRes.length) return construirResultadoBDLocal(bdRes[0].properties, claveArcGIS, lat, lng, 'arcgis+bd-local');
+      if(bdRes.length) return construirResultadoBDLocal(bdRes[0].properties, claveArcGIS, lat, lng, 'arcgis+bd-local', _dis);
       // 2b. BD local con clave base (MV3-PPE → MV3)
       // MV2-H → claveBase = 'MV2', busca en BD como MV2
       const claveBase = claveArcGIS.split('-')[0];
       const bdRes2 = vujBDLocalNormas(`municipio_id=120 AND clave LIKE '%${claveBase}%'`);
-      if(bdRes2.length) return construirResultadoBDLocal(bdRes2[0].properties, claveArcGIS, lat, lng, 'arcgis+bd-local-approx');
+      if(bdRes2.length) return construirResultadoBDLocal(bdRes2[0].properties, claveArcGIS, lat, lng, 'arcgis+bd-local-approx', _dis);
     }
     // ArcGIS falló (CORS) — intentar BD local sin clave exacta usando VUJ para obtener clave
     // El VUJ se usa, luego se cruza con BD local

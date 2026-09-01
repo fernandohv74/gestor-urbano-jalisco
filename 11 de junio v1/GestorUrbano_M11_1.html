@@ -357,6 +357,12 @@
        ════════════════════════════════ -->
   <div class="m11-panel" id="panel-pro">
 
+    <!-- Histórico — últimas 3 corridas guardadas (visible al inicio) -->
+    <div class="m11-hist" id="pro-hist" style="display:none">
+      <div class="m11-hist-hdr">Corridas guardadas</div>
+      <div id="pro-hist-list"></div>
+    </div>
+
     <!-- Bloque 1 -->
     <div class="blk-accordion open" id="blk1">
       <div class="blk-head" onclick="toggleBlk('blk1')">
@@ -596,12 +602,6 @@
 
     <div class="disclaimer">
       <strong>Modo Pro:</strong> El flujo de caja asume desembolso lineal de construcción durante la obra, y ventas/rentas desde el inicio de comercialización. La TIR se calcula mediante Newton-Raphson sobre los flujos mensuales. Los valores son estimados de factibilidad — no reemplazan una auditoría financiera formal.
-    </div>
-
-    <!-- Histórico — últimas 3 corridas guardadas -->
-    <div class="m11-hist" id="pro-hist" style="display:none">
-      <div class="m11-hist-hdr">Ingresos históricos — últimas 3 corridas</div>
-      <div id="pro-hist-list"></div>
     </div>
 
     <!-- Acciones post-cálculo -->

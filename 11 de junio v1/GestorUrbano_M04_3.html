@@ -1664,7 +1664,7 @@ const GU_CALIDAD_JPEG   = 0.7;
 const GU_CALIDAD_JPEG_2 = 0.5;
 const GU_LIMITE_B64     = 1 * 1024 * 1024; // 1 MB, medido sobre el string base64
 
-// Redimensiona (si hace falta) y comprime un <img> ya cargado. Si el base64
+// Redimensiona (si hace falta) y comprime un <img alt=""> ya cargado. Si el base64
 // resultante a calidad GU_CALIDAD_JPEG supera GU_LIMITE_B64, reintenta a
 // GU_CALIDAD_JPEG_2.
 function _comprimirDesdeImagen(imgEl) {

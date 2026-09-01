@@ -1512,6 +1512,83 @@ function limpiarRefrendo() {
     localStorage.removeItem('GU_m05_a_m08');
   }
 })();
+
+// ── HISTORIAL DE CÁLCULOS ──────────────────────────────────────────────────────
+var HIST_KEY = 'GU_m08_historial';
+var HIST_MAX = 5;
+
+function _escH(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function guardarEnHistorial() {
+  var panel = document.getElementById('result-panel');
+  if (!panel || panel.style.display === 'none') {
+    alert('Primero realiza un cálculo antes de guardar.');
+    return;
+  }
+  var nombre = (document.getElementById('inp-hist-nombre').value || '').trim();
+  if (!nombre) {
+    document.getElementById('inp-hist-nombre').focus();
+    return;
+  }
+  var titulo  = document.getElementById('result-titulo').textContent;
+  var sub     = document.getElementById('result-sub').textContent;
+  var totalEl = document.querySelector('#tabla-result .total-row td.right');
+  var total   = totalEl ? totalEl.textContent.trim() : '';
+  var html    = panel.innerHTML;
+  var fecha   = new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+
+  var hist = JSON.parse(localStorage.getItem(HIST_KEY)||'[]');
+  hist.unshift({ nombre:nombre, titulo:titulo, sub:sub, total:total, fecha:fecha, html:html });
+  if (hist.length > HIST_MAX) hist.length = HIST_MAX;
+  localStorage.setItem(HIST_KEY, JSON.stringify(hist));
+  document.getElementById('inp-hist-nombre').value = '';
+  renderHistorial();
+}
+
+function renderHistorial() {
+  var hist  = JSON.parse(localStorage.getItem(HIST_KEY)||'[]');
+  var sec   = document.getElementById('hist-section');
+  var lista = document.getElementById('hist-lista');
+  if (!sec || !lista) return;
+  if (hist.length === 0) { sec.style.display = 'none'; return; }
+  sec.style.display = '';
+  lista.innerHTML = hist.map(function(e,i){
+    return '<div class="hist-card">'
+      +'<div>'
+        +'<div class="hist-nombre">'+_escH(e.nombre)+'</div>'
+        +'<div class="hist-sub">'+_escH(e.sub)+(e.total?' &mdash; <strong>'+_escH(e.total)+'</strong>':'')+'</div>'
+        +'<div class="hist-sub" style="margin-top:2px;color:var(--text3);font-size:10px">'+_escH(e.fecha)+'</div>'
+      +'</div>'
+      +'<div class="hist-btns">'
+        +'<button class="btn-hist-load" onclick="cargarDesdeHistorial('+i+')">Cargar</button>'
+        +'<button class="btn-hist-del" onclick="borrarDeHistorial('+i+')">&times;</button>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+function cargarDesdeHistorial(idx) {
+  var hist = JSON.parse(localStorage.getItem(HIST_KEY)||'[]');
+  var e = hist[idx];
+  if (!e) return;
+  var panel = document.getElementById('result-panel');
+  panel.innerHTML = e.html;
+  panel.style.display = '';
+  var btnReset = document.getElementById('btn-reset');
+  if (btnReset) btnReset.style.display = '';
+  panel.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function borrarDeHistorial(idx) {
+  var hist = JSON.parse(localStorage.getItem(HIST_KEY)||'[]');
+  hist.splice(idx,1);
+  localStorage.setItem(HIST_KEY, JSON.stringify(hist));
+  renderHistorial();
+}
+
+document.addEventListener('DOMContentLoaded', renderHistorial);
 </script>
 
 <!-- WIDGET FEEDBACK TRAZA URBANA — no modificar manualmente -->

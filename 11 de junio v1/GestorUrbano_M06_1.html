@@ -285,6 +285,14 @@ details.ccf-details .ccf-body { padding: 12px 14px; background: #fafafa; color: 
 
 <div class="wrap">
 
+  <!-- ── HISTORIAL — visible al inicio si hay consultas guardadas ──── -->
+  <div class="hist-section" id="hist-section">
+    <div class="hist-title">&#128337; Consultas guardadas</div>
+    <div class="hist-cards" id="hist-cards">
+      <div class="hist-empty" id="hist-empty">Sin consultas guardadas aún.</div>
+    </div>
+  </div><!-- /hist-section -->
+
   <div style="margin-bottom:22px">
     <div style="font-size:23px;font-weight:700;color:var(--text1)">Licencia de Funcionamiento</div>
     <div style="font-size:13px;color:var(--text2);margin-top:5px">Requisitos y derechos para operar un giro comercial, industrial o de servicios &mdash; GDL y Zapopan 2026</div>
@@ -303,13 +311,6 @@ details.ccf-details .ccf-body { padding: 12px 14px; background: #fafafa; color: 
       <button class="muni-btn" id="btn-ton" onclick="selMun(101,'TON',this)">Tonalá</button>
     </div>
   </div>
-    <!-- ── HISTORIAL ───────────────────────────────────────────────── -->
-    <div class="hist-section" id="hist-section">
-      <div class="hist-title">&#128337; Consultas guardadas</div>
-      <div class="hist-cards" id="hist-cards">
-        <div class="hist-empty" id="hist-empty">Sin consultas guardadas aún.</div>
-      </div>
-    </div><!-- /hist-section -->
 
 
 <div id="form-gdl">
@@ -2233,6 +2234,76 @@ function guToggleTheme() {
   if (lbl) lbl.textContent = t === 'dark' ? 'Modo claro' : 'Modo oscuro';
 })();
 
+// ── HISTORIAL DE CONSULTAS ───────────────────────────────────────────
+var HIST_KEY_M06 = 'GU_m06_historial';
+var HIST_MAX_M06 = 5;
+
+function _escHistM06(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function histGuardar() {
+  var input  = document.getElementById('hist-nombre-inp');
+  var nombre = (input && input.value || '').trim();
+  if (!nombre) { if (input) input.focus(); return; }
+  var panel = document.getElementById('result-panel');
+  if (!panel) return;
+
+  var titulo = (document.getElementById('res-titulo')||{}).textContent || '';
+  var sub    = (document.getElementById('res-subtitulo')||{}).textContent || '';
+  var fecha  = new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+
+  var hist = JSON.parse(localStorage.getItem(HIST_KEY_M06)||'[]');
+  hist.unshift({ nombre:nombre, sub:sub, fecha:fecha, html:panel.innerHTML });
+  if (hist.length > HIST_MAX_M06) hist.length = HIST_MAX_M06;
+  localStorage.setItem(HIST_KEY_M06, JSON.stringify(hist));
+
+  input.value = '';
+  var sm = document.getElementById('hist-saved-msg');
+  if (sm) { sm.style.display = 'block'; setTimeout(function(){ sm.style.display = 'none'; }, 2500); }
+  histRender();
+}
+
+function histRender() {
+  var hist = JSON.parse(localStorage.getItem(HIST_KEY_M06)||'[]');
+  var cont = document.getElementById('hist-cards');
+  if (!cont) return;
+  if (!hist.length) {
+    cont.innerHTML = '<div class="hist-empty" id="hist-empty">Sin consultas guardadas aún.</div>';
+    return;
+  }
+  cont.innerHTML = hist.map(function(e, i) {
+    return '<div class="hist-card" onclick="histCargar('+i+')">'
+      +'<div class="hist-card-ico">💼</div>'
+      +'<div class="hist-card-body">'
+        +'<div class="hist-card-nom">'+_escHistM06(e.nombre)+'</div>'
+        +'<div class="hist-card-sub">'+_escHistM06(e.sub)+' · '+_escHistM06(e.fecha)+'</div>'
+      +'</div>'
+      +'<button class="hist-card-del" onclick="event.stopPropagation();histBorrar('+i+')" title="Eliminar">×</button>'
+    +'</div>';
+  }).join('');
+}
+
+function histCargar(idx) {
+  var hist = JSON.parse(localStorage.getItem(HIST_KEY_M06)||'[]');
+  var e = hist[idx];
+  if (!e) return;
+  var panel = document.getElementById('result-panel');
+  panel.innerHTML = e.html;
+  panel.style.display = 'block';
+  var btnNuevo = document.getElementById('btn-nuevo');
+  if (btnNuevo) btnNuevo.style.display = '';
+  panel.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function histBorrar(idx) {
+  var hist = JSON.parse(localStorage.getItem(HIST_KEY_M06)||'[]');
+  hist.splice(idx,1);
+  localStorage.setItem(HIST_KEY_M06, JSON.stringify(hist));
+  histRender();
+}
+
+histRender();
 
 // ── LISTA DE GIROS ZPN ──────────────────────────────────────────────
 

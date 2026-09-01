@@ -650,6 +650,19 @@ input[type=range]::-webkit-slider-thumb{
   <!-- ═══════════════════ PANEL DERECHO ═══════════════════ -->
   <div class="gu-panel-right">
 
+    <!-- Historial M10 — visible al inicio, sin necesidad de buscar un predio antes -->
+    <div id="m10HistPanel" style="display:none;margin-bottom:14px">
+      <div class="m10-hist-header" onclick="m10ToggleHistorial()">
+        <span style="font-size:14px">🕐</span>
+        <span style="font-size:12px;font-weight:600;color:var(--text1)">Análisis guardados</span>
+        <span class="m10-hist-header-count" id="m10HistCount">0</span>
+        <span class="m10-hist-chevron" id="m10HistChevron">▼</span>
+      </div>
+      <div id="m10HistBody" style="display:none;padding-top:8px">
+        <div id="m10HistLista"></div>
+      </div>
+    </div>
+
     <!-- Mapa resultado — FIJO, no se destruye con innerHTML -->
     <div id="mapaContainer" style="display:none">
       <div class="gu-mapa-card">
@@ -759,18 +772,6 @@ input[type=range]::-webkit-slider-thumb{
           <div id="m10NombreGuardadoMsg" style="display:none;font-size:10px;color:var(--sem-v-txt);margin-top:5px">✅ Guardado en el historial.</div>
         </div>
 
-        <!-- Historial M10 -->
-        <div id="m10HistPanel" style="display:none;margin-top:10px">
-          <div class="m10-hist-header" onclick="m10ToggleHistorial()">
-            <span style="font-size:14px">🕐</span>
-            <span style="font-size:12px;font-weight:600;color:var(--text1)">Análisis guardados</span>
-            <span class="m10-hist-header-count" id="m10HistCount">0</span>
-            <span class="m10-hist-chevron" id="m10HistChevron">▼</span>
-          </div>
-          <div id="m10HistBody" style="display:none;padding-top:8px">
-            <div id="m10HistLista"></div>
-          </div>
-        </div>
       </div>
     </div>
   </div><!-- /panel-right -->
@@ -6627,9 +6628,17 @@ function m10ReabrirHistEntry(idx){
   const hist  = m10CargarHistorial();
   const entry = hist[idx];
   if(!entry || !entry.r_completo) return;
-  // Restaurar contexto mínimo para que m10RenderizarVeredicto funcione
-  if(entry.zona_guardada) window._m10ZonaGuardada = entry.zona_guardada;
+  // Restaurar contexto real (no solo mínimo) para que m10RenderizarVeredicto
+  // y una eventual exportación a PDF usen los datos DE ESTE predio guardado,
+  // no los de datosZona/municipioActual que hayan quedado de otra sesión.
+  if(entry.zona_guardada) datosZona = entry.zona_guardada;
+  if(entry.municipio)     municipioActual = entry.municipio;
+  if(entry.domicilio)     window._ultimaDireccion = entry.domicilio;
+  const sec = document.getElementById('seccionPlanoM10');
+  if(sec) sec.style.display = 'block';
   m10RenderizarVeredicto(entry.r_completo, true); // true = no re-guardar
+  const veredictoEl = document.getElementById('m10Veredicto');
+  if(veredictoEl) veredictoEl.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function m10GuardarNombreHistorial(){

@@ -373,7 +373,7 @@ details.ccf-details .ccf-body { padding: 12px 14px; background: #fafafa; color: 
 
     <!-- Botones GDL -->
     <div class="btn-actions">
-      <button class="btn-calc" onclick="calcularGDL()">Calcular requisitos y derechos</button>
+      <button class="btn-calc" id="btn-calc-gdl" onclick="calcularGDL()">Calcular requisitos y derechos</button>
       <button class="btn-limpiar" onclick="nuevoAnalisis()">&#10005; Limpiar</button>
     </div>
 
@@ -1091,7 +1091,7 @@ details.ccf-details .ccf-body { padding: 12px 14px; background: #fafafa; color: 
 
     <!-- Botones ZPN -->
     <div class="btn-actions">
-      <button class="btn-calc" onclick="calcularZPN()">Calcular requisitos y derechos</button>
+      <button class="btn-calc" id="btn-calc-zpn" onclick="calcularZPN()">Calcular requisitos y derechos</button>
       <button class="btn-limpiar" onclick="nuevoAnalisis()">&#10005; Limpiar</button>
     </div>
 
@@ -1161,7 +1161,7 @@ details.ccf-details .ccf-body { padding: 12px 14px; background: #fafafa; color: 
 
     <!-- Botones -->
     <div class="btn-actions">
-      <button class="btn-calc" onclick="calcularMunGen()">Calcular requisitos y derechos</button>
+      <button class="btn-calc" id="btn-calc-mun" onclick="calcularMunGen()">Calcular requisitos y derechos</button>
       <button class="btn-limpiar" onclick="nuevoAnalisis()">&#10005; Limpiar</button>
     </div>
 
@@ -3851,6 +3851,29 @@ window.addEventListener('load', function() {
 </div>
 <script>
 (function(){var form=document.getElementById('gu-fb-form');if(!form)return;form.addEventListener('submit',function(e){e.preventDefault();var btn=document.getElementById('gu-fb-send');btn.disabled=true;btn.textContent='Enviando...';document.getElementById('gu-fb-err').style.display='none';fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}}).then(function(r){if(r.ok){form.style.display='none';document.getElementById('gu-fb-ok').style.display='block';setTimeout(function(){document.getElementById('gu-fb-overlay').style.display='none';form.style.display='block';form.reset();document.getElementById('gu-fb-ok').style.display='none';btn.disabled=false;btn.textContent='Enviar comentario';},3000);}else{document.getElementById('gu-fb-err').style.display='block';btn.disabled=false;btn.textContent='Enviar comentario';}}).catch(function(){document.getElementById('gu-fb-err').style.display='block';btn.disabled=false;btn.textContent='Enviar comentario';});});})();
+</script>
+<script>
+/* #4 loading state — botones de calculo */
+(function(){
+  function _wrapCalc(btnId, fn, label) {
+    var btn = document.getElementById(btnId);
+    if (!btn) return;
+    btn.removeAttribute('onclick');
+    btn.addEventListener('click', function() {
+      btn.disabled = true;
+      btn.textContent = 'Calculando\u2026';
+      setTimeout(function() {
+        try { fn(); }
+        finally { btn.disabled = false; btn.textContent = label; }
+      }, 20);
+    });
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    _wrapCalc('btn-calc-gdl', calcularGDL,    'Calcular requisitos y derechos');
+    _wrapCalc('btn-calc-zpn', calcularZPN,    'Calcular requisitos y derechos');
+    _wrapCalc('btn-calc-mun', calcularMunGen, 'Calcular requisitos y derechos');
+  });
+})();
 </script>
 <!-- /WIDGET FEEDBACK -->
 </html

@@ -1551,6 +1551,24 @@ function limpiarRefrendo() {
 <script>
 (function(){var form=document.getElementById('gu-fb-form');if(!form)return;form.addEventListener('submit',function(e){e.preventDefault();var btn=document.getElementById('gu-fb-send');btn.disabled=true;btn.textContent='Enviando...';document.getElementById('gu-fb-err').style.display='none';fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}}).then(function(r){if(r.ok){form.style.display='none';document.getElementById('gu-fb-ok').style.display='block';setTimeout(function(){document.getElementById('gu-fb-overlay').style.display='none';form.style.display='block';form.reset();document.getElementById('gu-fb-ok').style.display='none';btn.disabled=false;btn.textContent='Enviar comentario';},3000);}else{document.getElementById('gu-fb-err').style.display='block';btn.disabled=false;btn.textContent='Enviar comentario';}}).catch(function(){document.getElementById('gu-fb-err').style.display='block';btn.disabled=false;btn.textContent='Enviar comentario';});});})();
 </script>
+<script>
+/* #4 loading state — boton de calculo */
+(function(){
+  document.addEventListener('DOMContentLoaded', function() {
+    var btn = document.getElementById('btn-calcular');
+    if (!btn) return;
+    btn.removeAttribute('onclick');
+    btn.addEventListener('click', function() {
+      btn.disabled = true;
+      btn.textContent = 'Calculando\u2026';
+      setTimeout(function() {
+        try { calcular(); }
+        finally { btn.disabled = false; btn.textContent = '\ud83d\udcb0 Calcular derechos'; }
+      }, 20);
+    });
+  });
+})();
+</script>
 <!-- /WIDGET FEEDBACK -->
 </body>
 </html>

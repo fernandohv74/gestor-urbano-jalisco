@@ -1275,6 +1275,28 @@ function borrarCorrida(idx){
 <script>
 (function(){var form=document.getElementById('gu-fb-form');if(!form)return;form.addEventListener('submit',function(e){e.preventDefault();var btn=document.getElementById('gu-fb-send');btn.disabled=true;btn.textContent='Enviando...';document.getElementById('gu-fb-err').style.display='none';fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}}).then(function(r){if(r.ok){form.style.display='none';document.getElementById('gu-fb-ok').style.display='block';setTimeout(function(){document.getElementById('gu-fb-overlay').style.display='none';form.style.display='block';form.reset();document.getElementById('gu-fb-ok').style.display='none';btn.disabled=false;btn.textContent='Enviar comentario';},3000);}else{document.getElementById('gu-fb-err').style.display='block';btn.disabled=false;btn.textContent='Enviar comentario';}}).catch(function(){document.getElementById('gu-fb-err').style.display='block';btn.disabled=false;btn.textContent='Enviar comentario';});});})();
 </script>
+<script>
+/* #4 loading state — boton corrida financiera */
+(function(){
+  document.addEventListener('DOMContentLoaded', function() {
+    var btn = document.getElementById('pro-calc-btn');
+    if (!btn) return;
+    var sp = btn.querySelector('span');
+    btn.removeAttribute('onclick');
+    btn.addEventListener('click', function() {
+      btn.disabled = true;
+      if (sp) sp.textContent = 'Calculando\u2026';
+      setTimeout(function() {
+        try { proCalcular(); }
+        finally {
+          btn.disabled = false;
+          if (sp) sp.textContent = 'Calcular corrida financiera';
+        }
+      }, 20);
+    });
+  });
+})();
+</script>
 <!-- /WIDGET FEEDBACK -->
 </body>
 </html>

@@ -398,14 +398,14 @@ function guToggleTheme(){
             <input type="number" id="inp-refrendo" min="1" max="120" placeholder="ej. 6" oninput="calcularRefrendo()" style="flex:1">
             <button class="btn-clear-rf" onclick="limpiarRefrendo()" title="Limpiar refrendo">✕ Limpiar</button>
           </div>
-          <div id="ref-art9-row" style="display:none;margin-top:8px">
-            <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text2);cursor:pointer">
-              <input type="checkbox" id="inp-refrendo-5a" onchange="calcularRefrendo()" style="cursor:pointer">
-              &#128073; Da clic aqu&iacute; si tu licencia tiene m&aacute;s de 5 a&ntilde;os &mdash; cambia la tasa a 5%/mes (Art.&nbsp;9 Fracc.&nbsp;II)
-            </label>
-          </div>
         </div>
         <div class="refrendo-result" id="refrendo-result" style="display:none"></div>
+      </div>
+      <div id="ref-art9-row" style="display:none;margin-top:8px">
+        <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text2);cursor:pointer">
+          <input type="checkbox" id="inp-refrendo-5a" onchange="calcularRefrendo()" style="cursor:pointer">
+          &#128073; Da clic aqu&iacute; si tu licencia tiene m&aacute;s de 5 a&ntilde;os &mdash; cambia la tasa a 5%/mes (Art.&nbsp;9 Fracc.&nbsp;II)
+        </label>
       </div>
     </div>
 

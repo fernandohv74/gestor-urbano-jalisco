@@ -225,11 +225,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   body { background:#fff !important; color:#111 !important; font-size:10pt; }
   .wrap { padding:0 !important; max-width:100% !important; }
   /* Impresión general: todas las secciones */
-  #section-dir, #section-glo, #section-fue { display:block !important; }
+  #section-dir, #section-glo { display:block !important; }
   /* Impresión por sección: solo la que tiene print-target */
   body.printing-section #section-dir:not(.print-target),
   body.printing-section #section-glo:not(.print-target),
-  body.printing-section #section-fue:not(.print-target) { display:none !important; }
   body.printing-section .print-target { display:block !important; }
   .entry-card { break-inside:avoid; border:1px solid #ccc !important; box-shadow:none !important; }
   .card-head { background:#1A2744 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
@@ -291,9 +290,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <button class="tab-btn" id="tab-glo" onclick="switchTab('glo')">
       📖 Glosario<span class="tab-count" id="cnt-glo">44</span>
     </button>
-    <button class="tab-btn" id="tab-fue" onclick="switchTab('fue')">
-      📚 Fuentes
-    </button>
   </div>
 
   <!-- DIRECTORIO SECTION -->
@@ -331,140 +327,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <div class="empty-msg" id="empty-glo" style="display:none"><span>🔍</span>Sin resultados para esa búsqueda.</div>
   </div>
 
-  <!-- FUENTES SECTION -->
-  <div id="section-fue" style="display:none">
-    <div class="sec-top-bar" style="margin-bottom:16px;">
-      <span class="sec-desc">Fuentes normativas, planes, portales y APIs utilizados como base de datos para todos los módulos de TrazaUrbana AMG.</span>
-      <button class="btn-print-sec" onclick="imprimirSeccion('fue')" title="Imprimir solo las Fuentes">🖨️ Imprimir Fuentes</button>
-    </div>
-
-    <!-- Reglamentos y Leyes -->
-    <div class="fue-group">
-      <div class="fue-header" onclick="toggleFue(this)">
-        <span>📜 Reglamentos y Leyes</span><span class="fue-arrow">▼</span>
-      </div>
-      <div class="fue-body">
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/reglamentos" target="_blank">Código de Edificación del Municipio de Guadalajara</a><span class="fue-mod">M01 M03 M05 M08</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/reglamentos" target="_blank">Código de Gobierno Municipal de Guadalajara — Art. 260 (Medio Ambiente), Art. 261 (Movilidad)</a><span class="fue-mod">M07</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://retys.zapopan.gob.mx/regulaciones/117/detalle" target="_blank">Código Ambiental para el Municipio de Zapopan</a><span class="fue-mod">M07</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://retys.zapopan.gob.mx/regulaciones/139/detalle" target="_blank">Ley de Catastro Municipal del Estado de Jalisco (aplicación Zapopan)</a><span class="fue-mod">M07 M08</span></div>
-        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://www.zapopan.gob.mx/wp-content/uploads/2021/07/Reglamento_Estatal_de_Zonificacion_29052003.pdf" target="_blank">Reglamento de Zonificación del Estado de Jalisco (pub. 29 may 2003, vía portal Zapopan)</a><span class="fue-mod">M01 M03 M04</span></div>
-        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://semadet.jalisco.gob.mx" target="_blank">Ley Estatal del Equilibrio Ecológico y la Protección al Ambiente (LEEPA)</a><span class="fue-mod">M07</span></div>
-        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://info.jalisco.gob.mx" target="_blank">Ley de Desarrollo Urbano del Estado de Jalisco</a><span class="fue-mod">M01 M03</span></div>
-        <div class="fue-item"><span class="fue-tag fue-fed">Federal</span><a href="https://www.diputados.gob.mx" target="_blank">Ley General de Asentamientos Humanos, Ordenamiento Territorial y Desarrollo Urbano (LGAHOTDU)</a><span class="fue-mod">M01 M02 M03</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/reglamentos" target="_blank">Reglamento de Gestión del Desarrollo Urbano para el Municipio de Guadalajara</a><span class="fue-mod">M01 M02 M03 M05 M10</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/reglamentos" target="_blank">Reglamento de Zonificación Urbana del Municipio de Guadalajara</a><span class="fue-mod">M01 M02 M03 M04</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/reglamentos" target="_blank">Reglamento para la Gestión Integral del Municipio de Guadalajara — última reforma: 10 abr 2025, publicada 30 abr 2025 en Gaceta Municipal — Arts. 50 VIII (escaleras no computan CUS), 50 Ter (rejilla herrería sí computa), XII Bis / XIII Bis (ICOS/ICUS), Arts. 32, 89 Ter, 149 Ter, 157, 159 Bis, 161, 190, 241, 249 Bis, 273, 276, 278, 1332-1336</a><span class="fue-mod">M02 M03 M04 M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/reglamentos" target="_blank">Reglamento para el Funcionamiento de Giros Comerciales, Industriales y de Prestación de Servicios — Municipio de Guadalajara (últ. reforma 2023)</a><span class="fue-mod">M02 M06</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLQ</span><a href="https://transparencia.info.jalisco.gob.mx" target="_blank">Reglamento para el Funcionamiento de Establecimientos Comerciales, Industriales y de Prestación de Servicios — Municipio de San Pedro Tlaquepaque (aprobado 11 abr 2019, últ. reforma 31 oct 2023)</a><span class="fue-mod">M06</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><a href="https://tlajomulco.gob.mx/reglamentos" target="_blank">Reglamento para el Funcionamiento de Giros Comerciales, Industriales y de Prestación de Servicios del Municipio de Tlajomulco de Zúñiga (aprobado 2014, últ. reforma 4 jun 2021) — Arts. 13 Ter (SARE), 15 (vigencia/refrendo), 29 (requisitos apertura)</a><span class="fue-mod">M06</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TON</span><a href="https://transparencia.info.jalisco.gob.mx" target="_blank">Código Municipal de Comercio para el Municipio de Tonalá, Jalisco (Acuerdo 135 — 2025) — Arts. 5 (Consejo de Giros Restringidos), 8 y 12 (vigencia indefinida / pago anual)</a><span class="fue-mod">M06</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://movilidad.guadalajara.gob.mx" target="_blank">Reglamento de Movilidad, Transporte y Seguridad Vial de Guadalajara — Arts. 73, 74, 76 (Dictamen de Movilidad / Impacto Vial)</a><span class="fue-mod">M04 M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://retys.zapopan.gob.mx/regulaciones" target="_blank">Norma Técnica de Accesibilidad Universal para el Municipio de Zapopan (GMZ 13/12/2019)</a><span class="fue-mod">M04 M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><a href="https://tlajomulco.gob.mx/reglamentos" target="_blank">Reglamento Municipal de Zonificación de Tlajomulco de Zúñiga (publicado 21/11/2014)</a><span class="fue-mod">M01 M03 M04</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLQ</span><a href="https://transparencia.info.jalisco.gob.mx/sites/default/files/Reglamento%20de%20Construcciones%20en%20el%20Municipio%20de%20Tlaquepaque,%20Jalisco.pdf" target="_blank">Reglamento de Construcciones del Municipio de San Pedro Tlaquepaque, Jalisco</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLQ</span><a href="https://www.tlaquepaque.gob.mx/assets/cargas/general/REGLAMENTO%20DE%20MOVILIDAD,%20TRANSPORTE,%20ESTACIONAMIENTO%20Y%20SEGURIDAD%20VIAL%20PARA%20EL%20MUNICIPIO%20DE%20SAN%20PEDRO%20TLAQUEPAQUE,%20JALISCO-.docx" target="_blank">Reglamento de Movilidad, Transporte, Estacionamiento y Seguridad Vial — San Pedro Tlaquepaque — Art. 28 (usos comerciales, servicios, industriales y equipamiento → dictamen integración vial)</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLQ</span><a href="https://transparencia.info.jalisco.gob.mx/sites/default/files/Reglamento%20Municipal%20del%20Equilibrio%20Ecol%C3%B3gico%20y%20la%20Protecci%C3%B3n%20al%20Ambiente%20del%20Municipio%20de%20Tlaquepaque.pdf" target="_blank">Reglamento Municipal del Equilibrio Ecológico y la Protección al Ambiente — Tlaquepaque — Arts. 5, 18–20 (evaluación de impacto ambiental vinculada a licencias)</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><a href="https://www.tlajomulco.gob.mx/sites/default/files/transparencia/reglamentos/Reglamento-de-Construccion-y-Normas-Tecnicas-24oct17-31oct19.pdf" target="_blank">Reglamento de Construcción y Normas Técnicas — Tlajomulco de Zúñiga (oct. 2019)</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><a href="https://tlajomulco.gob.mx/sites/default/files/transparencia/reglamentos/ReglamentoMovilidadSeguridadVial-23Jun2024.pdf" target="_blank">Reglamento de Movilidad y Seguridad Vial — Tlajomulco de Zúñiga (jun. 2024) — Art. 56 (usos comerciales, servicios, industriales y equipamiento → dictamen DGM), Art. 10 Bis, Art. 53 Bis</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><a href="https://tlajomulco.gob.mx/sites/default/files/transparencia/reglamentos/8IIImarconormativoReglamentoDeProteccionAmbientalCambioclimaticoydesarrolloSustentableaprobadoypublicado-05nov21.pdf" target="_blank">Reglamento de Protección Ambiental, Cambio Climático y Desarrollo Sustentable — Tlajomulco (nov. 2021) — Art. 27 Fracc. I (uso no habitacional &gt;500 m² → dictamen impacto ambiental)</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TON</span><a href="https://www.tonala.gob.mx/portal/assets/reglamento_de_construccion.pdf" target="_blank">Reglamento de Construcción — Tonalá, Jalisco — Art. 77 Fracc. IV (dictamen de impacto ambiental como requisito de licencia cuando lo exija la ley aplicable)</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TON</span><a href="https://portal-transparencia.tonala.gob.mx/wp-content/uploads/2024/10/ACUERDOS-1186-Y-1203-REGLAMENTO-DE-MOVILIDAD-SEGURIDAD-VIAL-Y-TRANSPORTE-DEL-MUNICIPIO-DE-TONALA-JALISCO.docx" target="_blank">Reglamento de Movilidad, Seguridad Vial y Transporte — Tonalá (Acuerdos 1186 y 1203, oct. 2024) — Art. 31 Fracc. III (dictamen impacto al tránsito para nuevos desarrollos), Art. 33 (gaseras / gasolineras)</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TON</span><a href="http://siga.jalisco.gob.mx/assets/pdf/leyes/reglaproambientetonala.pdf" target="_blank">Reglamento de Protección al Ambiente — Tonalá, Jalisco (vía SIGA Jalisco)</a><span class="fue-mod">M05</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://www.zapopan.gob.mx/wp-content/uploads/2016/11/Reglamento-para-el-Ejercicio-de-Giros-Comerciales-y-de-Prestaciones-de-Servicios-para-el-Municipio-de-Zapopan-Jalisco.pdf" target="_blank">Reglamento para el Ejercicio de Giros Comerciales y de Prestaciones de Servicios del Municipio de Zapopan, Jalisco (últ. reforma 2016)</a><span class="fue-mod">M02 M06</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://portal.zapopan.gob.mx/ordenamiento/normatividad.html" target="_blank">Reglamento de Desarrollo Urbano y Ordenamiento del Territorio del Municipio de Zapopan, Jalisco (2012) — sin equivalente al Art. 29 RGIM GDL; zonificación por COS/CUS según PPDU</a><span class="fue-mod">M01 M02 M03</span></div>
-      </div>
-    </div>
-
-    <!-- Leyes de Ingresos (Tarifas) -->
-    <div class="fue-group">
-      <div class="fue-header" onclick="toggleFue(this)">
-        <span>💰 Leyes de Ingresos — Tarifas y Derechos 2026</span><span class="fue-arrow">▼</span>
-      </div>
-      <div class="fue-body">
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://catastro.guadalajara.gob.mx/leyes/LeyIngresos2026.pdf" target="_blank">Ley de Ingresos del Municipio de Guadalajara 2026 — Arts. 17 (PC), 44/46/47 (giros/alcohol/anuncios), 64/74 (construcción/forma valorada)</a><span class="fue-mod">M05 M06 M08 M10</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://transparencia.info.jalisco.gob.mx" target="_blank">Ley de Ingresos del Municipio de Zapopan 2026 — Arts. 77 (tarifas SCIAN alcohol), 93 Fracc. XXII (PC/Bomberos), tarifas de construcción y derechos</a><span class="fue-mod">M06 M08 M10</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLQ</span><a href="https://transparencia.info.jalisco.gob.mx" target="_blank">Ley de Ingresos del Municipio de San Pedro Tlaquepaque 2026 — Arts. 51 (alcohol), 52 (giros comunes $277), 63 (construcción), 64 (alineamiento), XXIV (PC/Bomberos)</a><span class="fue-mod">M06 M08</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><a href="https://congresoweb.congresojal.gob.mx/bibliotecavirtual/legislacion/Ingresos/Documentos_PDF-Ingresos/Ley%20de%20Ingresos%20del%20Municipio%20de%20Tlajomulco%20de%20Z%C3%BA%C3%B1iga,%20Jalisco%20para%20el%20ejercicio%20fiscal%202026-160626.pdf" target="_blank">Ley de Ingresos del Municipio de Tlajomulco de Zúñiga 2026 (Decreto 30157/LXIV/26, pub. 16 jun 2026) — Arts. 40 (INJI 1.25%), 78 (alcohol), 82 (construcción: hab $191/m², comercio $214/m², industria $143/m²; demolición 20%, remodelación 50%, prórroga 10%/bimestre), 86 (alineamiento: hab $130/ml, no hab $250/ml; nº oficial $383), 122 Fracc. XII (habitabilidad 10% licencia), XXXIX Fracc. l) (PC/Bomberos giros)</a><span class="fue-mod">M06 M08 M10</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TON</span><a href="https://transparencia.info.jalisco.gob.mx" target="_blank">Ley de Ingresos del Municipio de Tonalá 2026 — Arts. 61 (alcohol), 64 (construcción), 78 Fracc. ñ) (PC/Bomberos giros)</a><span class="fue-mod">M06 M08 M10</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://catastro.guadalajara.gob.mx/tabladevalores/tablasdevaloresguadalajara2026.pdf" target="_blank">Tablas de Valores Catastrales Guadalajara 2026</a><span class="fue-mod">M08</span></div>
-      </div>
-    </div>
-
-    <!-- Planes y Programas -->
-    <div class="fue-group">
-      <div class="fue-header" onclick="toggleFue(this)">
-        <span>🗺️ Planes de Desarrollo Urbano</span><span class="fue-arrow">▼</span>
-      </div>
-      <div class="fue-body">
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/contenido/pmdu" target="_blank">Plan de Desarrollo Urbano de Centro de Población — Guadalajara (PDUCP)</a><span class="fue-mod">M01 M03</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://portal.zapopan.gob.mx/ordenamiento/normatividad.html" target="_blank">Plan de Desarrollo Urbano Zapopan ZPN-01 2023 y sus 12 Planes Parciales (ZPN-01 a ZPN-12) — Normas de edificación calibradas para todos los distritos: MV1-MV4, MB/MD/MC, MR, APD/CPD y zonas especiales TC (ZPN-4/12), MVJ (ZPN-9), GH (ZPN-12), CS-C* PPE</a><span class="fue-mod">M01 M03</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLQ</span><a href="https://transparencia.info.jalisco.gob.mx" target="_blank">Plan Municipal de Desarrollo Urbano Tlaquepaque</a><span class="fue-mod">M01 M03</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TLA</span><a href="https://tlajomulco.gob.mx" target="_blank">Plan Municipal de Desarrollo Urbano Tlajomulco de Zúñiga</a><span class="fue-mod">M01 M03</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal TON</span><a href="https://transparencia.info.jalisco.gob.mx" target="_blank">Plan Municipal de Desarrollo Urbano Tonalá</a><span class="fue-mod">M01 M03</span></div>
-        <div class="fue-item"><span class="fue-tag fue-metro">Metropolitano</span><a href="https://www.imeplan.mx/wp-content/uploads/2021/12/POTmet_IIIFB-BajaRes-1.pdf" target="_blank">Plan de Ordenamiento Territorial Metropolitano del AMG — POTmet 2042 (IMEPLAN)</a><span class="fue-mod">M01 M03 M07 M10</span></div>
-      </div>
-    </div>
-
-    <!-- Portales Oficiales -->
-    <div class="fue-group">
-      <div class="fue-header" onclick="toggleFue(this)">
-        <span>🌐 Portales Oficiales Consultados</span><span class="fue-arrow">▼</span>
-      </div>
-      <div class="fue-body">
-        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://visorurbano.com/mapa/" target="_blank">Visor Urbano Jalisco — Consulta de zonificación y uso de suelo</a><span class="fue-mod">M01</span></div>
-        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://geoserver.jalisco.gob.mx" target="_blank">GeoServer Jalisco — WMS/WFS de capas urbanas y catastrales</a><span class="fue-mod">M01</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://mapa.zapopan.gob.mx/arcgis/rest/services/PPDU/PPDU_estrategias/MapServer" target="_blank">ArcGIS REST Services Zapopan — PPDU Estrategias (consulta de zonificación ZPN)</a><span class="fue-mod">M01</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://catastro.guadalajara.gob.mx" target="_blank">Catastro Guadalajara — Valores, avalúos y consultas catastrales</a><span class="fue-mod">M08 M07</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://portal.zapopan.gob.mx/ordenamiento/directorio.html" target="_blank">Ordenamiento del Territorio Zapopan — Directorio y trámites (CISZ)</a><span class="fue-mod">M07</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://portal.zapopan.gob.mx/pylc/directorio.html" target="_blank">Permisos y Licencias de Construcción Zapopan</a><span class="fue-mod">M05 M08</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://portal.zapopan.gob.mx/movilidad/directorio.html" target="_blank">Movilidad y Transporte Zapopan — Directorio oficial</a><span class="fue-mod">M07</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://portal.zapopan.gob.mx/medioambiente/directorio.html" target="_blank">Medio Ambiente Zapopan — Directorio oficial (Unidad El Vergel)</a><span class="fue-mod">M07</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://obraspublicas.guadalajara.gob.mx" target="_blank">Obras Públicas Guadalajara — Portal oficial</a><span class="fue-mod">M07</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://retys.zapopan.gob.mx" target="_blank">RETyS Zapopan — Regulaciones, Trámites y Servicios</a><span class="fue-mod">M06 M07</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://retys.zapopan.gob.mx/tramites/34/detalle" target="_blank">RETyS ZPN Trámite 34 — Dictamen de Trazo, Usos y Destinos Específicos (DTUDE) · $1,804 total ($1,495 trámite + $309 formato)</a><span class="fue-mod">M05 M06</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://retys.zapopan.gob.mx/tramites/29/detalle" target="_blank">RETyS ZPN Trámite 29 — DTUDE (referencia alterna / formato oficial)</a><span class="fue-mod">M05 M06</span></div>
-        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://transparencia.info.jalisco.gob.mx" target="_blank">Portal de Transparencia Jalisco — Directorio de dependencias</a><span class="fue-mod">M07</span></div>
-        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://proteccioncivil.jalisco.gob.mx" target="_blank">Unidad Estatal de Protección Civil y Bomberos Jalisco</a><span class="fue-mod">M07</span></div>
-        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://tonala.gob.mx/portal/coordinacion-del-gabinete-de-seguridad-prevencion-y-servicios-de-emergencia/" target="_blank">Protección Civil y Bomberos Tonalá — Coordinación de Gabinete de Seguridad</a><span class="fue-mod">M07</span></div>
-      </div>
-    </div>
-
-    <!-- APIs -->
-    <div class="fue-group">
-      <div class="fue-header" onclick="toggleFue(this)">
-        <span>⚙️ APIs y Servicios Técnicos</span><span class="fue-arrow">▼</span>
-      </div>
-      <div class="fue-body">
-        <div class="fue-item"><span class="fue-tag fue-fed">API Externa</span><a href="https://developers.google.com/maps/documentation/geocoding" target="_blank">Google Maps Geocoding API — Geocodificación de direcciones para localización de predios</a><span class="fue-mod">M01</span></div>
-        <div class="fue-item"><span class="fue-tag fue-fed">API Externa</span><span>Google Maps JavaScript API — Mapa interactivo con marcadores y capas</span><span class="fue-mod">M01</span></div>
-        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><a href="https://geoserver.jalisco.gob.mx/geoserver/ows" target="_blank">GeoServer WMS Jalisco — Capas zonificación, uso de suelo, vialidades</a><span class="fue-mod">M01</span></div>
-        <div class="fue-item"><span class="fue-tag fue-est">Estatal</span><span>GeoServer WFS Jalisco — Consulta de features por coordenada (getFeatureInfo)</span><span class="fue-mod">M01</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://mapa.zapopan.gob.mx/arcgis/rest/services/PPDU/PPDU_estrategias/MapServer/identify" target="_blank">ArcGIS Identify Zapopan — Consulta de zona PPDU por coordenada</a><span class="fue-mod">M01</span></div>
-        <div class="fue-item"><span class="fue-tag fue-fed">API Externa</span><a href="https://www.anthropic.com" target="_blank">Anthropic API (Claude) — Motor de análisis normativo en Módulo 04 (Asistente IA)</a><span class="fue-mod">M04</span></div>
-      </div>
-    </div>
-
-    <!-- Avisos de Privacidad (para direcciones verificadas) -->
-    <div class="fue-group">
-      <div class="fue-header" onclick="toggleFue(this)">
-        <span>📋 Avisos de Privacidad — Fuente de Domicilios Oficiales</span><span class="fue-arrow">▼</span>
-      </div>
-      <div class="fue-body">
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/sites/default/files/AvisoPrivacidadDireccionMovilidad2025.pdf" target="_blank">Aviso de Privacidad — Dirección de Movilidad y Transporte GDL (marzo 2025)</a><span class="fue-mod">M07</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://transparencia.guadalajara.gob.mx/sites/default/files/AvisoPrivacidadDireccionMedioAmbiente2025.pdf" target="_blank">Aviso de Privacidad — Dirección de Medio Ambiente GDL (febrero 2025)</a><span class="fue-mod">M07</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal GDL</span><a href="https://catastro.guadalajara.gob.mx/directorio.php" target="_blank">Directorio Catastro Guadalajara — 5 de Febrero 249, Col. Las Conchas</a><span class="fue-mod">M07</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://portal.zapopan.gob.mx/movilidad/directorio.html" target="_blank">Directorio Movilidad Zapopan — Unidad Administrativa Basílica, Andador 20 de Noviembre s/n</a><span class="fue-mod">M07</span></div>
-        <div class="fue-item"><span class="fue-tag fue-mun">Municipal ZPN</span><a href="https://portal.zapopan.gob.mx/medioambiente/directorio.html" target="_blank">Directorio Medio Ambiente Zapopan — Unidad Administrativa El Vergel, Av. De los Robles 1566</a><span class="fue-mod">M07</span></div>
-      </div>
-    </div>
-
-    <div style="margin-top:24px;padding:12px 16px;background:var(--bg2);border-radius:8px;font-size:.8rem;color:var(--text2);line-height:1.6;">
-      <strong>Nota:</strong> Las etiquetas <span style="background:var(--accent);color:#fff;padding:1px 6px;border-radius:4px;font-size:.75rem;">M01</span> indican en qué módulo se utilizó cada fuente.
-      Los domicilios del Directorio (Tab 1) fueron verificados directamente en portales oficiales de cada organismo.
-      Última actualización de fuentes: <strong>julio 2026</strong>.
-    </div>
-  </div>
+</div>
 
 </div><!-- /wrap -->
 

@@ -917,3 +917,9 @@ input,textarea,select{font-family:var(--sans)}
   .gu-footer{padding:16px}
   .gu-fgrid-3{grid-template-columns:1fr 1fr}
 }
+@media(max-width:480px){
+  .gu-fgrid-3{grid-template-columns:1fr}
+  .gu-fgrid{grid-template-columns:1fr}
+  .gu-rest-grid{grid-template-columns:1fr}
+  .gu-sim-grid{grid-template-columns:1fr}
+}

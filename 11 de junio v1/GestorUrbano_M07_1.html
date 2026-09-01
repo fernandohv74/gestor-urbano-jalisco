@@ -335,60 +335,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 // ── DATOS: DIRECTORIO ─────────────────────────────────────────────────────────
 const DIRECTORIO = [
   {
-    ico:'💧', nombre:'SIAPA', corto:'Sistema Intermunicipal de Agua Potable y Alcantarillado',
-    tipo:'estatal', municipios:['GDL','ZPN','TLQ','TON'],
-    tramites:'Factibilidad de agua y drenaje, tomas de agua, descargas industriales, constancias de no adeudo',
-    telefono:'(33) 3674-4300', web:'https://www.siapa.gob.mx', horario:'Lun–Vie 8:00–15:00',
-    direccion:'Av. Dr. R. Michel 2913, Col. Álamo Industrial, Guadalajara',
-    nota:'Organismo intermunicipal estatal. Oficinas centrales en Av. Dr. R. Michel 2913, Guadalajara. Trámite obligatorio previo a licencia de construcción.',
-    categoria:'estatal'
-  },
-  {
-    ico:'🛡️', nombre:'Protección Civil Guadalajara', corto:'Dirección de Protección Civil Municipal — GDL',
-    tipo:'municipal', municipios:['GDL'],
-    tramites:'Dictamen de seguridad, visto bueno PC, inspección de establecimientos, planes de emergencia',
-    telefono:'(33) 3837-6061', web:'https://www.guadalajara.gob.mx', horario:'Lun–Vie 8:00–15:00',
-    direccion:'Calzada del Campesino 1097, Col. Moderna, Guadalajara (Coordinación Municipal de Gestión Integral de Riesgos)',
-    nota:'Requerido para licencia de funcionamiento categoría B y C en GDL.',
-    categoria:'municipal'
-  },
-  {
-    ico:'🛡️', nombre:'Protección Civil Zapopan', corto:'Dirección de Protección Civil Municipal — ZPN',
-    tipo:'municipal', municipios:['ZPN'],
-    tramites:'Dictamen de seguridad, visto bueno PC, inspección, plan de contingencias',
-    telefono:'(33) 3818-2200', web:'https://www.zapopan.gob.mx', horario:'Lun–Vie 8:00–15:00',
-    direccion:'Av. Doctor Luis Farah 460, Conjunto Laureles, Zapopan — Trámites: CISZ Av. Laureles 300, Col. El Tepeyac',
-    nota:'Requerido para giros con alta afluencia de público o manejo de sustancias peligrosas.',
-    categoria:'municipal'
-  },
-  {
-    ico:'🛡️', nombre:'Protección Civil Tlaquepaque', corto:'Dirección de Protección Civil Municipal — TLQ',
-    tipo:'municipal', municipios:['TLQ'],
-    tramites:'Dictamen de seguridad, visto bueno PC, inspección de establecimientos',
-    telefono:'(33) 3837-3838', web:'https://www.tlaquepaque.gob.mx', horario:'Lun–Vie 8:00–15:00',
-    direccion:'San Mateo Evangelista 4174, San Pedro Tlaquepaque',
-    nota:'Necesario para establecimientos con más de 50 personas o manejo de gas LP.',
-    categoria:'municipal'
-  },
-  {
-    ico:'🛡️', nombre:'Protección Civil Tlajomulco', corto:'Dirección de Protección Civil Municipal — TLA',
-    tipo:'municipal', municipios:['TLA'],
-    tramites:'Dictamen de seguridad, visto bueno PC, inspección de establecimientos',
-    telefono:'(33) 3688-5500', web:'https://www.tlajomulco.gob.mx', horario:'Lun–Vie 8:00–15:00',
-    direccion:'Circuito Metropolitano Sur 440, Tlajomulco de Zúñiga — Ventanilla: Higuera 70 PB, Col. Centro',
-    nota:'Trámite en Palacio Municipal de Tlajomulco de Zúñiga.',
-    categoria:'municipal'
-  },
-  {
-    ico:'🛡️', nombre:'Protección Civil Tonalá', corto:'Dirección de Protección Civil Municipal — TON',
-    tipo:'municipal', municipios:['TON'],
-    tramites:'Dictamen de seguridad, visto bueno PC, inspección de establecimientos',
-    telefono:'(33) 3284-3232', web:'https://www.tonala.gob.mx', horario:'Lun–Vie 8:00–15:00',
-    direccion:'Paseo Loma Norte 8268, Loma Dorada Delegación C, CP 45402, Tonalá, Jalisco — Tel. (33) 3586-6100',
-    nota:'Ventanilla en Palacio Municipal de Tonalá.',
-    categoria:'municipal'
-  },
-  {
     ico:'🚒', nombre:'Bomberos GDL', corto:'Heroico Cuerpo de Bomberos de Guadalajara',
     tipo:'municipal', municipios:['GDL'],
     tramites:'Revisión de extintores, salidas de emergencia, rutas de evacuación, visto bueno contra incendios',
@@ -407,40 +353,22 @@ const DIRECTORIO = [
     categoria:'municipal'
   },
   {
-    ico:'🌿', nombre:'SEMADET', corto:'Secretaría de Medio Ambiente y Desarrollo Territorial de Jalisco',
-    tipo:'estatal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
-    tramites:'Cambio de uso de suelo forestal, dictamen ambiental, ANP, manejo de residuos peligrosos, arbolado urbano',
-    telefono:'(33) 3678-9500', web:'https://semadet.jalisco.gob.mx', horario:'Lun–Vie 9:00–15:00',
-    direccion:'Av. Circunvalación Agustín Yáñez 2343, Col. Moderna, Guadalajara',
-    nota:'El dictamen de arbolado urbano de SEMADET es obligatorio cuando la construcción implica derribo de árboles.',
-    categoria:'estatal'
+    ico:'🗃️', nombre:'Catastro GDL', corto:'Dirección de Catastro Municipal — Guadalajara',
+    tipo:'municipal', municipios:['GDL'],
+    tramites:'Clave catastral, valor catastral, avalúo, boleta predial, actualización de medidas',
+    telefono:'(33) 3837-6500', web:'https://www.guadalajara.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'5 de Febrero 249, Col. Las Conchas, CP 44460, Guadalajara',
+    nota:'La boleta predial al corriente es requisito base para cualquier trámite de licencia.',
+    categoria:'municipal'
   },
   {
-    ico:'🏛️', nombre:'INAH Jalisco', corto:'Instituto Nacional de Antropología e Historia — Delegación Jalisco',
-    tipo:'federal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
-    tramites:'Dictamen de impacto en zonas de monumentos históricos, autorización de intervención en inmuebles catalogados',
-    telefono:'(33) 3616-9197', web:'https://www.inah.gob.mx', horario:'Lun–Vie 9:00–14:00',
-    direccion:'Liceo 168, Sector Hidalgo, Centro Histórico, Guadalajara',
-    nota:'Obligatorio para predios dentro de la Zona de Monumentos Históricos de GDL o ZPN (centro de Zapopan).',
-    categoria:'federal'
-  },
-  {
-    ico:'🎭', nombre:'Secretaría de Cultura Jalisco', corto:'Patrimonio Urbano — Secretaría de Cultura del Estado de Jalisco',
-    tipo:'estatal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
-    tramites:'Dictamen patrimonial estatal, catálogo de inmuebles de valor cultural, autorización de intervención en patrimonio no federal',
-    telefono:'(33) 3030-1000', web:'https://sc.jalisco.gob.mx', horario:'Lun–Vie 9:00–15:00',
-    direccion:'Centro Cultural Patio Los Ángeles, Calle Cuitláhuac 305, Guadalajara',
-    nota:'El área de Patrimonio Urbano atiende en el Centro Cultural Patio Los Ángeles, Calle Cuitláhuac 305, Guadalajara. Necesario para inmuebles de valor patrimonial estatal no catalogados por el INAH.',
-    categoria:'estatal'
-  },
-  {
-    ico:'🏥', nombre:'COEPRIS / SSJ', corto:'Comisión Estatal para la Protección contra Riesgos Sanitarios',
-    tipo:'estatal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
-    tramites:'Aviso de funcionamiento sanitario, licencia sanitaria, inspección de alimentos, farmacias, clínicas, salones de belleza',
-    telefono:'(33) 3678-9700', web:'https://ssj.jalisco.gob.mx', horario:'Lun–Vie 9:00–15:00',
-    direccion:'Av. 8 de Julio 1489 / Calzada Lázaro Cárdenas 3540, Guadalajara',
-    nota:'El Aviso de Funcionamiento ante SSJ/COEPRIS debe tramitarse ANTES que la licencia municipal de funcionamiento para giros de alimentos y salud.',
-    categoria:'estatal'
+    ico:'🗃️', nombre:'Catastro ZPN', corto:'Dirección de Catastro Municipal — Zapopan',
+    tipo:'municipal', municipios:['ZPN'],
+    tramites:'Clave catastral, valor catastral, avalúo, boleta predial, traslado de dominio',
+    telefono:'(33) 3818-2200 ext. 2300', web:'https://www.zapopan.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'CISZ Edificio Segundo Nivel, Av. Prolongación Laureles 300, Col. El Tepeyac, Zapopan',
+    nota:'El valor catastral de Zapopan se actualiza anualmente con base en la Ley de Ingresos municipal.',
+    categoria:'municipal'
   },
   {
     ico:'⚡', nombre:'CFE', corto:'Comisión Federal de Electricidad — Zona Occidente',
@@ -452,31 +380,13 @@ const DIRECTORIO = [
     categoria:'federal'
   },
   {
-    ico:'🛣️', nombre:'SIOP', corto:'Secretaría de Infraestructura y Obra Pública de Jalisco',
+    ico:'🏥', nombre:'COEPRIS / SSJ', corto:'Comisión Estatal para la Protección contra Riesgos Sanitarios',
     tipo:'estatal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
-    tramites:'Permisos en vías estatales, rupturas de pavimento en carreteras, acceso a vías primarias estatales',
-    telefono:'(33) 3678-8700', web:'https://siop.jalisco.gob.mx', horario:'Lun–Vie 9:00–15:00',
-    direccion:'Av. Prolongación Alcalde 1351, Edificio B PB, Col. Miraflores, Guadalajara',
-    nota:'Necesario cuando el proyecto tiene acceso directo a una carretera o vialidad de jurisdicción estatal.',
+    tramites:'Aviso de funcionamiento sanitario, licencia sanitaria, inspección de alimentos, farmacias, clínicas, salones de belleza',
+    telefono:'(33) 3678-9700', web:'https://ssj.jalisco.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Av. 8 de Julio 1489 / Calzada Lázaro Cárdenas 3540, Guadalajara',
+    nota:'El Aviso de Funcionamiento ante SSJ/COEPRIS debe tramitarse ANTES que la licencia municipal de funcionamiento para giros de alimentos y salud.',
     categoria:'estatal'
-  },
-  {
-    ico:'📋', nombre:'RPPyC Jalisco', corto:'Registro Público de la Propiedad y del Comercio de Jalisco',
-    tipo:'estatal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
-    tramites:'Inscripción de escrituras, gravámenes, condominios, hipotecas, certificado de libertad de gravamen',
-    telefono:'(33) 3678-6900', web:'https://rppyc.jalisco.gob.mx', horario:'Lun–Vie 8:30–15:30',
-    direccion:'Av. Prolongación Alcalde 1855, Guadalajara',
-    nota:'El Certificado de Libertad de Gravamen (vigencia 30 días) es requisito para tramitar licencias en la mayoría de municipios.',
-    categoria:'estatal'
-  },
-  {
-    ico:'🗺️', nombre:'IMEPLAN', corto:'Instituto Metropolitano de Planeación del AMG',
-    tipo:'metro', municipios:['GDL','ZPN','TLQ','TLA','TON'],
-    tramites:'Consulta POTmet 2024, dictamen de impacto metropolitano, proyectos estratégicos, DUIS',
-    telefono:'(33) 3678-9800', web:'https://imeplan.mx', horario:'Lun–Vie 9:00–15:00',
-    direccion:'Av. Abedules 565, Col. Los Pinos, Zapopan',
-    nota:'El POTmet 2024 tiene jerarquía sobre los planes municipales. IMEPLAN emite dictámenes para proyectos de escala metropolitana.',
-    categoria:'metro'
   },
   {
     ico:'🏗️', nombre:'Dirección de Obras GDL', corto:'Dirección de Obras Públicas — Guadalajara',
@@ -497,30 +407,39 @@ const DIRECTORIO = [
     categoria:'municipal'
   },
   {
-    ico:'📐', nombre:'Ordenamiento Territorial GDL', corto:'Dirección de Ordenamiento del Territorio — Guadalajara',
+    ico:'🗺️', nombre:'IMEPLAN', corto:'Instituto Metropolitano de Planeación del AMG',
+    tipo:'metro', municipios:['GDL','ZPN','TLQ','TLA','TON'],
+    tramites:'Consulta POTmet 2024, dictamen de impacto metropolitano, proyectos estratégicos, DUIS',
+    telefono:'(33) 3678-9800', web:'https://imeplan.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Av. Abedules 565, Col. Los Pinos, Zapopan',
+    nota:'El POTmet 2024 tiene jerarquía sobre los planes municipales. IMEPLAN emite dictámenes para proyectos de escala metropolitana.',
+    categoria:'metro'
+  },
+  {
+    ico:'🏛️', nombre:'INAH Jalisco', corto:'Instituto Nacional de Antropología e Historia — Delegación Jalisco',
+    tipo:'federal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
+    tramites:'Dictamen de impacto en zonas de monumentos históricos, autorización de intervención en inmuebles catalogados',
+    telefono:'(33) 3616-9197', web:'https://www.inah.gob.mx', horario:'Lun–Vie 9:00–14:00',
+    direccion:'Liceo 168, Sector Hidalgo, Centro Histórico, Guadalajara',
+    nota:'Obligatorio para predios dentro de la Zona de Monumentos Históricos de GDL o ZPN (centro de Zapopan).',
+    categoria:'federal'
+  },
+  {
+    ico:'🌿', nombre:'Medio Ambiente GDL', corto:'Dirección General de Medio Ambiente y Ecología — Guadalajara',
     tipo:'municipal', municipios:['GDL'],
-    tramites:'Dictamen de uso de suelo, consultas de zonificación, planes parciales, subdivisiones, fusiones, permisos de fraccionamiento',
-    telefono:'(33) 3837-6400', web:'https://www.guadalajara.gob.mx', horario:'Lun–Vie 8:00–15:00',
-    direccion:'Calle Hospital 50-Z, 2do nivel, Col. El Retiro, Guadalajara, CP 44280',
-    nota:'Emite el dictamen oficial de uso de suelo (vigencia 1 año). Este es el documento base para cualquier licencia en GDL.',
+    tramites:'Dictamen de arbolado (tala/poda), inspecciones ambientales, control de residuos, autorizaciones de impacto ambiental municipal, puntos limpios',
+    telefono:'(33) 3837-6600', web:'https://www.guadalajara.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Av. Hidalgo 426, Centro Histórico, CP 44100, Guadalajara — Tel. (33) 3837-4400 ext. 4111',
+    nota:'Interviene obligatoriamente cuando un proyecto requiere tala o poda de árboles en la vía pública o en el propio predio. El dictamen de arbolado puede condicionar o modificar el proyecto.',
     categoria:'municipal'
   },
   {
-    ico:'📐', nombre:'Ordenamiento Territorial ZPN', corto:'Dirección de Ordenamiento del Territorio — Zapopan',
+    ico:'🌿', nombre:'Medio Ambiente ZPN', corto:'Dirección de Medio Ambiente — Zapopan',
     tipo:'municipal', municipios:['ZPN'],
-    tramites:'Dictamen de uso de suelo, planes parciales, consultas de zonificación, subdivisiones, fusiones',
-    telefono:'(33) 3818-2200 ext. 2200', web:'https://www.zapopan.gob.mx', horario:'Lun–Vie 8:00–15:00',
-    direccion:'CISZ Edificio Tercer Nivel, Av. Prolongación Laureles 300 esq. Blvd. Panamericano, Col. El Tepeyac, Zapopan, CP 45150',
-    nota:'Emite dictamen de uso de suelo con base en el PDU ZPN-01 2023 y sus 12 planes parciales.',
-    categoria:'municipal'
-  },
-  {
-    ico:'🗃️', nombre:'Catastro GDL', corto:'Dirección de Catastro Municipal — Guadalajara',
-    tipo:'municipal', municipios:['GDL'],
-    tramites:'Clave catastral, valor catastral, avalúo, boleta predial, actualización de medidas',
-    telefono:'(33) 3837-6500', web:'https://www.guadalajara.gob.mx', horario:'Lun–Vie 8:00–15:00',
-    direccion:'5 de Febrero 249, Col. Las Conchas, CP 44460, Guadalajara',
-    nota:'La boleta predial al corriente es requisito base para cualquier trámite de licencia.',
+    tramites:'Dictamen ambiental, autorización de poda o tala de árboles, gestión integral de residuos, cambio climático y resiliencia, protección ambiental',
+    telefono:'(33) 3818-2200 ext. 3205', web:'https://portal.zapopan.gob.mx/medioambiente/', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Unidad Administrativa El Vergel, Av. De los Robles 1566, Col. Jardines del Vergel, Zapopan, CP 45180',
+    nota:'Toda tala o poda de árbol en Zapopan requiere dictamen previo de esta dirección. Para proyectos con árboles catalogados puede exigirse reubicación o reposición 1:3.',
     categoria:'municipal'
   },
   {
@@ -542,30 +461,12 @@ const DIRECTORIO = [
     categoria:'municipal'
   },
   {
-    ico:'🌿', nombre:'Medio Ambiente GDL', corto:'Dirección General de Medio Ambiente y Ecología — Guadalajara',
-    tipo:'municipal', municipios:['GDL'],
-    tramites:'Dictamen de arbolado (tala/poda), inspecciones ambientales, control de residuos, autorizaciones de impacto ambiental municipal, puntos limpios',
-    telefono:'(33) 3837-6600', web:'https://www.guadalajara.gob.mx', horario:'Lun–Vie 9:00–15:00',
-    direccion:'Av. Hidalgo 426, Centro Histórico, CP 44100, Guadalajara — Tel. (33) 3837-4400 ext. 4111',
-    nota:'Interviene obligatoriamente cuando un proyecto requiere tala o poda de árboles en la vía pública o en el propio predio. El dictamen de arbolado puede condicionar o modificar el proyecto.',
-    categoria:'municipal'
-  },
-  {
-    ico:'🌿', nombre:'Medio Ambiente ZPN', corto:'Dirección de Medio Ambiente — Zapopan',
-    tipo:'municipal', municipios:['ZPN'],
-    tramites:'Dictamen ambiental, autorización de poda o tala de árboles, gestión integral de residuos, cambio climático y resiliencia, protección ambiental',
-    telefono:'(33) 3818-2200 ext. 3205', web:'https://portal.zapopan.gob.mx/medioambiente/', horario:'Lun–Vie 9:00–15:00',
-    direccion:'Unidad Administrativa El Vergel, Av. De los Robles 1566, Col. Jardines del Vergel, Zapopan, CP 45180',
-    nota:'Toda tala o poda de árbol en Zapopan requiere dictamen previo de esta dirección. Para proyectos con árboles catalogados puede exigirse reubicación o reposición 1:3.',
-    categoria:'municipal'
-  },
-  {
-    ico:'🗃️', nombre:'Catastro ZPN', corto:'Dirección de Catastro Municipal — Zapopan',
-    tipo:'municipal', municipios:['ZPN'],
-    tramites:'Clave catastral, valor catastral, avalúo, boleta predial, traslado de dominio',
-    telefono:'(33) 3818-2200 ext. 2300', web:'https://www.zapopan.gob.mx', horario:'Lun–Vie 8:00–15:00',
-    direccion:'CISZ Edificio Segundo Nivel, Av. Prolongación Laureles 300, Col. El Tepeyac, Zapopan',
-    nota:'El valor catastral de Zapopan se actualiza anualmente con base en la Ley de Ingresos municipal.',
+    ico:'🏗️', nombre:'Obras Públicas TLA', corto:'Dirección de Obras Públicas — Municipio de Tlajomulco de Zúñiga',
+    tipo:'municipal', municipios:['TLA'],
+    tramites:'Licencia de construcción, alineamiento y número oficial, habitabilidad, demolición, remodelación, rupturas de pavimento',
+    telefono:'(33) 3283-4400 Ext. 3221', web:'https://vecs.tlajomulco.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Higuera 70 PB, Col. Centro, Tlajomulco de Zúñiga',
+    nota:'Emite licencias de construcción conforme a la Ley de Ingresos TLA 2026. Remodelación: 50% del costo de licencia. Demolición: 20%. Trámites en línea: vecs.tlajomulco.gob.mx.',
     categoria:'municipal'
   },
   {
@@ -578,15 +479,6 @@ const DIRECTORIO = [
     categoria:'municipal'
   },
   {
-    ico:'🏗️', nombre:'Obras Públicas TLA', corto:'Dirección de Obras Públicas — Municipio de Tlajomulco de Zúñiga',
-    tipo:'municipal', municipios:['TLA'],
-    tramites:'Licencia de construcción, alineamiento y número oficial, habitabilidad, demolición, remodelación, rupturas de pavimento',
-    telefono:'(33) 3283-4400 Ext. 3221', web:'https://vecs.tlajomulco.gob.mx', horario:'Lun–Vie 9:00–15:00',
-    direccion:'Higuera 70 PB, Col. Centro, Tlajomulco de Zúñiga',
-    nota:'Emite licencias de construcción conforme a la Ley de Ingresos TLA 2026. Remodelación: 50% del costo de licencia. Demolición: 20%. Trámites en línea: vecs.tlajomulco.gob.mx.',
-    categoria:'municipal'
-  },
-  {
     ico:'🏗️', nombre:'Obras Públicas TON', corto:'Dirección de Obras Públicas — Municipio de Tonalá',
     tipo:'municipal', municipios:['TON'],
     tramites:'Licencia de construcción, alineamiento y número oficial, habitabilidad, demolición, remodelación, rupturas de pavimento',
@@ -596,12 +488,21 @@ const DIRECTORIO = [
     categoria:'municipal'
   },
   {
-    ico:'🗃️', nombre:'Padrón y Licencias TLQ', corto:'Dirección de Padrón y Licencias — San Pedro Tlaquepaque',
-    tipo:'municipal', municipios:['TLQ'],
-    tramites:'Alta en padrón de contribuyentes, licencia de funcionamiento, giros comerciales e industriales, cambios de giro, baja de padrón',
-    telefono:'(33) 10-57-62-23 / (33) 10-57-62-24 · Conmutador (33) 10-57-60-00 Ext. 6223 y 6224', web:'https://www.tlaquepaque.gob.mx', horario:'Lun–Vie 9:00–15:00',
-    direccion:'Av. Niños Héroes No. 360, Col. Álamo, San Pedro Tlaquepaque',
-    nota:'Ventanilla para licencias de funcionamiento de giros comerciales en TLQ. Requiere uso de suelo compatible, visto bueno de PC (cuando aplica) y constancia sanitaria (SSJ/COEPRIS para giros de alimentos).',
+    ico:'📐', nombre:'Ordenamiento Territorial GDL', corto:'Dirección de Ordenamiento del Territorio — Guadalajara',
+    tipo:'municipal', municipios:['GDL'],
+    tramites:'Dictamen de uso de suelo, consultas de zonificación, planes parciales, subdivisiones, fusiones, permisos de fraccionamiento',
+    telefono:'(33) 3837-6400', web:'https://www.guadalajara.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'Calle Hospital 50-Z, 2do nivel, Col. El Retiro, Guadalajara, CP 44280',
+    nota:'Emite el dictamen oficial de uso de suelo (vigencia 1 año). Este es el documento base para cualquier licencia en GDL.',
+    categoria:'municipal'
+  },
+  {
+    ico:'📐', nombre:'Ordenamiento Territorial ZPN', corto:'Dirección de Ordenamiento del Territorio — Zapopan',
+    tipo:'municipal', municipios:['ZPN'],
+    tramites:'Dictamen de uso de suelo, planes parciales, consultas de zonificación, subdivisiones, fusiones',
+    telefono:'(33) 3818-2200 ext. 2200', web:'https://www.zapopan.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'CISZ Edificio Tercer Nivel, Av. Prolongación Laureles 300 esq. Blvd. Panamericano, Col. El Tepeyac, Zapopan, CP 45150',
+    nota:'Emite dictamen de uso de suelo con base en el PDU ZPN-01 2023 y sus 12 planes parciales.',
     categoria:'municipal'
   },
   {
@@ -614,6 +515,15 @@ const DIRECTORIO = [
     categoria:'municipal'
   },
   {
+    ico:'🗃️', nombre:'Padrón y Licencias TLQ', corto:'Dirección de Padrón y Licencias — San Pedro Tlaquepaque',
+    tipo:'municipal', municipios:['TLQ'],
+    tramites:'Alta en padrón de contribuyentes, licencia de funcionamiento, giros comerciales e industriales, cambios de giro, baja de padrón',
+    telefono:'(33) 10-57-62-23 / (33) 10-57-62-24 · Conmutador (33) 10-57-60-00 Ext. 6223 y 6224', web:'https://www.tlaquepaque.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Av. Niños Héroes No. 360, Col. Álamo, San Pedro Tlaquepaque',
+    nota:'Ventanilla para licencias de funcionamiento de giros comerciales en TLQ. Requiere uso de suelo compatible, visto bueno de PC (cuando aplica) y constancia sanitaria (SSJ/COEPRIS para giros de alimentos).',
+    categoria:'municipal'
+  },
+  {
     ico:'🗃️', nombre:'Padrón y Licencias TON', corto:'Dirección de Padrón y Licencias — Municipio de Tonalá',
     tipo:'municipal', municipios:['TON'],
     tramites:'Alta en padrón de contribuyentes, licencia de funcionamiento, giros comerciales e industriales, cambios de giro, baja de padrón',
@@ -622,10 +532,208 @@ const DIRECTORIO = [
     nota:'Ventanilla para licencias de funcionamiento de giros comerciales en TON. Tonalá es municipio de vocación artesanal y manufactura; muchos giros combinan taller y local de exhibición.',
     categoria:'municipal'
   },
+  {
+    ico:'🛡️', nombre:'Protección Civil Guadalajara', corto:'Dirección de Protección Civil Municipal — GDL',
+    tipo:'municipal', municipios:['GDL'],
+    tramites:'Dictamen de seguridad, visto bueno PC, inspección de establecimientos, planes de emergencia',
+    telefono:'(33) 3837-6061', web:'https://www.guadalajara.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'Calzada del Campesino 1097, Col. Moderna, Guadalajara (Coordinación Municipal de Gestión Integral de Riesgos)',
+    nota:'Requerido para licencia de funcionamiento categoría B y C en GDL.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🛡️', nombre:'Protección Civil Tlajomulco', corto:'Dirección de Protección Civil Municipal — TLA',
+    tipo:'municipal', municipios:['TLA'],
+    tramites:'Dictamen de seguridad, visto bueno PC, inspección de establecimientos',
+    telefono:'(33) 3688-5500', web:'https://www.tlajomulco.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'Circuito Metropolitano Sur 440, Tlajomulco de Zúñiga — Ventanilla: Higuera 70 PB, Col. Centro',
+    nota:'Trámite en Palacio Municipal de Tlajomulco de Zúñiga.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🛡️', nombre:'Protección Civil Tlaquepaque', corto:'Dirección de Protección Civil Municipal — TLQ',
+    tipo:'municipal', municipios:['TLQ'],
+    tramites:'Dictamen de seguridad, visto bueno PC, inspección de establecimientos',
+    telefono:'(33) 3837-3838', web:'https://www.tlaquepaque.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'San Mateo Evangelista 4174, San Pedro Tlaquepaque',
+    nota:'Necesario para establecimientos con más de 50 personas o manejo de gas LP.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🛡️', nombre:'Protección Civil Tonalá', corto:'Dirección de Protección Civil Municipal — TON',
+    tipo:'municipal', municipios:['TON'],
+    tramites:'Dictamen de seguridad, visto bueno PC, inspección de establecimientos',
+    telefono:'(33) 3284-3232', web:'https://www.tonala.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'Paseo Loma Norte 8268, Loma Dorada Delegación C, CP 45402, Tonalá, Jalisco — Tel. (33) 3586-6100',
+    nota:'Ventanilla en Palacio Municipal de Tonalá.',
+    categoria:'municipal'
+  },
+  {
+    ico:'🛡️', nombre:'Protección Civil Zapopan', corto:'Dirección de Protección Civil Municipal — ZPN',
+    tipo:'municipal', municipios:['ZPN'],
+    tramites:'Dictamen de seguridad, visto bueno PC, inspección, plan de contingencias',
+    telefono:'(33) 3818-2200', web:'https://www.zapopan.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'Av. Doctor Luis Farah 460, Conjunto Laureles, Zapopan — Trámites: CISZ Av. Laureles 300, Col. El Tepeyac',
+    nota:'Requerido para giros con alta afluencia de público o manejo de sustancias peligrosas.',
+    categoria:'municipal'
+  },
+  {
+    ico:'📋', nombre:'RPPyC Jalisco', corto:'Registro Público de la Propiedad y del Comercio de Jalisco',
+    tipo:'estatal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
+    tramites:'Inscripción de escrituras, gravámenes, condominios, hipotecas, certificado de libertad de gravamen',
+    telefono:'(33) 3678-6900', web:'https://rppyc.jalisco.gob.mx', horario:'Lun–Vie 8:30–15:30',
+    direccion:'Av. Prolongación Alcalde 1855, Guadalajara',
+    nota:'El Certificado de Libertad de Gravamen (vigencia 30 días) es requisito para tramitar licencias en la mayoría de municipios.',
+    categoria:'estatal'
+  },
+  {
+    ico:'🎭', nombre:'Secretaría de Cultura Jalisco', corto:'Patrimonio Urbano — Secretaría de Cultura del Estado de Jalisco',
+    tipo:'estatal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
+    tramites:'Dictamen patrimonial estatal, catálogo de inmuebles de valor cultural, autorización de intervención en patrimonio no federal',
+    telefono:'(33) 3030-1000', web:'https://sc.jalisco.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Centro Cultural Patio Los Ángeles, Calle Cuitláhuac 305, Guadalajara',
+    nota:'El área de Patrimonio Urbano atiende en el Centro Cultural Patio Los Ángeles, Calle Cuitláhuac 305, Guadalajara. Necesario para inmuebles de valor patrimonial estatal no catalogados por el INAH.',
+    categoria:'estatal'
+  },
+  {
+    ico:'🌿', nombre:'SEMADET', corto:'Secretaría de Medio Ambiente y Desarrollo Territorial de Jalisco',
+    tipo:'estatal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
+    tramites:'Cambio de uso de suelo forestal, dictamen ambiental, ANP, manejo de residuos peligrosos, arbolado urbano',
+    telefono:'(33) 3678-9500', web:'https://semadet.jalisco.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Av. Circunvalación Agustín Yáñez 2343, Col. Moderna, Guadalajara',
+    nota:'El dictamen de arbolado urbano de SEMADET es obligatorio cuando la construcción implica derribo de árboles.',
+    categoria:'estatal'
+  },
+  {
+    ico:'💧', nombre:'SIAPA', corto:'Sistema Intermunicipal de Agua Potable y Alcantarillado',
+    tipo:'estatal', municipios:['GDL','ZPN','TLQ','TON'],
+    tramites:'Factibilidad de agua y drenaje, tomas de agua, descargas industriales, constancias de no adeudo',
+    telefono:'(33) 3674-4300', web:'https://www.siapa.gob.mx', horario:'Lun–Vie 8:00–15:00',
+    direccion:'Av. Dr. R. Michel 2913, Col. Álamo Industrial, Guadalajara',
+    nota:'Organismo intermunicipal estatal. Oficinas centrales en Av. Dr. R. Michel 2913, Guadalajara. Trámite obligatorio previo a licencia de construcción.',
+    categoria:'estatal'
+  },
+  {
+    ico:'🛣️', nombre:'SIOP', corto:'Secretaría de Infraestructura y Obra Pública de Jalisco',
+    tipo:'estatal', municipios:['GDL','ZPN','TLQ','TLA','TON'],
+    tramites:'Permisos en vías estatales, rupturas de pavimento en carreteras, acceso a vías primarias estatales',
+    telefono:'(33) 3678-8700', web:'https://siop.jalisco.gob.mx', horario:'Lun–Vie 9:00–15:00',
+    direccion:'Av. Prolongación Alcalde 1351, Edificio B PB, Col. Miraflores, Guadalajara',
+    nota:'Necesario cuando el proyecto tiene acceso directo a una carretera o vialidad de jurisdicción estatal.',
+    categoria:'estatal'
+  }
 ];
 
 // ── DATOS: GLOSARIO ────────────────────────────────────────────────────────────
 const GLOSARIO = [
+  {
+    ico:'✅', termino:'Afirmativa Ficta', nombre:'Afirmativa Ficta (Silencio Administrativo Positivo)',
+    categoria:'tramites',
+    def:'Principio jurídico por el cual, si una autoridad no responde una solicitud dentro del plazo legalmente establecido, la respuesta se considera aprobada de manera automática. En Tlajomulco de Zúñiga aplica a giros SARE de bajo riesgo: si la Oficialía Mayor de Padrón y Licencias no emite resolución en 3 días hábiles, la licencia de funcionamiento se tiene por otorgada (Art. 13 Ter, Reglamento de Giros TLA 2021). El solicitante debe conservar el acuse de recibo como comprobante.',
+    ejemplo:'Una pequeña tienda de artesanías ingresa su solicitud SARE el lunes. Si para el jueves al mediodía no ha recibido respuesta municipal, la Afirmativa Ficta opera y puede iniciar operaciones exhibiendo su acuse de recibo. No aplica para giros de alto riesgo, alcoholes, ni municipios sin SARE implementado.'
+  },
+  {
+    ico:'📄', termino:'Alineamiento', nombre:'Alineamiento y Número Oficial',
+    categoria:'tramites',
+    def:'Documento oficial donde el municipio certifica la línea de propiedad del predio respecto a la vía pública y asigna o confirma el número oficial de la dirección. Es el primer trámite antes de cualquier licencia de construcción.',
+    ejemplo:'El alineamiento te dice si la calle tiene ampliación vial planeada que afecta tu terreno, y cuántos metros de restricción frontal debes respetar desde la banqueta.'
+  },
+  {
+    ico:'📏', termino:'Altura máxima', nombre:'Altura Máxima de Edificación',
+    categoria:'zonificacion',
+    def:'Límite vertical de construcción permitido en la zona, expresado en metros o número de niveles (incluyendo sótanos en algunas zonas). Puede modificarse con compensaciones o en zonas con Plan Especial.',
+    ejemplo:'Una zona H3-V con altura máxima 12 ml permite aproximadamente 4 niveles. Si quieres más altura necesitas un dictamen especial o compensación de CUS.'
+  },
+  {
+    ico:'🌳', termino:'ANP', nombre:'Área Natural Protegida',
+    categoria:'zonificacion',
+    def:'Zona con protección legal federal o estatal por sus valores ambientales. Dentro de una ANP las construcciones están muy restringidas o prohibidas. En el AMG incluye el Bosque de La Primavera y el Cerro del Tepopote.',
+    ejemplo:'El Bosque de La Primavera es ANP federal. Cualquier proyecto dentro o colindante requiere manifestación de impacto ambiental federal (MIA) ante SEMARNAT.'
+  },
+  {
+    ico:'🤝', termino:'Área de cesión municipal', nombre:'Área de Cesión para Destinos Municipales',
+    categoria:'tramites',
+    def:'Proporción del predio o superficie equivalente que el propietario o desarrollador debe ceder gratuitamente al municipio como condición para autorizar subdivisiones, fusiones, fraccionamientos o proyectos de gran escala. La cesión se destina a vías públicas, áreas verdes, equipamiento urbano o donación al fondo municipal. El porcentaje varía según el municipio y el tipo de desarrollo; en algunos casos puede cubrirse con pago en efectivo equivalente al valor del terreno a ceder. Se registra en el Registro Público de la Propiedad y es requisito previo a la autorización de la subdivisión.',
+    ejemplo:'Un desarrollador que quiere subdividir un terreno de 3,000 m² en Guadalajara en 6 lotes debe ceder al municipio el porcentaje de área establecido para destinos públicos (jardín vecinal, vialidad interna, etc.) antes de que se autorice el plano de subdivisión. Sin la escritura de cesión, el RPP no inscribe los nuevos lotes.'
+  },
+  {
+    ico:'🌿', termino:'Área libre / Área verde', nombre:'Área Libre y Área Verde Obligatoria',
+    categoria:'coeficientes',
+    def:'Proporción del predio que debe quedar libre de construcción en planta baja, determinada como el complemento del COS (Área libre = 1 − COS). Se subdivide en: Área libre permeable (suelo natural, jardín o superficie que permite infiltración pluvial) y Área verde obligatoria (porcentaje mínimo de vegetación que exige el reglamento). Un COS de 0.70 obliga a dejar libre el 30% del terreno; parte de ese 30% debe ser área verde real. Relevante para calcular el Impacto Hidrológico Cero (IHC).',
+    ejemplo:'Un predio de 500 m² con COS 0.60 puede construir máximo 300 m² en planta baja. Los 200 m² restantes son área libre; si el reglamento exige 10% de área verde, el propietario debe destinar al menos 50 m² a jardín o vegetación real, no pavimento.'
+  },
+  {
+    ico:'📐', termino:'Art. 29 RGIM GDL', nombre:'Superficie máxima de locales comerciales por nivel de impacto',
+    categoria:'zonificacion',
+    def:'El Artículo 29 del Reglamento de Gestión Integral del Municipio de Guadalajara establece el tamaño máximo que puede tener el conjunto de locales comerciales y sus circulaciones, según el nivel de impacto de la <strong>zona del predio</strong> (no del giro):<br><br>'
+      +'<strong>CS1 — Impacto Mínimo (Frac. I):</strong> El comercio es secundario en estas zonas —principalmente habitacionales. El conjunto de locales en planta baja no puede superar: 75 m² en lotes &lt;100 m²; 150 m² en lotes 100–250 m²; 200 m² en lotes &gt;250 m². El resto del predio debe destinarse a vivienda.<br><br>'
+      +'<strong>CS2 — Impacto Bajo (Frac. II):</strong> El conjunto de locales puede ocupar hasta la <strong>superficie total del lote</strong> (100%). No hay obligación de incluir vivienda.<br><br>'
+      +'<strong>CS3 — Impacto Medio (Frac. III):</strong> El conjunto de locales no puede superar el <strong>60% del potencial edificable</strong> (CUS × superficie del lote). El 40% restante del potencial puede destinarse a otros usos.<br><br>'
+      +'<strong>CS4 — Impacto Alto (Frac. IV):</strong> El Art. 29 <strong>no impone límite adicional</strong>. El único tope es el CUS del Plan Parcial: todo lo que el CUS permite construir puede destinarse a locales comerciales.<br><br>'
+      +'<strong>CS5 — Impacto Máximo (Frac. V):</strong> Igual que CS4 — sin restricción de Art. 29. El CUS es el único límite de superficie edificable.<br><br>'
+      +'Regla clave: la fracción aplicable la determina la <strong>zona del predio</strong>, no la clasificación del giro. Un giro CS3 condicionado instalado en zona CS2 respeta el límite de la Frac. II (Art. 30 RGIM).',
+    ejemplo:'Predio Pedro Buzeta 717 (zona CS2, lote 180 m²). Se instala un giro condicionado CS3 (taquería). Aplica Frac. II → superficie máxima de locales = 180 m². El potencial edificable por CUS (2.4 × 180 = 432 m²) no es el límite de operación comercial — ese es el techo de construcción total. Confirmado en DTUDE emitido por la Dirección de Ordenamiento del Territorio de Guadalajara.'
+  },
+  {
+    ico:'🏥', termino:'Aviso de Funcionamiento Sanitario', nombre:'Aviso de Funcionamiento — COEPRIS / SSJ',
+    categoria:'tramites',
+    def:'Notificación obligatoria ante la Comisión Estatal para la Protección contra Riesgos Sanitarios (COEPRIS / Servicios de Salud Jalisco) para establecimientos que manejan alimentos, bebidas, cosméticos, medicamentos o prestan servicios de salud. Debe tramitarse antes de solicitar la licencia municipal de funcionamiento. Se gestiona en línea a través del portal COFEPRIS o en las ventanillas de la SSJ.',
+    ejemplo:'Una cafetería no puede obtener su licencia de funcionamiento municipal sin presentar primero el Aviso de Funcionamiento Sanitario. El municipio lo verifica como requisito del expediente. El aviso debe renovarse cada dos años y exhibirse en el establecimiento.'
+  },
+  {
+    ico:'🚗', termino:'Cajones de estacionamiento', nombre:'Cajones de Estacionamiento',
+    categoria:'zonificacion',
+    def:'Número mínimo de lugares de estacionamiento que exige el reglamento según el uso del suelo y la superficie. Se calculan por cada cierto número de m² o unidades del proyecto.',
+    ejemplo:'En GDL, oficinas requieren 1 cajón por cada 30 m² de construcción. Un edificio de oficinas de 600 m² necesita mínimo 20 cajones.'
+  },
+  {
+    ico:'🔄', termino:'Cambio de uso de suelo', nombre:'Cambio de Uso de Suelo',
+    categoria:'tramites',
+    def:'Trámite formal ante la Dirección de Ordenamiento Territorial para modificar el uso autorizado de un predio en el Plan Parcial. No todos los cambios son posibles: el municipio analiza compatibilidad con la zona, impacto vial, servicios existentes y voto de los vecinos. En algunos casos requiere aprobación del Cabildo y publicación en el Periódico Oficial del Estado.',
+    ejemplo:'Un terreno con uso de suelo habitacional H2 que quiere convertirse en comercio de barrio MC puede solicitar cambio de uso de suelo. El municipio evalúa la solicitud y puede aprobarla, negarla o condicionarla (por ejemplo, sin venta de alcohol, sin estacionamiento de alto flujo). El proceso puede tardar de 3 a 12 meses.'
+  },
+  {
+    ico:'🤝', termino:'Carta de anuencia de vecinos', nombre:'Carta de Anuencia de Vecinos Colindantes',
+    categoria:'tramites',
+    def:'Documento firmado por los propietarios o arrendatarios de los predios colindantes directos en el que manifiestan no tener objeción para que se instale el negocio o se realice la obra. En Tlajomulco de Zúñiga es requisito opcional para giros de bajo riesgo, pero se vuelve obligatoria en caso de controversia con algún vecino. El solicitante tiene 5 días hábiles para obtenerla mediante el Consejo Social de Participación Ciudadana (Art. 29 Fracc. I Item 9, Reg. Giros TLA 2021).',
+    ejemplo:'Una papelería que va a abrir junto a una casa habitación recibe objeción del vecino de la derecha. El municipio de Tlajomulco exige la carta de anuencia de ese vecino. El solicitante tiene 5 días hábiles para gestionarla con apoyo del Consejo Social de Participación Ciudadana. Si el vecino se niega sin causa justificada, el municipio puede mediar o conceder la licencia según el caso.'
+  },
+  {
+    ico:'⚡', termino:'CFE', nombre:'Comisión Federal de Electricidad',
+    categoria:'organismos',
+    def:'Empresa productiva del Estado que suministra energía eléctrica en México. Para proyectos de construcción emite la factibilidad de suministro eléctrico que confirma si hay capacidad en la red para atender la nueva demanda.',
+    ejemplo:'Un centro comercial o edificio de oficinas necesita tramitar la factibilidad CFE antes de iniciar obra. Sin ella el municipio no autoriza la licencia de construcción en proyectos de alta demanda.'
+  },
+  {
+    ico:'🗂️', termino:'Clave catastral', nombre:'Clave Catastral del Predio',
+    categoria:'tramites',
+    def:'Código alfanumérico único que identifica a cada predio dentro del padrón catastral municipal. Es el número de identidad del terreno y es obligatorio en todos los trámites de construcción, licencias de funcionamiento, traslados de dominio y pagos de predial. Se obtiene en la Dirección de Catastro municipal.',
+    ejemplo:'Una clave catastral típica en GDL tiene el formato: 0039-0001-0001 (manzana-lote-fracción). Con esa clave puedes verificar en Catastro la superficie del predio, el valor catastral, los propietarios registrados y si hay adeudos de predial. Sin clave catastral no avanza ningún trámite.'
+  },
+  {
+    ico:'📋', termino:'CLG', nombre:'Certificado de Libertad de Gravamen',
+    categoria:'tramites',
+    def:'Documento expedido por el Registro Público de la Propiedad y del Comercio (RPPyC) de Jalisco que certifica que un inmueble no tiene hipotecas, embargos, adeudos o cualquier otro gravamen registrado. Tiene vigencia de 30 días y es requisito obligatorio para tramitar licencias de construcción y de funcionamiento en la mayoría de municipios del AMG.',
+    ejemplo:'Antes de solicitar la licencia de construcción de un edificio de departamentos en ZPN, el trámite incluye presentar el CLG vigente del predio. Si el terreno tiene hipoteca, el RPPyC lo indicará en el certificado y el municipio puede condicionar la licencia hasta resolver el gravamen.'
+  },
+  {
+    ico:'🏥', termino:'COEPRIS', nombre:'Comisión Estatal para la Protección contra Riesgos Sanitarios',
+    categoria:'organismos',
+    def:'Organismo estatal de Jalisco (dependiente de la SSJ) que regula y autoriza establecimientos de alimentos, bebidas, farmacias, clínicas, laboratorios y servicios de salud.',
+    ejemplo:'Una cafetería debe tramitar el Aviso de Funcionamiento ante COEPRIS/SSJ ANTES de solicitar la licencia municipal. Sin el aviso sanitario, el municipio no entrega la licencia.'
+  },
+  {
+    ico:'💧', termino:'CONAGUA', nombre:'Comisión Nacional del Agua',
+    categoria:'organismos',
+    def:'Organismo federal que administra las aguas nacionales (ríos, acuíferos, cuerpos de agua). Otorga concesiones para extracción de agua subterránea y permisos de descarga a cuerpos de agua nacionales. Interviene en proyectos con pozos o descargas a cauces.',
+    ejemplo:'Un desarrollo habitacional con pozo propio necesita concesión de CONAGUA para extracción de agua subterránea. Un proyecto con descarga pluvial a un arroyo o río requiere permiso de descarga ante CONAGUA.'
+  },
+  {
+    ico:'🏛️', termino:'Consejo de Giros Restringidos TON', nombre:'Consejo Municipal para Giros de Control Especial — Tonalá',
+    categoria:'organismos',
+    def:'Órgano colegiado del Municipio de Tonalá que evalúa y dictamina las solicitudes de establecimientos considerados de control especial según el Acuerdo 135 (2025): cantinas, centros nocturnos, establecimientos con baile, venta de alcohol, entre otros. El consejo revisa la solicitud, realiza visita de inspección, recibe opinión de vecinos y emite dictamen en un plazo definido. Su aprobación es requisito previo para tramitar la licencia de funcionamiento en esa categoría.',
+    ejemplo:'Una cervecería artesanal que quiere abrir en Tonalá (giro con venta de alcohol para consumo en el lugar) debe primero presentar su solicitud ante el Consejo de Giros Restringidos. El consejo verifica la distancia a escuelas, el impacto en la colonia, y recaba opinión de los vecinos antes de emitir su dictamen. Sin ese dictamen favorable, el trámite de licencia no procede en Padrón y Licencias del municipio.'
+  },
   {
     ico:'📊', termino:'COS', nombre:'Coeficiente de Ocupación del Suelo',
     categoria:'coeficientes',
@@ -639,46 +747,16 @@ const GLOSARIO = [
     ejemplo:'Terreno de 300 m² con CUS 2.40 → máximo 720 m² totales de construcción (puede ser 180 m² × 4 niveles, por ejemplo, combinado con el COS).'
   },
   {
-    ico:'📊', termino:'iCOS', nombre:'Índice de Ocupación del Suelo (niveles superiores)',
+    ico:'📊', termino:'CUSMAX', nombre:'Coeficiente de Utilización del Suelo Máximo',
     categoria:'coeficientes',
-    def:'Restricción de huella de construcción aplicable a partir del segundo nivel o planta alta. Generalmente es menor que el COS para obligar a retrocesos en altura.',
-    ejemplo:'En GDL, zonas H3-V pueden tener COS 0.70 en PB e iCOS 0.50 desde el segundo nivel, creando una "escalera" de retrocesos.'
+    def:'Límite absoluto de superficie construible total en un predio, expresado como múltiplo de la superficie del terreno. A diferencia del CUS regular, el CUSMAX no puede incrementarse con transferencias de potencial, compensaciones ni acuerdos especiales. Es el techo definitivo de edificación que ningún proyecto puede superar independientemente de los estímulos que aplique.',
+    ejemplo:'En un plan parcial de Zapopan, una zona puede tener CUS 3.0 (base) y CUSMAX 4.5. Con transferencia de potencial puedes llegar hasta 4.5 pero nunca más. Un predio de 500 m² puede tener máximo 2,250 m² de construcción total aunque el propietario compre todos los derechos de desarrollo disponibles.'
   },
   {
-    ico:'📊', termino:'iCUS', nombre:'Índice de Utilización del Suelo (superficies superiores)',
-    categoria:'coeficientes',
-    def:'Límite de superficie por nivel individual en plantas altas. Complementa al CUS para regular cómo se distribuye la construcción verticalmente.',
-    ejemplo:'Usado principalmente en Zapopan para controlar la masa volumétrica de torres habitacionales.'
-  },
-  {
-    ico:'👷', termino:'DRO', nombre:'Director Responsable de Obra',
-    categoria:'actores',
-    def:'Profesionista acreditado ante el municipio (arquitecto o ingeniero) que firma y asume responsabilidad técnica y legal de un proyecto de construcción. Sin DRO no se autoriza ninguna licencia de obra en el AMG.',
-    ejemplo:'Para construir un edificio de 6 departamentos necesitas contratar un DRO registrado en el padrón municipal de GDL o ZPN. El DRO firma planos, memorias y es responsable ante el municipio.'
-  },
-  {
-    ico:'👷', termino:'Perito Corresponsable', nombre:'Perito Corresponsable de Obra',
-    categoria:'actores',
-    def:'Especialista adicional que co-firma el proyecto en áreas específicas cuando la obra supera ciertos umbrales. Tipos: estructural, instalaciones, diseño urbano.',
-    ejemplo:'Una bodega industrial de 2,500 m² en ZPN requiere Perito Corresponsable en Estructuras además del DRO, porque supera el umbral de superficie.'
-  },
-  {
-    ico:'📄', termino:'Licencia de construcción', nombre:'Licencia de Construcción',
-    categoria:'tramites',
-    def:'Autorización municipal que permite ejecutar una obra (nueva construcción, ampliación, remodelación, demolición). Es obligatoria antes de iniciar cualquier trabajo de obra en el AMG.',
-    ejemplo:'Antes de levantar una barda, ampliar una cocina o construir un cuarto adicional necesitas licencia de construcción del municipio donde se ubica el predio.'
-  },
-  {
-    ico:'📄', termino:'Licencia de funcionamiento', nombre:'Licencia de Funcionamiento',
-    categoria:'tramites',
-    def:'Autorización municipal para operar un negocio o establecimiento comercial. Es diferente a la licencia de construcción. Se tramita en la Dirección de Padrón o Gobierno Municipal.',
-    ejemplo:'Un restaurante necesita licencia de funcionamiento (para operar el negocio) Y puede necesitar licencia de construcción (si se va a remodelar el local).'
-  },
-  {
-    ico:'📄', termino:'Alineamiento', nombre:'Alineamiento y Número Oficial',
-    categoria:'tramites',
-    def:'Documento oficial donde el municipio certifica la línea de propiedad del predio respecto a la vía pública y asigna o confirma el número oficial de la dirección. Es el primer trámite antes de cualquier licencia de construcción.',
-    ejemplo:'El alineamiento te dice si la calle tiene ampliación vial planeada que afecta tu terreno, y cuántos metros de restricción frontal debes respetar desde la banqueta.'
+    ico:'🏘️', termino:'Densidad habitacional', nombre:'Densidad Habitacional (viviendas/hectárea)',
+    categoria:'zonificacion',
+    def:'Número máximo de viviendas que el PDU o PPDU permite edificar por hectárea de terreno en una zona determinada. Controla la intensidad de uso habitacional independientemente del CUS. Una zona con alta densidad permite más unidades de vivienda aunque sean de menor tamaño; una zona de baja densidad limita el número de viviendas aunque el predio sea grande. Se expresa como VIV/ha (viviendas por hectárea) o UNI/ha (unidades por hectárea).',
+    ejemplo:'Una zona H3 en Guadalajara puede tener densidad de 120 VIV/ha. Un predio de 2,000 m² (0.2 ha) solo podría tener hasta 24 viviendas aunque el CUS permitiera construir más superficie. Si el promotor quiere más unidades debe fraccionar o tramitar un cambio de densidad.'
   },
   {
     ico:'📄', termino:'Dictamen de uso de suelo', nombre:'Dictamen de Uso de Suelo',
@@ -687,182 +765,16 @@ const GLOSARIO = [
     ejemplo:'Para tramitar una licencia de funcionamiento en GDL, el municipio puede pedirte el dictamen de uso de suelo que confirma que tu giro es compatible con la zona.'
   },
   {
-    ico:'📄', termino:'Visto bueno', nombre:'Visto Bueno (VoBo)',
-    categoria:'tramites',
-    def:'Autorización o aprobación emitida por una dependencia como paso previo dentro de un trámite mayor. No es una licencia en sí misma, sino un requisito de aprobación intermedio.',
-    ejemplo:'Para obtener la licencia de funcionamiento de una tienda de abarrotes necesitas el visto bueno de Protección Civil (que el local cumple normas de seguridad) y el de uso de suelo.'
-  },
-  {
-    ico:'📄', termino:'Subdivisión', nombre:'Subdivisión de Predio',
-    categoria:'tramites',
-    def:'Trámite para dividir un terreno en dos o más fracciones, cada una con clave catastral independiente. Requiere que las fracciones resultantes cumplan superficie mínima y frente mínimo de la zona.',
-    ejemplo:'Un terreno de 800 m² en zona H2 (sup. mínima 120 m², frente mínimo 8 ml) puede subdividirse en máximo 6 fracciones si todas cumplen las medidas mínimas.'
-  },
-  {
-    ico:'📄', termino:'Fusión', nombre:'Fusión de Predios',
-    categoria:'tramites',
-    def:'Trámite inverso a la subdivisión: dos o más predios contiguos se unen en uno solo con una sola clave catastral. Común antes de desarrollos inmobiliarios para tener mayor superficie continua.',
-    ejemplo:'Dos terrenos de 300 m² cada uno se fusionan en un solo predio de 600 m², lo que permite aprovechar mejor el potencial constructivo de la zona.'
-  },
-  {
-    ico:'🏘️', termino:'Régimen de condominio', nombre:'Régimen de Condominio',
-    categoria:'tramites',
-    def:'Figura jurídica que permite que un inmueble tenga múltiples propietarios, cada uno con una unidad privativa (departamento, local, oficina) y derechos sobre las áreas comunes. Debe constituirse ante notario e inscribirse en el RPPyC.',
-    ejemplo:'Un edificio de 12 departamentos se constituye en régimen de condominio para poder vender cada departamento a un propietario diferente con escritura individual.'
-  },
-  {
-    ico:'🗺️', termino:'PPDU', nombre:'Plan Parcial de Desarrollo Urbano',
-    categoria:'zonificacion',
-    def:'Documento normativo que regula el uso del suelo, densidades, alturas y restricciones en un área específica de la ciudad. Cada municipio tiene varios PPDUs que cubren su territorio.',
-    ejemplo:'Zapopan tiene 12 PPDUs (ZPN-01 a ZPN-12). El predio de Andares está en ZPN-05 "Vallarta-Patria". Ese plan define exactamente qué puede construirse ahí.'
-  },
-  {
-    ico:'🗺️', termino:'POTmet', nombre:'Programa de Ordenamiento Territorial Metropolitano 2024',
-    categoria:'zonificacion',
-    def:'Instrumento de planeación de escala metropolitana que establece la visión de crecimiento del AMG al 2042. Tiene jerarquía superior a los planes municipales. Emitido por IMEPLAN.',
-    ejemplo:'Si el POTmet clasifica un área como "zona de contención" y el municipio la tiene como "zona de crecimiento", prevalece el POTmet.'
-  },
-  {
-    ico:'🌳', termino:'ANP', nombre:'Área Natural Protegida',
-    categoria:'zonificacion',
-    def:'Zona con protección legal federal o estatal por sus valores ambientales. Dentro de una ANP las construcciones están muy restringidas o prohibidas. En el AMG incluye el Bosque de La Primavera y el Cerro del Tepopote.',
-    ejemplo:'El Bosque de La Primavera es ANP federal. Cualquier proyecto dentro o colindante requiere manifestación de impacto ambiental federal (MIA) ante SEMARNAT.'
-  },
-  {
-    ico:'🗺️', termino:'Zonificación', nombre:'Zonificación',
-    categoria:'zonificacion',
-    def:'Sistema de clasificación del territorio en zonas con diferentes usos permitidos (habitacional, comercial, industrial, mixto, verde). Cada zona tiene su clave (H1, MC, MV2, EV-V, etc.) y sus propias restricciones.',
-    ejemplo:'Una zona H2-V significa Habitacional con densidad 2, Vertical. Permite casas y edificios de departamentos pero no comercio de alto impacto.'
-  },
-  {
-    ico:'📏', termino:'Restricción frontal', nombre:'Restricción Frontal (Retiro)',
-    categoria:'zonificacion',
-    def:'Distancia mínima que debe dejarse libre entre la línea de propiedad (banqueta) y la construcción. Varía por zona y municipio. No puede construirse ni techarse en esa franja.',
-    ejemplo:'Una zona MV1-H en ZPN puede tener restricción frontal de 3 ml. Si tu terreno empieza en la banqueta, los primeros 3 metros deben quedar como área libre o jardín frontal.'
-  },
-  {
-    ico:'📏', termino:'Restricciones laterales y posteriores', nombre:'Restricciones Laterales y Posteriores',
-    categoria:'zonificacion',
-    def:'Franjas libres obligatorias en los lados y el fondo del terreno. Garantizan ventilación, iluminación y separación entre edificios. Se expresan en metros lineales.',
-    ejemplo:'Restricción lateral de 1.5 ml significa que ninguna construcción puede estar a menos de 1.5 m de la colindancia lateral con el vecino.'
-  },
-  {
-    ico:'📏', termino:'Altura máxima', nombre:'Altura Máxima de Edificación',
-    categoria:'zonificacion',
-    def:'Límite vertical de construcción permitido en la zona, expresado en metros o número de niveles (incluyendo sótanos en algunas zonas). Puede modificarse con compensaciones o en zonas con Plan Especial.',
-    ejemplo:'Una zona H3-V con altura máxima 12 ml permite aproximadamente 4 niveles. Si quieres más altura necesitas un dictamen especial o compensación de CUS.'
-  },
-  {
-    ico:'🚗', termino:'Cajones de estacionamiento', nombre:'Cajones de Estacionamiento',
-    categoria:'zonificacion',
-    def:'Número mínimo de lugares de estacionamiento que exige el reglamento según el uso del suelo y la superficie. Se calculan por cada cierto número de m² o unidades del proyecto.',
-    ejemplo:'En GDL, oficinas requieren 1 cajón por cada 30 m² de construcción. Un edificio de oficinas de 600 m² necesita mínimo 20 cajones.'
-  },
-  {
-    ico:'🌿', termino:'SEMADET', nombre:'Secretaría de Medio Ambiente y Desarrollo Territorial',
-    categoria:'organismos',
-    def:'Dependencia estatal de Jalisco responsable de la política ambiental, áreas naturales protegidas, arbolado urbano y residuos. Sus dictámenes son obligatorios en proyectos con impacto ambiental.',
-    ejemplo:'Si tu proyecto de construcción requiere derribar un árbol en la vía pública, necesitas dictamen de arbolado urbano de SEMADET antes de que el municipio te otorgue la licencia.'
-  },
-  {
-    ico:'🏥', termino:'COEPRIS', nombre:'Comisión Estatal para la Protección contra Riesgos Sanitarios',
-    categoria:'organismos',
-    def:'Organismo estatal de Jalisco (dependiente de la SSJ) que regula y autoriza establecimientos de alimentos, bebidas, farmacias, clínicas, laboratorios y servicios de salud.',
-    ejemplo:'Una cafetería debe tramitar el Aviso de Funcionamiento ante COEPRIS/SSJ ANTES de solicitar la licencia municipal. Sin el aviso sanitario, el municipio no entrega la licencia.'
-  },
-  {
-    ico:'💧', termino:'SIAPA', nombre:'Sistema Intermunicipal de Agua Potable y Alcantarillado',
-    categoria:'organismos',
-    def:'Organismo público que presta los servicios de agua potable y alcantarillado en GDL, Zapopan, Tlaquepaque y Tonalá. Emite la factibilidad de servicios (agua y drenaje) necesaria para licencias de construcción.',
-    ejemplo:'Antes de tramitar una licencia de construcción en GDL necesitas la constancia de factibilidad SIAPA, que confirma que hay capacidad de agua y drenaje para tu proyecto.'
-  },
-  {
-    ico:'📋', termino:'Giro tipo A/B/C/D', nombre:'Categorías de Giro Comercial',
-    categoria:'tramites',
-    def:'Clasificación municipal del impacto de un establecimiento comercial. A = bajo impacto (papelería, estética). B = impacto medio (restaurante, gimnasio). C = alto impacto (bar, gasolinera). D = giro especial con requisitos adicionales.',
-    ejemplo:'Un taller mecánico en GDL es giro tipo C. Requiere visto bueno de PC, SEMADET y uso de suelo compatible. Una librería es tipo A y tiene trámite simplificado.'
-  },
-  {
-    ico:'🚫', termino:'Giro restringido', nombre:'Giro Restringido o de Control Especial',
-    categoria:'tramites',
-    def:'Actividad comercial cuyo funcionamiento requiere autorización especial adicional a la licencia ordinaria de funcionamiento, por el impacto potencial que genera en el entorno social, la salud pública, la seguridad o la tranquilidad vecinal. Incluye: cantinas, bares, centros nocturnos, establecimientos con baile, venta de bebidas alcohólicas para consumo en el lugar, casas de empeño y giros con entretenimiento para adultos, entre otros. Cada municipio del AMG define su propio catálogo: en Guadalajara se denominan "giros de control especial" (RGIM); en Tonalá los regula el Consejo Municipal para Giros de Control Especial (Acuerdo 135/2025); otros municipios tienen esquemas similares. El proceso de autorización incluye inspección previa al local, opinión de vecinos colindantes y dictamen de la comisión o consejo municipal competente — solo después de ese dictamen favorable se puede tramitar la licencia de funcionamiento.',
-    ejemplo:'Una tienda de conveniencia que solo vende alcohol en botella cerrada puede tramitar licencia ordinaria. Si instala mesas y sirve bebidas para consumo en el lugar, se convierte en giro restringido: debe obtener primero el dictamen del consejo correspondiente antes de ingresar el trámite de licencia de funcionamiento.'
-  },
-  {
-    ico:'🌊', termino:'Impacto Hidrológico Cero', nombre:'Impacto Hidrológico Cero (IHC)',
-    categoria:'tramites',
-    def:'Obligación normativa de no aumentar el escurrimiento pluvial respecto al estado natural del predio. Proyectos grandes deben incluir sistemas de captación, pozos de infiltración o superficies permeables para compensar la impermeabilización.',
-    ejemplo:'Una bodega de 5,000 m² que cubre casi todo el terreno debe instalar cisternas de retención pluvial o pozos de infiltración para cumplir con IHC.'
-  },
-  {
-    ico:'🗺️', termino:'Perímetro A / Perímetro B', nombre:'Perímetros de Contención Urbana',
-    categoria:'zonificacion',
-    def:'Delimitaciones territoriales del POTmet 2042 (IMEPLAN) que regulan el crecimiento urbano del AMG y orientan las políticas de inversión, densidad y uso de suelo. Perímetro A (zona consolidada): ciudad construida con infraestructura completa (agua, drenaje, vialidades, transporte público); se favorece la redensificación y rehabilitación con COS/CUS más elevados permitidos; para giros comerciales de alto impacto (alcoholes, entretenimiento nocturno, giros restringidos), las restricciones de distancias mínimas y de impacto vecinal son más estrictas debido a la alta densidad de población. Perímetro B (crecimiento controlado): periferia urbana donde se permiten nuevos desarrollos, pero el promovente debe garantizar la urbanización a su cargo (agua, drenaje, pavimentación); densidades y alturas más moderadas; menor presión regulatoria de impacto vecinal por menor densidad. Fuera de perímetros: restricción máxima; prácticamente no se autorizan nuevos desarrollos habitacionales o comerciales de gran escala. Regla práctica: Perímetro A = más consolidado, más regulado en giros de impacto social; Perímetro B = más permisivo en densidades bajas pero condicionado a urbanizar; Exterior = prohibición de crecimiento.',
-    ejemplo:'Un bar que abre en el Centro de Guadalajara (Perímetro A) debe respetar distancias mínimas estrictas a escuelas, iglesias y otros giros de alcohol; uno en la periferia de Tonalá (Perímetro B) enfrenta restricciones menores. Un fraccionamiento en Tlajomulco dentro del Perímetro B debe urbanizar a su cuenta; uno fuera de ambos perímetros prácticamente no se puede autorizar.'
-  },
-  {
-    ico:'📄', termino:'Manifestación de Impacto Ambiental', nombre:'MIA — Manifestación de Impacto Ambiental',
-    categoria:'tramites',
-    def:'Estudio técnico que evalúa los efectos ambientales de un proyecto. La MIA federal la resuelve SEMARNAT; la estatal la tramita SEMADET Jalisco. Requerida para proyectos en ANP, zonas de barrancas o con impacto significativo.',
-    ejemplo:'Un hotel de 200 habitaciones en zona colindante con barranca requiere MIA estatal ante SEMADET antes de cualquier licencia municipal.'
-  },
-  {
     ico:'🌳', termino:'Dictamen forestal / arbolado', nombre:'Dictamen de Arbolado Urbano',
     categoria:'tramites',
     def:'Autorización de SEMADET para derribar, trasplantar o podar árboles en la vía pública o dentro del predio cuando la construcción los afecta. Incluye compensación con reforestación.',
     ejemplo:'Si hay un árbol en la banqueta frente a tu predio y la construcción lo afecta, necesitas dictamen forestal de SEMADET. Sin él el municipio no expide la licencia.'
   },
-
-  // ── ORGANISMOS FEDERALES ────────────────────────────────────────────────────
   {
-    ico:'🏛️', termino:'INAH', nombre:'Instituto Nacional de Antropología e Historia',
+    ico:'🚗', termino:'Dirección de Movilidad', nombre:'Dirección de Movilidad y Transporte Municipal',
     categoria:'organismos',
-    def:'Organismo federal que protege el patrimonio arqueológico, histórico y artístico de México. Cualquier intervención en inmuebles catalogados o dentro de zonas de monumentos históricos requiere su autorización previa.',
-    ejemplo:'El Centro Histórico de Guadalajara y el entorno de la Basílica de Zapopan son zonas de monumentos históricos del INAH. Remodelar una fachada en esas zonas sin dictamen del INAH es ilegal.'
-  },
-  {
-    ico:'🎭', termino:'Secretaría de Cultura Jalisco', nombre:'Secretaría de Cultura del Estado de Jalisco',
-    categoria:'organismos',
-    def:'Dependencia estatal que complementa la labor del INAH en la protección del patrimonio cultural de Jalisco. Emite dictámenes para inmuebles de valor patrimonial estatal (no federales) y gestiona el catálogo de patrimonio del estado.',
-    ejemplo:'Un inmueble declarado patrimonio del estado de Jalisco pero no federal requiere autorización de la Secretaría de Cultura Jalisco, no del INAH, para cualquier modificación.'
-  },
-  {
-    ico:'💧', termino:'CONAGUA', nombre:'Comisión Nacional del Agua',
-    categoria:'organismos',
-    def:'Organismo federal que administra las aguas nacionales (ríos, acuíferos, cuerpos de agua). Otorga concesiones para extracción de agua subterránea y permisos de descarga a cuerpos de agua nacionales. Interviene en proyectos con pozos o descargas a cauces.',
-    ejemplo:'Un desarrollo habitacional con pozo propio necesita concesión de CONAGUA para extracción de agua subterránea. Un proyecto con descarga pluvial a un arroyo o río requiere permiso de descarga ante CONAGUA.'
-  },
-  {
-    ico:'⚡', termino:'CFE', nombre:'Comisión Federal de Electricidad',
-    categoria:'organismos',
-    def:'Empresa productiva del Estado que suministra energía eléctrica en México. Para proyectos de construcción emite la factibilidad de suministro eléctrico que confirma si hay capacidad en la red para atender la nueva demanda.',
-    ejemplo:'Un centro comercial o edificio de oficinas necesita tramitar la factibilidad CFE antes de iniciar obra. Sin ella el municipio no autoriza la licencia de construcción en proyectos de alta demanda.'
-  },
-  // ── ORGANISMOS ESTATALES ──────────────────────────────────────────────────
-  {
-    ico:'🌿', termino:'Medio Ambiente / Arbolado Urbano', nombre:'SEMADET — Dirección de Arbolado Urbano',
-    categoria:'organismos',
-    def:'Área de SEMADET encargada de la protección, inventario y gestión del arbolado en la vía pública y espacios públicos del estado. Toda poda, derribo o trasplante de árbol en banqueta o área pública requiere su dictamen.',
-    ejemplo:'Si tu proyecto requiere retirar un árbol de la banqueta, debes solicitar el dictamen de arbolado urbano a SEMADET con: fotos, croquis de ubicación, diámetro del tronco y motivo. El trámite puede incluir compensación con reforestación en otra zona.'
-  },
-  // ── ORGANISMOS MUNICIPALES ────────────────────────────────────────────────
-  {
-    ico:'🛡️', termino:'Protección Civil Municipal', nombre:'Dirección de Protección Civil Municipal',
-    categoria:'organismos',
-    def:'Dependencia municipal que verifica que los establecimientos y construcciones cumplan con normas de seguridad civil: extintores, salidas de emergencia, rutas de evacuación, señalética y capacidad máxima. Emite el visto bueno de PC.',
-    ejemplo:'Para obtener licencia de funcionamiento de un gimnasio, restaurante o tienda con afluencia mayor a 30 personas, necesitas el visto bueno de Protección Civil que certifica que el local es seguro para el público.'
-  },
-  {
-    ico:'📐', termino:'Ordenamiento del Territorio', nombre:'Dirección de Ordenamiento del Territorio',
-    categoria:'organismos',
-    def:'Dirección municipal responsable de aplicar los planes parciales y el reglamento de zonificación. Emite el dictamen oficial de uso de suelo, autoriza subdivisiones, fusiones y consultas de compatibilidad de giro.',
-    ejemplo:'Antes de comprar un terreno para un proyecto comercial, puedes solicitar una consulta de compatibilidad de uso de suelo a la Dirección de Ordenamiento del Territorio del municipio correspondiente.'
-  },
-  {
-    ico:'📋', termino:'Dirección de Padrón y Licencias', nombre:'Dirección de Padrón y Licencias Municipales',
-    categoria:'organismos',
-    def:'Dirección municipal encargada de registrar y autorizar los establecimientos comerciales, industriales y de servicios. Es la ventanilla donde se tramita la licencia de funcionamiento y el alta en el padrón de contribuyentes municipal.',
-    ejemplo:'Al abrir un negocio, el primer trámite municipal es darte de alta en Padrón y Licencias. Ellos revisan que tengas el uso de suelo compatible, los vistos buenos requeridos (PC, Salud, etc.) y te expiden la licencia de funcionamiento.'
+    def:'Dependencia municipal que regula el tráfico, el estacionamiento, las vialidades y los accesos desde la vía pública. Interviene en proyectos que generan impacto vial significativo (centros comerciales, hospitales, fraccionamientos).',
+    ejemplo:'Un supermercado o centro comercial grande debe presentar un Estudio de Impacto Vial (EIV) ante la Dirección de Movilidad. Si el estudio detecta problemas, pueden exigir semáforos, carriles de aceleración o limitaciones de acceso.'
   },
   {
     ico:'🏗️', termino:'Dirección de Obras Públicas', nombre:'Dirección de Obras Públicas Municipales',
@@ -871,25 +783,53 @@ const GLOSARIO = [
     ejemplo:'Cuando terminas tu construcción, Obras Públicas te realiza la inspección final y, si todo cumple con lo autorizado, emite la constancia de habitabilidad que permite que el inmueble sea ocupado.'
   },
   {
-    ico:'🚗', termino:'Dirección de Movilidad', nombre:'Dirección de Movilidad y Transporte Municipal',
+    ico:'📋', termino:'Dirección de Padrón y Licencias', nombre:'Dirección de Padrón y Licencias Municipales',
     categoria:'organismos',
-    def:'Dependencia municipal que regula el tráfico, el estacionamiento, las vialidades y los accesos desde la vía pública. Interviene en proyectos que generan impacto vial significativo (centros comerciales, hospitales, fraccionamientos).',
-    ejemplo:'Un supermercado o centro comercial grande debe presentar un Estudio de Impacto Vial (EIV) ante la Dirección de Movilidad. Si el estudio detecta problemas, pueden exigir semáforos, carriles de aceleración o limitaciones de acceso.'
-  },
-  // ── ZONIFICACIÓN ─────────────────────────────────────────────────────────
-  {
-    ico:'📐', termino:'Regla de los 56°', nombre:'Ángulo de Inclinación — Regla de los 56°',
-    categoria:'zonificacion',
-    def:'Regla urbanística de Guadalajara que limita la altura de un edificio en función del ancho de la calle. Desde un punto en la acera opuesta, la fachada del edificio no puede superar un ángulo de 56° sobre la horizontal. Esto garantiza iluminación solar y ventilación en la vía pública. La fórmula es: Altura máxima = distancia desde el centro de la calle × tan(56°) ≈ × 1.48.',
-    ejemplo:'Calle de 12 m de ancho → 6 m desde el centro hasta la fachada → Altura máxima ≈ 6 × 1.48 = 8.88 m (aproximadamente 3 niveles). Si la calle tiene 20 m, la altura máxima sube a ≈ 14.8 m (unos 5 niveles). En predios con frente a avenidas anchas, esta regla permite mayor altura.'
+    def:'Dirección municipal encargada de registrar y autorizar los establecimientos comerciales, industriales y de servicios. Es la ventanilla donde se tramita la licencia de funcionamiento y el alta en el padrón de contribuyentes municipal.',
+    ejemplo:'Al abrir un negocio, el primer trámite municipal es darte de alta en Padrón y Licencias. Ellos revisan que tengas el uso de suelo compatible, los vistos buenos requeridos (PC, Salud, etc.) y te expiden la licencia de funcionamiento.'
   },
   {
-    ico:'🗺️', termino:'Uso de suelo', nombre:'Uso de Suelo',
-    categoria:'zonificacion',
-    def:'Clasificación normativa que determina para qué puede utilizarse un terreno o inmueble: habitacional, comercial, industrial, mixto, equipamiento, áreas verdes, etc. Está definido en el Plan Parcial de Desarrollo Urbano de cada municipio y no puede modificarse sin autorización.',
-    ejemplo:'Un terreno con uso de suelo "Habitacional Unifamiliar" solo puede tener casas. Si quieres poner un negocio, primero debes verificar si el uso comercial es compatible (permitido o condicionado) o si necesitas tramitar un cambio de uso de suelo ante el municipio.'
+    ico:'👷', termino:'DRO', nombre:'Director Responsable de Obra',
+    categoria:'actores',
+    def:'Profesionista acreditado ante el municipio (arquitecto o ingeniero) que firma y asume responsabilidad técnica y legal de un proyecto de construcción. Sin DRO no se autoriza ninguna licencia de obra en el AMG.',
+    ejemplo:'Para construir un edificio de 6 departamentos necesitas contratar un DRO registrado en el padrón municipal de GDL o ZPN. El DRO firma planos, memorias y es responsable ante el municipio.'
   },
-  // ── TRÁMITES ─────────────────────────────────────────────────────────────
+  {
+    ico:'📄', termino:'EIV', nombre:'Estudio de Impacto Vial',
+    categoria:'tramites',
+    def:'Análisis técnico que cuantifica los viajes vehiculares y peatonales que generará un proyecto, y evalúa si la red vial existente puede absorberlos sin afectar la circulación. Es requisito para desarrollos que superan ciertos umbrales de superficie o aforo (centros comerciales, hospitales, fraccionamientos, hoteles). Lo revisa y aprueba la Dirección de Movilidad del municipio.',
+    ejemplo:'Un supermercado de 3,500 m² en GDL genera entre 800 y 1,200 viajes por hora pico. El EIV debe demostrar que la intersección más cercana no se saturará. Si se detecta problema, el desarrollador puede tener que financiar un semáforo, un carril de aceleración o ajustar el acceso del estacionamiento.'
+  },
+  {
+    ico:'⚡', termino:'Factibilidad CFE', nombre:'Factibilidad de Suministro Eléctrico — CFE',
+    categoria:'tramites',
+    def:'Documento de CFE que confirma que la red eléctrica tiene capacidad para atender la demanda del proyecto. Se calcula en KVA (kilovoltamperes) según el uso del inmueble. Para proyectos de alta demanda es requisito previo a la licencia de construcción.',
+    ejemplo:'Un hospital privado de 5,000 m² estima una demanda de 800 KVA. CFE revisa la red del área y emite la factibilidad confirmando que puede suministrar esa carga. Si no hay capacidad, puede requerir que el desarrollador costee una subestación eléctrica.'
+  },
+  {
+    ico:'💧', termino:'Factibilidad SIAPA', nombre:'Factibilidad de Servicios — SIAPA',
+    categoria:'tramites',
+    def:'Documento emitido por SIAPA que certifica que existe capacidad suficiente en la red de agua potable y alcantarillado para atender el proyecto. Es requisito previo a la licencia de construcción. Se solicita con los datos del predio y el número de unidades o superficie a construir.',
+    ejemplo:'Para construir un edificio de 20 departamentos en GDL, el DRO debe presentar la factibilidad SIAPA al municipio junto con el expediente de licencia. Si la red no tiene capacidad, SIAPA puede condicionarla a ampliaciones de infraestructura a cargo del desarrollador.'
+  },
+  {
+    ico:'📄', termino:'Fusión', nombre:'Fusión de Predios',
+    categoria:'tramites',
+    def:'Trámite inverso a la subdivisión: dos o más predios contiguos se unen en uno solo con una sola clave catastral. Común antes de desarrollos inmobiliarios para tener mayor superficie continua.',
+    ejemplo:'Dos terrenos de 300 m² cada uno se fusionan en un solo predio de 600 m², lo que permite aprovechar mejor el potencial constructivo de la zona.'
+  },
+  {
+    ico:'🚫', termino:'Giro restringido', nombre:'Giro Restringido o de Control Especial',
+    categoria:'tramites',
+    def:'Actividad comercial cuyo funcionamiento requiere autorización especial adicional a la licencia ordinaria de funcionamiento, por el impacto potencial que genera en el entorno social, la salud pública, la seguridad o la tranquilidad vecinal. Incluye: cantinas, bares, centros nocturnos, establecimientos con baile, venta de bebidas alcohólicas para consumo en el lugar, casas de empeño y giros con entretenimiento para adultos, entre otros. Cada municipio del AMG define su propio catálogo: en Guadalajara se denominan "giros de control especial" (RGIM); en Tonalá los regula el Consejo Municipal para Giros de Control Especial (Acuerdo 135/2025); otros municipios tienen esquemas similares. El proceso de autorización incluye inspección previa al local, opinión de vecinos colindantes y dictamen de la comisión o consejo municipal competente — solo después de ese dictamen favorable se puede tramitar la licencia de funcionamiento.',
+    ejemplo:'Una tienda de conveniencia que solo vende alcohol en botella cerrada puede tramitar licencia ordinaria. Si instala mesas y sirve bebidas para consumo en el lugar, se convierte en giro restringido: debe obtener primero el dictamen del consejo correspondiente antes de ingresar el trámite de licencia de funcionamiento.'
+  },
+  {
+    ico:'📋', termino:'Giro tipo A/B/C/D', nombre:'Categorías de Giro Comercial',
+    categoria:'tramites',
+    def:'Clasificación municipal del impacto de un establecimiento comercial. A = bajo impacto (papelería, estética). B = impacto medio (restaurante, gimnasio). C = alto impacto (bar, gasolinera). D = giro especial con requisitos adicionales.',
+    ejemplo:'Un taller mecánico en GDL es giro tipo C. Requiere visto bueno de PC, SEMADET y uso de suelo compatible. Una librería es tipo A y tiene trámite simplificado.'
+  },
   {
     ico:'🏠', termino:'Habitabilidad', nombre:'Constancia de Habitabilidad',
     categoria:'tramites',
@@ -909,36 +849,16 @@ const GLOSARIO = [
     ejemplo:'Al terminar completamente un fraccionamiento de 50 casas, el desarrollador solicita la habitabilidad total que certifica que todas las casas, áreas comunes, vialidades internas y servicios están terminados y aprobados por el municipio.'
   },
   {
-    ico:'💧', termino:'Factibilidad SIAPA', nombre:'Factibilidad de Servicios — SIAPA',
-    categoria:'tramites',
-    def:'Documento emitido por SIAPA que certifica que existe capacidad suficiente en la red de agua potable y alcantarillado para atender el proyecto. Es requisito previo a la licencia de construcción. Se solicita con los datos del predio y el número de unidades o superficie a construir.',
-    ejemplo:'Para construir un edificio de 20 departamentos en GDL, el DRO debe presentar la factibilidad SIAPA al municipio junto con el expediente de licencia. Si la red no tiene capacidad, SIAPA puede condicionarla a ampliaciones de infraestructura a cargo del desarrollador.'
-  },
-  {
-    ico:'♻️', termino:'Punto Limpio', nombre:'Punto Limpio — Centro Municipal de Acopio',
-    categoria:'tramites',
-    def:'Instalación municipal gratuita donde los ciudadanos depositan residuos de difícil disposición que no se recolectan en la basura domiciliaria ordinaria. Acepta residuos electrónicos (RAEE), pilas y baterías, aceites usados, medicamentos caducados, cartón, escombro en pequeñas cantidades y otros materiales reciclables clasificados. Operados por los municipios del AMG como parte de la Gestión Integral de Residuos Sólidos Urbanos (GIRSU).',
-    ejemplo:'En Zapopan puedes llevar tu viejo refrigerador, pilas gastadas y medicamentos vencidos al Punto Limpio de la Unidad Administrativa El Vergel (Av. De los Robles 1566). En GDL los Puntos Limpios están en distintas colonias y son gratuitos para uso doméstico. Para residuos de obra (escombro), el volumen permitido es limitado; excedentes requieren empresa transportista autorizada por SEMADET.'
-  },
-  {
-    ico:'⚡', termino:'Factibilidad CFE', nombre:'Factibilidad de Suministro Eléctrico — CFE',
-    categoria:'tramites',
-    def:'Documento de CFE que confirma que la red eléctrica tiene capacidad para atender la demanda del proyecto. Se calcula en KVA (kilovoltamperes) según el uso del inmueble. Para proyectos de alta demanda es requisito previo a la licencia de construcción.',
-    ejemplo:'Un hospital privado de 5,000 m² estima una demanda de 800 KVA. CFE revisa la red del área y emite la factibilidad confirmando que puede suministrar esa carga. Si no hay capacidad, puede requerir que el desarrollador costee una subestación eléctrica.'
-  },
-
-  // ── NUEVOS TÉRMINOS: LICENCIAS DE GIRO Y CONSTRUCCIÓN ────────────────────
-  {
-    ico:'📋', termino:'CLG', nombre:'Certificado de Libertad de Gravamen',
-    categoria:'tramites',
-    def:'Documento expedido por el Registro Público de la Propiedad y del Comercio (RPPyC) de Jalisco que certifica que un inmueble no tiene hipotecas, embargos, adeudos o cualquier otro gravamen registrado. Tiene vigencia de 30 días y es requisito obligatorio para tramitar licencias de construcción y de funcionamiento en la mayoría de municipios del AMG.',
-    ejemplo:'Antes de solicitar la licencia de construcción de un edificio de departamentos en ZPN, el trámite incluye presentar el CLG vigente del predio. Si el terreno tiene hipoteca, el RPPyC lo indicará en el certificado y el municipio puede condicionar la licencia hasta resolver el gravamen.'
-  },
-  {
-    ico:'📊', termino:'CUSMAX', nombre:'Coeficiente de Utilización del Suelo Máximo',
+    ico:'📊', termino:'iCOS', nombre:'Índice de Ocupación del Suelo (niveles superiores)',
     categoria:'coeficientes',
-    def:'Límite absoluto de superficie construible total en un predio, expresado como múltiplo de la superficie del terreno. A diferencia del CUS regular, el CUSMAX no puede incrementarse con transferencias de potencial, compensaciones ni acuerdos especiales. Es el techo definitivo de edificación que ningún proyecto puede superar independientemente de los estímulos que aplique.',
-    ejemplo:'En un plan parcial de Zapopan, una zona puede tener CUS 3.0 (base) y CUSMAX 4.5. Con transferencia de potencial puedes llegar hasta 4.5 pero nunca más. Un predio de 500 m² puede tener máximo 2,250 m² de construcción total aunque el propietario compre todos los derechos de desarrollo disponibles.'
+    def:'Restricción de huella de construcción aplicable a partir del segundo nivel o planta alta. Generalmente es menor que el COS para obligar a retrocesos en altura.',
+    ejemplo:'En GDL, zonas H3-V pueden tener COS 0.70 en PB e iCOS 0.50 desde el segundo nivel, creando una "escalera" de retrocesos.'
+  },
+  {
+    ico:'📊', termino:'iCUS', nombre:'Índice de Utilización del Suelo (superficies superiores)',
+    categoria:'coeficientes',
+    def:'Límite de superficie por nivel individual en plantas altas. Complementa al CUS para regular cómo se distribuye la construcción verticalmente.',
+    ejemplo:'Usado principalmente en Zapopan para controlar la masa volumétrica de torres habitacionales.'
   },
   {
     ico:'📊', termino:'IDE', nombre:'Índice de Edificación',
@@ -947,40 +867,28 @@ const GLOSARIO = [
     ejemplo:'En una zona H3-V de Zapopan con superficie mínima por unidad de 60 m², un terreno de 480 m² tiene IDE = 8. Aunque el CUS permita construir 1,440 m² totales (suficientes para 10 departamentos de 144 m² c/u), el IDE limita a 8 unidades. La restricción más estricta prevalece siempre.'
   },
   {
-    ico:'📄', termino:'EIV', nombre:'Estudio de Impacto Vial',
-    categoria:'tramites',
-    def:'Análisis técnico que cuantifica los viajes vehiculares y peatonales que generará un proyecto, y evalúa si la red vial existente puede absorberlos sin afectar la circulación. Es requisito para desarrollos que superan ciertos umbrales de superficie o aforo (centros comerciales, hospitales, fraccionamientos, hoteles). Lo revisa y aprueba la Dirección de Movilidad del municipio.',
-    ejemplo:'Un supermercado de 3,500 m² en GDL genera entre 800 y 1,200 viajes por hora pico. El EIV debe demostrar que la intersección más cercana no se saturará. Si se detecta problema, el desarrollador puede tener que financiar un semáforo, un carril de aceleración o ajustar el acceso del estacionamiento.'
+    ico:'🏙️', termino:'IMEPLAN', nombre:'Instituto Metropolitano de Planeación del AMG',
+    categoria:'organismos',
+    def:'Organismo público intermunicipal creado en 2014 que planifica y coordina el desarrollo urbano y territorial de la Zona Metropolitana de Guadalajara. Es el autor del POTmet 2042, que establece los Perímetros de Contención Urbana y las directrices metropolitanas de uso de suelo, movilidad e infraestructura. Sus dictámenes tienen jerarquía sobre los planes municipales para proyectos de escala metropolitana.',
+    ejemplo:'Un desarrollo inmobiliario de gran escala en Tlajomulco que impacta la movilidad de toda la zona metropolitana requiere dictamen de IMEPLAN antes de que el municipio pueda emitir el uso de suelo. El POTmet que emitió IMEPLAN define si el predio está dentro del Perímetro A, B o fuera de perímetros.'
   },
   {
-    ico:'🏷️', termino:'SCIAN', nombre:'Sistema de Clasificación Industrial de América del Norte',
+    ico:'🌊', termino:'Impacto Hidrológico Cero', nombre:'Impacto Hidrológico Cero (IHC)',
     categoria:'tramites',
-    def:'Nomenclatura estándar compartida por México, EUA y Canadá que clasifica todas las actividades económicas en códigos numéricos de 6 dígitos. En el AMG, los municipios usan el SCIAN para identificar el giro de un negocio y determinar sus requisitos de licencia, uso de suelo compatible, aforo y tarifas de derechos. Es la base de los catálogos de giros comerciales en M02 y M06.',
-    ejemplo:'Una "Taquería con servicio a mesa" tiene código SCIAN 722511 (Restaurantes con servicio completo). Con ese código el municipio determina: uso de suelo compatible (CS o MC), categoría de giro (B o C), dictámenes requeridos (PC, SSJ) y tarifa de la licencia de funcionamiento.'
+    def:'Obligación normativa de no aumentar el escurrimiento pluvial respecto al estado natural del predio. Proyectos grandes deben incluir sistemas de captación, pozos de infiltración o superficies permeables para compensar la impermeabilización.',
+    ejemplo:'Una bodega de 5,000 m² que cubre casi todo el terreno debe instalar cisternas de retención pluvial o pozos de infiltración para cumplir con IHC.'
   },
   {
-    ico:'🏥', termino:'Aviso de Funcionamiento Sanitario', nombre:'Aviso de Funcionamiento — COEPRIS / SSJ',
-    categoria:'tramites',
-    def:'Notificación obligatoria ante la Comisión Estatal para la Protección contra Riesgos Sanitarios (COEPRIS / Servicios de Salud Jalisco) para establecimientos que manejan alimentos, bebidas, cosméticos, medicamentos o prestan servicios de salud. Debe tramitarse antes de solicitar la licencia municipal de funcionamiento. Se gestiona en línea a través del portal COFEPRIS o en las ventanillas de la SSJ.',
-    ejemplo:'Una cafetería no puede obtener su licencia de funcionamiento municipal sin presentar primero el Aviso de Funcionamiento Sanitario. El municipio lo verifica como requisito del expediente. El aviso debe renovarse cada dos años y exhibirse en el establecimiento.'
+    ico:'🏛️', termino:'INAH', nombre:'Instituto Nacional de Antropología e Historia',
+    categoria:'organismos',
+    def:'Organismo federal que protege el patrimonio arqueológico, histórico y artístico de México. Cualquier intervención en inmuebles catalogados o dentro de zonas de monumentos históricos requiere su autorización previa.',
+    ejemplo:'El Centro Histórico de Guadalajara y el entorno de la Basílica de Zapopan son zonas de monumentos históricos del INAH. Remodelar una fachada en esas zonas sin dictamen del INAH es ilegal.'
   },
   {
-    ico:'🔄', termino:'Cambio de uso de suelo', nombre:'Cambio de Uso de Suelo',
+    ico:'🍺', termino:'Licencia de alcoholes', nombre:'Licencia para Venta o Consumo de Bebidas Alcohólicas',
     categoria:'tramites',
-    def:'Trámite formal ante la Dirección de Ordenamiento Territorial para modificar el uso autorizado de un predio en el Plan Parcial. No todos los cambios son posibles: el municipio analiza compatibilidad con la zona, impacto vial, servicios existentes y voto de los vecinos. En algunos casos requiere aprobación del Cabildo y publicación en el Periódico Oficial del Estado.',
-    ejemplo:'Un terreno con uso de suelo habitacional H2 que quiere convertirse en comercio de barrio MC puede solicitar cambio de uso de suelo. El municipio evalúa la solicitud y puede aprobarla, negarla o condicionarla (por ejemplo, sin venta de alcohol, sin estacionamiento de alto flujo). El proceso puede tardar de 3 a 12 meses.'
-  },
-  {
-    ico:'🔨', termino:'Ruptura de pavimento', nombre:'Permiso de Ruptura de Pavimento',
-    categoria:'tramites',
-    def:'Autorización municipal para cortar o romper la banqueta, guarnición o calzada para ejecutar trabajos de instalación de tomas de agua, drenaje, gas, fibra óptica u otros. Al terminar, el responsable debe reintegrar el pavimento en las mismas condiciones originales. Se solicita en la Dirección de Obras Públicas junto con una garantía económica.',
-    ejemplo:'Para conectar la toma de agua de un nuevo edificio a la red municipal, el plomero o constructor debe tramitar un permiso de ruptura de pavimento indicando la calle, la longitud de la zanja y la fecha estimada de trabajo. Si no se repone correctamente, el municipio ejecuta la garantía y recupera el costo.'
-  },
-  {
-    ico:'🗂️', termino:'Clave catastral', nombre:'Clave Catastral del Predio',
-    categoria:'tramites',
-    def:'Código alfanumérico único que identifica a cada predio dentro del padrón catastral municipal. Es el número de identidad del terreno y es obligatorio en todos los trámites de construcción, licencias de funcionamiento, traslados de dominio y pagos de predial. Se obtiene en la Dirección de Catastro municipal.',
-    ejemplo:'Una clave catastral típica en GDL tiene el formato: 0039-0001-0001 (manzana-lote-fracción). Con esa clave puedes verificar en Catastro la superficie del predio, el valor catastral, los propietarios registrados y si hay adeudos de predial. Sin clave catastral no avanza ningún trámite.'
+    def:'Autorización municipal específica para establecimientos que venden, sirven o permiten el consumo de bebidas con contenido alcohólico. Es adicional e independiente de la licencia de funcionamiento general. Se clasifica según el tipo de expendio: abarrotes, restaurante con bar, cantina, cervecera, etc. Cada categoría tiene restricciones de horario, distancia a escuelas e iglesias, y tarifa de derechos diferenciada.',
+    ejemplo:'Un restaurante que quiere ofrecer cerveza y vino de mesa necesita solicitar licencia de alcoholes en la categoría restaurante-bar además de su licencia de funcionamiento general. En GDL la tarifa es proporcional a la categoría y superficie. Si el local está a menos de 200 metros de una escuela primaria, la licencia puede ser negada en ese municipio.'
   },
   {
     ico:'📢', termino:'Licencia de anuncio', nombre:'Licencia de Anuncio Publicitario',
@@ -989,16 +897,88 @@ const GLOSARIO = [
     ejemplo:'Un local comercial que quiere poner un letrero iluminado en fachada de 3 × 1 m y una lona en la ventana necesita licencia de anuncio aparte de su licencia de funcionamiento. En zonas de centro histórico (GDL, Zapopan) los materiales, colores y tamaños están muy regulados por el reglamento de imagen urbana.'
   },
   {
+    ico:'📄', termino:'Licencia de construcción', nombre:'Licencia de Construcción',
+    categoria:'tramites',
+    def:'Autorización municipal que permite ejecutar una obra (nueva construcción, ampliación, remodelación, demolición). Es obligatoria antes de iniciar cualquier trabajo de obra en el AMG.',
+    ejemplo:'Antes de levantar una barda, ampliar una cocina o construir un cuarto adicional necesitas licencia de construcción del municipio donde se ubica el predio.'
+  },
+  {
+    ico:'📄', termino:'Licencia de funcionamiento', nombre:'Licencia de Funcionamiento',
+    categoria:'tramites',
+    def:'Autorización municipal para operar un negocio o establecimiento comercial. Es diferente a la licencia de construcción. Se tramita en la Dirección de Padrón o Gobierno Municipal.',
+    ejemplo:'Un restaurante necesita licencia de funcionamiento (para operar el negocio) Y puede necesitar licencia de construcción (si se va a remodelar el local).'
+  },
+  {
+    ico:'📄', termino:'Manifestación de Impacto Ambiental', nombre:'MIA — Manifestación de Impacto Ambiental',
+    categoria:'tramites',
+    def:'Estudio técnico que evalúa los efectos ambientales de un proyecto. La MIA federal la resuelve SEMARNAT; la estatal la tramita SEMADET Jalisco. Requerida para proyectos en ANP, zonas de barrancas o con impacto significativo.',
+    ejemplo:'Un hotel de 200 habitaciones en zona colindante con barranca requiere MIA estatal ante SEMADET antes de cualquier licencia municipal.'
+  },
+  {
     ico:'📝', termino:'Manifestación de obra', nombre:'Manifestación de Obra (Obra Menor)',
     categoria:'tramites',
     def:'Trámite simplificado, alternativo a la licencia de construcción completa, para obras de bajo impacto que no modifican la estructura del inmueble: pintura de fachada, impermeabilización, cambio de recubrimientos, instalación de tinacos, albañilería menor. La gestión es más rápida y de menor costo. El alcance varía por municipio.',
     ejemplo:'Cambiar el piso de una habitación, instalar un baño adicional sin modificar muros de carga, o impermeabilizar una azotea son trabajos que en GDL y ZPN pueden tramitarse como manifestación de obra. Si la obra se extiende o afecta estructura, el municipio puede exigir convertirla en licencia de construcción regular con firma de DRO.'
   },
   {
+    ico:'🌿', termino:'Medio Ambiente / Arbolado Urbano', nombre:'SEMADET — Dirección de Arbolado Urbano',
+    categoria:'organismos',
+    def:'Área de SEMADET encargada de la protección, inventario y gestión del arbolado en la vía pública y espacios públicos del estado. Toda poda, derribo o trasplante de árbol en banqueta o área pública requiere su dictamen.',
+    ejemplo:'Si tu proyecto requiere retirar un árbol de la banqueta, debes solicitar el dictamen de arbolado urbano a SEMADET con: fotos, croquis de ubicación, diámetro del tronco y motivo. El trámite puede incluir compensación con reforestación en otra zona.'
+  },
+  {
+    ico:'📐', termino:'Ordenamiento del Territorio', nombre:'Dirección de Ordenamiento del Territorio',
+    categoria:'organismos',
+    def:'Dirección municipal responsable de aplicar los planes parciales y el reglamento de zonificación. Emite el dictamen oficial de uso de suelo, autoriza subdivisiones, fusiones y consultas de compatibilidad de giro.',
+    ejemplo:'Antes de comprar un terreno para un proyecto comercial, puedes solicitar una consulta de compatibilidad de uso de suelo a la Dirección de Ordenamiento del Territorio del municipio correspondiente.'
+  },
+  {
     ico:'🏷️', termino:'Padrón de contribuyentes municipal', nombre:'Alta en Padrón de Contribuyentes Municipal',
     categoria:'tramites',
     def:'Registro obligatorio de todo negocio ante la Dirección de Padrón y Licencias del municipio donde opera. Es el paso previo a la licencia de funcionamiento. El alta incluye datos del propietario, giro SCIAN, domicilio, superficie del local, régimen fiscal y los vistos buenos requeridos. Una vez dado de alta, el negocio queda sujeto a inspecciones periódicas.',
     ejemplo:'Antes de que el municipio te entregue la licencia de funcionamiento de tu negocio, debes llenar la cédula de empadronamiento con los datos del establecimiento, presentar INE, RFC, comprobante de domicilio del local, comprobante del uso de suelo y los vistos buenos (PC, SSJ si aplica). Ese expediente queda en el padrón municipal permanentemente.'
+  },
+  {
+    ico:'🗺️', termino:'Perímetro A / Perímetro B', nombre:'Perímetros de Contención Urbana',
+    categoria:'zonificacion',
+    def:'Delimitaciones territoriales del POTmet 2042 (IMEPLAN) que regulan el crecimiento urbano del AMG y orientan las políticas de inversión, densidad y uso de suelo. Perímetro A (zona consolidada): ciudad construida con infraestructura completa (agua, drenaje, vialidades, transporte público); se favorece la redensificación y rehabilitación con COS/CUS más elevados permitidos; para giros comerciales de alto impacto (alcoholes, entretenimiento nocturno, giros restringidos), las restricciones de distancias mínimas y de impacto vecinal son más estrictas debido a la alta densidad de población. Perímetro B (crecimiento controlado): periferia urbana donde se permiten nuevos desarrollos, pero el promovente debe garantizar la urbanización a su cargo (agua, drenaje, pavimentación); densidades y alturas más moderadas; menor presión regulatoria de impacto vecinal por menor densidad. Fuera de perímetros: restricción máxima; prácticamente no se autorizan nuevos desarrollos habitacionales o comerciales de gran escala. Regla práctica: Perímetro A = más consolidado, más regulado en giros de impacto social; Perímetro B = más permisivo en densidades bajas pero condicionado a urbanizar; Exterior = prohibición de crecimiento.',
+    ejemplo:'Un bar que abre en el Centro de Guadalajara (Perímetro A) debe respetar distancias mínimas estrictas a escuelas, iglesias y otros giros de alcohol; uno en la periferia de Tonalá (Perímetro B) enfrenta restricciones menores. Un fraccionamiento en Tlajomulco dentro del Perímetro B debe urbanizar a su cuenta; uno fuera de ambos perímetros prácticamente no se puede autorizar.'
+  },
+  {
+    ico:'👷', termino:'Perito Corresponsable', nombre:'Perito Corresponsable de Obra',
+    categoria:'actores',
+    def:'Especialista adicional que co-firma el proyecto en áreas específicas cuando la obra supera ciertos umbrales. Tipos: estructural, instalaciones, diseño urbano.',
+    ejemplo:'Una bodega industrial de 2,500 m² en ZPN requiere Perito Corresponsable en Estructuras además del DRO, porque supera el umbral de superficie.'
+  },
+  {
+    ico:'📐', termino:'Polígono de actuación', nombre:'Polígono de Actuación Urbanística',
+    categoria:'zonificacion',
+    def:'Delimitación territorial establecida en un PPDU que define un área específica donde se coordinan acciones de desarrollo, regeneración o mejoramiento urbano de manera integral. Permite que varios predios actúen en conjunto para cumplir obligaciones de urbanización, cesión de áreas verdes y equipamiento, transferencia de potencial o proyectos de redensificación. Dentro del polígono, los propietarios pueden celebrar convenios entre sí y con el municipio para distribuir cargas y beneficios.',
+    ejemplo:'Un conjunto de 8 predios vecinos en el Centro de Guadalajara que individualmente no cumplen el frente mínimo para proyectos de redensificación, pueden constituir un polígono de actuación. Así actúan como una sola unidad, comparten la obligación de ceder área verde y pueden acceder colectivamente al mecanismo de Transferencia de Derechos de Desarrollo.'
+  },
+  {
+    ico:'🗺️', termino:'POTmet', nombre:'Programa de Ordenamiento Territorial Metropolitano 2024',
+    categoria:'zonificacion',
+    def:'Instrumento de planeación de escala metropolitana que establece la visión de crecimiento del AMG al 2042. Tiene jerarquía superior a los planes municipales. Emitido por IMEPLAN.',
+    ejemplo:'Si el POTmet clasifica un área como "zona de contención" y el municipio la tiene como "zona de crecimiento", prevalece el POTmet.'
+  },
+  {
+    ico:'🗺️', termino:'PPDU', nombre:'Plan Parcial de Desarrollo Urbano',
+    categoria:'zonificacion',
+    def:'Documento normativo que regula el uso del suelo, densidades, alturas y restricciones en un área específica de la ciudad. Cada municipio tiene varios PPDUs que cubren su territorio.',
+    ejemplo:'Zapopan tiene 12 PPDUs (ZPN-01 a ZPN-12). El predio de Andares está en ZPN-05 "Vallarta-Patria". Ese plan define exactamente qué puede construirse ahí.'
+  },
+  {
+    ico:'🛡️', termino:'Protección Civil Municipal', nombre:'Dirección de Protección Civil Municipal',
+    categoria:'organismos',
+    def:'Dependencia municipal que verifica que los establecimientos y construcciones cumplan con normas de seguridad civil: extintores, salidas de emergencia, rutas de evacuación, señalética y capacidad máxima. Emite el visto bueno de PC.',
+    ejemplo:'Para obtener licencia de funcionamiento de un gimnasio, restaurante o tienda con afluencia mayor a 30 personas, necesitas el visto bueno de Protección Civil que certifica que el local es seguro para el público.'
+  },
+  {
+    ico:'♻️', termino:'Punto Limpio', nombre:'Punto Limpio — Centro Municipal de Acopio',
+    categoria:'tramites',
+    def:'Instalación municipal gratuita donde los ciudadanos depositan residuos de difícil disposición que no se recolectan en la basura domiciliaria ordinaria. Acepta residuos electrónicos (RAEE), pilas y baterías, aceites usados, medicamentos caducados, cartón, escombro en pequeñas cantidades y otros materiales reciclables clasificados. Operados por los municipios del AMG como parte de la Gestión Integral de Residuos Sólidos Urbanos (GIRSU).',
+    ejemplo:'En Zapopan puedes llevar tu viejo refrigerador, pilas gastadas y medicamentos vencidos al Punto Limpio de la Unidad Administrativa El Vergel (Av. De los Robles 1566). En GDL los Puntos Limpios están en distintas colonias y son gratuitos para uso doméstico. Para residuos de obra (escombro), el volumen permitido es limitado; excedentes requieren empresa transportista autorizada por SEMADET.'
   },
   {
     ico:'🔄', termino:'Refrendo / Prórroga de licencia de construcción', nombre:'Refrendo de Licencia de Construcción',
@@ -1013,10 +993,34 @@ const GLOSARIO = [
     ejemplo:'Un restaurante con licencia de funcionamiento expedida en marzo de 2023 debe tramitar el refrendo en enero–marzo de 2024 pagando la tarifa correspondiente. En GDL y ZPN el refrendo incluye la actualización de datos del padrón y la verificación de que siguen vigentes los vistos buenos de PC y SSJ.'
   },
   {
-    ico:'🍺', termino:'Licencia de alcoholes', nombre:'Licencia para Venta o Consumo de Bebidas Alcohólicas',
+    ico:'🏘️', termino:'Régimen de condominio', nombre:'Régimen de Condominio',
     categoria:'tramites',
-    def:'Autorización municipal específica para establecimientos que venden, sirven o permiten el consumo de bebidas con contenido alcohólico. Es adicional e independiente de la licencia de funcionamiento general. Se clasifica según el tipo de expendio: abarrotes, restaurante con bar, cantina, cervecera, etc. Cada categoría tiene restricciones de horario, distancia a escuelas e iglesias, y tarifa de derechos diferenciada.',
-    ejemplo:'Un restaurante que quiere ofrecer cerveza y vino de mesa necesita solicitar licencia de alcoholes en la categoría restaurante-bar además de su licencia de funcionamiento general. En GDL la tarifa es proporcional a la categoría y superficie. Si el local está a menos de 200 metros de una escuela primaria, la licencia puede ser negada en ese municipio.'
+    def:'Figura jurídica que permite que un inmueble tenga múltiples propietarios, cada uno con una unidad privativa (departamento, local, oficina) y derechos sobre las áreas comunes. Debe constituirse ante notario e inscribirse en el RPPyC.',
+    ejemplo:'Un edificio de 12 departamentos se constituye en régimen de condominio para poder vender cada departamento a un propietario diferente con escritura individual.'
+  },
+  {
+    ico:'📐', termino:'Regla de los 56°', nombre:'Ángulo de Inclinación — Regla de los 56°',
+    categoria:'zonificacion',
+    def:'Regla urbanística de Guadalajara que limita la altura de un edificio en función del ancho de la calle. Desde un punto en la acera opuesta, la fachada del edificio no puede superar un ángulo de 56° sobre la horizontal. Esto garantiza iluminación solar y ventilación en la vía pública. La fórmula es: Altura máxima = distancia desde el centro de la calle × tan(56°) ≈ × 1.48.',
+    ejemplo:'Calle de 12 m de ancho → 6 m desde el centro hasta la fachada → Altura máxima ≈ 6 × 1.48 = 8.88 m (aproximadamente 3 niveles). Si la calle tiene 20 m, la altura máxima sube a ≈ 14.8 m (unos 5 niveles). En predios con frente a avenidas anchas, esta regla permite mayor altura.'
+  },
+  {
+    ico:'📏', termino:'Restricción frontal', nombre:'Restricción Frontal (Retiro)',
+    categoria:'zonificacion',
+    def:'Distancia mínima que debe dejarse libre entre la línea de propiedad (banqueta) y la construcción. Varía por zona y municipio. No puede construirse ni techarse en esa franja.',
+    ejemplo:'Una zona MV1-H en ZPN puede tener restricción frontal de 3 ml. Si tu terreno empieza en la banqueta, los primeros 3 metros deben quedar como área libre o jardín frontal.'
+  },
+  {
+    ico:'📏', termino:'Restricciones laterales y posteriores', nombre:'Restricciones Laterales y Posteriores',
+    categoria:'zonificacion',
+    def:'Franjas libres obligatorias en los lados y el fondo del terreno. Garantizan ventilación, iluminación y separación entre edificios. Se expresan en metros lineales.',
+    ejemplo:'Restricción lateral de 1.5 ml significa que ninguna construcción puede estar a menos de 1.5 m de la colindancia lateral con el vecino.'
+  },
+  {
+    ico:'🔨', termino:'Ruptura de pavimento', nombre:'Permiso de Ruptura de Pavimento',
+    categoria:'tramites',
+    def:'Autorización municipal para cortar o romper la banqueta, guarnición o calzada para ejecutar trabajos de instalación de tomas de agua, drenaje, gas, fibra óptica u otros. Al terminar, el responsable debe reintegrar el pavimento en las mismas condiciones originales. Se solicita en la Dirección de Obras Públicas junto con una garantía económica.',
+    ejemplo:'Para conectar la toma de agua de un nuevo edificio a la red municipal, el plomero o constructor debe tramitar un permiso de ruptura de pavimento indicando la calle, la longitud de la zanja y la fecha estimada de trabajo. Si no se repone correctamente, el municipio ejecuta la garantía y recupera el costo.'
   },
   {
     ico:'⚡', termino:'SARE', nombre:'Sistema de Apertura Rápida de Empresas',
@@ -1025,52 +1029,34 @@ const GLOSARIO = [
     ejemplo:'Una papelería que quiere abrir en Tlajomulco ingresa al SARE: presenta documentación básica (INE, RFC, comprobante domicilio, uso de suelo) y en máximo 3 días hábiles recibe su licencia sin dictamen previo de PC ni SSJ. Si el municipio no responde en ese plazo, la Afirmativa Ficta le otorga la licencia automáticamente.'
   },
   {
-    ico:'✅', termino:'Afirmativa Ficta', nombre:'Afirmativa Ficta (Silencio Administrativo Positivo)',
+    ico:'🏷️', termino:'SCIAN', nombre:'Sistema de Clasificación Industrial de América del Norte',
     categoria:'tramites',
-    def:'Principio jurídico por el cual, si una autoridad no responde una solicitud dentro del plazo legalmente establecido, la respuesta se considera aprobada de manera automática. En Tlajomulco de Zúñiga aplica a giros SARE de bajo riesgo: si la Oficialía Mayor de Padrón y Licencias no emite resolución en 3 días hábiles, la licencia de funcionamiento se tiene por otorgada (Art. 13 Ter, Reglamento de Giros TLA 2021). El solicitante debe conservar el acuse de recibo como comprobante.',
-    ejemplo:'Una pequeña tienda de artesanías ingresa su solicitud SARE el lunes. Si para el jueves al mediodía no ha recibido respuesta municipal, la Afirmativa Ficta opera y puede iniciar operaciones exhibiendo su acuse de recibo. No aplica para giros de alto riesgo, alcoholes, ni municipios sin SARE implementado.'
+    def:'Nomenclatura estándar compartida por México, EUA y Canadá que clasifica todas las actividades económicas en códigos numéricos de 6 dígitos. En el AMG, los municipios usan el SCIAN para identificar el giro de un negocio y determinar sus requisitos de licencia, uso de suelo compatible, aforo y tarifas de derechos. Es la base de los catálogos de giros comerciales en M02 y M06.',
+    ejemplo:'Una "Taquería con servicio a mesa" tiene código SCIAN 722511 (Restaurantes con servicio completo). Con ese código el municipio determina: uso de suelo compatible (CS o MC), categoría de giro (B o C), dictámenes requeridos (PC, SSJ) y tarifa de la licencia de funcionamiento.'
   },
   {
-    ico:'🤝', termino:'Carta de anuencia de vecinos', nombre:'Carta de Anuencia de Vecinos Colindantes',
-    categoria:'tramites',
-    def:'Documento firmado por los propietarios o arrendatarios de los predios colindantes directos en el que manifiestan no tener objeción para que se instale el negocio o se realice la obra. En Tlajomulco de Zúñiga es requisito opcional para giros de bajo riesgo, pero se vuelve obligatoria en caso de controversia con algún vecino. El solicitante tiene 5 días hábiles para obtenerla mediante el Consejo Social de Participación Ciudadana (Art. 29 Fracc. I Item 9, Reg. Giros TLA 2021).',
-    ejemplo:'Una papelería que va a abrir junto a una casa habitación recibe objeción del vecino de la derecha. El municipio de Tlajomulco exige la carta de anuencia de ese vecino. El solicitante tiene 5 días hábiles para gestionarla con apoyo del Consejo Social de Participación Ciudadana. Si el vecino se niega sin causa justificada, el municipio puede mediar o conceder la licencia según el caso.'
-  },
-  {
-    ico:'🏛️', termino:'Consejo de Giros Restringidos TON', nombre:'Consejo Municipal para Giros de Control Especial — Tonalá',
+    ico:'🎭', termino:'Secretaría de Cultura Jalisco', nombre:'Secretaría de Cultura del Estado de Jalisco',
     categoria:'organismos',
-    def:'Órgano colegiado del Municipio de Tonalá que evalúa y dictamina las solicitudes de establecimientos considerados de control especial según el Acuerdo 135 (2025): cantinas, centros nocturnos, establecimientos con baile, venta de alcohol, entre otros. El consejo revisa la solicitud, realiza visita de inspección, recibe opinión de vecinos y emite dictamen en un plazo definido. Su aprobación es requisito previo para tramitar la licencia de funcionamiento en esa categoría.',
-    ejemplo:'Una cervecería artesanal que quiere abrir en Tonalá (giro con venta de alcohol para consumo en el lugar) debe primero presentar su solicitud ante el Consejo de Giros Restringidos. El consejo verifica la distancia a escuelas, el impacto en la colonia, y recaba opinión de los vecinos antes de emitir su dictamen. Sin ese dictamen favorable, el trámite de licencia no procede en Padrón y Licencias del municipio.'
+    def:'Dependencia estatal que complementa la labor del INAH en la protección del patrimonio cultural de Jalisco. Emite dictámenes para inmuebles de valor patrimonial estatal (no federales) y gestiona el catálogo de patrimonio del estado.',
+    ejemplo:'Un inmueble declarado patrimonio del estado de Jalisco pero no federal requiere autorización de la Secretaría de Cultura Jalisco, no del INAH, para cualquier modificación.'
   },
   {
-    ico:'🏙️', termino:'IMEPLAN', nombre:'Instituto Metropolitano de Planeación del AMG',
+    ico:'🌿', termino:'SEMADET', nombre:'Secretaría de Medio Ambiente y Desarrollo Territorial',
     categoria:'organismos',
-    def:'Organismo público intermunicipal creado en 2014 que planifica y coordina el desarrollo urbano y territorial de la Zona Metropolitana de Guadalajara. Es el autor del POTmet 2042, que establece los Perímetros de Contención Urbana y las directrices metropolitanas de uso de suelo, movilidad e infraestructura. Sus dictámenes tienen jerarquía sobre los planes municipales para proyectos de escala metropolitana.',
-    ejemplo:'Un desarrollo inmobiliario de gran escala en Tlajomulco que impacta la movilidad de toda la zona metropolitana requiere dictamen de IMEPLAN antes de que el municipio pueda emitir el uso de suelo. El POTmet que emitió IMEPLAN define si el predio está dentro del Perímetro A, B o fuera de perímetros.'
+    def:'Dependencia estatal de Jalisco responsable de la política ambiental, áreas naturales protegidas, arbolado urbano y residuos. Sus dictámenes son obligatorios en proyectos con impacto ambiental.',
+    ejemplo:'Si tu proyecto de construcción requiere derribar un árbol en la vía pública, necesitas dictamen de arbolado urbano de SEMADET antes de que el municipio te otorgue la licencia.'
   },
   {
-    ico:'🌿', termino:'Área libre / Área verde', nombre:'Área Libre y Área Verde Obligatoria',
-    categoria:'coeficientes',
-    def:'Proporción del predio que debe quedar libre de construcción en planta baja, determinada como el complemento del COS (Área libre = 1 − COS). Se subdivide en: Área libre permeable (suelo natural, jardín o superficie que permite infiltración pluvial) y Área verde obligatoria (porcentaje mínimo de vegetación que exige el reglamento). Un COS de 0.70 obliga a dejar libre el 30% del terreno; parte de ese 30% debe ser área verde real. Relevante para calcular el Impacto Hidrológico Cero (IHC).',
-    ejemplo:'Un predio de 500 m² con COS 0.60 puede construir máximo 300 m² en planta baja. Los 200 m² restantes son área libre; si el reglamento exige 10% de área verde, el propietario debe destinar al menos 50 m² a jardín o vegetación real, no pavimento.'
+    ico:'💧', termino:'SIAPA', nombre:'Sistema Intermunicipal de Agua Potable y Alcantarillado',
+    categoria:'organismos',
+    def:'Organismo público que presta los servicios de agua potable y alcantarillado en GDL, Zapopan, Tlaquepaque y Tonalá. Emite la factibilidad de servicios (agua y drenaje) necesaria para licencias de construcción.',
+    ejemplo:'Antes de tramitar una licencia de construcción en GDL necesitas la constancia de factibilidad SIAPA, que confirma que hay capacidad de agua y drenaje para tu proyecto.'
   },
   {
-    ico:'🏘️', termino:'Densidad habitacional', nombre:'Densidad Habitacional (viviendas/hectárea)',
-    categoria:'zonificacion',
-    def:'Número máximo de viviendas que el PDU o PPDU permite edificar por hectárea de terreno en una zona determinada. Controla la intensidad de uso habitacional independientemente del CUS. Una zona con alta densidad permite más unidades de vivienda aunque sean de menor tamaño; una zona de baja densidad limita el número de viviendas aunque el predio sea grande. Se expresa como VIV/ha (viviendas por hectárea) o UNI/ha (unidades por hectárea).',
-    ejemplo:'Una zona H3 en Guadalajara puede tener densidad de 120 VIV/ha. Un predio de 2,000 m² (0.2 ha) solo podría tener hasta 24 viviendas aunque el CUS permitiera construir más superficie. Si el promotor quiere más unidades debe fraccionar o tramitar un cambio de densidad.'
-  },
-  {
-    ico:'📐', termino:'Polígono de actuación', nombre:'Polígono de Actuación Urbanística',
-    categoria:'zonificacion',
-    def:'Delimitación territorial establecida en un PPDU que define un área específica donde se coordinan acciones de desarrollo, regeneración o mejoramiento urbano de manera integral. Permite que varios predios actúen en conjunto para cumplir obligaciones de urbanización, cesión de áreas verdes y equipamiento, transferencia de potencial o proyectos de redensificación. Dentro del polígono, los propietarios pueden celebrar convenios entre sí y con el municipio para distribuir cargas y beneficios.',
-    ejemplo:'Un conjunto de 8 predios vecinos en el Centro de Guadalajara que individualmente no cumplen el frente mínimo para proyectos de redensificación, pueden constituir un polígono de actuación. Así actúan como una sola unidad, comparten la obligación de ceder área verde y pueden acceder colectivamente al mecanismo de Transferencia de Derechos de Desarrollo.'
-  },
-  {
-    ico:'🤝', termino:'Área de cesión municipal', nombre:'Área de Cesión para Destinos Municipales',
+    ico:'📄', termino:'Subdivisión', nombre:'Subdivisión de Predio',
     categoria:'tramites',
-    def:'Proporción del predio o superficie equivalente que el propietario o desarrollador debe ceder gratuitamente al municipio como condición para autorizar subdivisiones, fusiones, fraccionamientos o proyectos de gran escala. La cesión se destina a vías públicas, áreas verdes, equipamiento urbano o donación al fondo municipal. El porcentaje varía según el municipio y el tipo de desarrollo; en algunos casos puede cubrirse con pago en efectivo equivalente al valor del terreno a ceder. Se registra en el Registro Público de la Propiedad y es requisito previo a la autorización de la subdivisión.',
-    ejemplo:'Un desarrollador que quiere subdividir un terreno de 3,000 m² en Guadalajara en 6 lotes debe ceder al municipio el porcentaje de área establecido para destinos públicos (jardín vecinal, vialidad interna, etc.) antes de que se autorice el plano de subdivisión. Sin la escritura de cesión, el RPP no inscribe los nuevos lotes.'
+    def:'Trámite para dividir un terreno en dos o más fracciones, cada una con clave catastral independiente. Requiere que las fracciones resultantes cumplan superficie mínima y frente mínimo de la zona.',
+    ejemplo:'Un terreno de 800 m² en zona H2 (sup. mínima 120 m², frente mínimo 8 ml) puede subdividirse en máximo 6 fracciones si todas cumplen las medidas mínimas.'
   },
   {
     ico:'⚡', termino:'TDD — Transferencia de Derechos de Desarrollo', nombre:'Transferencia de Derechos de Desarrollo Urbano (TDD)',
@@ -1079,16 +1065,22 @@ const GLOSARIO = [
     ejemplo:'Una casona catalogada en el Centro Histórico de Guadalajara no puede demolerse ni aumentar sus metros construidos. Sus derechos de desarrollo excedentes (diferencia entre lo que se podría construir según CUS y lo que tiene actualmente) se transfieren a un edificio en construcción en la misma zona. El nuevo edificio paga al fondo municipal y puede agregar pisos adicionales que de otro modo no podría.'
   },
   {
-    ico:'📐', termino:'Art. 29 RGIM GDL', nombre:'Superficie máxima de locales comerciales por nivel de impacto',
+    ico:'🗺️', termino:'Uso de suelo', nombre:'Uso de Suelo',
     categoria:'zonificacion',
-    def:'El Artículo 29 del Reglamento de Gestión Integral del Municipio de Guadalajara establece el tamaño máximo que puede tener el conjunto de locales comerciales y sus circulaciones, según el nivel de impacto de la <strong>zona del predio</strong> (no del giro):<br><br>'
-      +'<strong>CS1 — Impacto Mínimo (Frac. I):</strong> El comercio es secundario en estas zonas —principalmente habitacionales. El conjunto de locales en planta baja no puede superar: 75 m² en lotes &lt;100 m²; 150 m² en lotes 100–250 m²; 200 m² en lotes &gt;250 m². El resto del predio debe destinarse a vivienda.<br><br>'
-      +'<strong>CS2 — Impacto Bajo (Frac. II):</strong> El conjunto de locales puede ocupar hasta la <strong>superficie total del lote</strong> (100%). No hay obligación de incluir vivienda.<br><br>'
-      +'<strong>CS3 — Impacto Medio (Frac. III):</strong> El conjunto de locales no puede superar el <strong>60% del potencial edificable</strong> (CUS × superficie del lote). El 40% restante del potencial puede destinarse a otros usos.<br><br>'
-      +'<strong>CS4 — Impacto Alto (Frac. IV):</strong> El Art. 29 <strong>no impone límite adicional</strong>. El único tope es el CUS del Plan Parcial: todo lo que el CUS permite construir puede destinarse a locales comerciales.<br><br>'
-      +'<strong>CS5 — Impacto Máximo (Frac. V):</strong> Igual que CS4 — sin restricción de Art. 29. El CUS es el único límite de superficie edificable.<br><br>'
-      +'Regla clave: la fracción aplicable la determina la <strong>zona del predio</strong>, no la clasificación del giro. Un giro CS3 condicionado instalado en zona CS2 respeta el límite de la Frac. II (Art. 30 RGIM).',
-    ejemplo:'Predio Pedro Buzeta 717 (zona CS2, lote 180 m²). Se instala un giro condicionado CS3 (taquería). Aplica Frac. II → superficie máxima de locales = 180 m². El potencial edificable por CUS (2.4 × 180 = 432 m²) no es el límite de operación comercial — ese es el techo de construcción total. Confirmado en DTUDE emitido por la Dirección de Ordenamiento del Territorio de Guadalajara.'
+    def:'Clasificación normativa que determina para qué puede utilizarse un terreno o inmueble: habitacional, comercial, industrial, mixto, equipamiento, áreas verdes, etc. Está definido en el Plan Parcial de Desarrollo Urbano de cada municipio y no puede modificarse sin autorización.',
+    ejemplo:'Un terreno con uso de suelo "Habitacional Unifamiliar" solo puede tener casas. Si quieres poner un negocio, primero debes verificar si el uso comercial es compatible (permitido o condicionado) o si necesitas tramitar un cambio de uso de suelo ante el municipio.'
+  },
+  {
+    ico:'📄', termino:'Visto bueno', nombre:'Visto Bueno (VoBo)',
+    categoria:'tramites',
+    def:'Autorización o aprobación emitida por una dependencia como paso previo dentro de un trámite mayor. No es una licencia en sí misma, sino un requisito de aprobación intermedio.',
+    ejemplo:'Para obtener la licencia de funcionamiento de una tienda de abarrotes necesitas el visto bueno de Protección Civil (que el local cumple normas de seguridad) y el de uso de suelo.'
+  },
+  {
+    ico:'🗺️', termino:'Zonificación', nombre:'Zonificación',
+    categoria:'zonificacion',
+    def:'Sistema de clasificación del territorio en zonas con diferentes usos permitidos (habitacional, comercial, industrial, mixto, verde). Cada zona tiene su clave (H1, MC, MV2, EV-V, etc.) y sus propias restricciones.',
+    ejemplo:'Una zona H2-V significa Habitacional con densidad 2, Vertical. Permite casas y edificios de departamentos pero no comercio de alto impacto.'
   }
 ];
 

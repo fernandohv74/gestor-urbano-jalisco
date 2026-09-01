@@ -220,6 +220,12 @@ function guToggleTheme(){
     Solicita la cédula de cálculo oficial directamente en la Dirección de Obras Públicas del municipio.
   </div>
 
+  <!-- HISTORIAL — aparece al inicio si hay análisis guardados -->
+  <div class="hist-section" id="hist-section" style="display:none">
+    <div class="section-hdr">Historial de c&#225;lculos <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--text3)">(m&#225;x. 5)</span></div>
+    <div id="hist-lista"></div>
+  </div>
+
   <div style="margin-bottom:20px">
     <div style="font-size:20px;font-weight:600;color:var(--text);margin-bottom:4px">Calculadora de Derechos</div>
     <div style="font-size:12px;color:var(--text2)">Estima el costo de la licencia de construcción con desglose por concepto y fundamento legal. Los valores son orientativos — confirmar en ventanilla.</div>
@@ -420,12 +426,6 @@ function guToggleTheme(){
       <input type="text" id="inp-hist-nombre" placeholder="Nombre del proyecto para guardar..." maxlength="60">
       <button type="button" class="btn-guardar" onclick="guardarEnHistorial()">&#128190; Guardar</button>
     </div>
-  </div>
-
-  <!-- HISTORIAL -->
-  <div class="hist-section" id="hist-section" style="display:none">
-    <div class="section-hdr">Historial de c&#225;lculos <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--text3)">(m&#225;x. 5)</span></div>
-    <div id="hist-lista"></div>
   </div>
 
   <!-- CALCULADORA RAPIDA DE REFRENDO -->

@@ -6659,7 +6659,7 @@ function m10GuardarNombreHistorial(){
 
 // ══════════════════════════════════════════════════════════════════════
 const ES_LOCALHOST_M10 = location.hostname==='localhost'||location.hostname==='127.0.0.1';
-const M10_MODEL = 'claude-sonnet-5';
+const M10_MODEL = 'claude-sonnet-4-6';
 
 function m10MostrarUpload(){
   const sec=document.getElementById('seccionPlanoM10');
@@ -6677,6 +6677,39 @@ function m10MostrarUpload(){
 
 const M10_MAX = 8;
 let m10Archivos = [];
+let m10SolapaCrops = []; // recortes en alta res de la solapa, 1:1 con m10Archivos (null si no se genero)
+
+// ── RECORTE DE SOLAPA (cuadro de areas / COS-CUS) ───────────────────────
+// Franja derecha del "Plano de permisos" estandar del AMG. El presupuesto
+// de resolucion por imagen de la API es fijo (tope de tokens visuales) —
+// si se manda la lamina completa a mayor resolucion no ayuda, porque ese
+// tope se reparte entre TODA la hoja. Recortando solo la solapa, el mismo
+// tope de tokens rinde mucha mas resolucion efectiva ahi.
+const M10_SOLAPA_X0=0.815, M10_SOLAPA_X1=0.985, M10_SOLAPA_Y0=0.135, M10_SOLAPA_Y1=0.34;
+const M10_SOLAPA_TARGET_W=1233;
+
+function m10RecortarSolapaDeCanvas(canvasCompleta){
+  const w=canvasCompleta.width, h=canvasCompleta.height;
+  const sx=w*M10_SOLAPA_X0, sy=h*M10_SOLAPA_Y0;
+  const sw=w*(M10_SOLAPA_X1-M10_SOLAPA_X0), sh=h*(M10_SOLAPA_Y1-M10_SOLAPA_Y0);
+  const targetW=Math.min(M10_SOLAPA_TARGET_W, Math.round(sw));
+  const targetH=Math.round(targetW*(sh/sw));
+  const canvas=document.createElement('canvas');
+  canvas.width=targetW; canvas.height=targetH;
+  canvas.getContext('2d').drawImage(canvasCompleta, sx,sy,sw,sh, 0,0, targetW,targetH);
+  return canvas.toDataURL('image/jpeg',0.85).split(',')[1];
+}
+
+async function m10RecortarSolapaDeImagen(imgEl){
+  const w=imgEl.naturalWidth||imgEl.width, h=imgEl.naturalHeight||imgEl.height;
+  const sx=w*M10_SOLAPA_X0, sy=h*M10_SOLAPA_Y0;
+  const sw=w*(M10_SOLAPA_X1-M10_SOLAPA_X0), sh=h*(M10_SOLAPA_Y1-M10_SOLAPA_Y0);
+  const targetH=Math.round(M10_SOLAPA_TARGET_W*(sh/sw));
+  const canvas=document.createElement('canvas');
+  canvas.width=M10_SOLAPA_TARGET_W; canvas.height=targetH;
+  canvas.getContext('2d').drawImage(imgEl, sx,sy,sw,sh, 0,0, M10_SOLAPA_TARGET_W,targetH);
+  return canvas.toDataURL('image/jpeg',0.85).split(',')[1];
+}
 
 function m10DragOver(e){
   e.preventDefault();
@@ -6711,10 +6744,17 @@ async function m10AgregarArchivos(files){
         for(const p of pags){
           if(m10Archivos.length>=M10_MAX){limiteAlcanzado=true;break;}
           m10Archivos.push({base64:p.base64,mime:p.mime,nombre:p.nombre,thumb:'data:'+p.mime+';base64,'+p.base64});
+          m10SolapaCrops.push(p.solapa||null);
         }
       } else {
         const b64=await m10FileToBase64(file);
         m10Archivos.push({base64:b64,mime:file.type,nombre:file.name,thumb:'data:'+file.type+';base64,'+b64});
+        let solapaImg=null;
+        try{
+          const imgEl=await m10ImgDesdeDataUrl('data:'+file.type+';base64,'+b64);
+          solapaImg=await m10RecortarSolapaDeImagen(imgEl);
+        }catch(eSolapaImg){}
+        m10SolapaCrops.push(solapaImg);
       }
     }catch(e2){errores.push(file.name+': '+e2.message);}
   }
@@ -6747,6 +6787,7 @@ function m10ActualizarUI(){
 }
 function m10EliminarArchivo(i){
   m10Archivos.splice(i,1);
+  m10SolapaCrops.splice(i,1);
   m10ActualizarUI();
 }
 async function m10Analizar(){
@@ -6776,7 +6817,7 @@ async function m10Analizar(){
 
 // ── Rasterización PDF → JPEG para M10 (mismo enfoque que M04) ──────
 function m10ComprimirImagen(imgEl){
-  const LADO=3200, Q1=0.7, Q2=0.5, LIMITE=1*1024*1024;
+  const LADO=1920, Q1=0.7, Q2=0.5, LIMITE=1*1024*1024;
   let w=imgEl.naturalWidth||imgEl.width, h=imgEl.naturalHeight||imgEl.height;
   if(w>LADO){h=Math.round(h*LADO/w);w=LADO;}else if(h>LADO){w=Math.round(w*LADO/h);h=LADO;}
   const c=document.createElement('canvas'); c.width=w; c.height=h;
@@ -6800,9 +6841,13 @@ async function m10PdfARasterizado(file){
     const vp=page.getViewport({scale:2});
     const canvas=document.createElement('canvas'); canvas.width=vp.width; canvas.height=vp.height;
     await page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;
+
+    let solapa=null;
+    try{ solapa=m10RecortarSolapaDeCanvas(canvas); }catch(eSolapa){}
+
     const img=await m10ImgDesdeDataUrl(canvas.toDataURL('image/jpeg',0.7));
     const b64=m10ComprimirImagen(img);
-    paginas.push({base64:b64,mime:'image/jpeg',nombre:nombre+(pdf.numPages>1?` (pág.${i}/${pdf.numPages})`:'')});
+    paginas.push({base64:b64,mime:'image/jpeg',nombre:nombre+(pdf.numPages>1?` (pág.${i}/${pdf.numPages})`:''),solapa});
   }
   return paginas;
 }
@@ -6866,6 +6911,8 @@ async function m10LlamarClaude(){
 El usuario indica que el terreno REAL mide ${supReal} m².
 Los coeficientes normativos COS, iCOS, CUS, iCUS ya están en el sistema — NO los busques en el plano.
 
+Se incluye, ademas de cada lamina completa, un acercamiento en alta resolución de su solapa — úsalo para leer estos valores con precisión; si no está disponible, usa el cuadro de áreas de la lámina completa.
+
 En el cuadro de áreas (solapa o tabla de superficies) del plano localiza y extrae ÚNICAMENTE:
   a) Superficie total del TERRENO declarada en el plano → "superficie_plano"
   b) Área de DESPLANTE (Planta Baja, primer nivel) en m² → "desplante_pb_m2"
@@ -6907,10 +6954,16 @@ Reglas: superficie_plano debe ser el número leído del cuadro de áreas, null s
   const userMsg = `Normativa:\n${normaLineas}${usosContexto}${supInstruccion}\n\nAnaliza el/los plano(s): ${_noms}.${m10Archivos.length>1?' ('+m10Archivos.length+' láminas — analiza todas y combina la información)':''}`;
 
 
-  const content = [
-    { type:'text', text: userMsg },
-    ...m10Archivos.map(a=>({ type:'image', source:{ type:'base64', media_type: a.mime||'image/jpeg', data:a.base64 } }))
-  ];
+  const content = [ { type:'text', text: userMsg } ];
+  m10Archivos.forEach((a,i)=>{
+    content.push({ type:'text', text: `Lámina ${i+1} — ${a.nombre}:` });
+    content.push({ type:'image', source:{ type:'base64', media_type:a.mime||'image/jpeg', data:a.base64 } });
+    const crop = m10SolapaCrops[i];
+    if(crop){
+      content.push({ type:'text', text: `Lámina ${i+1} — acercamiento de la solapa/cuadro de áreas (usa esta imagen para leer con precisión COS, CUS y superficie de terreno):` });
+      content.push({ type:'image', source:{ type:'base64', media_type:'image/jpeg', data:crop } });
+    }
+  });
 
   const endpoint = ES_LOCALHOST_M10 ? 'https://api.anthropic.com/v1/messages' : '/api/claude-proxy';
   const headers  = { 'Content-Type':'application/json' };
@@ -7197,6 +7250,7 @@ function m10RenderizarVeredicto(r, esReapertura){
 
 function m10ResetUpload(){
   m10Archivos=[];
+  m10SolapaCrops=[];
   const _btnR2 = document.getElementById('m10BtnRecalc');
   if(_btnR2) _btnR2.style.display='none';
   document.getElementById('m10Veredicto').style.display='none';

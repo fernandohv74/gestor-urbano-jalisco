@@ -498,7 +498,7 @@ input[type=range]::-webkit-slider-thumb{
         <button class="gu-muni-btn" onclick="selMunicipio('tlaquepaque',this)">Tlaquepaque</button>
         <button class="gu-muni-btn" onclick="selMunicipio('tonala',this)">Tonalá</button>
       </div>
-      <div id="muniNota" class="gu-nota" style="margin-top:8px">Guadalajara — API Visor Urbano activa</div>
+      <div id="muniNota" class="gu-nota" style="margin-top:8px">Selecciona un municipio para empezar</div>
     </div>
 
     <!-- Divider -->
@@ -892,7 +892,7 @@ const RETRANQUEO = {
 // ══════════════════════════════════════════════════
 // ESTADO GLOBAL
 // ══════════════════════════════════════════════════
-let municipioActual = 'guadalajara';
+let municipioActual = '';
 let datosZona = null;
 let _restaurandoHistorial = null;
 let todosPoligonos = [];
@@ -4396,6 +4396,7 @@ async function buscar(){
   const cp      = document.getElementById('inCP').value.trim();
 
   if(!dir){ setStatus('error','Escribe la dirección'); return; }
+  if(!municipioActual){ setStatus('error','⚠️ Selecciona primero el municipio donde está el domicilio'); return; }
 
   // ── DETECTAR MUNICIPIO EN LA DIRECCIÓN ESCRITA ──────────────────────────
   // Si el usuario escribe "Pedro Moreno 516 Zapopan", detectar "Zapopan" y activarlo

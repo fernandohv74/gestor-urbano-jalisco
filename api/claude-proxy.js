@@ -29,8 +29,13 @@ export default async function handler(req, res) {
     }
     // Llamar a la API de Anthropic
     const modeloFinal = body.model || 'claude-sonnet-4-6';
-    // Los modelos Opus (razonamiento extendido) ya no aceptan un temperature personalizado
-    const esOpus = modeloFinal.includes('opus');
+    // Lista de PERMITIDOS (no de excluidos): Opus ya no aceptaba temperature
+    // personalizado, y ahora tampoco lo acepta Sonnet 5 (error real visto en
+    // produccion: "`temperature` is deprecated for this model"). En vez de
+    // ir agregando cada modelo nuevo que lo rechace, solo se manda para los
+    // modelos confirmados que si lo soportan -- cualquier modelo futuro no
+    // probado cae por defecto en "no mandar temperature", que es lo seguro.
+    const soportaTemperaturePersonalizado = modeloFinal === 'claude-sonnet-4-6';
     // Prompt caching: el bloque normativo que manda M04 en body.system es
     // estatico por municipio — no cambia entre lotes de un mismo analisis
     // ni entre analisis del mismo municipio dentro de la ventana de cache
@@ -57,7 +62,7 @@ export default async function handler(req, res) {
     if (systemPayload) {
       payloadAnthropic.system = systemPayload;
     }
-    if (!esOpus) {
+    if (soportaTemperaturePersonalizado) {
       payloadAnthropic.temperature = body.temperature ?? 0;
     }
     const response = await fetch('https://api.anthropic.com/v1/messages', {

@@ -534,6 +534,10 @@ input[type=range]::-webkit-slider-thumb{
           </button>
           <button onclick="limpiarBusqueda()" title="Limpiar campos" style="background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);color:var(--text3);padding:0 13px;font-size:15px;cursor:pointer;transition:all var(--t-fast);flex-shrink:0" onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">✕</button>
         </div>
+
+        <!-- Status box — justo debajo del boton para que sea imposible perderse el aviso -->
+        <div id="statusBox"></div>
+
         <div class="gu-nota" style="margin-top:8px;font-size:10.5px">Escribe el domicilio completo incluyendo colonia o código postal. ¿No lo encontró? Prueba con la clave catastral en <strong>Predial</strong> o con <strong>Coordenadas</strong>. Para afinar la ubicación, arrastra el pin en el mapa.</div>
         <div class="gu-nota" style="margin-top:6px;font-size:10.5px">Si tu domicilio cae sobre una vialidad, arrastra el pin al interior del predio para obtener la zonificación correcta.</div>
 
@@ -576,9 +580,6 @@ input[type=range]::-webkit-slider-thumb{
         <button class="gu-btn gu-btn-secondary" onclick="buscarCoords()">Consultar por coordenadas</button>
       </div>
     </div>
-
-    <!-- Status box -->
-    <div id="statusBox"></div>
 
     <!-- Historial -->
     <div id="historialPanel" style="display:none">

@@ -400,8 +400,8 @@
       <div class="form-group">
         <label>Modelo IA <span style="font-size:10px;font-weight:400;color:var(--text3);margin-left:4px">velocidad vs. precisión</span></label>
         <select id="sel-modelo">
-          <option value="claude-sonnet-4-6" selected>⚡ Sonnet 4.6 — rápido y económico</option>
-          <option value="claude-opus-4-8">🧠 Opus 4.8 — máxima precisión</option>
+          <option value="claude-sonnet-5" selected>⚡ Sonnet 5 — rápido y económico</option>
+          <option value="claude-opus-5">🧠 Opus 5 — máxima precisión</option>
         </select>
       </div>
     </div>
@@ -1654,12 +1654,16 @@ uploadZone.addEventListener('drop', e => {
 // ══════════════════════════════════════════════════════════════════════════
 // COMPRESION DE LAMINAS — evita superar el limite de 4.5MB por peticion
 // que impone Vercel a las funciones serverless (api/claude-proxy.js).
-// Cada lamina se redimensiona a un maximo de 1920px en el lado mas largo y
-// se comprime a JPEG calidad 0.7; si el base64 resultante supera 1MB se
-// vuelve a comprimir a calidad 0.5. Los PDF se rasterizan pagina por pagina
-// con pdf.js antes de aplicar la misma compresion.
+// Cada lamina se redimensiona a un maximo de GU_LADO_MAX en el lado mas
+// largo y se comprime a JPEG calidad 0.7; si el base64 resultante supera
+// 1MB se vuelve a comprimir a calidad 0.5. Los PDF se rasterizan pagina
+// por pagina con pdf.js antes de aplicar la misma compresion.
+// GU_LADO_MAX=2576 coincide con el tope de "alta resolucion" (2576px /
+// 4784 tokens visuales) de Claude Sonnet 5 / Opus 5 — mandar menos que
+// eso desperdicia parte de la resolucion que ya se esta pagando; mandar
+// mas no sirve, la API igual la baja a ese tope.
 // ══════════════════════════════════════════════════════════════════════════
-const GU_LADO_MAX       = 1920;
+const GU_LADO_MAX       = 2576;
 const GU_CALIDAD_JPEG   = 0.7;
 const GU_CALIDAD_JPEG_2 = 0.5;
 const GU_LIMITE_B64     = 1 * 1024 * 1024; // 1 MB, medido sobre el string base64
@@ -1953,7 +1957,7 @@ async function llamarAPI(laminasLote, config, esLoteUnico) {
   contentConLabels.push({ type: 'text', text: userText });
 
   const body = {
-    model: (document.getElementById('sel-modelo')?.value || 'claude-sonnet-4-6'),
+    model: (document.getElementById('sel-modelo')?.value || 'claude-sonnet-5'),
     max_tokens: 5000,
     temperature: 0,
     system: systemText,

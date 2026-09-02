@@ -28,7 +28,7 @@ Ninguno identificado aún — proyecto de un solo desarrollador. Se agregará si
 - Archivos HTML >300KB: usar scripts Python atómicos, nunca el tool Edit directo.
 - `node --check` NO disponible en este equipo (Node.js no está en PATH) — omitir este paso.
 - Nunca inventar datos normativos ni direcciones de organismos.
-- Bitácoras se guardan en `Bitacoras/` con consecutivo (`GestorUrbano_Bitacora_vXX_0.md` + `.docx`) — próxima: v44.0 (v43.0 creada 01-sep-2026). La rama `BITACORA_v3.x.md` quedó obsoleta y fue movida a `_OBSOLETO/`.
+- Bitácoras se guardan en `Bitacoras/` con consecutivo (`GestorUrbano_Bitacora_vXX_0.md` + `.docx`) — próxima: v45.0 (v44.0 creada 01-sep-2026). La rama `BITACORA_v3.x.md` quedó obsoleta y fue movida a `_OBSOLETO/`.
 - Push automático sin pedir confirmación — autorización permanente de Fernando.
 - Leer `Instrucciones · CLAUDE.md` (raíz del proyecto) y la bitácora más reciente al inicio de cada sesión de trabajo en el proyecto.
 

@@ -6774,7 +6774,7 @@ async function m10Analizar(){
 
 // ── Rasterización PDF → JPEG para M10 (mismo enfoque que M04) ──────
 function m10ComprimirImagen(imgEl){
-  const LADO=1920, Q1=0.7, Q2=0.5, LIMITE=1*1024*1024;
+  const LADO=3200, Q1=0.7, Q2=0.5, LIMITE=1*1024*1024;
   let w=imgEl.naturalWidth||imgEl.width, h=imgEl.naturalHeight||imgEl.height;
   if(w>LADO){h=Math.round(h*LADO/w);w=LADO;}else if(h>LADO){w=Math.round(w*LADO/h);h=LADO;}
   const c=document.createElement('canvas'); c.width=w; c.height=h;

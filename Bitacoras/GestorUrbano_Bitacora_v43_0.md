@@ -1,7 +1,7 @@
 # Bitácora v43.0 — Gestor Urbano Jalisco AMG
 **Período:** 01-sep-2026
 **Rama:** master + main (Vercel)
-**Autor:** Fernando H. / Claude Sonnet 4.6
+**Autor:** Fernando H. / Claude Sonnet 5
 
 ---
 

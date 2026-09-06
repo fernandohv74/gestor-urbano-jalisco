@@ -1958,7 +1958,13 @@ async function llamarAPI(laminasLote, config, esLoteUnico) {
 
   const body = {
     model: (document.getElementById('sel-modelo')?.value || 'claude-sonnet-5'),
-    max_tokens: 5000,
+    // 5000 alcanzaba con Sonnet 4.6 (sin razonamiento interno, todo el
+    // presupuesto iba a la respuesta visible). Sonnet 5 tiene "adaptive
+    // thinking" activado por defecto y max_tokens es el limite del TOTAL
+    // (pensamiento + texto) -- con planos complejos y 10 rubros normativos
+    // por evaluar, se agotaba pensando y no quedaba espacio para el JSON,
+    // devolviendo una respuesta vacia que el parser no podia interpretar.
+    max_tokens: 16000,
     temperature: 0,
     system: systemText,
     messages: [

@@ -42,7 +42,7 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
 .stat-val{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--accent2)}
 .stat-lbl{font-size:11px;color:var(--text3);margin-top:2px}
 .jump-nav{max-width:1000px;width:100%;margin:0 auto;padding:0 24px 24px;display:flex;flex-wrap:wrap;gap:10px}
-.jump-btn{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--text2);background:var(--bg2);border:1px solid var(--border);padding:9px 16px;border-radius:20px;text-decoration:none;display:flex;align-items:center;gap:7px;transition:all .15s}
+.jump-btn{font-family:var(--sans);font-size:13px;font-weight:500;letter-spacing:normal;text-transform:none;color:var(--text2);background:var(--bg2);border:1px solid var(--border);padding:9px 16px;border-radius:20px;text-decoration:none;display:flex;align-items:center;gap:7px;transition:all .15s;flex-shrink:0}
 .jump-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--bg3)}
 .section-label{max-width:1000px;width:100%;margin:0 auto;padding:0 24px 14px;font-family:var(--mono);font-size:20px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--accent2);border-bottom:2px solid var(--accent);scroll-margin-top:84px}
 .modules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;max-width:1000px;width:100%;margin:0 auto;padding:16px 24px 32px}
@@ -289,7 +289,10 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
 
 </div>
 
-<div class="section-label" id="bloque-negocio" style="margin-top:4px">Negocio y comercio</div>
+<div class="section-label" id="bloque-negocio" style="margin-top:4px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+  <span>Negocio y comercio</span>
+  <a href="#" class="jump-btn">↑ Volver arriba</a>
+</div>
 <div class="modules-grid">
 
   <a class="mod-card" href="GestorUrbano_M02_4.html">
@@ -330,7 +333,10 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
 
 </div>
 
-<div class="section-label" id="bloque-soporte" style="margin-top:4px">Soporte y consulta</div>
+<div class="section-label" id="bloque-soporte" style="margin-top:4px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+  <span>Soporte y consulta</span>
+  <a href="#" class="jump-btn">↑ Volver arriba</a>
+</div>
 <div class="modules-grid">
 
   <a class="mod-card" href="GestorUrbano_M07_1.html">

@@ -44,7 +44,9 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
 .jump-nav{max-width:1000px;width:100%;margin:0 auto;padding:0 24px 24px;display:flex;flex-wrap:wrap;gap:10px}
 .jump-btn{font-family:var(--sans);font-size:13px;font-weight:500;letter-spacing:normal;text-transform:none;color:var(--text2);background:var(--bg2);border:1px solid var(--border);padding:9px 16px;border-radius:20px;text-decoration:none;display:flex;align-items:center;gap:7px;transition:all .15s;flex-shrink:0}
 .jump-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--bg3)}
-.section-label{max-width:1000px;width:100%;margin:0 auto;padding:0 24px 14px;font-family:var(--mono);font-size:20px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--accent2);border-bottom:2px solid var(--accent);scroll-margin-top:84px}
+.section-label{max-width:1000px;width:100%;margin:0 auto;padding:0 24px 14px;font-family:'Outfit','Helvetica Neue',Arial,sans-serif;font-size:24px;letter-spacing:-.3px;line-height:1.15;scroll-margin-top:84px}
+.lbl-b{font-weight:800;color:var(--text)}
+.lbl-l{font-weight:300;color:#D85A30}
 .modules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;max-width:1000px;width:100%;margin:0 auto;padding:16px 24px 32px}
 .mod-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:background-color .4s ease,border-color .25s ease,color .3s ease,transform .15s,box-shadow .2s;text-decoration:none;color:inherit}
 .mod-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 8px 32px rgba(61,123,255,.18)}
@@ -155,7 +157,7 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
   <a href="#bloque-soporte" class="jump-btn">📖 Soporte y consulta</a>
 </div>
 
-<div class="section-label" id="bloque-construccion">Desarrollo inmobiliario y construcción</div>
+<div class="section-label" id="bloque-construccion"><span class="lbl-b">Desarrollo</span><span class="lbl-l"> inmobiliario y construcción</span></div>
 <div class="modules-grid">
 
   <a class="mod-card" href="GestorUrbano_M01_3.html">
@@ -290,7 +292,7 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
 </div>
 
 <div class="section-label" id="bloque-negocio" style="margin-top:4px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
-  <span>Negocio y comercio</span>
+  <span><span class="lbl-b">Negocio</span><span class="lbl-l"> y comercio</span></span>
   <a href="#" class="jump-btn">↑ Volver arriba</a>
 </div>
 <div class="modules-grid">
@@ -334,7 +336,7 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
 </div>
 
 <div class="section-label" id="bloque-soporte" style="margin-top:4px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
-  <span>Soporte y consulta</span>
+  <span><span class="lbl-b">Soporte</span><span class="lbl-l"> y consulta</span></span>
   <a href="#" class="jump-btn">↑ Volver arriba</a>
 </div>
 <div class="modules-grid">

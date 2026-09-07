@@ -15,6 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=Outfit:wght@300;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
 :root{
   --bg:#0B0F1A;--bg2:#111827;--bg3:#1A2235;--bg4:#212d42;
   --text:#E2E8F0;--text2:#94A3B8;--text3:#4B5563;
@@ -40,7 +41,10 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
 .stat-box{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;transition:background-color .4s ease,border-color .35s ease}
 .stat-val{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--accent2)}
 .stat-lbl{font-size:11px;color:var(--text3);margin-top:2px}
-.section-label{max-width:1000px;width:100%;margin:0 auto;padding:0 24px 10px;font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)}
+.jump-nav{max-width:1000px;width:100%;margin:0 auto;padding:0 24px 24px;display:flex;flex-wrap:wrap;gap:10px}
+.jump-btn{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--text2);background:var(--bg2);border:1px solid var(--border);padding:9px 16px;border-radius:20px;text-decoration:none;display:flex;align-items:center;gap:7px;transition:all .15s}
+.jump-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--bg3)}
+.section-label{max-width:1000px;width:100%;margin:0 auto;padding:0 24px 12px;font-family:var(--mono);font-size:15px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text);border-bottom:1px solid var(--border);scroll-margin-top:84px}
 .modules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;max-width:1000px;width:100%;margin:0 auto;padding:16px 24px 32px}
 .mod-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:background-color .4s ease,border-color .25s ease,color .3s ease,transform .15s,box-shadow .2s;text-decoration:none;color:inherit}
 .mod-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 8px 32px rgba(61,123,255,.18)}
@@ -72,7 +76,7 @@ footer{margin-top:auto;padding:24px 28px;border-top:1px solid var(--border);disp
 #hdr-brand.live{opacity:1;transform:none}
 .hero-eyebrow,.tag,.stack-tag,.hbadge,.mod-card-top,.mod-card-body{transition:background-color .4s ease,border-color .35s ease,color .3s ease}
 footer{transition:background-color .4s ease,border-color .35s ease}
-@media(max-width:600px){header{padding:12px 16px}.hero{padding:36px 16px 28px}.modules-grid,.section-label,.status-row{padding-left:16px;padding-right:16px}footer{padding:18px 16px}}
+@media(max-width:600px){header{padding:12px 16px}.hero{padding:36px 16px 28px}.modules-grid,.section-label,.status-row,.jump-nav{padding-left:16px;padding-right:16px}footer{padding:18px 16px}}
 body.light{
   --bg:#F8F9FC;--bg2:#FFFFFF;--bg3:#F1F4F9;--bg4:#E4E9F2;
   --text:#0F172A;--text2:#475569;--text3:#94A3B8;
@@ -145,7 +149,13 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
   <div class="stat-box"><div class="stat-val">53</div><div class="stat-lbl">Subdistritos GDL</div></div>
 </div>
 
-<div class="section-label">Desarrollo inmobiliario y construcción</div>
+<div class="jump-nav">
+  <a href="#bloque-construccion" class="jump-btn">🏗️ Desarrollo inmobiliario</a>
+  <a href="#bloque-negocio" class="jump-btn">🏪 Negocio y comercio</a>
+  <a href="#bloque-soporte" class="jump-btn">📖 Soporte y consulta</a>
+</div>
+
+<div class="section-label" id="bloque-construccion">Desarrollo inmobiliario y construcción</div>
 <div class="modules-grid">
 
   <a class="mod-card" href="GestorUrbano_M01_3.html">
@@ -182,24 +192,6 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
         <span class="tag">Comparativa Excel</span>
       </div>
       <span class="mod-cta primary">Abrir Módulo 03 →</span>
-    </div>
-  </a>
-
-  <a class="mod-card" href="GestorUrbano_M11_1.html">
-    <div class="mod-card-top">
-      <div class="mod-icon" style="background:linear-gradient(135deg,#065F46,#0891B2)">📊</div>
-      <div><div class="mod-num">Módulo 11</div><div class="mod-name">Corrida Financiera</div></div>
-      <span class="mod-badge live">✓ Activo</span>
-    </div>
-    <div class="mod-card-body">
-      <p class="mod-desc">¿Es viable tu proyecto inmobiliario? Ingresa terreno, metros cuadrados y tipo de desarrollo, y obtén en segundos la TIR, VPN, Payback y ROI. Modo Express para análisis rápido; modo Pro para corrida completa con flujos mensuales y análisis de sensibilidad.</p>
-      <div class="mod-tags">
-        <span class="tag">Express · Pro</span>
-        <span class="tag">TIR · VPN · Payback</span>
-        <span class="tag">Residencial · Bodega · Industrial</span>
-        <span class="tag">Sensibilidad</span>
-      </div>
-      <span class="mod-cta primary">Abrir Módulo 11 →</span>
     </div>
   </a>
 
@@ -277,9 +269,27 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
     </div>
   </a>
 
+  <a class="mod-card" href="GestorUrbano_M11_1.html">
+    <div class="mod-card-top">
+      <div class="mod-icon" style="background:linear-gradient(135deg,#065F46,#0891B2)">📊</div>
+      <div><div class="mod-num">Módulo 11</div><div class="mod-name">Corrida Financiera</div></div>
+      <span class="mod-badge live">✓ Activo</span>
+    </div>
+    <div class="mod-card-body">
+      <p class="mod-desc">¿Es viable tu proyecto inmobiliario? Ingresa terreno, metros cuadrados y tipo de desarrollo, y obtén en segundos la TIR, VPN, Payback y ROI. Modo Express para análisis rápido; modo Pro para corrida completa con flujos mensuales y análisis de sensibilidad.</p>
+      <div class="mod-tags">
+        <span class="tag">Express · Pro</span>
+        <span class="tag">TIR · VPN · Payback</span>
+        <span class="tag">Residencial · Bodega · Industrial</span>
+        <span class="tag">Sensibilidad</span>
+      </div>
+      <span class="mod-cta primary">Abrir Módulo 11 →</span>
+    </div>
+  </a>
+
 </div>
 
-<div class="section-label" style="margin-top:4px">Negocio y comercio</div>
+<div class="section-label" id="bloque-negocio" style="margin-top:4px">Negocio y comercio</div>
 <div class="modules-grid">
 
   <a class="mod-card" href="GestorUrbano_M02_4.html">
@@ -320,7 +330,7 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
 
 </div>
 
-<div class="section-label" style="margin-top:4px">Soporte y consulta</div>
+<div class="section-label" id="bloque-soporte" style="margin-top:4px">Soporte y consulta</div>
 <div class="modules-grid">
 
   <a class="mod-card" href="GestorUrbano_M07_1.html">

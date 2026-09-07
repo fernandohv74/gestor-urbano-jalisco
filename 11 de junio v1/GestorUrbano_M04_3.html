@@ -397,13 +397,6 @@
           <option value="7">7+ niveles</option>
         </select>
       </div>
-      <div class="form-group">
-        <label>Modelo IA <span style="font-size:10px;font-weight:400;color:var(--text3);margin-left:4px">velocidad vs. precisión</span></label>
-        <select id="sel-modelo">
-          <option value="claude-sonnet-5" selected>⚡ Sonnet 5 — rápido y económico</option>
-          <option value="claude-opus-5">🧠 Opus 5 — máxima precisión</option>
-        </select>
-      </div>
     </div>
     <div style="font-size:11px;color:var(--text3);margin-top:-4px;margin-bottom:8px">✦ Estos campos se llenan automáticamente al analizar el plano. Puedes ajustarlos después si es necesario.</div>
 
@@ -1956,8 +1949,16 @@ async function llamarAPI(laminasLote, config, esLoteUnico) {
   });
   contentConLabels.push({ type: 'text', text: userText });
 
+  // Modelo fijo en Sonnet 5 para todos los usuarios de la app — el selector
+  // se quitó de la vista porque quien elige el modelo (el usuario final) no
+  // es quien paga el gasto de la API (Fernando). Opus 5 cuesta 2.5x mas y no
+  // aporta suficiente en esta tarea (lectura de plano + verificacion contra
+  // reglas) para justificar exponerlo a todo el trafico. Acceso puntual a
+  // Opus 5 para casos dificiles: agregar ?modelo=opus5 a la URL.
+  const _modeloForzado = new URLSearchParams(location.search).get('modelo') === 'opus5'
+    ? 'claude-opus-5' : 'claude-sonnet-5';
   const body = {
-    model: (document.getElementById('sel-modelo')?.value || 'claude-sonnet-5'),
+    model: _modeloForzado,
     // 5000 alcanzaba con Sonnet 4.6 (sin razonamiento interno, todo el
     // presupuesto iba a la respuesta visible). Sonnet 5 tiene "adaptive
     // thinking" activado por defecto y max_tokens es el limite del TOTAL

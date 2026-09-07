@@ -1869,19 +1869,10 @@ function renderResultado(giro, mun, sup, tramiteLabel) {
   if (giro.pc !== 'minimo') {
     var pcTarifa = 0;
     if (mun === 'GDL') {
-      var tabla = PC_GDL.otros;
-      if (giro.id==='escuela'||giro.id==='guarderia') tabla=PC_GDL.escuela;
-      else if (giro.id==='cabaret'||giro.id==='bar'||giro.id==='discoteca') tabla=PC_GDL.nocturno;
-      else if (giro.id==='hotel') tabla=PC_GDL.hotel;
-      else if (giro.id==='estacion') tabla=PC_GDL.gasolinera;
-      else if (giro.id==='estacionam') tabla=PC_GDL.estacionam;
-      if (sup > 0) {
-        for (var j=0; j<tabla.length; j++) { if (sup<=tabla[j].max){pcTarifa=tabla[j].t;break;} }
-        dHtml += '<div class="fee-row"><div class="fee-label">Constancia de Proteccion Civil<div class="fundamento">Art. 17 Fracc. XVII, Ley Ingresos GDL 2026</div></div><div class="fee-val"><span class="badge-pc">'+fmt(pcTarifa)+'</span></div></div>';
-        total += pcTarifa;
-      } else {
-        dHtml += '<div class="fee-row"><div class="fee-label">Constancia de Proteccion Civil</div><div class="fee-val">Indica m&#178; para calcular</div></div>';
-      }
+      // GDL: la constancia de Proteccion Civil (Art. 17 Fracc. XVII, Ley Ingresos GDL 2026)
+      // se expide "a solicitud de parte" -- no es un cobro automatico del tramite de licencia
+      // de giro. La inspeccion de verificacion (extintores, salidas, ducto de gas) no tiene
+      // costo aparte, por eso no se incluye en el total estimado.
     } else if (mun === 'ZPN') {
       if (sup > 0) {
         var valorBienes = sup * 3000;

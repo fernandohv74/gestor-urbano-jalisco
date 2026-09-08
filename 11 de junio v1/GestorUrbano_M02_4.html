@@ -4415,6 +4415,14 @@ const GDL_JERARQUIA = {
   'ARN':99,'N/A':98,'PROHIBIDO':0,
 };
 
+// Giros restringidos (venta y consumo de alcohol en el lugar) — Art. 66, 70-VIII y 74
+// del Reglamento para el Funcionamiento de Giros Comerciales de Guadalajara: solo
+// pueden establecerse desde CS3 en adelante, y siempre como condicionado sujeto a
+// autorizacion del Consejo de Giros Restringidos, sin importar lo que diga uso_gdl
+// en el catalogo (ej. 462112 aparece capturado como CS2, pero la ley no lo permite ahi).
+const GIROS_RESTRINGIDOS_GDL = new Set(['462112','722411','722412','713950','713991']);
+const NIVEL_MIN_RESTRINGIDO_GDL = 3; // CS3
+
 const GU_SCIAN_GDL = [
   {c:'111110',n:'Cultivo de soya',u:'ARN',x:''},
   {c:'111121',n:'Cultivo de cártamo',u:'ARN',x:''},
@@ -5927,6 +5935,15 @@ function calcularGirosZona(clave){
       if(!u || u==='PROHIBIDO' || u==='N/A' || u==='ARN') return;
       const famGiro   = u.replace(/\d+$/,'');
       const nivelGiro = GDL_JERARQUIA[u] || 99;
+      const restringido = GIROS_RESTRINGIDOS_GDL.has(g.codigo);
+      if(restringido){
+        // Art. 74: giros restringidos solo desde CS3, siempre condicionados
+        // (nunca automaticamente permitidos, sin importar lo que diga el catalogo)
+        if(famGiro === 'CS' && nivelZona >= NIVEL_MIN_RESTRINGIDO_GDL){
+          condicionados.push(g);
+        }
+        return;
+      }
       if(famGiro === familia && nivelZona >= nivelGiro){
         g.cond ? condicionados.push(g) : permitidos.push(g);
       }
@@ -5944,6 +5961,16 @@ function calcularGirosZona(clave){
         if(!u || u==='PROHIBIDO' || u==='N/A' || u==='ARN') return;
         const famGiro   = u.replace(/\d+$/,'');
         const nivelGiro = GDL_JERARQUIA[u] || 99;
+        const restringido = GIROS_RESTRINGIDOS_GDL.has(g.codigo);
+        if(restringido){
+          // Art. 74: aunque el nivel condicionado de la zona coincida, un giro
+          // restringido no entra si ese nivel condicionado es menor a CS3
+          if(famGiro === 'CS' && nivelCond >= NIVEL_MIN_RESTRINGIDO_GDL &&
+             !condicionados.includes(g)){
+            condicionados.push(g);
+          }
+          return;
+        }
         if(famGiro === famCond && nivelGiro === nivelCond &&
            !permitidos.includes(g) && !condicionados.includes(g)){
           condicionados.push(g);
@@ -6450,7 +6477,7 @@ function filtrarGirosM02(q){
         <span style="font-family:var(--mono);font-size:10px;
           color:${window._mostrandoCondicionado?'var(--yellowD)':'var(--uso-p-txt)'};
           min-width:54px;flex-shrink:0">${g.codigo||''}</span>
-        <span style="flex:1"><span style="display:block">${g.nombre||''}</span>${g.ns&&g.ns!==g.nombre?`<span style="display:block;font-size:10px;color:var(--text3);margin-top:1px">${g.ns}</span>`:''}</span>
+        <span style="flex:1"><span style="display:block">${g.nombre||''}</span>${g.ns&&g.ns!==g.nombre?`<span style="display:block;font-size:10px;color:var(--text3);margin-top:1px">${g.ns}</span>`:''}${(typeof GIROS_RESTRINGIDOS_GDL!=='undefined'&&GIROS_RESTRINGIDOS_GDL.has(g.codigo))?`<span style="display:block;font-size:10px;color:#92400E;margin-top:2px">⚠️ Giro restringido — requiere autorización adicional del Consejo de Giros Restringidos</span>`:''}</span>
       </div>`).join('');
   if(_giroSeleccionado){const _sEl=lista.querySelector('[data-giro-codigo="'+_giroSeleccionado.codigo+'"]');if(_sEl){window._giroSelEl=_sEl;_sEl.style.background='var(--brand-pale)';_sEl.style.color='var(--brand)';_sEl.style.borderLeft='3px solid var(--brand)';_sEl.style.fontWeight='500';}}
 }

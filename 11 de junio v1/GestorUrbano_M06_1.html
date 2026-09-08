@@ -3503,7 +3503,7 @@ var SCIAN_ENT = {
   "ALQUILER SIN INTERMEDIACION DE VIVIENDAS AMUEBLADAS":[["531111","*Alquiler sin intermediación de viviendas amuebladas"]],
   "ALQUILER SIN INTERMEDIACION DE VIVIENDAS NO AMUEBLADAS":[["531112","*Alquiler sin intermediación de viviendas no amuebladas"]],
   "ALUMINIO":[["434221","Comercio  al  por  mayor  de  materiales  metálicos  para  la construcción y la "]],
-  "ANIMALES":[["115210","Servicios relacionados con la cría y explotación de animales"],["722511","Restaurantes con servicio de preparación de alimentos a la carta o de comida cor"],["112920","Explotación de équidos"],["112930","Cunicultura y explotación de animales con pelaje fino"],["112991","Explotación de animales combinada con aprovechamiento forestal"],["112999","Explotación de otros animales"]],
+  "ANIMALES":[["115210","Servicios relacionados con la cría y explotación de animales"],["112920","Explotación de équidos"],["112930","Cunicultura y explotación de animales con pelaje fino"],["112991","Explotación de animales combinada con aprovechamiento forestal"],["112999","Explotación de otros animales"]],
   "ANTIGUEDADES":[["466313","Comercio al por menor de antigüedades y obras de arte"]],
   "ANUNCIO SEMIESTRUCTURAL LUMINOSO":[["541850","Agencias de anuncios publicitarios"]],
   "ANUNCIO SEMIESTRUCTURAL OPACO":[["541830","Agencias de compra de medios a petición del cliente"]],
@@ -3728,6 +3728,21 @@ function _acBuscar(q) {
     } else {
       var sd = SCIAN_DATA[name];
       entries.push({name:name, code:sd?sd[0]:'', desc:sd?sd[1]:''});
+    }
+  }
+  // 0. Busqueda directa por codigo SCIAN (si la consulta es numerica)
+  if (/^\d{3,6}$/.test(q2)) {
+    var girosEnt0 = Object.keys(SCIAN_ENT);
+    for (var e0=0; e0<girosEnt0.length; e0++) {
+      var g0 = girosEnt0[e0], ents0 = SCIAN_ENT[g0];
+      for (var ee0=0; ee0<ents0.length; ee0++) {
+        if (ents0[ee0][0] && ents0[ee0][0].indexOf(q2) === 0) { addGiro(g0); break; }
+      }
+    }
+    var girosData0 = Object.keys(SCIAN_DATA);
+    for (var d0=0; d0<girosData0.length; d0++) {
+      var gd0 = girosData0[d0], sd0 = SCIAN_DATA[gd0];
+      if (sd0 && sd0[0] && sd0[0].indexOf(q2) === 0) addGiro(gd0);
     }
   }
   // 1. Sinónimos exactos

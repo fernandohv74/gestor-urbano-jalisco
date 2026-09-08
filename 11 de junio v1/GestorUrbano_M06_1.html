@@ -1513,7 +1513,7 @@ function getChecklist(giro, mun, moral, zonaPat, tramite) {
     if (zonaPat && gdl) {
       docs.adicionales.push({txt:'Visto bueno de Zona Patrimonial (IPLAN Guadalajara)', nota:'Requerido para negocios en Zona Centro Histórico y zonas patrimoniales'});
     }
-    docs.previos.push({txt:'DTUDE (Dictamen de Trazos, Usos y Destinos Específicos) vigente', nota:'Si el dictamen anterior sigue vigente puede omitirse; verificar con Padrón y Licencias'});
+    docs.previos.push({txt:'Dictamen de Uso y Destinos Específicos vigente', nota:'Si el dictamen anterior sigue vigente puede omitirse; verificar con Padrón y Licencias'});
     return docs;
   }
 
@@ -1585,7 +1585,7 @@ function getChecklist(giro, mun, moral, zonaPat, tramite) {
       docs.base.push({txt:'Poder notarial del representante legal'});
     }
     if (t === 'CAMBIO DE GIRO O ANUNCIO') {
-      docs.previos.push({txt:'Dictamen de Trazo, Usos y Destinos Específicos (DTUDE) para el nuevo giro', nota:'El nuevo giro debe ser compatible con el uso de suelo del predio — Módulo 01'});
+      docs.previos.push({txt:'Dictamen de Uso y Destinos Específicos para el nuevo giro', nota:'El nuevo giro debe ser compatible con el uso de suelo del predio — Módulo 01'});
       docs.previos.push({txt:'Constancia de Protección Civil y Bomberos actualizada para el nuevo giro', nota:'Si el nuevo giro implica mayor riesgo o aforo'});
       if (giro.alcohol) {
         docs.previos.push({txt:'Licencia estatal para el nuevo giro con alcohol (SEPSAJ)', nota:'Si el cambio implica adquisición de licencia de alcoholes'});
@@ -1649,7 +1649,7 @@ function getChecklist(giro, mun, moral, zonaPat, tramite) {
 
   // ─── TRÁMITES PREVIOS OBLIGATORIOS ────────────
   docs.previos.push({
-    txt: 'Dictamen de Trazo, Usos y Destinos Específicos (DTUDE) o Certificado de Uso de Suelo',
+    txt: 'Dictamen de Uso y Destinos Específicos o Certificado de Uso de Suelo',
     nota: 'Emitido por la Dirección de Ordenamiento del Territorio — confirma que el giro está PERMITIDO o CONDICIONADO en el predio. Módulo 01 del Gestor Urbano te indica la zonificación'
   });
   if (zpn) {
@@ -1664,7 +1664,7 @@ function getChecklist(giro, mun, moral, zonaPat, tramite) {
   }
   if (t === 'ANEXO') {
     docs.previos.push({txt:'Licencia de funcionamiento principal vigente', nota:'El anexo se agrega a una licencia ya existente — presentar copia de la licencia principal'});
-    docs.previos.push({txt:'DTUDE que ampare el giro adicional (anexo)', nota:'Debe confirmar que el giro del anexo está permitido en el mismo predio'});
+    docs.previos.push({txt:'Dictamen de Uso y Destinos Específicos que ampare el giro adicional (anexo)', nota:'Debe confirmar que el giro del anexo está permitido en el mismo predio'});
   }
 
   // ─── DOCUMENTOS ADICIONALES POR TIPO DE GIRO ──
@@ -1920,9 +1920,9 @@ function renderResultado(giro, mun, sup, tramiteLabel) {
   }
   var dtudeCosto, dtudeArt;
   if (mun === 'GDL') {
-    dtudeCosto = '$2,016';
-    dtudeArt   = 'Dictamen de Trazos, Usos y Destinos Específicos — Pág. 201, Ley de Ingresos GDL 2026';
-    total += 2016;
+    dtudeCosto = '$1,222';
+    dtudeArt   = 'Dictamen de Uso y Destinos Específicos (para giros comerciales) — Costo Dictamen de Uso y Destinos Específicos, aviso de trámites de uso de suelo, Guadalajara';
+    total += 1222;
   } else if (mun === 'ZPN') {
     dtudeCosto = '$1,804 ($1,495 trámite + $309 formato)';
     dtudeArt   = 'Trámite $1,495 + Formato oficial $309 · retys.zapopan.gob.mx/tramites/34 · ZPN 2026';

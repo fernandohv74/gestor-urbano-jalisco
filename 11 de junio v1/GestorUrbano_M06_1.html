@@ -123,10 +123,16 @@
 }
 .btn-pdf:hover { opacity:.88; }
 @media print {
-  .muni-bar,.hist-section,.btn-calc,.btn-limpiar,.btn-pdf,
-  .btn-guardar,.hist-save-wrap,.btn-nuevo,#btn-gdl,#btn-zpn,
-  #form-gdl,#form-zpn,.header-bar,.footer-note,
-  .header-bar,nav,.gu-nav { display:none !important; }
+  /* .card cubre las 7 tarjetas de entrada (selector de municipio, giro,
+     tramite, datos del local) para los 3 flujos -- GDL, ZPN y el generico
+     TLQ/TLA/TON -- en vez de listar clases sueltas que se desactualizan
+     cuando cambia el HTML (asi paso con ".muni-bar", que ya no coincidia
+     con nada y dejaba el selector de municipios completo en el PDF). */
+  .card,.hist-section,.btn-calc,.btn-limpiar,.btn-pdf,
+  .btn-guardar,.hist-save-wrap,.btn-nuevo,
+  #form-gdl,#form-zpn,#form-mun-gen,#page-intro,
+  #gu-fb-btn,#gu-fb-overlay,
+  nav,.gu-nav { display:none !important; }
 
   @page { margin: 1.5cm; }
 
@@ -293,7 +299,7 @@ details.ccf-details .ccf-body { padding: 12px 14px; background: #fafafa; color: 
     </div>
   </div><!-- /hist-section -->
 
-  <div style="margin-bottom:22px">
+  <div id="page-intro" style="margin-bottom:22px">
     <div style="font-size:23px;font-weight:700;color:var(--text1)">Licencia de Funcionamiento</div>
     <div style="font-size:13px;color:var(--text2);margin-top:5px">Requisitos y derechos para operar un giro comercial, industrial o de servicios &mdash; GDL y Zapopan 2026</div>
   </div>
@@ -2024,7 +2030,7 @@ function renderResultado(giro, mun, sup, tramiteLabel) {
   dHtml += '<div style="margin-top:10px;padding:8px 12px;background:var(--bg2);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;font-size:.78rem;color:var(--text);opacity:.82;line-height:1.5">'
     + '&#8505;&#65039; <strong>Información orientativa.</strong> Los requisitos y costos mostrados se basan en reglamentos y leyes de ingresos vigentes. Confírmalos con la dependencia correspondiente antes de iniciar el trámite.'
     + '</div>';
-  if (!hayDerecho && !giro.alcohol) {
+  if (!hayDerecho && !giro.alcohol && giro.pc !== 'minimo') {
     var ventDir = {GDL:'Padrón y Licencias, Guadalajara', ZPN:'Desarrollo Económico, Zapopan', TLQ:'Padrón y Licencias, Tlaquepaque', TLA:'Oficialía Mayor de Padrón y Licencias, Tlajomulco', TON:'Padrón y Licencias, Tonalá'};
     dHtml += '<div class="alert-box alert-warn" style="margin-top:10px">&#9888; El costo real depende de si tu giro requiere dictamen de Protección Civil. Consulta con la Dirección de ' + (ventDir[mun]||mun) + ' para confirmar los requisitos.</div>';
   }

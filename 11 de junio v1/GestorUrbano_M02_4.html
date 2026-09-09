@@ -4458,11 +4458,26 @@ const GIROS_RESTRINGIDOS_TON = {'462112':3, '722412':3, '713950':3, '713991':3, 
 // motivo que en TLQ/Tonala: el catalogo no separa ambos giros bajo ese codigo.
 const GIROS_RESTRINGIDOS_TLA = {'462112':4, '722412':4, '713950':3, '713991':3, '722411':4};
 
+// Giros restringidos Zapopan — el catalogo GU_SCIAN_ZAP no tenia Bar/Cantina/Discoteca
+// (confirmado contra el catalogo oficial de 532 giros de la Ventanilla Digital de
+// Zapopan: si existen como giros reales -- BAR, CANTINA, CENTRO NOCTURNO, DISCOTEQUES,
+// etc. -- solo faltaban en GU_SCIAN_ZAP). Se agregaron arriba con codigo SCIAN real
+// verificado (722412 Bares/cantinas, 722411 Centros nocturnos/discotecas). Nivel minimo
+// vecino al Cuadro 3 estatal (Zapopan remite via su propio Art. 27): Bar/Cantina/Boliche
+// a nivel 3 (CS-D); Centro nocturno a nivel 4 (CS-C), igual que TLQ/Tonala. El codigo
+// 722411 (Discoteca+Centro nocturno) se clasifica al nivel mas alto (4) por el mismo
+// motivo que en los demas municipios: el catalogo no separa ambos giros. 713991 (Billar)
+// ya existia correctamente en el catalogo de Zapopan, solo faltaba en esta tabla.
+// 462112 (Minisuper en el catalogo de Zapopan) NO se incluye aqui -- ese codigo esta
+// tomado por un giro distinto, sin relacion con alcohol.
+const GIROS_RESTRINGIDOS_ZAP = {'722412':3, '713950':3, '713991':3, '722411':4};
+
 // Tabla de giros restringidos fuera de GDL, por municipio (clave de municipioActual)
 const GIROS_RESTRINGIDOS_POR_MUN = {
   'tlaquepaque': GIROS_RESTRINGIDOS_TLQ,
   'tonala': GIROS_RESTRINGIDOS_TON,
-  'tlajomulco': GIROS_RESTRINGIDOS_TLA
+  'tlajomulco': GIROS_RESTRINGIDOS_TLA,
+  'zapopan': GIROS_RESTRINGIDOS_ZAP
 };
 
 const GU_SCIAN_GDL = [
@@ -5551,6 +5566,9 @@ const GU_SCIAN_ZAP = [
   {c:'311930',n:'Bebidas sin contenido alcohólico',ns:'Elaboración de concentrados, polvos, jarabes y esencias de sabor para bebidas',u:'I3'},
   {c:'311215',n:'Bebidas sin contenido alcohólico',ns:'Elaboración de malta',u:'I3'},
   {c:'465213',n:'Bicicletas',ns:'Comercio al por menor de bicicletas y triciclos',u:'CS2'},
+  {c:'722412',n:'Bar · Cantina · Pulquería',ns:'Bares, cantinas y similares',u:'CS3'},
+  {c:'722411',n:'Discoteca · Centro nocturno · Club',ns:'Centros nocturnos, discotecas y similares',u:'CS4'},
+  {c:'713950',n:'Boliche · Bolera',ns:'Boliches',u:'CS3'},
   {c:'713991',n:'Billar  categoría a',ns:'Billares',u:'CS3'},
   {c:'713291',n:'Billetes de lotería',ns:'Venta de billetes de lotería, pronósticos deportivos y otros boletos de sorteo',u:'CS1'},
   {c:'339913',n:'Bisutería',ns:'Joyería de metales y piedras no preciosos y de otros materiales',u:'I1'},

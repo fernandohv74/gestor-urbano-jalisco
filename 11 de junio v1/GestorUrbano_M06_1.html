@@ -1390,6 +1390,14 @@ var SCIAN_A_PC = {
   '561520':'minimo'  // Agencia de viajes - Tour operador
 };
 
+// Giros de consumo de alcohol en el lugar (bar, discoteca, cabaret, etc.) --
+// distinto de rest_baja/rest_alta/fonda_baja (restaurante con alcohol como giro
+// secundario) y de dep_cerveza/dep_vinos/mini_alc/abarro_alc (venta al menudeo).
+// Compartida entre getChecklist() (Dictamen de Uso y Destinos Especificos, y el
+// aviso "Giro restringido") y renderResultado() (costo del mismo dictamen) --
+// antes vivia solo dentro de renderResultado() y getChecklist() no podia usarla.
+var GIROS_RESTRINGIDOS_M06 = {bar:1, rest_bar:1, discoteca:1, cabaret:1, terraza_a:1, cerveceria:1};
+
 // PC nivel ZPN (default: 'bajo')
 var PC_NIVEL_ZPN = {
   'BAR':'alto','BAR EN CABARET':'alto','BAR EN CENTRO NOCTURNO':'alto',
@@ -1687,9 +1695,12 @@ function getChecklist(giro, mun, moral, zonaPat, tramite) {
   }
 
   // ─── TRÁMITES PREVIOS OBLIGATORIOS ────────────
+  var esGiroRestringidoChecklist = giro.alcohol && !!GIROS_RESTRINGIDOS_M06[giro.tipoAlc];
   docs.previos.push({
     txt: 'Dictamen de Uso y Destinos Específicos o Certificado de Uso de Suelo',
-    nota: 'Emitido por la Dirección de Ordenamiento del Territorio — confirma que el giro está PERMITIDO o CONDICIONADO en el predio. Módulo 01 del Gestor Urbano te indica la zonificación'
+    nota: esGiroRestringidoChecklist
+      ? 'Emitido por la Dirección de Ordenamiento del Territorio — confirma que el giro está PERMITIDO o CONDICIONADO en el predio. Al ser un giro restringido, normalmente se pide como trámite formal. Módulo 01 del Gestor Urbano te indica la zonificación'
+      : 'En la mayoría de los giros el uso de suelo se revisa directo en la ventanilla al tramitar la licencia, sin pedir este dictamen formal aparte. Suele solicitarse solo si hace falta una aclaración puntual sobre el uso en tu domicilio. Módulo 01 del Gestor Urbano te indica la zonificación'
   });
   if (zpn) {
     docs.previos.push({txt:'Dictamen de Protección Civil y Bomberos de Zapopan', nota:'Emitido por la Coordinación de Protección Civil Municipal — incluye revisión de instalaciones, extintores, señalización y salidas de emergencia'});
@@ -1851,8 +1862,8 @@ function renderResultado(giro, mun, sup, tramiteLabel) {
   // Consejo de Giros Restringidos -- distinto al derecho de licencia calculado arriba.
   // No se conoce la zonificacion real del predio en este modulo (eso vive en M02), asi
   // que el aviso es informativo, sin dar un veredicto de nivel CS especifico.
-  var GIROS_RESTRINGIDOS_M06 = {bar:1, rest_bar:1, discoteca:1, cabaret:1, terraza_a:1, cerveceria:1};
-  if (giro.alcohol && GIROS_RESTRINGIDOS_M06[giro.tipoAlc]) {
+  var esGiroRestringidoM06 = giro.alcohol && !!GIROS_RESTRINGIDOS_M06[giro.tipoAlc];
+  if (esGiroRestringidoM06) {
     alertHtml += '<div class="alert-box alert-warn">&#9888; <strong>Giro restringido</strong> — la mayoría de municipios exige zonificación comercial de mayor intensidad (Distrital o superior) y autorización adicional del Consejo de Giros Restringidos, además de esta licencia. Verifica la zonificación de tu predio en el Módulo 02 antes de tramitar.</div>';
   }
   document.getElementById('res-alerta').innerHTML = alertHtml;
@@ -1969,12 +1980,19 @@ function renderResultado(giro, mun, sup, tramiteLabel) {
       dHtml += '<div class="fee-row"><div class="fee-label">Constancia / Dictamen de Protección Civil<div class="fundamento">Confirmar tarifa vigente en Dirección de Protección Civil de ' + (MUN_NOMBRES[mun]||mun) + '</div></div><div class="fee-val" style="font-size:11px;color:var(--text2)">Solicitar en ventanilla</div></div>';
     }
   }
+  // El dictamen formal de uso de suelo no aplica parejo para todos los giros --
+  // en la mayoria de los casos el uso de suelo se revisa directo en la ventanilla
+  // al tramitar la licencia, sin pagar/solicitar este dictamen por separado.
+  // Normalmente se pide de forma explicita cuando el giro es restringido (ya
+  // requiere el visto bueno del Consejo de Giros Restringidos de todos modos) o
+  // cuando hace falta una aclaracion puntual sobre el uso en ese domicilio -- algo
+  // que este modulo no puede saber, porque no pide direccion (eso vive en M02).
   var dtudeCosto, dtudeArt, dtudeLabel;
   if (mun === 'GDL') {
     dtudeLabel = 'Dictamen de Uso y Destinos Específicos';
     dtudeCosto = '$1,222';
     dtudeArt   = 'Dictamen de Uso y Destinos Específicos (para giros comerciales) — Costo Dictamen de Uso y Destinos Específicos, aviso de trámites de uso de suelo, Guadalajara';
-    total += 1222;
+    if (esGiroRestringidoM06) total += 1222;
   } else if (mun === 'ZPN') {
     // Mismo tramite (ZAP-DOTERR-006) para licencia de giro y de construccion en Zapopan
     // -- no hay version mas barata como en GDL. Confirmado en retys.zapopan.gob.mx/
@@ -1983,13 +2001,17 @@ function renderResultado(giro, mun, sup, tramiteLabel) {
     dtudeLabel = 'Dictamen de Trazo, Usos y Destinos Específicos';
     dtudeCosto = '$1,804 ($1,495 trámite + $309 formato)';
     dtudeArt   = 'Trámite $1,495 + Formato oficial $309 · retys.zapopan.gob.mx/tramites/34 · ZPN 2026';
-    total += 1804;
+    if (esGiroRestringidoM06) total += 1804;
   } else {
     dtudeLabel = 'Dictamen de Uso de Suelo (DTUDE o equivalente)';
     dtudeCosto = 'Confirmar en ventanilla';
     dtudeArt   = 'Dictamen de Compatibilidad de Uso de Suelo — Dirección de Ordenamiento Territorial de ' + (MUN_NOMBRES[mun]||mun) + '. Tarifa por confirmar en Ley de Ingresos 2026 del municipio.';
   }
-  dHtml += '<div class="fee-row"><div class="fee-label">'+dtudeLabel+'<div class="fundamento">'+dtudeArt+'</div></div><div class="fee-val">'+dtudeCosto+'</div></div>';
+  if (esGiroRestringidoM06) {
+    dHtml += '<div class="fee-row"><div class="fee-label">'+dtudeLabel+'<div class="fundamento">'+dtudeArt+'</div></div><div class="fee-val">'+dtudeCosto+'</div></div>';
+  } else {
+    dHtml += '<div class="fee-row"><div class="fee-label">'+dtudeLabel+'<div class="fundamento">No incluido en el total — normalmente el uso de suelo se revisa directo en ventanilla al tramitar la licencia. Este dictamen formal ('+dtudeCosto+') suele pedirse solo para giros restringidos o cuando hace falta una aclaración puntual sobre el uso en tu domicilio.</div></div><div class="fee-val" style="font-size:11px;color:var(--text2)">Solo si aplica</div></div>';
+  }
   dHtml += '<div class="fee-total-row"><div>Total estimado</div><div class="fee-total-val">'+fmt(total)+'</div></div>';
   dHtml += '</div>';
   if (mun==='GDL') {

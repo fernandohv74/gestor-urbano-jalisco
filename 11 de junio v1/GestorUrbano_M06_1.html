@@ -376,6 +376,18 @@ details.ccf-details .ccf-body { padding: 12px 14px; background: #fafafa; color: 
         <input type="checkbox" id="chk-zona-pat">
         El local se ubica en zona patrimonial (Centro Historico u otra)
       </label>
+      <label class="chk-row">
+        <input type="checkbox" id="chk-rentado-gdl">
+        El local es rentado o en comodato (no es propiedad del titular)
+      </label>
+      <label class="chk-row">
+        <input type="checkbox" id="chk-plaza-gdl">
+        El local está dentro de una plaza o centro comercial
+      </label>
+      <label class="chk-row">
+        <input type="checkbox" id="chk-tercero-gdl">
+        Un tercero (no el titular) va a realizar el trámite
+      </label>
     </div>
 
     <!-- Botones GDL -->
@@ -1094,6 +1106,14 @@ details.ccf-details .ccf-body { padding: 12px 14px; background: #fafafa; color: 
           </label>
         </div>
       </div>
+      <label class="chk-row">
+        <input type="checkbox" id="chk-rentado-zpn">
+        El local es rentado o en comodato (no es propiedad del titular)
+      </label>
+      <label class="chk-row">
+        <input type="checkbox" id="chk-tercero-zpn">
+        Un tercero (no el titular) va a realizar el trámite
+      </label>
     </div>
 
     <!-- Botones ZPN -->
@@ -1163,6 +1183,18 @@ details.ccf-details .ccf-body { padding: 12px 14px; background: #fafafa; color: 
       <label class="chk-row">
         <input type="checkbox" id="chk-zona-pat-gen">
         El local se ubica en zona patrimonial o centro histórico
+      </label>
+      <label class="chk-row">
+        <input type="checkbox" id="chk-rentado-gen">
+        El local es rentado o en comodato (no es propiedad del titular)
+      </label>
+      <label class="chk-row">
+        <input type="checkbox" id="chk-plaza-gen">
+        El local está dentro de una plaza o centro comercial
+      </label>
+      <label class="chk-row">
+        <input type="checkbox" id="chk-tercero-gen">
+        Un tercero (no el titular) va a realizar el trámite
       </label>
     </div>
 
@@ -1665,10 +1697,14 @@ function getChecklist(giro, mun, moral, zonaPat, tramite) {
   docs.base.push({txt:'Constancia de situación fiscal (RFC) actualizada', nota:'Emitida por el SAT — debe incluir el domicilio fiscal o actividad económica compatible con el giro'});
   docs.base.push({txt:'Comprobante de domicilio del local (no mayor a 3 meses)', nota: gdl ? 'Recibo con fecha de expedición no mayor a tres meses a nombre del titular' : 'Recibo de agua, luz o teléfono fijo a nombre del titular o arrendador. Debe coincidir con la dirección del negocio'});
   if (gdl) {
-    docs.base.push({txt:'Recibo predial del Municipio de Guadalajara a nombre del titular (domicilio del negocio)', nota:'Si es propietario: recibo predial vigente. Si NO es propietario: recibo predial + contrato de arrendamiento o comodato vigente firmado por el propietario de la finca + identificación oficial vigente del propietario de la finca'});
+    docs.base.push({txt:'Recibo predial del Municipio de Guadalajara a nombre del titular (domicilio del negocio)', nota: giro.rentado
+      ? 'Requisito 5, Formato Múltiple Padrón y Licencias GDL — recibo predial + copia del contrato de arrendamiento o comodato vigente firmado por el propietario de la finca (debe coincidir con el predial) + copia de identificación oficial vigente del propietario de la finca'
+      : 'Requisito 5, Formato Múltiple Padrón y Licencias GDL — a nombre del titular, por ser propietario del local'});
   } else {
     docs.base.push({txt:'Predial vigente del local (año en curso)', nota:'Expedido por el municipio — confirma que el inmueble está al corriente de pagos'});
-    docs.base.push({txt:'Título de propiedad o contrato de arrendamiento del local', nota:'Si es arrendatario: contrato vigente con firma del arrendador. Si es propietario: escritura o título de propiedad inscrito en el Registro Público'});
+    docs.base.push({txt: giro.rentado ? 'Contrato de arrendamiento o comodato del local' : 'Título de propiedad del local', nota: giro.rentado
+      ? 'Contrato vigente con firma del arrendador, más copia de identificación oficial vigente del arrendador'
+      : 'Escritura o título de propiedad inscrito en el Registro Público, a nombre del titular'});
   }
   docs.base.push({txt:'Croquis de localización del negocio', nota:'Indicando calles circundantes, número exterior e interior, referencia de cruce más cercano'});
   if (gdl) {
@@ -1686,6 +1722,21 @@ function getChecklist(giro, mun, moral, zonaPat, tramite) {
     if (!gdl) {
       docs.base.push({txt:'Comprobante de domicilio del representante legal'});
     }
+  }
+
+  // ─── TERCERO REALIZA EL TRÁMITE (aplica a física y moral) ──
+  if (giro.terceroTramite) {
+    docs.adicionales.push({txt:'Carta poder simple original firmada por el otorgante, el aceptante y dos testigos', nota: gdl
+      ? 'Requisito 10, Formato Múltiple Padrón y Licencias GDL — necesaria cuando el titular (o representante legal) no se presenta personalmente a realizar el trámite'
+      : 'Necesaria cuando el titular (o representante legal) no se presenta personalmente a realizar el trámite'});
+    docs.adicionales.push({txt:'Copia de identificación oficial vigente del otorgante, aceptante y los dos testigos de la carta poder', nota: gdl ? 'Requisito 11, Formato Múltiple Padrón y Licencias GDL' : ''});
+  }
+
+  // ─── LOCAL DENTRO DE PLAZA O CENTRO COMERCIAL ──
+  if (giro.enPlaza) {
+    docs.adicionales.push({txt:'Carta de anuencia firmada por el administrador del centro comercial o plaza', nota: gdl
+      ? 'Requisito 12, Formato Múltiple Padrón y Licencias GDL — para centros comerciales ya registrados ante la Dirección de Padrón y Licencias'
+      : 'Solicitar con la administración de la plaza o centro comercial'});
   }
 
   // ─── DOCUMENTOS ESPECÍFICOS TLA ───────────────
@@ -2084,6 +2135,9 @@ function calcularGDL() {
   var sup     = parseFloat(document.getElementById('inp-sup').value) || 0;
   var moral   = document.querySelector('input[name="tpers-gdl"]:checked').value === 'moral';
   var zonaPat = document.getElementById('chk-zona-pat').checked;
+  var rentado = document.getElementById('chk-rentado-gdl').checked;
+  var enPlaza = document.getElementById('chk-plaza-gdl').checked;
+  var tercero = document.getElementById('chk-tercero-gdl').checked;
   var inpG    = document.getElementById('inp-giro-gdl');
   if (!giroNom) {
     inpG.style.borderColor='#e53935'; inpG.focus();
@@ -2104,7 +2158,8 @@ function calcularGDL() {
     alcohol: !!tipoAlc, tipoAlc: tipoAlc,
     pc: pcNivel, cofepris: cofepris, rpbi: rpbi,
     semarnat: semarnat, residuos: semarnat,
-    moral: moral, zonaPat: zonaPat
+    moral: moral, zonaPat: zonaPat,
+    rentado: rentado, enPlaza: enPlaza, terceroTramite: tercero
   };
   renderResultado(giro, 'GDL', sup, tramite, tramite);
 }
@@ -2116,6 +2171,10 @@ function calcularZPN() {
   var sup     = parseFloat(document.getElementById('inp-sup-zpn').value) || 0;
   var moral   = document.querySelector('input[name="tpers-zpn"]:checked').value === 'moral';
   var zonaPat = document.getElementById('chk-zona-pat-zpn').checked;
+  var rentado = document.getElementById('chk-rentado-zpn').checked;
+  var tercero = document.getElementById('chk-tercero-zpn').checked;
+  var plazaVal = (document.getElementById('sel-plaza-zpn')||{}).value || '';
+  var enPlaza = !!plazaVal && plazaVal !== '(SIN PLAZA COMERCIAL)';
   var selG    = document.getElementById('sel-giro-zpn');
   if (!giroNom) {
     selG.style.borderColor='#e53935'; selG.focus();
@@ -2137,7 +2196,8 @@ function calcularZPN() {
     alcohol: !!tipoAlc, tipoAlc: tipoAlc,
     pc: pcNivel, cofepris: cofepris, rpbi: rpbi,
     semarnat: semarnat, residuos: semarnat,
-    moral: moral, zonaPat: zonaPat
+    moral: moral, zonaPat: zonaPat,
+    rentado: rentado, enPlaza: enPlaza, terceroTramite: tercero
   };
   renderResultado(giro, 'ZPN', sup, tramite, tramite);
 }
@@ -2149,6 +2209,9 @@ function calcularMunGen() {
   var sup     = parseFloat(document.getElementById('inp-sup-gen').value) || 0;
   var moral   = document.querySelector('input[name="tpers-gen"]:checked').value === 'moral';
   var zonaPat = document.getElementById('chk-zona-pat-gen').checked;
+  var rentado = document.getElementById('chk-rentado-gen').checked;
+  var enPlaza = document.getElementById('chk-plaza-gen').checked;
+  var tercero = document.getElementById('chk-tercero-gen').checked;
   var inp     = document.getElementById('inp-giro-gen');
   if (!giroNom) {
     inp.style.borderColor = '#e53935'; inp.focus();
@@ -2168,7 +2231,8 @@ function calcularMunGen() {
     alcohol: esAlcohol, tipoAlc: esAlcohol ? tipoAlc : null,
     pc: pcNivel, cofepris: cofepris, rpbi: rpbi,
     semarnat: semarnat, residuos: semarnat,
-    moral: moral, zonaPat: zonaPat
+    moral: moral, zonaPat: zonaPat,
+    rentado: rentado, enPlaza: enPlaza, terceroTramite: tercero
   };
   renderResultado(giro, munNom, sup, tramite);
 }
@@ -2207,6 +2271,9 @@ function nuevoAnalisis() {
   var gdlFis = document.querySelector('input[name="tpers-gdl"][value="fisica"]');
   if(gdlFis) gdlFis.checked=true;
   document.getElementById('chk-zona-pat').checked=false;
+  document.getElementById('chk-rentado-gdl').checked=false;
+  document.getElementById('chk-plaza-gdl').checked=false;
+  document.getElementById('chk-tercero-gdl').checked=false;
   // Reset ZPN
   document.getElementById('inp-giro-zpn').value='';
   document.getElementById('inp-giro-zpn').classList.remove('has-value');
@@ -2221,12 +2288,17 @@ function nuevoAnalisis() {
   var plZpn = document.getElementById('sel-plaza-zpn');
   if(plZpn) plZpn.value='(SIN PLAZA COMERCIAL)';
   document.getElementById('chk-zona-pat-zpn').checked=false;
+  document.getElementById('chk-rentado-zpn').checked=false;
+  document.getElementById('chk-tercero-zpn').checked=false;
   // Reset GEN (TLQ/TLA/TON)
   var ig = document.getElementById('inp-giro-gen'); if(ig) ig.value='';
   var tg = document.getElementById('sel-tramite-gen'); if(tg) tg.value='ALTA';
   var sg = document.getElementById('inp-sup-gen'); if(sg) sg.value='';
   var tpg = document.querySelector('input[name="tpers-gen"][value="fisica"]'); if(tpg) tpg.checked=true;
   var zpg = document.getElementById('chk-zona-pat-gen'); if(zpg) zpg.checked=false;
+  var rpg = document.getElementById('chk-rentado-gen'); if(rpg) rpg.checked=false;
+  var plg = document.getElementById('chk-plaza-gen'); if(plg) plg.checked=false;
+  var tcg = document.getElementById('chk-tercero-gen'); if(tcg) tcg.checked=false;
   // Reset resultado
   document.getElementById('result-panel').style.display='none';
   var _sw2=document.getElementById('hist-save-wrap'); if(_sw2)_sw2.style.display='none';

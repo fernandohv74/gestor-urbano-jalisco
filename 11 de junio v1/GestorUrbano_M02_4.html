@@ -6641,7 +6641,17 @@ async function detectarGiroIA(){
     }).join('');
   };
   let fil=palabras.length>0?_filDirecto(palabras):[];
-  if(fil.length>=4){
+  // Con 2+ palabras, solo saltarse la IA si hay 4+ resultados que coincidan con
+  // TODAS las palabras (no solo con alguna) -- de lo contrario una palabra generica
+  // como "oficina" ya junta 4+ giros por si sola (mueblería, limpieza, renta de
+  // equipo...) y nunca deja que la IA traduzca la frase completa a algo como
+  // "contaduria" para "oficina de contadores".
+  const _matchTodas=function(g){
+    const n=norm(g.nombre), ns=norm(g.ns);
+    return palabras.every(function(p){return n.includes(p)||ns.includes(p);});
+  };
+  const _fuertes = palabras.length>1 ? fil.filter(_matchTodas) : fil;
+  if(_fuertes.length>=4){
     fil=_rankear(fil,palabras);
     if(lc) lc.textContent=fil.length+' giro'+(fil.length!==1?'s':'')+' encontrados';
     if(li) li.innerHTML=_renderLista(fil);

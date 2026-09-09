@@ -4446,10 +4446,23 @@ const GIROS_RESTRINGIDOS_TLQ = {'462112':3, '722412':3, '713950':3, '722411':4};
 // el mismo motivo que en Tlaquepaque: el catalogo no separa ambos giros.
 const GIROS_RESTRINGIDOS_TON = {'462112':3, '722412':3, '713950':3, '713991':3, '722411':4};
 
-// Tabla de giros restringidos fuera de GDL, por municipio (calve de municipioActual)
+// Giros restringidos Tlajomulco — Reglamento de Zonificacion de Tlajomulco de
+// Zuniga, Cuadro 8 (CS-D, "Centros de Entretenimiento" = nivel 3): Billares,
+// Boliches, Centros botaneros, Discotecas, Restaurante-bar, Salas de baile,
+// Salon de eventos. Cuadro 9 (CS-C, "Centros de Entretenimiento restringidos"
+// = nivel 4): Bares, Cantinas, Centros nocturnos, Espectaculos para adultos,
+// Video bares. A diferencia de GDL/TLQ/Tonala (donde Bar/Cantina piden solo
+// nivel 3), en Tlajomulco "Bares" y "Cantinas" estan explicitamente en el
+// cuadro de nivel 4 — por eso 462112 y 722412 suben a nivel 4 aqui. 722411
+// (Discoteca+Centro nocturno) se clasifica al nivel mas alto (4) por el mismo
+// motivo que en TLQ/Tonala: el catalogo no separa ambos giros bajo ese codigo.
+const GIROS_RESTRINGIDOS_TLA = {'462112':4, '722412':4, '713950':3, '713991':3, '722411':4};
+
+// Tabla de giros restringidos fuera de GDL, por municipio (clave de municipioActual)
 const GIROS_RESTRINGIDOS_POR_MUN = {
   'tlaquepaque': GIROS_RESTRINGIDOS_TLQ,
-  'tonala': GIROS_RESTRINGIDOS_TON
+  'tonala': GIROS_RESTRINGIDOS_TON,
+  'tlajomulco': GIROS_RESTRINGIDOS_TLA
 };
 
 const GU_SCIAN_GDL = [
@@ -6515,7 +6528,7 @@ function filtrarGirosM02(q){
         <span style="font-family:var(--mono);font-size:10px;
           color:${window._mostrandoCondicionado?'var(--yellowD)':'var(--uso-p-txt)'};
           min-width:54px;flex-shrink:0">${g.codigo||''}</span>
-        <span style="flex:1"><span style="display:block">${g.nombre||''}</span>${g.ns&&g.ns!==g.nombre?`<span style="display:block;font-size:10px;color:var(--text3);margin-top:1px">${g.ns}</span>`:''}${((typeof GIROS_RESTRINGIDOS_GDL!=='undefined'&&GIROS_RESTRINGIDOS_GDL.has(g.codigo))||(typeof GIROS_RESTRINGIDOS_POR_MUN!=='undefined'&&GIROS_RESTRINGIDOS_POR_MUN[municipioActual]&&(g.codigo in GIROS_RESTRINGIDOS_POR_MUN[municipioActual])))?`<span style="display:block;font-size:10px;color:#92400E;margin-top:2px">⚠️ Giro restringido — requiere autorización adicional del Consejo de Giros Restringidos</span>`:''}</span>
+        <span style="flex:1"><span style="display:block">${g.nombre||''}</span>${g.ns&&g.ns!==g.nombre?`<span style="display:block;font-size:10px;color:var(--text3);margin-top:1px">${g.ns}</span>`:''}${((municipioActual==='guadalajara'&&typeof GIROS_RESTRINGIDOS_GDL!=='undefined'&&GIROS_RESTRINGIDOS_GDL.has(g.codigo))||(typeof GIROS_RESTRINGIDOS_POR_MUN!=='undefined'&&GIROS_RESTRINGIDOS_POR_MUN[municipioActual]&&(g.codigo in GIROS_RESTRINGIDOS_POR_MUN[municipioActual])))?`<span style="display:block;font-size:10px;color:#92400E;margin-top:2px">⚠️ Giro restringido — requiere autorización adicional del Consejo de Giros Restringidos</span>`:''}</span>
       </div>`).join('');
   if(_giroSeleccionado){const _sEl=lista.querySelector('[data-giro-codigo="'+_giroSeleccionado.codigo+'"]');if(_sEl){window._giroSelEl=_sEl;_sEl.style.background='var(--brand-pale)';_sEl.style.color='var(--brand)';_sEl.style.borderLeft='3px solid var(--brand)';_sEl.style.fontWeight='500';}}
 }

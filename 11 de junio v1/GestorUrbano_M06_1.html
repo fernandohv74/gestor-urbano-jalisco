@@ -1351,6 +1351,16 @@ var ALC_ZPN = {
   'ALIMENTOS CON VINOS GENEROSOS':'rest_baja'
 };
 
+// Respaldo por codigo SCIAN para cuando el giro llega por el deep link de M02
+// (GU_m02_a_m06): M02 manda el nombre tal como esta en su propio catalogo
+// (ej. "Bar - Cantina (consumo en local)"), que no coincide con las claves en
+// mayusculas estilo portal Zapopan de ALC_ZPN de arriba, asi que la busqueda por
+// nombre falla en silencio. El codigo SCIAN si viaja intacto en el deep link
+// (d.giroId), asi que sirve de respaldo. Codigos tomados del catalogo GU_SCIAN_GDL
+// de M02: 462112 y 722412 son Bar/Cantina; 722411 agrupa Discoteca+Centro nocturno
+// bajo un mismo codigo y se clasifica como 'cabaret' (el mas restrictivo de los dos).
+var SCIAN_A_TIPOALC = {'462112':'bar', '722412':'bar', '722411':'cabaret'};
+
 // PC nivel ZPN (default: 'bajo')
 var PC_NIVEL_ZPN = {
   'BAR':'alto','BAR EN CABARET':'alto','BAR EN CENTRO NOCTURNO':'alto',
@@ -2019,6 +2029,10 @@ function calcularGDL() {
     setTimeout(function(){inpG.style.borderColor='';},2000); return;
   }
   var tipoAlc  = ALC_ZPN[giroNom] || null;
+  if (!tipoAlc) {
+    var scianCodGDL = (document.getElementById('scian-id-gdl')||{}).textContent || '';
+    tipoAlc = SCIAN_A_TIPOALC[scianCodGDL] || null;
+  }
   var pcNivel  = PC_NIVEL_ZPN[giroNom] || 'bajo';
   var cofepris = COFEPRIS_ZPN.indexOf(giroNom) >= 0;
   var rpbi     = RPBI_ZPN.indexOf(giroNom) >= 0;
@@ -2047,6 +2061,10 @@ function calcularZPN() {
     return;
   }
   var tipoAlc  = ALC_ZPN[giroNom] || null;
+  if (!tipoAlc) {
+    var scianCodZPN = (document.getElementById('scian-id-zpn')||{}).textContent || '';
+    tipoAlc = SCIAN_A_TIPOALC[scianCodZPN] || null;
+  }
   var pcNivel  = PC_NIVEL_ZPN[giroNom] || 'bajo';
   var cofepris = COFEPRIS_ZPN.indexOf(giroNom) >= 0;
   var rpbi     = RPBI_ZPN.indexOf(giroNom) >= 0;

@@ -1937,20 +1937,27 @@ function renderResultado(giro, mun, sup, tramiteLabel) {
       dHtml += '<div class="fee-row"><div class="fee-label">Constancia / Dictamen de Protección Civil<div class="fundamento">Confirmar tarifa vigente en Dirección de Protección Civil de ' + (MUN_NOMBRES[mun]||mun) + '</div></div><div class="fee-val" style="font-size:11px;color:var(--text2)">Solicitar en ventanilla</div></div>';
     }
   }
-  var dtudeCosto, dtudeArt;
+  var dtudeCosto, dtudeArt, dtudeLabel;
   if (mun === 'GDL') {
+    dtudeLabel = 'Dictamen de Uso y Destinos Específicos';
     dtudeCosto = '$1,222';
     dtudeArt   = 'Dictamen de Uso y Destinos Específicos (para giros comerciales) — Costo Dictamen de Uso y Destinos Específicos, aviso de trámites de uso de suelo, Guadalajara';
     total += 1222;
   } else if (mun === 'ZPN') {
+    // Mismo tramite (ZAP-DOTERR-006) para licencia de giro y de construccion en Zapopan
+    // -- no hay version mas barata como en GDL. Confirmado en retys.zapopan.gob.mx/
+    // tramites/34/detalle (actualizado 26/01/2026): "para tramitar tu licencia de giro"
+    // aparece explicitamente junto con licencia de construccion como caso de uso.
+    dtudeLabel = 'Dictamen de Trazo, Usos y Destinos Específicos';
     dtudeCosto = '$1,804 ($1,495 trámite + $309 formato)';
     dtudeArt   = 'Trámite $1,495 + Formato oficial $309 · retys.zapopan.gob.mx/tramites/34 · ZPN 2026';
     total += 1804;
   } else {
+    dtudeLabel = 'Dictamen de Uso de Suelo (DTUDE o equivalente)';
     dtudeCosto = 'Confirmar en ventanilla';
     dtudeArt   = 'Dictamen de Compatibilidad de Uso de Suelo — Dirección de Ordenamiento Territorial de ' + (MUN_NOMBRES[mun]||mun) + '. Tarifa por confirmar en Ley de Ingresos 2026 del municipio.';
   }
-  dHtml += '<div class="fee-row"><div class="fee-label">Dictamen de Uso de Suelo (DTUDE o equivalente)<div class="fundamento">'+dtudeArt+'</div></div><div class="fee-val">'+dtudeCosto+'</div></div>';
+  dHtml += '<div class="fee-row"><div class="fee-label">'+dtudeLabel+'<div class="fundamento">'+dtudeArt+'</div></div><div class="fee-val">'+dtudeCosto+'</div></div>';
   dHtml += '<div class="fee-total-row"><div>Total estimado</div><div class="fee-total-val">'+fmt(total)+'</div></div>';
   dHtml += '</div>';
   if (mun==='GDL') {

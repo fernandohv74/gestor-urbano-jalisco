@@ -4433,6 +4433,25 @@ const NIVEL_MIN_RESTRINGIDO_GDL = 3; // CS3
 // de las 292 paginas del reglamento de Tlaquepaque, por lo que no se incluye aqui.
 const GIROS_RESTRINGIDOS_TLQ = {'462112':3, '722412':3, '713950':3, '722411':4};
 
+// Giros restringidos Tonala — Tonala no tiene Reglamento de Zonificacion propio
+// (su Reglamento de Comercio, Art. 26, remite a "las Normas Urbanisticas aplicables
+// en el Municipio"); el unico Reglamento de Zonificacion vinculado desde su propio
+// portal es el ESTATAL, por lo que aplica directo el Cuadro 3 estatal: Cantinas y
+// bares (4.3.17), Billares (5.3.10), Boliches (5.3.12), Discotecas (5.3.21) y Salon
+// de eventos y similares (5.3.51) estan en Comercio/Servicios Distritales = nivel 3;
+// Centros nocturnos (5.4.4) y Espectaculos para adultos (5.4.7) estan en Servicios
+// Centrales = nivel 4. A diferencia de Tlaquepaque, aqui si hay entrada explicita
+// para "Salon de eventos" (713991), por lo que se incluye a nivel 3. El codigo
+// SCIAN 722411 (Discoteca+Centro nocturno) se clasifica al nivel mas alto (4) por
+// el mismo motivo que en Tlaquepaque: el catalogo no separa ambos giros.
+const GIROS_RESTRINGIDOS_TON = {'462112':3, '722412':3, '713950':3, '713991':3, '722411':4};
+
+// Tabla de giros restringidos fuera de GDL, por municipio (calve de municipioActual)
+const GIROS_RESTRINGIDOS_POR_MUN = {
+  'tlaquepaque': GIROS_RESTRINGIDOS_TLQ,
+  'tonala': GIROS_RESTRINGIDOS_TON
+};
+
 const GU_SCIAN_GDL = [
   {c:'111110',n:'Cultivo de soya',u:'ARN',x:''},
   {c:'111121',n:'Cultivo de cártamo',u:'ARN',x:''},
@@ -6077,12 +6096,13 @@ function calcularGirosZona(clave){
       const famG = u.replace(/\d+$/,'');
       const nivG = GDL_JERARQUIA[u] || 99;
       if(famG === 'CS'){
-        const nivelMinRestTLQ = (municipioActual==='tlaquepaque' && typeof GIROS_RESTRINGIDOS_TLQ!=='undefined')
-          ? GIROS_RESTRINGIDOS_TLQ[g.codigo] : undefined;
-        if(nivelMinRestTLQ){
-          // Cuadro 3 TLQ: giro restringido — nunca permitido automaticamente, solo
-          // condicionado, y solo si la zona alcanza el nivel minimo real de la ley
-          if((nivelCSPer > 0 && nivelCSPer >= nivelMinRestTLQ) || (nivelCSCon > 0 && nivelCSCon >= nivelMinRestTLQ)){
+        const _tablaRest = (typeof GIROS_RESTRINGIDOS_POR_MUN!=='undefined') ? GIROS_RESTRINGIDOS_POR_MUN[municipioActual] : undefined;
+        const nivelMinRest = _tablaRest ? _tablaRest[g.codigo] : undefined;
+        if(nivelMinRest){
+          // Giro restringido (Cuadro 3 municipal o estatal, segun corresponda): nunca
+          // permitido automaticamente, solo condicionado, y solo si la zona alcanza
+          // el nivel minimo real de la ley
+          if((nivelCSPer > 0 && nivelCSPer >= nivelMinRest) || (nivelCSCon > 0 && nivelCSCon >= nivelMinRest)){
             if(!condicionados.includes(g)) condicionados.push(g);
           }
         } else if(nivelCSPer > 0 && nivG <= nivelCSPer){
@@ -6495,7 +6515,7 @@ function filtrarGirosM02(q){
         <span style="font-family:var(--mono);font-size:10px;
           color:${window._mostrandoCondicionado?'var(--yellowD)':'var(--uso-p-txt)'};
           min-width:54px;flex-shrink:0">${g.codigo||''}</span>
-        <span style="flex:1"><span style="display:block">${g.nombre||''}</span>${g.ns&&g.ns!==g.nombre?`<span style="display:block;font-size:10px;color:var(--text3);margin-top:1px">${g.ns}</span>`:''}${((typeof GIROS_RESTRINGIDOS_GDL!=='undefined'&&GIROS_RESTRINGIDOS_GDL.has(g.codigo))||(typeof GIROS_RESTRINGIDOS_TLQ!=='undefined'&&municipioActual==='tlaquepaque'&&(g.codigo in GIROS_RESTRINGIDOS_TLQ)))?`<span style="display:block;font-size:10px;color:#92400E;margin-top:2px">⚠️ Giro restringido — requiere autorización adicional del Consejo de Giros Restringidos</span>`:''}</span>
+        <span style="flex:1"><span style="display:block">${g.nombre||''}</span>${g.ns&&g.ns!==g.nombre?`<span style="display:block;font-size:10px;color:var(--text3);margin-top:1px">${g.ns}</span>`:''}${((typeof GIROS_RESTRINGIDOS_GDL!=='undefined'&&GIROS_RESTRINGIDOS_GDL.has(g.codigo))||(typeof GIROS_RESTRINGIDOS_POR_MUN!=='undefined'&&GIROS_RESTRINGIDOS_POR_MUN[municipioActual]&&(g.codigo in GIROS_RESTRINGIDOS_POR_MUN[municipioActual])))?`<span style="display:block;font-size:10px;color:#92400E;margin-top:2px">⚠️ Giro restringido — requiere autorización adicional del Consejo de Giros Restringidos</span>`:''}</span>
       </div>`).join('');
   if(_giroSeleccionado){const _sEl=lista.querySelector('[data-giro-codigo="'+_giroSeleccionado.codigo+'"]');if(_sEl){window._giroSelEl=_sEl;_sEl.style.background='var(--brand-pale)';_sEl.style.color='var(--brand)';_sEl.style.borderLeft='3px solid var(--brand)';_sEl.style.fontWeight='500';}}
 }

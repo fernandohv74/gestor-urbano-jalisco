@@ -1361,6 +1361,29 @@ var ALC_ZPN = {
 // bajo un mismo codigo y se clasifica como 'cabaret' (el mas restrictivo de los dos).
 var SCIAN_A_TIPOALC = {'462112':'bar', '722412':'bar', '722411':'cabaret'};
 
+// Mismo respaldo por codigo SCIAN, para el nivel de riesgo de Proteccion Civil
+// (giro.pc). Sin esto, un giro que llega por el deep link de M02 siempre cae al
+// default 'bajo' de calcularGDL()/calcularZPN(), incluso si es una oficina de
+// riesgo minimo -- la categoria pc:'minimo' ya existe en M06 (ver 'despacho',
+// 'agencia', 'inmobiliaria' arriba) pero solo se alcanza seleccionando el giro
+// desde el propio buscador de M06, no desde el enlace de M02. Codigos tomados
+// de GU_SCIAN_GDL: despachos y oficinas de servicios profesionales sin manejo
+// de alimentos, quimicos ni aforo publico relevante. Lista inicial con los
+// casos mas claros -- ampliar si aparecen mas giros de oficina mal clasificados.
+var SCIAN_A_PC = {
+  '541211':'minimo', // Contaduria - Despacho fiscal (privado)
+  '541110':'minimo', // Abogados - Despacho legal
+  '541120':'minimo', // Notaria publica
+  '522410':'minimo', // Arrendadora - Leasing
+  '524110':'minimo', // Aseguradora - Seguros
+  '524210':'minimo', // Agente de seguros - Ajustador
+  '524220':'minimo', // Pensiones - AFORE - Fondo de retiro
+  '531210':'minimo', // Inmobiliaria - Desarrolladora
+  '531311':'minimo', // Administracion de condominios - Inmobiliaria
+  '561510':'minimo', // Agencia de viajes
+  '561520':'minimo'  // Agencia de viajes - Tour operador
+};
+
 // PC nivel ZPN (default: 'bajo')
 var PC_NIVEL_ZPN = {
   'BAR':'alto','BAR EN CABARET':'alto','BAR EN CENTRO NOCTURNO':'alto',
@@ -1666,8 +1689,8 @@ function getChecklist(giro, mun, moral, zonaPat, tramite) {
     docs.previos.push({txt:'Dictamen de Protección Civil y Bomberos de Zapopan', nota:'Emitido por la Coordinación de Protección Civil Municipal — incluye revisión de instalaciones, extintores, señalización y salidas de emergencia'});
     docs.previos.push({txt:'Aviso de funcionamiento ante la Secretaría de Salud Jalisco (SSJ)', nota:'Para giros que manejan alimentos, bebidas, servicios de salud o actividades de riesgo sanitario — tramitar en la Jurisdicción Sanitaria correspondiente'});
   }
-  if (gdl) {
-    docs.previos.push({txt:'Constancia de Protección Civil (GDL)', nota:'Coordinación Municipal de Protección Civil Guadalajara — Art. 17 Fracc. XVII, Ley Ingresos GDL 2026'});
+  if (gdl && giro.pc !== 'minimo') {
+    docs.previos.push({txt:'Constancia de Protección Civil (GDL)', nota:'Aplica según el riesgo del giro — Coordinación Municipal de Protección Civil Guadalajara. Se expide a solicitud de parte, sin costo automático en este trámite (Art. 17 Fracc. XVII, Ley Ingresos GDL 2026)'});
   }
   if (zonaPat) {
     docs.previos.push({txt:'Dictamen de Zona Patrimonial (IPLAN / Coordinación de Patrimonio Histórico)', nota:'Obligatorio para locales en el Centro Histórico de Guadalajara u otras zonas patrimoniales catalogadas'});
@@ -1736,7 +1759,10 @@ function getChecklist(giro, mun, moral, zonaPat, tramite) {
     docs.adicionales.push({txt:'Licencia sanitaria COFEPRIS para farmacia', nota:'La farmacia debe contar con Director Técnico (Químico Farmacéutico Biólogo o Farmacéutico)'});
     docs.adicionales.push({txt:'Cédula profesional del Director Técnico de la farmacia'});
   }
-  if (nomUp.indexOf('SALON DE BELLEZA') >= 0 || nomUp.indexOf('ESTETICA') >= 0 || nomUp.indexOf('SPA') >= 0 || nomUp.indexOf('MASAJE') >= 0) {
+  // Coincidencia por palabra completa (con limite de palabra), no por substring --
+  // "SPA" sin limite hacia coincidir dentro de "DESPACHO" (Contaduria - Despacho
+  // fiscal, etc.), y "ESTETICA" podria hacerlo dentro de otras palabras compuestas.
+  if (/\b(SALON DE BELLEZA|ESTETICA|SPA|MASAJE)\b/.test(nomUp)) {
     docs.adicionales.push({txt:'Aviso de funcionamiento ante la Secretaría de Salud (establecimientos de salud estética)', nota:'Aplica según servicios ofrecidos — consultar Normas Oficiales Mexicanas NOM-082 y NOM-141'});
   }
   if (nomUp.indexOf('VETERINARIA') >= 0 || nomUp.indexOf('CLINICA VETERINARIA') >= 0) {
@@ -2040,7 +2066,8 @@ function calcularGDL() {
     var scianCodGDL = (document.getElementById('scian-id-gdl')||{}).textContent || '';
     tipoAlc = SCIAN_A_TIPOALC[scianCodGDL] || null;
   }
-  var pcNivel  = PC_NIVEL_ZPN[giroNom] || 'bajo';
+  var pcNivel  = PC_NIVEL_ZPN[giroNom];
+  if (!pcNivel) { pcNivel = SCIAN_A_PC[scianCodGDL] || 'bajo'; }
   var cofepris = COFEPRIS_ZPN.indexOf(giroNom) >= 0;
   var rpbi     = RPBI_ZPN.indexOf(giroNom) >= 0;
   var semarnat = SEMARNAT_ZPN.indexOf(giroNom) >= 0;
@@ -2072,7 +2099,8 @@ function calcularZPN() {
     var scianCodZPN = (document.getElementById('scian-id-zpn')||{}).textContent || '';
     tipoAlc = SCIAN_A_TIPOALC[scianCodZPN] || null;
   }
-  var pcNivel  = PC_NIVEL_ZPN[giroNom] || 'bajo';
+  var pcNivel  = PC_NIVEL_ZPN[giroNom];
+  if (!pcNivel) { pcNivel = SCIAN_A_PC[scianCodZPN] || 'bajo'; }
   var cofepris = COFEPRIS_ZPN.indexOf(giroNom) >= 0;
   var rpbi     = RPBI_ZPN.indexOf(giroNom) >= 0;
   var semarnat = SEMARNAT_ZPN.indexOf(giroNom) >= 0;

@@ -2133,7 +2133,11 @@ function renderResultado(giro, mun, sup, tramiteLabel) {
 
 // ── CALCULAR GDL ─────────────────────────────────────────────────────
 function calcularGDL() {
-  var giroNom = document.getElementById('sel-giro-gdl').value;
+  // Si el usuario escribe directo en el buscador sin darle clic a una sugerencia
+  // (ej. pegar un codigo SCIAN o un nombre que el autocomplete no reconocio), el
+  // campo oculto sel-giro-gdl nunca se llena -- se usa lo escrito como respaldo
+  // para que "Calcular" no ignore silenciosamente lo que el usuario tecleo.
+  var giroNom = document.getElementById('sel-giro-gdl').value || document.getElementById('inp-giro-gdl').value.trim();
   var tramite = document.getElementById('sel-tramite-gdl').value;
   var sup     = parseFloat(document.getElementById('inp-sup').value) || 0;
   var moral   = document.querySelector('input[name="tpers-gdl"]:checked').value === 'moral';
@@ -2146,11 +2150,13 @@ function calcularGDL() {
     inpG.style.borderColor='#e53935'; inpG.focus();
     setTimeout(function(){inpG.style.borderColor='';},2000); return;
   }
+  // Respaldo por codigo SCIAN: toma el de la ficha SCIAN mostrada (si se eligio del
+  // autocomplete o llego por deep link) o, si el usuario escribio el codigo a mano,
+  // el propio giroNom cuando es un numero de 3 a 6 digitos.
+  var scianCodGDL = (document.getElementById('scian-id-gdl')||{}).textContent || '';
+  if (!scianCodGDL && /^\d{3,6}$/.test(giroNom)) { scianCodGDL = giroNom; }
   var tipoAlc  = ALC_ZPN[giroNom] || null;
-  if (!tipoAlc) {
-    var scianCodGDL = (document.getElementById('scian-id-gdl')||{}).textContent || '';
-    tipoAlc = SCIAN_A_TIPOALC[scianCodGDL] || null;
-  }
+  if (!tipoAlc) { tipoAlc = SCIAN_A_TIPOALC[scianCodGDL] || null; }
   var pcNivel  = PC_NIVEL_ZPN[giroNom];
   if (!pcNivel) { pcNivel = SCIAN_A_PC[scianCodGDL] || 'bajo'; }
   var cofepris = COFEPRIS_ZPN.indexOf(giroNom) >= 0;
@@ -2169,7 +2175,9 @@ function calcularGDL() {
 
 // ── CALCULAR ZPN ─────────────────────────────────────────────────────
 function calcularZPN() {
-  var giroNom = document.getElementById('sel-giro-zpn').value;
+  // Mismo respaldo que calcularGDL(): si escribio directo sin seleccionar del
+  // autocomplete, el campo oculto sel-giro-zpn queda vacio -- usar lo escrito.
+  var giroNom = document.getElementById('sel-giro-zpn').value || document.getElementById('inp-giro-zpn').value.trim();
   var tramite = document.getElementById('sel-tramite-zpn').value;
   var sup     = parseFloat(document.getElementById('inp-sup-zpn').value) || 0;
   var moral   = document.querySelector('input[name="tpers-zpn"]:checked').value === 'moral';
@@ -2184,11 +2192,10 @@ function calcularZPN() {
     setTimeout(function(){selG.style.borderColor='';},2000);
     return;
   }
+  var scianCodZPN = (document.getElementById('scian-id-zpn')||{}).textContent || '';
+  if (!scianCodZPN && /^\d{3,6}$/.test(giroNom)) { scianCodZPN = giroNom; }
   var tipoAlc  = ALC_ZPN[giroNom] || null;
-  if (!tipoAlc) {
-    var scianCodZPN = (document.getElementById('scian-id-zpn')||{}).textContent || '';
-    tipoAlc = SCIAN_A_TIPOALC[scianCodZPN] || null;
-  }
+  if (!tipoAlc) { tipoAlc = SCIAN_A_TIPOALC[scianCodZPN] || null; }
   var pcNivel  = PC_NIVEL_ZPN[giroNom];
   if (!pcNivel) { pcNivel = SCIAN_A_PC[scianCodZPN] || 'bajo'; }
   var cofepris = COFEPRIS_ZPN.indexOf(giroNom) >= 0;
@@ -2223,9 +2230,13 @@ function calcularMunGen() {
   }
   // Detectar alcohol y tipo usando el mismo mapeo que ZPN (mismos nombres de giro)
   var giroUp   = giroNom.toUpperCase();
-  var tipoAlc  = ALC_ZPN[giroUp] || null;
+  // Respaldo por codigo SCIAN cuando el usuario escribe el codigo directo (este
+  // formulario no tiene ficha SCIAN propia como GDL/ZPN, asi que solo se puede
+  // usar el codigo si es lo que el usuario tecleo tal cual).
+  var scianCodGen = /^\d{3,6}$/.test(giroNom) ? giroNom : '';
+  var tipoAlc  = ALC_ZPN[giroUp] || SCIAN_A_TIPOALC[scianCodGen] || null;
   var esAlcohol = (tipoAlc !== null) && !!(TARIFAS_ALCOHOL[munNom] && TARIFAS_ALCOHOL[munNom][tipoAlc]);
-  var pcNivel  = PC_NIVEL_ZPN[giroUp] || 'bajo';
+  var pcNivel  = PC_NIVEL_ZPN[giroUp] || SCIAN_A_PC[scianCodGen] || 'bajo';
   var cofepris = COFEPRIS_ZPN.indexOf(giroUp) >= 0;
   var rpbi     = RPBI_ZPN.indexOf(giroUp) >= 0;
   var semarnat = SEMARNAT_ZPN.indexOf(giroUp) >= 0;

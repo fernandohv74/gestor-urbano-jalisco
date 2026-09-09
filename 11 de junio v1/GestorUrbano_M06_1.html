@@ -1698,8 +1698,11 @@ function getChecklist(giro, mun, moral, zonaPat, tramite) {
   docs.base.push({txt:'Comprobante de domicilio del local (no mayor a 3 meses)', nota: gdl ? 'Recibo con fecha de expedición no mayor a tres meses a nombre del titular' : 'Recibo de agua, luz o teléfono fijo a nombre del titular o arrendador. Debe coincidir con la dirección del negocio'});
   if (gdl) {
     docs.base.push({txt:'Recibo predial del Municipio de Guadalajara a nombre del titular (domicilio del negocio)', nota: giro.rentado
-      ? 'Requisito 5, Formato Múltiple Padrón y Licencias GDL — recibo predial + copia del contrato de arrendamiento o comodato vigente firmado por el propietario de la finca (debe coincidir con el predial) + copia de identificación oficial vigente del propietario de la finca'
+      ? 'Requisito 5, Formato Múltiple Padrón y Licencias GDL — debe coincidir con el domicilio del contrato de arrendamiento'
       : 'Requisito 5, Formato Múltiple Padrón y Licencias GDL — a nombre del titular, por ser propietario del local'});
+    if (giro.rentado) {
+      docs.base.push({txt:'Contrato de arrendamiento o comodato vigente + identificación del propietario de la finca', nota:'Requisito 5, Formato Múltiple Padrón y Licencias GDL — copia del contrato firmado por el propietario de la finca (debe coincidir con el recibo predial) + copia de identificación oficial vigente del propietario'});
+    }
   } else {
     docs.base.push({txt:'Predial vigente del local (año en curso)', nota:'Expedido por el municipio — confirma que el inmueble está al corriente de pagos'});
     docs.base.push({txt: giro.rentado ? 'Contrato de arrendamiento o comodato del local' : 'Título de propiedad del local', nota: giro.rentado

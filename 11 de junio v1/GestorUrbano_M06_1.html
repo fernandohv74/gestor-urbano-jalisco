@@ -1804,6 +1804,15 @@ function renderResultado(giro, mun, sup, tramiteLabel) {
   } else if (tarAlc && tarAlc.tarifa === 0) {
     alertHtml = '<div class="alert-box alert-info">&#9432; <strong>Exento de derechos de licencia municipal</strong> - ' + tarAlc.art + '</div>';
   }
+  // Giros de consumo de alcohol en el lugar (bar, discoteca, cabaret, etc.) suelen
+  // requerir zonificacion comercial de mayor intensidad y autorizacion adicional del
+  // Consejo de Giros Restringidos -- distinto al derecho de licencia calculado arriba.
+  // No se conoce la zonificacion real del predio en este modulo (eso vive en M02), asi
+  // que el aviso es informativo, sin dar un veredicto de nivel CS especifico.
+  var GIROS_RESTRINGIDOS_M06 = {bar:1, rest_bar:1, discoteca:1, cabaret:1, terraza_a:1, cerveceria:1};
+  if (giro.alcohol && GIROS_RESTRINGIDOS_M06[giro.tipoAlc]) {
+    alertHtml += '<div class="alert-box alert-warn">&#9888; <strong>Giro restringido</strong> — la mayoría de municipios exige zonificación comercial de mayor intensidad (Distrital o superior) y autorización adicional del Consejo de Giros Restringidos, además de esta licencia. Verifica la zonificación de tu predio en el Módulo 02 antes de tramitar.</div>';
+  }
   document.getElementById('res-alerta').innerHTML = alertHtml;
   document.getElementById('res-ccf').innerHTML = ccfHtml;
 

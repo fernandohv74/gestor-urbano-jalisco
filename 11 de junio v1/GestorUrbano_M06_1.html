@@ -1757,8 +1757,19 @@ function getChecklist(giro, mun, moral, zonaPat, tramite) {
       : 'En la mayoría de los giros el uso de suelo se revisa directo en la ventanilla al tramitar la licencia, sin pedir este dictamen formal aparte. Suele solicitarse solo si hace falta una aclaración puntual sobre el uso en tu domicilio. Módulo 01 del Gestor Urbano te indica la zonificación'
   });
   if (zpn) {
-    docs.previos.push({txt:'Dictamen de Protección Civil y Bomberos de Zapopan', nota:'Emitido por la Coordinación de Protección Civil Municipal — incluye revisión de instalaciones, extintores, señalización y salidas de emergencia'});
-    docs.previos.push({txt:'Aviso de funcionamiento ante la Secretaría de Salud Jalisco (SSJ)', nota:'Para giros que manejan alimentos, bebidas, servicios de salud o actividades de riesgo sanitario — tramitar en la Jurisdicción Sanitaria correspondiente'});
+    // Igual que el fix de GDL: un giro de riesgo minimo (oficina de servicios
+    // profesionales) no deberia pedir dictamen de PC. Antes se pedia parejo
+    // para cualquier giro en Zapopan, sin revisar el nivel de riesgo.
+    if (giro.pc !== 'minimo') {
+      docs.previos.push({txt:'Dictamen de Protección Civil y Bomberos de Zapopan', nota:'Emitido por la Coordinación de Protección Civil Municipal — incluye revisión de instalaciones, extintores, señalización y salidas de emergencia'});
+    }
+    // El aviso SSJ es especifico de giros con manejo de alimentos/salud/riesgo
+    // sanitario -- se usa el mismo indicador cofepris que ya existe para esos
+    // giros (consultorios, laboratorios, guarderias, etc.), en vez de pedirlo
+    // parejo para cualquier giro en Zapopan.
+    if (giro.cofepris) {
+      docs.previos.push({txt:'Aviso de funcionamiento ante la Secretaría de Salud Jalisco (SSJ)', nota:'Para giros que manejan alimentos, bebidas, servicios de salud o actividades de riesgo sanitario — tramitar en la Jurisdicción Sanitaria correspondiente'});
+    }
   }
   if (gdl && giro.pc !== 'minimo') {
     docs.previos.push({txt:'Constancia de Protección Civil (GDL)', nota:'Aplica según el riesgo del giro — Coordinación Municipal de Protección Civil Guadalajara. Se expide a solicitud de parte, sin costo automático en este trámite (Art. 17 Fracc. XVII, Ley Ingresos GDL 2026)'});

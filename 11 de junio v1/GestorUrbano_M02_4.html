@@ -6816,6 +6816,8 @@ function getMensajeM2(clave, condGiro, zonaActual){
 function verificarGiro(){
   if(!_giroSeleccionado||!_zonaActualM02) return;
   const g = GU_SCIAN.find(x=>x.codigo===_giroSeleccionado.codigo)||{..._giroSeleccionado,uso_gdl:'',cond:''};
+  const esGiroRestringido = ((municipioActual==='guadalajara'&&typeof GIROS_RESTRINGIDOS_GDL!=='undefined'&&GIROS_RESTRINGIDOS_GDL.has(g.codigo))||(typeof GIROS_RESTRINGIDOS_POR_MUN!=='undefined'&&GIROS_RESTRINGIDOS_POR_MUN[municipioActual]&&(g.codigo in GIROS_RESTRINGIDOS_POR_MUN[municipioActual])));
+  const avisoGiroRestringidoHTML = esGiroRestringido?'<div style="font-size:11px;margin-top:6px;padding:6px 10px;background:rgba(146,64,14,.25);border-radius:5px;color:#FCD34D;line-height:1.5">⚠️ Giro restringido — requiere autorización adicional del Consejo de Giros Restringidos</div>':'';
   const clave    = _zonaActualM02;
   const zonaBase = clave.toUpperCase().replace(/-.*$/,'');
   const familia  = zonaBase.replace(/\d+$/,'');
@@ -6907,6 +6909,7 @@ function verificarGiro(){
         <div style="font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:${tc[tipo]};margin-bottom:4px">${labels[tipo]}</div>
         <div style="font-size:14px;font-weight:600;margin-bottom:4px">${g.nombre||''}</div>
         <div style="font-size:12px;color:var(--text2)">${razon}</div>
+        ${avisoGiroRestringidoHTML}
         ${conds.map(c=>`<div style="font-size:11px;margin-top:6px;padding:6px 10px;background:rgba(0,0,0,.3);border-radius:5px;color:#FCD34D;line-height:1.5">${c}</div>`).join('')}
       </div>
     </div>
@@ -6926,7 +6929,18 @@ function verificarGiro(){
   }
   // ── Fin rama Zapopan ──
 
-  if(u==='PROHIBIDO'){
+  if(esGiroRestringido){
+    const enCondRest = (window._girosC||[]).some(x=>x.codigo===g.codigo);
+    const enPerRest  = (window._girosP||[]).some(x=>x.codigo===g.codigo);
+    if(enCondRest||enPerRest){
+      tipo='condicionado';
+      razon=`Giro restringido en zona ${clave} — requiere autorización del Consejo de Giros Restringidos, además del Dictamen de Compatibilidad de Uso de Suelo.`;
+      conds.push('Solicitar autorización ante el Consejo de Giros Restringidos, además del Dictamen de Compatibilidad de Uso de Suelo en la Dirección de Padrón y Licencias.');
+    } else {
+      tipo='prohibido';
+      razon=`Este giro es restringido y requiere una zona de mayor intensidad para poder solicitar autorización — zona ${clave} no alcanza el nivel mínimo.`;
+    }
+  } else if(u==='PROHIBIDO'){
     tipo='prohibido';
     razon=`"${g.nombre}" está PROHIBIDO en el Reglamento de Giros GDL.`;
   } else if(!u||u==='ARN'||u==='N/A'){
@@ -6974,6 +6988,7 @@ function verificarGiro(){
         <div style="font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:${tc[tipo]};margin-bottom:4px">${labels[tipo]}</div>
         <div style="font-size:14px;font-weight:600;margin-bottom:4px">${g.nombre||''}</div>
         <div style="font-size:12px;color:var(--text2)">${razon}</div>
+        ${avisoGiroRestringidoHTML}
         ${conds.map(c=>`<div style="font-size:11px;margin-top:6px;padding:6px 10px;background:rgba(0,0,0,.3);border-radius:5px;color:#FCD34D;line-height:1.5">${c}</div>`).join('')}
       </div>
     </div>

@@ -13,6 +13,7 @@
 <title>Planes y precios — TrazaUrbana</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -159,15 +160,26 @@ footer{margin-top:auto;padding:24px 28px;border-top:1px solid var(--border);text
 </footer>
 
 <script>
+const SUPABASE_URL = 'https://bhryrrdygghhospfqgtj.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Ma2gxSyWx4rDHIbDPKGUdg_lO0xZeZr';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
 async function suscribir(plan, btn) {
   var textoOriginal = btn.textContent;
   btn.disabled = true;
+  btn.textContent = 'Verificando sesión…';
+  var sesion = await supabaseClient.auth.getSession();
+  var session = sesion.data && sesion.data.session;
+  if (!session) {
+    window.location.href = 'login-nuevo.html?next=planes.html';
+    return;
+  }
   btn.textContent = 'Redirigiendo…';
   try {
     var resp = await fetch('/api/create-checkout-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan: plan })
+      body: JSON.stringify({ plan: plan, userId: session.user.id, email: session.user.email })
     });
     var data = await resp.json();
     if (resp.ok && data.url) {

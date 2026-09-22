@@ -23,12 +23,17 @@ export default async function handler(req, res) {
     }
     const body = req.body || {};
     const plan = body.plan;
+    const userId = body.userId;
+    const email = body.email;
     const priceId = PRICE_IDS[plan];
     if (!priceId) {
       return res.status(400).json({
         error: 'Plan invalido',
         debug: { planRecibido: plan, planesValidos: Object.keys(PRICE_IDS) }
       });
+    }
+    if (!userId) {
+      return res.status(400).json({ error: 'Debes iniciar sesion antes de suscribirte' });
     }
     const origin = req.headers.origin || `https://${req.headers.host}`;
 
@@ -39,6 +44,10 @@ export default async function handler(req, res) {
     params.append('line_items[0][quantity]', '1');
     params.append('success_url', `${origin}/planes.html?success=true`);
     params.append('cancel_url', `${origin}/planes.html?canceled=true`);
+    params.append('client_reference_id', userId);
+    if (email) params.append('customer_email', email);
+    params.append('metadata[plan]', plan);
+    params.append('subscription_data[metadata][plan]', plan);
 
     const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',

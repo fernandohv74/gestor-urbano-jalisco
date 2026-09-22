@@ -104,7 +104,7 @@ document.getElementById('form-magico').addEventListener('submit', async function
   btn.textContent = 'Enviando…';
   const { error } = await supabaseClient.auth.signInWithOtp({
     email: email,
-    options: { emailRedirectTo: window.location.origin + '/login-nuevo.html' }
+    options: { emailRedirectTo: window.location.origin + '/login-nuevo.html' + window.location.search }
   });
   if (error) {
     mostrarMensaje('No se pudo enviar el link: ' + error.message, 'err');
@@ -133,7 +133,8 @@ document.getElementById('form-password').addEventListener('submit', async functi
 
 supabaseClient.auth.onAuthStateChange(function (event, session) {
   if (event === 'SIGNED_IN' && session) {
-    window.location.href = 'index.html';
+    const params = new URLSearchParams(window.location.search);
+    window.location.href = params.get('next') || 'index.html';
   }
 });
 </script>

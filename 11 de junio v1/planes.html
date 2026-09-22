@@ -44,8 +44,11 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
 .hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:48px 24px 8px;background:radial-gradient(ellipse 70% 40% at 50% 0%,#0d1f3c 0%,transparent 70%)}
 .hero-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent2);background:var(--accentL);border:1px solid #2A52A8;padding:4px 14px;border-radius:20px;margin-bottom:20px}
 .hero-title{font-family:'Outfit','Helvetica Neue',Arial,sans-serif;font-size:clamp(26px,5vw,40px);font-weight:600;letter-spacing:-.5px;line-height:1.15;margin-bottom:12px}
-.hero-sub{font-size:14px;color:var(--text2);max-width:520px;margin-bottom:8px}
-.iva-note{font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:36px}
+.hero-sub{font-size:14px;color:var(--text2);max-width:520px;margin-bottom:22px}
+.value-points{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin-bottom:8px}
+.value-point{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
+.plans-label{text-align:center;font-family:'Outfit','Helvetica Neue',Arial,sans-serif;font-size:20px;font-weight:600;color:var(--text);margin-top:44px}
+.iva-note{font-family:var(--mono);font-size:11px;color:var(--text3);text-align:center;margin-bottom:28px}
 .plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;max-width:1080px;width:100%;margin:0 auto;padding:0 24px 56px}
 .plan-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;display:flex;flex-direction:column;padding:26px 22px;position:relative;transition:border-color .2s,transform .15s}
 .plan-card:hover{border-color:var(--accent);transform:translateY(-3px)}
@@ -87,11 +90,19 @@ footer{margin-top:auto;padding:24px 28px;border-top:1px solid var(--border);text
 </header>
 
 <div class="hero">
-  <div class="hero-eyebrow">Suscripciones TrazaUrbana</div>
-  <h1 class="hero-title">Elige tu plan</h1>
-  <p class="hero-sub">Consultas normales para uso de suelo, giros, requisitos y derechos, más análisis con inteligencia artificial para revisión de planos.</p>
-  <div class="iva-note">Precios en pesos mexicanos, IVA incluido · Cancela cuando quieras</div>
+  <div class="hero-eyebrow">Plataforma AMG</div>
+  <h1 class="hero-title">Uso de suelo, licencias y trámites del AMG en un solo lugar</h1>
+  <p class="hero-sub">11 módulos para consultar zonificación, giros comerciales y requisitos en los 5 municipios del AMG — sin ir a ventanilla.</p>
+  <div class="value-points">
+    <div class="value-point">🗺️ 5 municipios</div>
+    <div class="value-point">🧩 11 módulos</div>
+    <div class="value-point">🤖 Análisis con IA</div>
+    <div class="value-point">📄 Dato oficial</div>
+  </div>
 </div>
+
+<div class="plans-label">Elige tu plan</div>
+<div class="iva-note">Precios en pesos mexicanos, IVA incluido · Cancela cuando quieras</div>
 
 <div class="msg-box">
   <div id="msg-ok" class="msg ok" style="display:none">✓ Pago completado. Gracias por suscribirte a TrazaUrbana.</div>

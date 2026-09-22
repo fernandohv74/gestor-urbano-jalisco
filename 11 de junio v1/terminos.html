@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<!-- ==========================================================
+     GestorUrbano Jalisco AMG / TrazaUrbana
+     (c) 2026 Fernando H. - trazaurbana.mx
+     Todos los derechos reservados.
+     Reproduccion o uso no autorizado esta prohibido.
+     ========================================================== -->
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Términos de Servicio — TrazaUrbana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0B0F1A;--bg2:#111827;--bg3:#1A2235;--bg4:#212d42;
+  --text:#E2E8F0;--text2:#94A3B8;--text3:#4B5563;
+  --border:#1E2D45;
+  --accent:#3D7BFF;--accent2:#6699FF;--accentL:#1A3A8F;
+  --teal:#06B6D4;
+  --green:#10B981;--greenD:#34D399;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+}
+body.light{
+  --bg:#F8F9FC;--bg2:#FFFFFF;--bg3:#F1F4F9;--bg4:#E4E9F2;
+  --text:#0F172A;--text2:#475569;--text3:#94A3B8;
+  --border:#CBD5E1;
+  --accent:#2563EB;--accent2:#3B82F6;--accentL:#DBEAFE;
+  --teal:#0891B2;--green:#059669;--greenD:#10B981;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;font-size:14px;line-height:1.7;display:flex;flex-direction:column;transition:background-color .4s ease,color .3s ease}
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;transition:background-color .4s ease,border-color .35s ease}
+.logo-sub{font-size:11px;color:var(--text3);letter-spacing:.6px;text-transform:uppercase}
+.theme-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:11px;padding:5px 12px;border-radius:20px;cursor:pointer;transition:all .2s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+.back-link{font-family:var(--sans);font-size:12px;color:var(--text2);text-decoration:none;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg3)}
+.back-link:hover{border-color:var(--accent);color:var(--accent)}
+main{max-width:760px;width:100%;margin:0 auto;padding:40px 24px 80px}
+h1{font-family:'Outfit','Helvetica Neue',Arial,sans-serif;font-size:clamp(26px,5vw,34px);font-weight:600;letter-spacing:-.5px;margin-bottom:6px}
+.updated{font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:36px}
+h2{font-family:'Outfit','Helvetica Neue',Arial,sans-serif;font-size:19px;font-weight:600;margin:34px 0 12px;color:var(--accent2)}
+p{color:var(--text2);margin-bottom:12px}
+ul{color:var(--text2);margin:0 0 12px 20px}
+li{margin-bottom:6px}
+strong{color:var(--text);font-weight:600}
+table{width:100%;border-collapse:collapse;margin:14px 0 18px;font-size:13px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border)}
+th{color:var(--text3);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+td{color:var(--text2)}
+.box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:16px 0}
+a{color:var(--accent2)}
+footer{margin-top:auto;padding:24px 28px;border-top:1px solid var(--border);text-align:center}
+.footer-txt{font-size:11px;color:var(--text3);font-family:var(--mono)}
+@media(max-width:600px){header{padding:12px 16px}main{padding:28px 16px 56px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div style="font-family:'Outfit','Helvetica Neue',Arial,sans-serif;line-height:1;letter-spacing:-.3px;margin-bottom:2px"><span style="font-weight:800;font-size:17px;color:var(--text)">Traza</span><span style="font-weight:300;font-size:17px;color:#D85A30">Urbana</span></div>
+    <div class="logo-sub">Términos de servicio</div>
+  </div>
+  <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" style="margin-left:auto">🌙 Modo oscuro</button>
+  <a href="index.html" class="back-link">← Menú principal</a>
+</header>
+
+<main>
+  <h1>Términos de Servicio</h1>
+  <div class="updated">Última actualización: 21 de septiembre de 2026</div>
+
+  <h2>1. Identificación del prestador del servicio</h2>
+  <p><strong>TrazaUrbana</strong> es el nombre comercial de la plataforma operada por <strong>Fernando Hernández Valdez</strong>, RFC <strong>HEVF740827DU4</strong>, con domicilio de contacto electrónico en <a href="mailto:fernandohv74@gmail.com">fernandohv74@gmail.com</a>. Al usar TrazaUrbana, aceptas estos términos.</p>
+
+  <h2>2. Descripción del servicio</h2>
+  <p>TrazaUrbana es una plataforma web de consulta normativa urbana para el Área Metropolitana de Guadalajara (Guadalajara, Zapopan, Tlaquepaque, Tlajomulco de Zúñiga y Tonalá), que incluye 11 módulos para consultar uso de suelo, verificar giros comerciales, calcular potencial constructivo, calcular derechos de licencia, revisar planos con inteligencia artificial y monitorear plazos de trámites.</p>
+  <div class="box">
+    <p style="margin:0"><strong>Naturaleza informativa.</strong> Los datos de TrazaUrbana se basan en reglamentos y ordenamientos oficiales vigentes al momento de su consulta, pero no sustituyen la confirmación directa con la dependencia municipal o estatal correspondiente antes de iniciar cualquier trámite. TrazaUrbana no emite dictámenes oficiales ni actúa como representante legal ante autoridad alguna.</p>
+  </div>
+
+  <h2>3. Planes y precios</h2>
+  <p>Los precios están expresados en pesos mexicanos (MXN) e incluyen IVA. Se cobran de forma recurrente mensual a través de Stripe, nuestro procesador de pagos.</p>
+  <table>
+    <tr><th>Plan</th><th>Precio/mes</th><th>Incluye</th></tr>
+    <tr><td>Básico</td><td>$80 MXN</td><td>8 consultas normales + 4 análisis con IA</td></tr>
+    <tr><td>Estándar</td><td>$199 MXN</td><td>30 consultas normales + 8 análisis con IA</td></tr>
+    <tr><td>Profesional</td><td>$499 MXN</td><td>80 consultas normales + 20 análisis con IA</td></tr>
+    <tr><td>Empresarial</td><td>$999 MXN</td><td>Consultas ilimitadas + 100 análisis con IA, hasta 5 usuarios</td></tr>
+  </table>
+  <p>Los precios y los límites de cada plan pueden ajustarse; cualquier cambio se anunciará con anticipación razonable y no afectará el ciclo de facturación ya en curso.</p>
+
+  <h2>4. Cancelación y reembolsos</h2>
+  <ul>
+    <li>Puedes cancelar tu suscripción en cualquier momento; dejarás de tener acceso al finalizar el ciclo ya pagado, sin cargos adicionales a partir de entonces.</li>
+    <li><strong>Garantía de 7 días:</strong> si cancelas dentro de los primeros 7 días naturales de tu <strong>primera</strong> suscripción a TrazaUrbana, te reembolsamos el pago completo. Escríbenos a <a href="mailto:fernandohv74@gmail.com">fernandohv74@gmail.com</a> para solicitarlo.</li>
+    <li>Fuera de esa ventana de 7 días, o en renovaciones posteriores a la primera, los pagos no son reembolsables, incluso si cancelas antes de que termine el ciclo.</li>
+  </ul>
+
+  <h2>5. Uso aceptable</h2>
+  <p>Te comprometes a usar TrazaUrbana de forma lícita y a no intentar vulnerar los límites de tu plan, compartir credenciales de acceso con terceros ajenos a tu plan, ni extraer o revender de forma masiva la información de la plataforma.</p>
+
+  <h2>6. Propiedad intelectual</h2>
+  <p>El software, diseño, marca "TrazaUrbana" y los materiales originales de la plataforma son propiedad de Fernando Hernández Valdez. La información normativa mostrada proviene de fuentes públicas oficiales de los municipios y del estado de Jalisco.</p>
+
+  <h2>7. Limitación de responsabilidad</h2>
+  <p>TrazaUrbana se ofrece "tal cual". Hacemos nuestro mejor esfuerzo por mantener la información actualizada y precisa, pero no garantizamos que esté libre de errores u omisiones, ni asumimos responsabilidad por decisiones tomadas exclusivamente con base en la información de la plataforma sin la confirmación oficial correspondiente.</p>
+
+  <h2>8. Modificaciones</h2>
+  <p>Podemos actualizar estos términos ocasionalmente. Los cambios relevantes se reflejarán en la fecha de "Última actualización" de esta página.</p>
+
+  <h2>9. Ley aplicable</h2>
+  <p>Estos términos se rigen por las leyes aplicables en el estado de Jalisco, México.</p>
+
+  <h2>10. Contacto</h2>
+  <p>Para dudas sobre estos términos, escribe a <a href="mailto:fernandohv74@gmail.com">fernandohv74@gmail.com</a>.</p>
+</main>
+
+<footer>
+  <span class="footer-txt">© 2026 TrazaUrbana · Jalisco AMG · trazaurbana.mx · Todos los derechos reservados.</span>
+</footer>
+
+<script>
+function applyTheme(theme) {
+  document.body.classList.toggle('light', theme === 'light');
+  var btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = theme === 'light' ? '☀️ Modo claro' : '🌙 Modo oscuro';
+}
+function toggleTheme() {
+  var isLight = document.body.classList.contains('light');
+  var next = isLight ? 'dark' : 'light';
+  applyTheme(next);
+  try { localStorage.setItem('gu_theme', next); } catch (e) {}
+}
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem('gu_theme'); } catch (e) {}
+  if (saved === 'light') applyTheme('light');
+})();
+</script>
+
+</body>
+</html>

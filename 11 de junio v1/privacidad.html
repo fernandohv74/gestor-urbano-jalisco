@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<!-- ==========================================================
+     GestorUrbano Jalisco AMG / TrazaUrbana
+     (c) 2026 Fernando H. - trazaurbana.mx
+     Todos los derechos reservados.
+     Reproduccion o uso no autorizado esta prohibido.
+     ========================================================== -->
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aviso de Privacidad — TrazaUrbana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0B0F1A;--bg2:#111827;--bg3:#1A2235;--bg4:#212d42;
+  --text:#E2E8F0;--text2:#94A3B8;--text3:#4B5563;
+  --border:#1E2D45;
+  --accent:#3D7BFF;--accent2:#6699FF;--accentL:#1A3A8F;
+  --teal:#06B6D4;
+  --green:#10B981;--greenD:#34D399;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+}
+body.light{
+  --bg:#F8F9FC;--bg2:#FFFFFF;--bg3:#F1F4F9;--bg4:#E4E9F2;
+  --text:#0F172A;--text2:#475569;--text3:#94A3B8;
+  --border:#CBD5E1;
+  --accent:#2563EB;--accent2:#3B82F6;--accentL:#DBEAFE;
+  --teal:#0891B2;--green:#059669;--greenD:#10B981;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;font-size:14px;line-height:1.7;display:flex;flex-direction:column;transition:background-color .4s ease,color .3s ease}
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;transition:background-color .4s ease,border-color .35s ease}
+.logo-sub{font-size:11px;color:var(--text3);letter-spacing:.6px;text-transform:uppercase}
+.theme-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:11px;padding:5px 12px;border-radius:20px;cursor:pointer;transition:all .2s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+.back-link{font-family:var(--sans);font-size:12px;color:var(--text2);text-decoration:none;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg3)}
+.back-link:hover{border-color:var(--accent);color:var(--accent)}
+main{max-width:760px;width:100%;margin:0 auto;padding:40px 24px 80px}
+h1{font-family:'Outfit','Helvetica Neue',Arial,sans-serif;font-size:clamp(26px,5vw,34px);font-weight:600;letter-spacing:-.5px;margin-bottom:6px}
+.updated{font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:36px}
+h2{font-family:'Outfit','Helvetica Neue',Arial,sans-serif;font-size:19px;font-weight:600;margin:34px 0 12px;color:var(--accent2)}
+p{color:var(--text2);margin-bottom:12px}
+ul{color:var(--text2);margin:0 0 12px 20px}
+li{margin-bottom:6px}
+strong{color:var(--text);font-weight:600}
+table{width:100%;border-collapse:collapse;margin:14px 0 18px;font-size:13px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+th{color:var(--text3);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+td{color:var(--text2)}
+.box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:16px 0}
+a{color:var(--accent2)}
+footer{margin-top:auto;padding:24px 28px;border-top:1px solid var(--border);text-align:center}
+.footer-txt{font-size:11px;color:var(--text3);font-family:var(--mono)}
+@media(max-width:600px){header{padding:12px 16px}main{padding:28px 16px 56px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div style="font-family:'Outfit','Helvetica Neue',Arial,sans-serif;line-height:1;letter-spacing:-.3px;margin-bottom:2px"><span style="font-weight:800;font-size:17px;color:var(--text)">Traza</span><span style="font-weight:300;font-size:17px;color:#D85A30">Urbana</span></div>
+    <div class="logo-sub">Aviso de privacidad</div>
+  </div>
+  <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" style="margin-left:auto">🌙 Modo oscuro</button>
+  <a href="index.html" class="back-link">← Menú principal</a>
+</header>
+
+<main>
+  <h1>Aviso de Privacidad</h1>
+  <div class="updated">Última actualización: 21 de septiembre de 2026</div>
+
+  <h2>1. Responsable del tratamiento de datos</h2>
+  <p><strong>Fernando Hernández Valdez</strong>, RFC <strong>HEVF740827DU4</strong>, operando bajo el nombre comercial <strong>TrazaUrbana</strong>, es responsable del tratamiento de tus datos personales conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP). Contacto: <a href="mailto:fernandohv74@gmail.com">fernandohv74@gmail.com</a>.</p>
+
+  <h2>2. Datos personales que recabamos</h2>
+  <table>
+    <tr><th>Dato</th><th>¿Cuándo se recaba?</th></tr>
+    <tr><td>Correo electrónico</td><td>Al suscribirte a un plan (a través de Stripe) o al escribirnos por el formulario de comentarios</td></tr>
+    <tr><td>Mensaje de contacto</td><td>Solo si usas el botón "Comentarios" dentro de la plataforma</td></tr>
+    <tr><td>Datos de pago (tarjeta, etc.)</td><td>Nunca los recibimos ni almacenamos nosotros — los procesa directamente Stripe, nuestro procesador de pagos</td></tr>
+    <tr><td>Preferencia de tema (claro/oscuro)</td><td>Se guarda localmente en tu navegador, no en nuestros servidores</td></tr>
+  </table>
+  <p>No recabamos datos sensibles (salud, origen étnico, creencias religiosas, etc.) ni información de menores de edad de forma intencional.</p>
+
+  <h2>3. Finalidades del tratamiento</h2>
+  <ul>
+    <li>Procesar tu suscripción y darte acceso a la plataforma según tu plan.</li>
+    <li>Responder tus dudas o comentarios enviados a través del formulario de contacto.</li>
+    <li>Enviarte avisos relacionados con tu cuenta o cambios importantes al servicio.</li>
+  </ul>
+  <p>No usamos tus datos con fines de mercadotecnia de terceros ni los vendemos.</p>
+
+  <h2>4. Terceros que participan en el tratamiento</h2>
+  <table>
+    <tr><th>Servicio</th><th>Para qué se usa</th></tr>
+    <tr><td>Stripe</td><td>Procesamiento de pagos y suscripciones. TrazaUrbana nunca ve ni guarda el número de tu tarjeta.</td></tr>
+    <tr><td>Formspree</td><td>Recibir los mensajes del formulario de comentarios de la plataforma.</td></tr>
+    <tr><td>Vercel</td><td>Hospedaje técnico del sitio web.</td></tr>
+  </table>
+  <p>Estos proveedores procesan los datos únicamente para prestar el servicio contratado y están sujetos a sus propias políticas de privacidad.</p>
+
+  <h2>5. Derechos ARCO</h2>
+  <p>Tienes derecho a <strong>Acceder</strong> a tus datos personales, <strong>Rectificarlos</strong> si son inexactos, <strong>Cancelarlos</strong> cuando consideres que no se requieren para las finalidades señaladas, y <strong>Oponerte</strong> al uso de los mismos para fines específicos (derechos ARCO). Para ejercerlos, escríbenos a <a href="mailto:fernandohv74@gmail.com">fernandohv74@gmail.com</a> indicando tu solicitud; te responderemos en un plazo razonable.</p>
+
+  <h2>6. Conservación de datos</h2>
+  <p>Conservamos tu información mientras mantengas una suscripción activa y durante el tiempo adicional necesario para cumplir obligaciones fiscales o legales. Puedes solicitar la cancelación de tus datos en cualquier momento a través del correo de contacto.</p>
+
+  <h2>7. Cambios a este aviso</h2>
+  <p>Este aviso puede actualizarse para reflejar cambios en la plataforma o en la normativa aplicable. La fecha de "Última actualización" en esta página indica la versión vigente.</p>
+
+  <h2>8. Contacto</h2>
+  <p>Para cualquier duda sobre este aviso o el tratamiento de tus datos, escribe a <a href="mailto:fernandohv74@gmail.com">fernandohv74@gmail.com</a>.</p>
+</main>
+
+<footer>
+  <span class="footer-txt">© 2026 TrazaUrbana · Jalisco AMG · trazaurbana.mx · Todos los derechos reservados.</span>
+</footer>
+
+<script>
+function applyTheme(theme) {
+  document.body.classList.toggle('light', theme === 'light');
+  var btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = theme === 'light' ? '☀️ Modo claro' : '🌙 Modo oscuro';
+}
+function toggleTheme() {
+  var isLight = document.body.classList.contains('light');
+  var next = isLight ? 'dark' : 'light';
+  applyTheme(next);
+  try { localStorage.setItem('gu_theme', next); } catch (e) {}
+}
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem('gu_theme'); } catch (e) {}
+  if (saved === 'light') applyTheme('light');
+})();
+</script>
+
+</body>
+</html>

@@ -96,6 +96,7 @@ footer{margin-top:auto;padding:24px 28px;border-top:1px solid var(--border);text
 <div class="msg-box">
   <div id="msg-ok" class="msg ok" style="display:none">✓ Pago completado. Gracias por suscribirte a TrazaUrbana.</div>
   <div id="msg-cancel" class="msg cancel" style="display:none">Se canceló el proceso de pago. Puedes intentarlo de nuevo cuando quieras.</div>
+  <div id="msg-sinplan" class="msg cancel" style="display:none">Necesitas un plan activo para entrar a la plataforma. Elige uno para continuar.</div>
 </div>
 
 <div class="plans-grid">
@@ -199,6 +200,8 @@ async function suscribir(plan, btn) {
     document.getElementById('msg-ok').style.display = 'block';
   } else if (params.get('canceled') === 'true') {
     document.getElementById('msg-cancel').style.display = 'block';
+  } else if (params.get('sinplan') === 'true') {
+    document.getElementById('msg-sinplan').style.display = 'block';
   }
 })();
 

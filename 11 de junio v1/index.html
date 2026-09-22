@@ -13,6 +13,7 @@
 <title>Gestor Urbano Jalisco AMG</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -111,6 +112,32 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
 </style>
 </head>
 <body>
+<script>
+(function () {
+  var SUPABASE_URL = 'https://bhryrrdygghhospfqgtj.supabase.co';
+  var SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Ma2gxSyWx4rDHIbDPKGUdg_lO0xZeZr';
+  var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  var PLANES_VALIDOS = ['basico', 'estandar', 'profesional', 'empresarial'];
+
+  (async function verificarAcceso() {
+    var sesion = await supabaseClient.auth.getSession();
+    var session = sesion.data && sesion.data.session;
+    if (!session) {
+      window.location.replace('login-nuevo.html?next=index.html');
+      return;
+    }
+    var perfilResp = await supabaseClient
+      .from('profiles')
+      .select('plan')
+      .eq('id', session.user.id)
+      .single();
+    var plan = perfilResp.data && perfilResp.data.plan;
+    if (PLANES_VALIDOS.indexOf(plan) === -1) {
+      window.location.replace('planes.html?sinplan=true');
+    }
+  })();
+})();
+</script>
 <div id="tu-splash" role="status" aria-label="Cargando TrazaUrbana">
   <svg viewBox="0 0 100 100" width="80" height="80" aria-hidden="true">
     <defs><clipPath id="tu-spl-c"><rect x="10" y="10" width="80" height="80"/></clipPath></defs>

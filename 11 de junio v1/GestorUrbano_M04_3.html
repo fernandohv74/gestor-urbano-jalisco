@@ -383,6 +383,19 @@
     </button>
   </div>
 
+  <!-- Historial de análisis -->
+  <div class="hist-panel" id="hist-panel" style="display:none">
+    <div class="hist-header" onclick="toggleHistorial()">
+      <span style="font-size:15px">🕐</span>
+      <span class="hist-header-title">Análisis anteriores</span>
+      <span class="hist-header-count" id="hist-count">0</span>
+      <span class="hist-header-chevron" id="hist-chevron">▼</span>
+    </div>
+    <div class="hist-body" id="hist-body">
+      <div id="hist-lista"></div>
+    </div>
+  </div>
+
   <!-- Configuración — DESPUÉS -->
   <div class="config-card">
     <h2>⚙️ Configuración del análisis</h2>
@@ -562,19 +575,6 @@
     </div>
     <div class="print-footer" id="print-footer">
       <span id="print-footer-texto">Documento generado por TrazaUrbana. Análisis orientativo basado en normativa municipal vigente. No sustituye dictamen oficial de la autoridad municipal correspondiente.</span>
-    </div>
-  </div>
-
-  <!-- Historial de análisis -->
-  <div class="hist-panel" id="hist-panel" style="display:none">
-    <div class="hist-header" onclick="toggleHistorial()">
-      <span style="font-size:15px">🕐</span>
-      <span class="hist-header-title">Análisis anteriores</span>
-      <span class="hist-header-count" id="hist-count">0</span>
-      <span class="hist-header-chevron" id="hist-chevron">▼</span>
-    </div>
-    <div class="hist-body" id="hist-body">
-      <div id="hist-lista"></div>
     </div>
   </div>
 

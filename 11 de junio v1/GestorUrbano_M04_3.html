@@ -177,9 +177,9 @@
 
 /* ── HISTORIAL M04 ── */
 .hist-panel{background:var(--card-bg);border:0.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:background var(--t),border-color var(--t)}
-.hist-header{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none;transition:background var(--t-fast)}
+.hist-header{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;user-select:none;transition:background var(--t-fast)}
 .hist-header:hover{background:var(--bg3)}
-.hist-header-title{font-size:13px;font-weight:600;color:var(--text);flex:1;transition:color var(--t)}
+.hist-header-title{font-size:15px;font-weight:700;color:var(--brand);flex:1;transition:color var(--t)}
 .hist-header-count{font-size:11px;color:var(--text3);background:var(--bg3);border-radius:10px;padding:1px 8px;transition:background var(--t),color var(--t)}
 .hist-header-chevron{font-size:11px;color:var(--text3);transition:transform .2s,color var(--t)}
 .hist-header-chevron.open{transform:rotate(180deg)}
@@ -386,8 +386,8 @@
   <!-- Historial de análisis -->
   <div class="hist-panel" id="hist-panel" style="display:none">
     <div class="hist-header" onclick="toggleHistorial()">
-      <span style="font-size:15px">🕐</span>
-      <span class="hist-header-title">Análisis anteriores</span>
+      <span style="font-size:20px">🗂️</span>
+      <span class="hist-header-title">Cargar análisis anteriores</span>
       <span class="hist-header-count" id="hist-count">0</span>
       <span class="hist-header-chevron" id="hist-chevron">▼</span>
     </div>

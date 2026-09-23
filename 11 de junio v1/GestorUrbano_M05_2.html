@@ -113,8 +113,36 @@
 .val-aviso span{flex-shrink:0;font-size:14px}
 @media print{.gu-nav,.muni-row,.tipo-grid,.form-section,.btn-generar,.footer-btns,.banner-m04{display:none!important}.resultado-panel{display:block!important}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+<script>
+(function () {
+  var SUPABASE_URL = 'https://bhryrrdygghhospfqgtj.supabase.co';
+  var SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Ma2gxSyWx4rDHIbDPKGUdg_lO0xZeZr';
+  window.guSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  var PLANES_VALIDOS = ['basico', 'estandar', 'profesional', 'empresarial'];
+
+  (async function verificarAcceso() {
+    var sesion = await window.guSupabase.auth.getSession();
+    var session = sesion.data && sesion.data.session;
+    if (!session) {
+      window.location.replace('login-nuevo.html?next=GestorUrbano_M05_2.html');
+      return;
+    }
+    window.guSesion = session;
+    var perfilResp = await window.guSupabase
+      .from('profiles')
+      .select('plan')
+      .eq('id', session.user.id)
+      .single();
+    var plan = perfilResp.data && perfilResp.data.plan;
+    if (PLANES_VALIDOS.indexOf(plan) === -1) {
+      window.location.replace('planes.html?sinplan=true');
+    }
+  })();
+})();
+</script>
 
 <nav class="gu-nav">
   <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
@@ -627,7 +655,31 @@ function cargarDesdeM04() {
 // ══════════════════════════════════════════════════════════════════════════
 // GENERACIÓN DE CHECKLIST
 // ══════════════════════════════════════════════════════════════════════════
-function generarChecklist() {
+async function generarChecklist() {
+  const btnGen = document.querySelector('.btn-generar');
+  if (btnGen && btnGen.disabled) return;
+  if (!window.guSesion) {
+    alert('Debes iniciar sesión para generar el checklist.');
+    return;
+  }
+  if (btnGen) btnGen.disabled = true;
+  try {
+    const respCuota = await fetch('/api/verificar-consulta', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: window.guSesion.user.id })
+    });
+    const dataCuota = await respCuota.json();
+    if (!respCuota.ok || !dataCuota.permitido) {
+      alert(dataCuota.error || 'No se pudo verificar tu cuota.');
+      return;
+    }
+  } catch (e) {
+    alert('Error de conexión al verificar tu cuota. Intenta de nuevo.');
+    return;
+  } finally {
+    if (btnGen) btnGen.disabled = false;
+  }
   // Recoger inputs
   const sup       = parseFloat(document.getElementById('inp-sup-const').value) || 0;
   const niveles   = parseInt(document.getElementById('inp-niveles').value) || 0;

@@ -128,8 +128,36 @@
   #calendarContent { max-height:none !important; overflow:visible !important; }
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+<script>
+(function () {
+  var SUPABASE_URL = 'https://bhryrrdygghhospfqgtj.supabase.co';
+  var SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Ma2gxSyWx4rDHIbDPKGUdg_lO0xZeZr';
+  window.guSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  var PLANES_VALIDOS = ['basico', 'estandar', 'profesional', 'empresarial'];
+
+  (async function verificarAcceso() {
+    var sesion = await window.guSupabase.auth.getSession();
+    var session = sesion.data && sesion.data.session;
+    if (!session) {
+      window.location.replace('login-nuevo.html?next=GestorUrbano_M09_1.html');
+      return;
+    }
+    window.guSesion = session;
+    var perfilResp = await window.guSupabase
+      .from('profiles')
+      .select('plan')
+      .eq('id', session.user.id)
+      .single();
+    var plan = perfilResp.data && perfilResp.data.plan;
+    if (PLANES_VALIDOS.indexOf(plan) === -1) {
+      window.location.replace('planes.html?sinplan=true');
+    }
+  })();
+})();
+</script>
 
 <!-- ── NAVEGACIÓN ── -->
 <nav class="gu-nav">
@@ -1015,6 +1043,21 @@ function mostrarSec(id,btn){
 async function verificarAhora(){
   const btn=document.querySelector('.btn-refresh');
   if(!btn) return;
+  if(!window.guSesion){
+    m09MostrarVerifPanel('error', null, null, 'Debes iniciar sesión para usar esta verificación.');
+    return;
+  }
+  try{
+    const respCuota=await fetch('/api/verificar-consulta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:window.guSesion.user.id})});
+    const dataCuota=await respCuota.json();
+    if(!respCuota.ok||!dataCuota.permitido){
+      m09MostrarVerifPanel('error', null, null, dataCuota.error||'No se pudo verificar tu cuota.');
+      return;
+    }
+  }catch(e){
+    m09MostrarVerifPanel('error', null, null, 'Error de conexión al verificar tu cuota. Intenta de nuevo.');
+    return;
+  }
   btn.innerHTML='<svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="animation:spin 1s linear infinite"><path d="M13.5 2.5A7 7 0 102.5 13.5M13.5 2.5V6.5M13.5 2.5H9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Verificando…';
   btn.disabled=true;
   m09MostrarVerifPanel('loading');

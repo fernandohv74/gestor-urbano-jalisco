@@ -259,8 +259,36 @@ details.ccf-details .ccf-body { padding: 12px 14px; background: #fafafa; color: 
 .field-opt .field label::after { content: " (opcional)"; font-weight: 400; color: var(--text3); font-size: 10px; }
 .wrap-giro { display: none; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+<script>
+(function () {
+  var SUPABASE_URL = 'https://bhryrrdygghhospfqgtj.supabase.co';
+  var SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Ma2gxSyWx4rDHIbDPKGUdg_lO0xZeZr';
+  window.guSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  var PLANES_VALIDOS = ['basico', 'estandar', 'profesional', 'empresarial'];
+
+  (async function verificarAcceso() {
+    var sesion = await window.guSupabase.auth.getSession();
+    var session = sesion.data && sesion.data.session;
+    if (!session) {
+      window.location.replace('login-nuevo.html?next=GestorUrbano_M06_1.html');
+      return;
+    }
+    window.guSesion = session;
+    var perfilResp = await window.guSupabase
+      .from('profiles')
+      .select('plan')
+      .eq('id', session.user.id)
+      .single();
+    var plan = perfilResp.data && perfilResp.data.plan;
+    if (PLANES_VALIDOS.indexOf(plan) === -1) {
+      window.location.replace('planes.html?sinplan=true');
+    }
+  })();
+})();
+</script>
 
 <nav class="gu-nav">
   <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
@@ -4136,8 +4164,32 @@ window.addEventListener('load', function() {
     var btn = document.getElementById(btnId);
     if (!btn) return;
     btn.removeAttribute('onclick');
-    btn.addEventListener('click', function() {
+    btn.addEventListener('click', async function() {
+      if (!window.guSesion) {
+        alert('Debes iniciar sesi\u00f3n para usar esta calculadora.');
+        return;
+      }
       btn.disabled = true;
+      btn.textContent = 'Verificando cuota\u2026';
+      try {
+        var respCuota = await fetch('/api/verificar-consulta', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: window.guSesion.user.id })
+        });
+        var dataCuota = await respCuota.json();
+        if (!respCuota.ok || !dataCuota.permitido) {
+          alert(dataCuota.error || 'No se pudo verificar tu cuota.');
+          btn.disabled = false;
+          btn.textContent = label;
+          return;
+        }
+      } catch (e) {
+        alert('Error de conexi\u00f3n al verificar tu cuota. Intenta de nuevo.');
+        btn.disabled = false;
+        btn.textContent = label;
+        return;
+      }
       btn.textContent = 'Calculando\u2026';
       setTimeout(function() {
         try { fn(); }

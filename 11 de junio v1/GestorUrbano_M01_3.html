@@ -371,9 +371,37 @@ input[type=range]::-webkit-slider-thumb{
 .chip-az{background:var(--brand-pale);color:var(--brand)}
 .anp-src{font-size:10px;color:var(--text3);padding:7px 12px;background:var(--bg3);border-top:0.5px solid var(--border);transition:background var(--t),color var(--t),border-color var(--t)}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
+<script>
+(function () {
+  var SUPABASE_URL = 'https://bhryrrdygghhospfqgtj.supabase.co';
+  var SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Ma2gxSyWx4rDHIbDPKGUdg_lO0xZeZr';
+  window.guSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  var PLANES_VALIDOS = ['basico', 'estandar', 'profesional', 'empresarial'];
+
+  (async function verificarAcceso() {
+    var sesion = await window.guSupabase.auth.getSession();
+    var session = sesion.data && sesion.data.session;
+    if (!session) {
+      window.location.replace('login-nuevo.html?next=GestorUrbano_M01_3.html');
+      return;
+    }
+    window.guSesion = session;
+    var perfilResp = await window.guSupabase
+      .from('profiles')
+      .select('plan')
+      .eq('id', session.user.id)
+      .single();
+    var plan = perfilResp.data && perfilResp.data.plan;
+    if (PLANES_VALIDOS.indexOf(plan) === -1) {
+      window.location.replace('planes.html?sinplan=true');
+    }
+  })();
+})();
+</script>
 
 <!-- ── NAVEGACIÓN ── -->
 <nav class="gu-nav">
@@ -4160,6 +4188,25 @@ function calcularVistos(pat){
 async function procesarCoordenadas(lat,lng){
   latActual=lat;lngActual=lng;
   document.getElementById('btnBuscar').disabled=true;
+  if(!window.guSesion){
+    setStatus('error','Debes iniciar sesión para consultar.');
+    document.getElementById('btnBuscar').disabled=false;
+    return;
+  }
+  setStatus('loading','Verificando cuota…');
+  try{
+    const respCuota=await fetch('/api/verificar-consulta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:window.guSesion.user.id})});
+    const dataCuota=await respCuota.json();
+    if(!respCuota.ok||!dataCuota.permitido){
+      setStatus('error',dataCuota.error||'No se pudo verificar tu cuota.');
+      document.getElementById('btnBuscar').disabled=false;
+      return;
+    }
+  }catch(e){
+    setStatus('error','Error de conexión al verificar tu cuota. Intenta de nuevo.');
+    document.getElementById('btnBuscar').disabled=false;
+    return;
+  }
   // Nota: detectarYActualizarMunicipio ya fue llamado antes de esta función
 
   // Sincronizar badge con el municipio real de las coords

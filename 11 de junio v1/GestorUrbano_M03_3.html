@@ -181,8 +181,36 @@ function guToggleTheme(){
   #compSection { display:block !important; }
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+<script>
+(function () {
+  var SUPABASE_URL = 'https://bhryrrdygghhospfqgtj.supabase.co';
+  var SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Ma2gxSyWx4rDHIbDPKGUdg_lO0xZeZr';
+  window.guSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  var PLANES_VALIDOS = ['basico', 'estandar', 'profesional', 'empresarial'];
+
+  (async function verificarAcceso() {
+    var sesion = await window.guSupabase.auth.getSession();
+    var session = sesion.data && sesion.data.session;
+    if (!session) {
+      window.location.replace('login-nuevo.html?next=GestorUrbano_M03_3.html');
+      return;
+    }
+    window.guSesion = session;
+    var perfilResp = await window.guSupabase
+      .from('profiles')
+      .select('plan')
+      .eq('id', session.user.id)
+      .single();
+    var plan = perfilResp.data && perfilResp.data.plan;
+    if (PLANES_VALIDOS.indexOf(plan) === -1) {
+      window.location.replace('planes.html?sinplan=true');
+    }
+  })();
+})();
+</script>
 
 <!-- ── NAVEGACIÓN ── -->
 <nav class="gu-nav">
@@ -2655,8 +2683,25 @@ async function agregarPredio(){
   const col=document.getElementById('inColonia').value.trim();
   const cp =document.getElementById('inCP').value.trim();
   if(!dir){ setStatus('error','Ingresa una dirección.'); return; }
+  if(!window.guSesion){ setStatus('error','Debes iniciar sesión para consultar.'); return; }
   buscando=true;
   document.getElementById('btnAgregar').disabled=true;
+  setStatus('loading','Verificando cuota…');
+  try{
+    const respCuota=await fetch('/api/verificar-consulta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:window.guSesion.user.id})});
+    const dataCuota=await respCuota.json();
+    if(!respCuota.ok||!dataCuota.permitido){
+      setStatus('error',dataCuota.error||'No se pudo verificar tu cuota.');
+      buscando=false;
+      document.getElementById('btnAgregar').disabled=false;
+      return;
+    }
+  }catch(e){
+    setStatus('error','Error de conexión al verificar tu cuota. Intenta de nuevo.');
+    buscando=false;
+    document.getElementById('btnAgregar').disabled=false;
+    return;
+  }
   setStatus('loading','Geocodificando dirección…');
   try{
     const {lat,lng,dir:dirFmt}=await geocodificarM03(dir,col,cp);
@@ -2684,7 +2729,22 @@ async function buscarCatM03(){
   if(predios.length>=2){ setStatus('error','Máximo 2 predios simultáneos.'); return; }
   const cat=document.getElementById('inCat').value.trim();
   if(!cat){ setStatus('error','Ingresa la clave catastral.'); return; }
+  if(!window.guSesion){ setStatus('error','Debes iniciar sesión para consultar.'); return; }
   buscando=true;
+  setStatus('loading','Verificando cuota…');
+  try{
+    const respCuota=await fetch('/api/verificar-consulta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:window.guSesion.user.id})});
+    const dataCuota=await respCuota.json();
+    if(!respCuota.ok||!dataCuota.permitido){
+      setStatus('error',dataCuota.error||'No se pudo verificar tu cuota.');
+      buscando=false;
+      return;
+    }
+  }catch(e){
+    setStatus('error','Error de conexión al verificar tu cuota. Intenta de nuevo.');
+    buscando=false;
+    return;
+  }
   setStatus('loading','Buscando predio por clave catastral…');
   try{
     const res=await vujWfs('VUJ:predios',`clave_catastral LIKE '%${cat}%'`,1);
@@ -2717,7 +2777,22 @@ async function buscarCoordsM03(){
   const lng=parseFloat(document.getElementById('inLng').value);
   if(isNaN(lat)||isNaN(lng)){ setStatus('error','Ingresa latitud y longitud válidas.'); return; }
   if(lat<20.3||lat>21.0||lng<-103.8||lng>-103.0){ setStatus('error','Coordenadas fuera del AMG. Verifica que sean correctas.'); return; }
+  if(!window.guSesion){ setStatus('error','Debes iniciar sesión para consultar.'); return; }
   buscando=true;
+  setStatus('loading','Verificando cuota…');
+  try{
+    const respCuota=await fetch('/api/verificar-consulta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:window.guSesion.user.id})});
+    const dataCuota=await respCuota.json();
+    if(!respCuota.ok||!dataCuota.permitido){
+      setStatus('error',dataCuota.error||'No se pudo verificar tu cuota.');
+      buscando=false;
+      return;
+    }
+  }catch(e){
+    setStatus('error','Error de conexión al verificar tu cuota. Intenta de nuevo.');
+    buscando=false;
+    return;
+  }
   setStatus('loading','Consultando zonificación…');
   try{
     const munDetec=detectarMunicipioPorCoords(lat,lng);

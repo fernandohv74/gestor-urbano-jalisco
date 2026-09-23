@@ -1745,7 +1745,7 @@ function recargarHist(idx){
   }
   document.getElementById('inCalle').value=h.dir||'';
   cambiarTab('Dir');
-  agregarPredio();
+  agregarPredio(true);
 }
 function eliminarHist(idx){
   historial.splice(idx,1);
@@ -2676,31 +2676,33 @@ async function geocodificarM03(dir,colonia,cp){
 }
 
 // ── AGREGAR PREDIO — Tab Dirección ────────────────────────────────────────
-async function agregarPredio(){
+async function agregarPredio(saltarCuota){
   if(buscando) return;
   if(predios.length>=2){ setStatus('error','Máximo 2 predios simultáneos.'); return; }
   const dir=document.getElementById('inCalle').value.trim();
   const col=document.getElementById('inColonia').value.trim();
   const cp =document.getElementById('inCP').value.trim();
   if(!dir){ setStatus('error','Ingresa una dirección.'); return; }
-  if(!window.guSesion){ setStatus('error','Debes iniciar sesión para consultar.'); return; }
+  if(!saltarCuota && !window.guSesion){ setStatus('error','Debes iniciar sesión para consultar.'); return; }
   buscando=true;
   document.getElementById('btnAgregar').disabled=true;
-  setStatus('loading','Verificando cuota…');
-  try{
-    const respCuota=await fetch('/api/verificar-consulta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:window.guSesion.user.id})});
-    const dataCuota=await respCuota.json();
-    if(!respCuota.ok||!dataCuota.permitido){
-      setStatus('error',dataCuota.error||'No se pudo verificar tu cuota.');
+  if(!saltarCuota){
+    setStatus('loading','Verificando cuota…');
+    try{
+      const respCuota=await fetch('/api/verificar-consulta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:window.guSesion.user.id})});
+      const dataCuota=await respCuota.json();
+      if(!respCuota.ok||!dataCuota.permitido){
+        setStatus('error',dataCuota.error||'No se pudo verificar tu cuota.');
+        buscando=false;
+        document.getElementById('btnAgregar').disabled=false;
+        return;
+      }
+    }catch(e){
+      setStatus('error','Error de conexión al verificar tu cuota. Intenta de nuevo.');
       buscando=false;
       document.getElementById('btnAgregar').disabled=false;
       return;
     }
-  }catch(e){
-    setStatus('error','Error de conexión al verificar tu cuota. Intenta de nuevo.');
-    buscando=false;
-    document.getElementById('btnAgregar').disabled=false;
-    return;
   }
   setStatus('loading','Geocodificando dirección…');
   try{

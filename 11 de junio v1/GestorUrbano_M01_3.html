@@ -1002,7 +1002,7 @@ function recargarHistorial(idx){
       entrepiso: item.entrepiso || null,
       ancho56:   item.ancho56   || null
     };
-    procesarCoordenadas(item.lat, item.lng);
+    procesarCoordenadas(item.lat, item.lng, true);
   }catch(e){}
 }
 function tiempoRelativo(ts){
@@ -4185,27 +4185,29 @@ function calcularVistos(pat){
 // ══════════════════════════════════════════════════
 // BÚSQUEDA PRINCIPAL
 // ══════════════════════════════════════════════════
-async function procesarCoordenadas(lat,lng){
+async function procesarCoordenadas(lat,lng,saltarCuota){
   latActual=lat;lngActual=lng;
   document.getElementById('btnBuscar').disabled=true;
-  if(!window.guSesion){
-    setStatus('error','Debes iniciar sesión para consultar.');
-    document.getElementById('btnBuscar').disabled=false;
-    return;
-  }
-  setStatus('loading','Verificando cuota…');
-  try{
-    const respCuota=await fetch('/api/verificar-consulta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:window.guSesion.user.id})});
-    const dataCuota=await respCuota.json();
-    if(!respCuota.ok||!dataCuota.permitido){
-      setStatus('error',dataCuota.error||'No se pudo verificar tu cuota.');
+  if(!saltarCuota){
+    if(!window.guSesion){
+      setStatus('error','Debes iniciar sesión para consultar.');
       document.getElementById('btnBuscar').disabled=false;
       return;
     }
-  }catch(e){
-    setStatus('error','Error de conexión al verificar tu cuota. Intenta de nuevo.');
-    document.getElementById('btnBuscar').disabled=false;
-    return;
+    setStatus('loading','Verificando cuota…');
+    try{
+      const respCuota=await fetch('/api/verificar-consulta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:window.guSesion.user.id})});
+      const dataCuota=await respCuota.json();
+      if(!respCuota.ok||!dataCuota.permitido){
+        setStatus('error',dataCuota.error||'No se pudo verificar tu cuota.');
+        document.getElementById('btnBuscar').disabled=false;
+        return;
+      }
+    }catch(e){
+      setStatus('error','Error de conexión al verificar tu cuota. Intenta de nuevo.');
+      document.getElementById('btnBuscar').disabled=false;
+      return;
+    }
   }
   // Nota: detectarYActualizarMunicipio ya fue llamado antes de esta función
 

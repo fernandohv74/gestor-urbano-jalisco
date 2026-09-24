@@ -55,27 +55,43 @@ button{width:100%;padding:11px;border-radius:8px;border:none;font-family:var(--s
 
 <div class="card">
   <div class="logo"><span style="font-weight:800;color:var(--text)">Traza</span><span style="font-weight:300;color:#D85A30">Urbana</span></div>
-  <div class="logo-sub">Entrar a tu cuenta</div>
+  <div class="logo-sub" id="modo-titulo">Entrar a tu cuenta</div>
 
   <div id="msg-box"></div>
 
-  <form id="form-magico">
-    <label for="email-magico">Correo electrónico</label>
-    <input type="email" id="email-magico" placeholder="tu@correo.com" required autocomplete="email">
-    <button type="submit" class="btn-primary" id="btn-magico">Enviarme un link para entrar</button>
-  </form>
+  <div id="bloque-entrar">
+    <form id="form-magico">
+      <label for="email-magico">Correo electrónico</label>
+      <input type="email" id="email-magico" placeholder="tu@correo.com" required autocomplete="email">
+      <button type="submit" class="btn-primary" id="btn-magico">Enviarme un link para entrar</button>
+    </form>
 
-  <button type="button" class="btn-link" id="toggle-password" style="width:100%">¿Prefieres usar una contraseña?</button>
+    <button type="button" class="btn-link" id="toggle-password" style="width:100%">¿Prefieres usar una contraseña?</button>
 
-  <div class="password-block" id="password-block">
-    <form id="form-password">
-      <label for="email-password">Correo electrónico</label>
-      <input type="email" id="email-password" placeholder="tu@correo.com" required autocomplete="email">
-      <label for="password">Contraseña</label>
-      <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
-      <button type="submit" class="btn-primary" id="btn-password">Iniciar sesión</button>
+    <div class="password-block" id="password-block">
+      <form id="form-password">
+        <label for="email-password">Correo electrónico</label>
+        <input type="email" id="email-password" placeholder="tu@correo.com" required autocomplete="email">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+        <button type="submit" class="btn-primary" id="btn-password">Iniciar sesión</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="bloque-registro" style="display:none">
+    <form id="form-registro">
+      <label for="email-registro">Correo electrónico</label>
+      <input type="email" id="email-registro" placeholder="tu@correo.com" required autocomplete="email">
+      <label for="password-registro">Crea una contraseña</label>
+      <input type="password" id="password-registro" placeholder="Mínimo 8 caracteres" required autocomplete="new-password" minlength="8">
+      <label for="password-registro2">Confirmar contraseña</label>
+      <input type="password" id="password-registro2" placeholder="Repite la contraseña" required autocomplete="new-password" minlength="8">
+      <button type="submit" class="btn-primary" id="btn-registro">Crear mi cuenta</button>
     </form>
   </div>
+
+  <button type="button" class="btn-link" id="toggle-modo" style="width:100%">¿Primera vez? Crea tu cuenta</button>
 
   <div class="footer-note">TrazaUrbana · Jalisco AMG</div>
 </div>
@@ -129,6 +145,48 @@ document.getElementById('form-password').addEventListener('submit', async functi
     btn.textContent = 'Iniciar sesión';
   }
   // Si funciona, onAuthStateChange (abajo) se encarga de redirigir.
+});
+
+document.getElementById('form-registro').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const email = document.getElementById('email-registro').value.trim();
+  const pass1 = document.getElementById('password-registro').value;
+  const pass2 = document.getElementById('password-registro2').value;
+  if (pass1.length < 8) {
+    mostrarMensaje('La contraseña debe tener al menos 8 caracteres.', 'err');
+    return;
+  }
+  if (pass1 !== pass2) {
+    mostrarMensaje('Las contraseñas no coinciden.', 'err');
+    return;
+  }
+  const btn = document.getElementById('btn-registro');
+  btn.disabled = true;
+  btn.textContent = 'Creando cuenta…';
+  const { error } = await supabaseClient.auth.signUp({
+    email: email,
+    password: pass1,
+    options: { emailRedirectTo: window.location.origin + '/login-nuevo.html' + window.location.search }
+  });
+  if (error) {
+    mostrarMensaje('No se pudo crear la cuenta: ' + error.message, 'err');
+  } else {
+    mostrarMensaje('Listo — revisa tu correo (' + email + ') y da clic para confirmar. Tu contraseña ya quedó lista, no hace falta crearla de nuevo.', 'ok');
+    document.getElementById('form-registro').reset();
+  }
+  btn.disabled = false;
+  btn.textContent = 'Crear mi cuenta';
+});
+
+document.getElementById('toggle-modo').addEventListener('click', function () {
+  const entrar = document.getElementById('bloque-entrar');
+  const registro = document.getElementById('bloque-registro');
+  const mostrandoRegistro = registro.style.display !== 'none';
+  entrar.style.display = mostrandoRegistro ? '' : 'none';
+  registro.style.display = mostrandoRegistro ? 'none' : '';
+  document.getElementById('modo-titulo').textContent = mostrandoRegistro ? 'Entrar a tu cuenta' : 'Crear tu cuenta';
+  this.textContent = mostrandoRegistro ? '¿Primera vez? Crea tu cuenta' : '¿Ya tienes cuenta? Entra aquí';
+  document.getElementById('msg-box').innerHTML = '';
 });
 
 supabaseClient.auth.onAuthStateChange(function (event, session) {

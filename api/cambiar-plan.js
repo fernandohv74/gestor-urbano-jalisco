@@ -86,11 +86,16 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Tu suscripcion en Stripe no tiene un item valido' });
     }
 
-    // 3) Cambiar el price de ese item, con prorrateo automatico
+    // 3) Cambiar el price de ese item, con prorrateo cobrado de inmediato.
+    // 'always_invoice' (no 'create_prorations') -- create_prorations solo
+    // ACUMULA el ajuste para la siguiente factura del ciclo normal, sin
+    // cobrar nada en el momento; el usuario ve el cambio como "gratis"
+    // hasta el siguiente corte. always_invoice genera y cobra la factura
+    // de la diferencia ahora mismo.
     const params = new URLSearchParams();
     params.append('items[0][id]', itemId);
     params.append('items[0][price]', nuevoPriceId);
-    params.append('proration_behavior', 'create_prorations');
+    params.append('proration_behavior', 'always_invoice');
     params.append('metadata[plan]', nuevoPlan);
 
     const updResp = await fetch(`https://api.stripe.com/v1/subscriptions/${subscriptionId}`, {

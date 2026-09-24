@@ -2388,10 +2388,10 @@ function leerDeepLink() {
     setTimeout(function() {
       if (munNom === 'ZPN') {
         acSeleccionar(giroNom, d.giroId||'', '');
-        setTimeout(function() { calcularZPN(); }, 150);
+        setTimeout(function() { var b=document.getElementById('btn-calc-zpn'); if(b) b.click(); }, 150);
       } else if (munNom === 'GDL') {
         acSeleccionarGDL(giroNom, d.giroId||'', '');
-        setTimeout(function() { calcularGDL(); }, 150);
+        setTimeout(function() { var b=document.getElementById('btn-calc-gdl'); if(b) b.click(); }, 150);
       } else {
         var inp = document.getElementById('inp-giro-gen');
         if (inp) { inp.value = giroNom; inp.classList.add('has-value'); }

@@ -37,6 +37,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px}
 input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-family:var(--sans);margin-bottom:14px;outline:none;transition:border-color .15s}
 input:focus{border-color:var(--accent)}
+.pass-wrap{position:relative;margin-bottom:14px}
+.pass-wrap input{margin-bottom:0;padding-right:40px}
+.pass-toggle{position:absolute;right:2px;top:0;height:100%;display:flex;align-items:center;width:auto;background:none;border:none;padding:0 10px;cursor:pointer;font-size:15px;color:var(--text2)}
+.pass-toggle:hover{color:var(--accent2)}
 .hint{font-size:11px;color:var(--text3);margin-top:-8px;margin-bottom:14px}
 button{width:100%;padding:11px;border-radius:8px;border:none;font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s}
 .btn-primary{background:var(--accent);color:#fff;margin-bottom:10px}
@@ -61,9 +65,15 @@ button{width:100%;padding:11px;border-radius:8px;border:none;font-family:var(--s
 
   <form id="form-pass">
     <label for="pass1">Nueva contraseña</label>
-    <input type="password" id="pass1" placeholder="Mínimo 8 caracteres" required autocomplete="new-password" minlength="8">
+    <div class="pass-wrap">
+      <input type="password" id="pass1" placeholder="Mínimo 8 caracteres" required autocomplete="new-password" minlength="8">
+      <button type="button" class="pass-toggle" onclick="togglePass(this,'pass1')" aria-label="Mostrar contraseña">👁</button>
+    </div>
     <label for="pass2">Confirmar contraseña</label>
-    <input type="password" id="pass2" placeholder="Repite la contraseña" required autocomplete="new-password" minlength="8">
+    <div class="pass-wrap">
+      <input type="password" id="pass2" placeholder="Repite la contraseña" required autocomplete="new-password" minlength="8">
+      <button type="button" class="pass-toggle" onclick="togglePass(this,'pass2')" aria-label="Mostrar contraseña">👁</button>
+    </div>
     <div class="hint">Con esto podrás entrar directo con tu correo y contraseña, sin esperar el link mágico.</div>
     <button type="submit" class="btn-primary" id="btn-guardar">Guardar contraseña</button>
   </form>
@@ -81,6 +91,14 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLI
 function mostrarMensaje(texto, tipo) {
   const box = document.getElementById('msg-box');
   box.innerHTML = '<div class="msg ' + tipo + '">' + texto + '</div>';
+}
+
+function togglePass(btnEl, inputId) {
+  const input = document.getElementById(inputId);
+  const mostrar = input.type === 'password';
+  input.type = mostrar ? 'text' : 'password';
+  btnEl.textContent = mostrar ? '🙈' : '👁';
+  btnEl.setAttribute('aria-label', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
 }
 
 (async function verificarSesion() {

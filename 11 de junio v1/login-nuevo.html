@@ -87,6 +87,8 @@ button{width:100%;padding:11px;border-radius:8px;border:none;font-family:var(--s
       <button type="submit" class="btn-primary" id="btn-login">Iniciar sesión</button>
     </form>
 
+    <button type="button" class="btn-link" id="btn-olvide-pass" style="width:100%">¿Olvidaste tu contraseña?</button>
+
     <div class="divider"></div>
     <div class="cta-alt">
       <div class="cta-alt-txt">¿Primera vez en TrazaUrbana?</div>
@@ -166,6 +168,31 @@ function irALogin(emailPrellenado) {
 
 document.getElementById('btn-ir-registro').addEventListener('click', function () { irARegistro(); });
 document.getElementById('btn-ir-login').addEventListener('click', function () { irALogin(); });
+
+document.getElementById('btn-olvide-pass').addEventListener('click', async function () {
+  const email = document.getElementById('email-login').value.trim();
+  if (!email) {
+    mostrarMensaje('Primero escribe tu correo arriba, luego dale clic a "¿Olvidaste tu contraseña?".', 'err');
+    document.getElementById('email-login').focus();
+    return;
+  }
+  const btn = this;
+  btn.disabled = true;
+  btn.textContent = 'Enviando…';
+  limpiarMensaje();
+
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/configurar-contrasena.html'
+  });
+
+  if (error) {
+    mostrarMensaje('No se pudo enviar el correo de recuperación: ' + error.message, 'err');
+  } else {
+    mostrarMensaje('Listo — revisa tu correo (' + email + ') y da clic al link para crear una contraseña nueva.', 'ok');
+  }
+  btn.disabled = false;
+  btn.textContent = '¿Olvidaste tu contraseña?';
+});
 
 document.getElementById('form-login').addEventListener('submit', async function (e) {
   e.preventDefault();

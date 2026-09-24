@@ -378,7 +378,7 @@
 const MAPS_KEY = 'AIzaSyAc6-2m7WvZf-u8AK7Co74PdJqp0ceer0o';
 const GEOSERVER_GDL = 'https://visorgeoserver.guadalajara.gob.mx/geoserver/gic/wfs';
 
-let munActual = 'GDL';
+let munActual = '';
 let tipoObra  = 'nueva';
 let personaTipo = 'fisica-dir';
 
@@ -660,6 +660,10 @@ async function generarChecklist() {
   if (btnGen && btnGen.disabled) return;
   if (!window.guSesion) {
     alert('Debes iniciar sesión para generar el checklist.');
+    return;
+  }
+  if (!munActual) {
+    alert('⚠️ Selecciona primero el municipio donde está el domicilio');
     return;
   }
   if (btnGen) btnGen.disabled = true;

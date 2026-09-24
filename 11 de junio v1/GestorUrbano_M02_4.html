@@ -474,7 +474,7 @@ const RETRANQUEO = {
 // ══════════════════════════════════════════════════
 // ESTADO GLOBAL
 // ══════════════════════════════════════════════════
-let municipioActual = 'guadalajara';
+let municipioActual = '';
 let datosZona = null;
 let todosPoligonos = [];
 let zonasVUJ = []; // Zonas múltiples del VUJ para municipios no-Zapopan
@@ -2913,6 +2913,8 @@ async function buscar(){
     }
   }
   // ────────────────────────────────────────────────────────────────────────
+
+  if(!municipioActual){ setStatus('error','⚠️ Selecciona primero el municipio donde está el domicilio'); return; }
 
   const munSeleccionado = municipioActual;
 

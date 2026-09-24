@@ -1655,7 +1655,7 @@ async function consultarVisorJalisco(lat, lng, munId){
 // ══════════════════════════════════════════════════
 
 
-let munActual  = 'guadalajara';
+let munActual  = '';
 let predios    = [];
 let buscando   = false;
 let zonasVUJ   = [];          // requerida por consultarVisorJalisco
@@ -2683,6 +2683,7 @@ async function agregarPredio(saltarCuota){
   const col=document.getElementById('inColonia').value.trim();
   const cp =document.getElementById('inCP').value.trim();
   if(!dir){ setStatus('error','Ingresa una dirección.'); return; }
+  if(!munActual){ setStatus('error','⚠️ Selecciona primero el municipio donde está el domicilio'); return; }
   if(!saltarCuota && !window.guSesion){ setStatus('error','Debes iniciar sesión para consultar.'); return; }
   buscando=true;
   document.getElementById('btnAgregar').disabled=true;
@@ -2731,6 +2732,7 @@ async function buscarCatM03(){
   if(predios.length>=2){ setStatus('error','Máximo 2 predios simultáneos.'); return; }
   const cat=document.getElementById('inCat').value.trim();
   if(!cat){ setStatus('error','Ingresa la clave catastral.'); return; }
+  if(!munActual){ setStatus('error','⚠️ Selecciona primero el municipio donde está el domicilio'); return; }
   if(!window.guSesion){ setStatus('error','Debes iniciar sesión para consultar.'); return; }
   buscando=true;
   setStatus('loading','Verificando cuota…');
@@ -2779,6 +2781,7 @@ async function buscarCoordsM03(){
   const lng=parseFloat(document.getElementById('inLng').value);
   if(isNaN(lat)||isNaN(lng)){ setStatus('error','Ingresa latitud y longitud válidas.'); return; }
   if(lat<20.3||lat>21.0||lng<-103.8||lng>-103.0){ setStatus('error','Coordenadas fuera del AMG. Verifica que sean correctas.'); return; }
+  if(!munActual){ setStatus('error','⚠️ Selecciona primero el municipio donde está el domicilio'); return; }
   if(!window.guSesion){ setStatus('error','Debes iniciar sesión para consultar.'); return; }
   buscando=true;
   setStatus('loading','Verificando cuota…');

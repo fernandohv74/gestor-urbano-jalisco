@@ -235,7 +235,11 @@ async function suscribir(plan, btn) {
   var plan = perfilResp.data && perfilResp.data.plan;
   if (PLANES_VALIDOS.indexOf(plan) !== -1) {
     var msgPlan = document.getElementById('msg-plan-activo');
-    if (msgPlan) msgPlan.style.display = 'block';
+    if (msgPlan) {
+      msgPlan.textContent = '✓ Ya tienes un plan activo — te llevamos al menú principal en unos segundos…';
+      msgPlan.style.display = 'block';
+    }
+    setTimeout(function () { window.location.href = 'index.html'; }, 3000);
   }
 })();
 

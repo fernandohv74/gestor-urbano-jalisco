@@ -60,7 +60,7 @@ async function actualizarPerfil(campo, valor, cambios) {
   }
 }
 
-async function registrarHistorial(userId, planAnterior, planNuevo, tipoCambio) {
+async function registrarHistorial(userId, email, planAnterior, planNuevo, tipoCambio) {
   try {
     await fetch(`${process.env.SUPABASE_URL}/rest/v1/plan_historial`, {
       method: 'POST',
@@ -70,7 +70,7 @@ async function registrarHistorial(userId, planAnterior, planNuevo, tipoCambio) {
         'Content-Type': 'application/json',
         Prefer: 'return=minimal'
       },
-      body: JSON.stringify({ user_id: userId, plan_anterior: planAnterior, plan_nuevo: planNuevo, tipo_cambio: tipoCambio })
+      body: JSON.stringify({ user_id: userId, email: email || null, plan_anterior: planAnterior, plan_nuevo: planNuevo, tipo_cambio: tipoCambio })
     });
   } catch (error) {
     console.error('[stripe-webhook] No se pudo registrar en plan_historial:', error.message);
@@ -123,7 +123,8 @@ export default async function handler(req, res) {
             analisis_usados: 0,
             periodo_actual: hoyISO()
           });
-          await registrarHistorial(userId, null, plan, 'alta');
+          const email = (session.customer_details && session.customer_details.email) || session.customer_email || null;
+          await registrarHistorial(userId, email, null, plan, 'alta');
         } else {
           console.error('[stripe-webhook] checkout.session.completed sin userId/plan validos', { userId, plan });
         }

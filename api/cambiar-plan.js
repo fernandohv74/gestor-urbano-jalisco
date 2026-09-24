@@ -50,7 +50,7 @@ export default async function handler(req, res) {
 
     // 1) Leer la suscripcion activa del usuario
     const perfilResp = await fetch(
-      `${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}&select=plan,stripe_subscription_id`,
+      `${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}&select=plan,stripe_subscription_id,email`,
       { headers: supaHeaders }
     );
     if (!perfilResp.ok) {
@@ -132,6 +132,7 @@ export default async function handler(req, res) {
         headers: { ...supaHeaders, Prefer: 'return=minimal' },
         body: JSON.stringify({
           user_id: userId,
+          email: perfil.email || null,
           plan_anterior: perfil.plan,
           plan_nuevo: nuevoPlan,
           tipo_cambio: esDowngrade ? 'downgrade' : 'upgrade'

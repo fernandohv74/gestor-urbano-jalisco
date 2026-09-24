@@ -179,6 +179,7 @@ const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Ma2gxSyWx4rDHIbDPKGUdg_lO0xZeZr
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 const ORDEN_PLANES = { basico: 1, estandar: 2, profesional: 3, empresarial: 4 };
 const NOMBRE_PLAN = { basico: 'Básico', estandar: 'Estándar', profesional: 'Profesional', empresarial: 'Empresarial' };
+const PRECIO_PLAN = { basico: 80, estandar: 199, profesional: 499, empresarial: 999 };
 
 async function suscribir(plan, btn) {
   var textoOriginal = btn.textContent;
@@ -210,18 +211,28 @@ async function suscribir(plan, btn) {
     }
 
     var esDowngrade = ORDEN_PLANES[plan] < ORDEN_PLANES[perfil.plan];
+    var nombreActual = NOMBRE_PLAN[perfil.plan] || perfil.plan;
+    var nombreNuevo = NOMBRE_PLAN[plan] || plan;
+    var mensajeConfirm;
     if (esDowngrade) {
-      var confirmado = confirm(
-        'Vas a bajar de ' + (NOMBRE_PLAN[perfil.plan] || perfil.plan) + ' a ' + (NOMBRE_PLAN[plan] || plan) + '.\n\n' +
-        'El cambio aplica de inmediato: tus límites de consultas pasan a ser los de ' + (NOMBRE_PLAN[plan] || plan) + ' desde ahora. ' +
-        'No se te devuelve ni se te acredita lo que ya pagaste de más por ' + (NOMBRE_PLAN[perfil.plan] || perfil.plan) + ' este período.\n\n' +
-        '¿Confirmas el cambio?'
-      );
-      if (!confirmado) {
-        btn.disabled = false;
-        btn.textContent = textoOriginal;
-        return;
-      }
+      mensajeConfirm =
+        'Vas a bajar de ' + nombreActual + ' a ' + nombreNuevo + '.\n\n' +
+        'El cambio aplica de inmediato: tus límites de consultas pasan a ser los de ' + nombreNuevo + ' desde ahora. ' +
+        'No se te devuelve ni se te acredita lo que ya pagaste de más por ' + nombreActual + ' este período.\n\n' +
+        '¿Confirmas el cambio?';
+    } else {
+      var diferencia = (PRECIO_PLAN[plan] || 0) - (PRECIO_PLAN[perfil.plan] || 0);
+      mensajeConfirm =
+        'Vas a subir de ' + nombreActual + ' a ' + nombreNuevo + '.\n\n' +
+        'Se te cobrará de inmediato, con la tarjeta que ya tienes registrada, la parte proporcional de la diferencia por los días que te quedan de este período (hasta $' + diferencia + ' MXN si cambias justo al inicio del ciclo). ' +
+        'No se te pedirá la tarjeta de nuevo.\n\n' +
+        '¿Confirmas el cambio?';
+    }
+    var confirmado = confirm(mensajeConfirm);
+    if (!confirmado) {
+      btn.disabled = false;
+      btn.textContent = textoOriginal;
+      return;
     }
 
     btn.textContent = 'Cambiando de plan…';

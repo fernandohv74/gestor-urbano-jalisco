@@ -49,6 +49,8 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
 .usage-fill.warn{background:#F59E0B}
 .usage-fill.full{background:#F87171}
 .usage-free-note{font-family:var(--mono);font-size:11px;color:var(--text3);text-align:center;max-width:1000px;width:100%;margin:-8px auto 0;padding:0 24px 24px}
+.plan-actual{font-family:var(--mono);font-size:12px;color:var(--text2);text-align:center;max-width:1000px;width:100%;margin:0 auto;padding:0 24px 10px}
+.plan-actual strong{color:var(--accent2);font-weight:600}
 .jump-nav{max-width:1000px;width:100%;margin:0 auto;padding:0 24px 24px;display:flex;flex-wrap:wrap;gap:10px}
 .jump-btn{font-family:var(--sans);font-size:13px;font-weight:500;letter-spacing:normal;text-transform:none;color:var(--text2);background:var(--bg2);border:1px solid var(--border);padding:9px 16px;border-radius:20px;text-decoration:none;display:flex;align-items:center;gap:7px;transition:all .15s;flex-shrink:0}
 .jump-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--bg3)}
@@ -128,6 +130,7 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
   var PLANES_VALIDOS = ['basico', 'estandar', 'profesional', 'empresarial'];
   var LIMITES_CONSULTAS = { basico: 8, estandar: 30, profesional: 80, empresarial: Infinity };
   var LIMITES_ANALISIS = { basico: 4, estandar: 8, profesional: 20, empresarial: 100 };
+  var NOMBRE_PLAN = { basico: 'Básico', estandar: 'Estándar', profesional: 'Profesional', empresarial: 'Empresarial' };
 
   function llenarMedidor(usados, limite, valId, fillId) {
     var valEl = document.getElementById(valId);
@@ -164,6 +167,12 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
       return;
     }
     var datos = perfilResp.data || {};
+    var planActualEl = document.getElementById('plan-actual');
+    var planActualNombreEl = document.getElementById('plan-actual-nombre');
+    if (planActualEl && planActualNombreEl) {
+      planActualNombreEl.textContent = NOMBRE_PLAN[plan] || plan;
+      planActualEl.style.display = '';
+    }
     llenarMedidor(datos.consultas_usadas || 0, LIMITES_CONSULTAS[plan], 'usage-consultas-val', 'usage-consultas-fill');
     llenarMedidor(datos.analisis_usados || 0, LIMITES_ANALISIS[plan], 'usage-analisis-val', 'usage-analisis-fill');
     var usageRow = document.getElementById('usage-row');
@@ -209,6 +218,7 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
   <div class="hero-muni">Guadalajara · Zapopan · Tlaquepaque · Tlajomulco · Tonalá</div>
 </div>
 
+<div class="plan-actual" id="plan-actual" style="display:none">Tu plan: <strong id="plan-actual-nombre">—</strong></div>
 <div class="usage-row" id="usage-row" style="display:none">
   <div class="usage-box">
     <div class="usage-top"><span class="usage-lbl">Consultas normales</span><span class="usage-val" id="usage-consultas-val">—</span></div>

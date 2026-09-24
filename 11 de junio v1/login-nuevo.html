@@ -5,10 +5,12 @@
      Todos los derechos reservados.
      Reproduccion o uso no autorizado esta prohibido.
 
-     login-nuevo.html — login real con Supabase Auth (link magico +
-     contrasena opcional). Archivo NUEVO, separado de login.html
-     (que sigue siendo el que controla el acceso real en produccion)
-     para poder probar sin riesgo antes de cambiar.
+     login-nuevo.html — login + registro con Supabase Auth. Dos
+     caminos separados y claros (patron estandar tipo izzi/telecom):
+     login arriba como principal, "crear cuenta" como llamado aparte
+     debajo. Archivo NUEVO, separado de login.html (que sigue siendo
+     el que controla el acceso real -- candado de acceso general --
+     en produccion) para poder probar sin riesgo antes de cambiar.
      ========================================================== -->
 
 <html lang="es">
@@ -50,10 +52,13 @@ button{width:100%;padding:11px;border-radius:8px;border:none;font-family:var(--s
 .btn-primary{background:var(--accent);color:#fff;margin-bottom:10px}
 .btn-primary:hover{background:#2D6AEE}
 .btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent2)}
 .btn-link{background:none;color:var(--text2);font-size:13px;text-decoration:underline;padding:6px}
 .btn-link:hover{color:var(--accent2)}
-.password-block{display:none;margin-top:4px;padding-top:14px;border-top:1px solid var(--border)}
-.password-block.show{display:block}
+.divider{border-top:1px solid var(--border);margin:22px 0 16px}
+.cta-alt{text-align:center}
+.cta-alt-txt{font-size:12px;color:var(--text2);margin-bottom:10px}
 .msg{font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:14px;display:none}
 .msg.ok{background:#064E3B;border:1px solid #065F46;color:var(--greenD);display:block}
 .msg.err{background:#450A0A;border:1px solid #7F1D1D;color:var(--red);display:block}
@@ -64,25 +69,54 @@ button{width:100%;padding:11px;border-radius:8px;border:none;font-family:var(--s
 
 <div class="card">
   <div class="logo"><span style="font-weight:800;color:var(--text)">Traza</span><span style="font-weight:300;color:#D85A30">Urbana</span></div>
-  <div class="logo-sub">Entrar o crear tu cuenta</div>
+  <div class="logo-sub" id="modo-titulo">Iniciar sesión</div>
 
   <div id="msg-box"></div>
 
-  <form id="form-unico">
-    <label for="email-unico">Correo electrónico</label>
-    <div class="email-wrap">
-      <input type="email" id="email-unico" placeholder="tu@correo.com" required autocomplete="email">
-      <button type="button" class="clear-btn" onclick="limpiarCampo('email-unico')" aria-label="Borrar correo" tabindex="-1">✕</button>
-    </div>
-    <label for="password-unico">Contraseña</label>
-    <div class="pass-wrap">
-      <input type="password" id="password-unico" placeholder="Mínimo 8 caracteres" required autocomplete="current-password" minlength="8">
-      <button type="button" class="pass-toggle" onclick="togglePass(this,'password-unico')" aria-label="Mostrar contraseña">👁</button>
-    </div>
-    <button type="submit" class="btn-primary" id="btn-continuar">Continuar</button>
-  </form>
+  <div id="bloque-login">
+    <form id="form-login">
+      <label for="email-login">Correo electrónico</label>
+      <div class="email-wrap">
+        <input type="email" id="email-login" placeholder="tu@correo.com" required autocomplete="email">
+        <button type="button" class="clear-btn" onclick="limpiarCampo('email-login')" aria-label="Borrar correo" tabindex="-1">✕</button>
+      </div>
+      <label for="password-login">Contraseña</label>
+      <div class="pass-wrap">
+        <input type="password" id="password-login" placeholder="Tu contraseña" required autocomplete="current-password">
+        <button type="button" class="pass-toggle" onclick="togglePass(this,'password-login')" aria-label="Mostrar contraseña">👁</button>
+      </div>
+      <button type="submit" class="btn-primary" id="btn-login">Iniciar sesión</button>
+    </form>
 
-  <div class="footer-note" style="margin-top:14px">Si es tu primera vez, esto crea tu cuenta con esa contraseña. Si ya tienes cuenta, entras directo.</div>
+    <div class="divider"></div>
+    <div class="cta-alt">
+      <div class="cta-alt-txt">¿Primera vez en TrazaUrbana?</div>
+      <button type="button" class="btn-outline" id="btn-ir-registro">Crear cuenta nueva</button>
+    </div>
+  </div>
+
+  <div id="bloque-registro" style="display:none">
+    <form id="form-registro">
+      <label for="email-registro">Correo electrónico</label>
+      <div class="email-wrap">
+        <input type="email" id="email-registro" placeholder="tu@correo.com" required autocomplete="email">
+        <button type="button" class="clear-btn" onclick="limpiarCampo('email-registro')" aria-label="Borrar correo" tabindex="-1">✕</button>
+      </div>
+      <label for="password-registro">Crea una contraseña</label>
+      <div class="pass-wrap">
+        <input type="password" id="password-registro" placeholder="Mínimo 8 caracteres" required autocomplete="new-password" minlength="8">
+        <button type="button" class="pass-toggle" onclick="togglePass(this,'password-registro')" aria-label="Mostrar contraseña">👁</button>
+      </div>
+      <label for="password-registro2">Confirmar contraseña</label>
+      <div class="pass-wrap">
+        <input type="password" id="password-registro2" placeholder="Repite la contraseña" required autocomplete="new-password" minlength="8">
+        <button type="button" class="pass-toggle" onclick="togglePass(this,'password-registro2')" aria-label="Mostrar contraseña">👁</button>
+      </div>
+      <button type="submit" class="btn-primary" id="btn-registro">Crear mi cuenta</button>
+    </form>
+
+    <button type="button" class="btn-link" id="btn-ir-login" style="width:100%;margin-top:4px">← Ya tengo cuenta, iniciar sesión</button>
+  </div>
 
   <div class="footer-note">TrazaUrbana · Jalisco AMG</div>
 </div>
@@ -95,6 +129,10 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLI
 function mostrarMensaje(texto, tipo) {
   const box = document.getElementById('msg-box');
   box.innerHTML = '<div class="msg ' + tipo + '">' + texto + '</div>';
+}
+
+function limpiarMensaje() {
+  document.getElementById('msg-box').innerHTML = '';
 }
 
 function limpiarCampo(inputId) {
@@ -111,43 +149,84 @@ function togglePass(btnEl, inputId) {
   btnEl.setAttribute('aria-label', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
 }
 
-document.getElementById('form-unico').addEventListener('submit', async function (e) {
-  e.preventDefault();
-  const email = document.getElementById('email-unico').value.trim();
-  const password = document.getElementById('password-unico').value;
-  const btn = document.getElementById('btn-continuar');
-  btn.disabled = true;
-  btn.textContent = 'Verificando…';
-  document.getElementById('msg-box').innerHTML = '';
+function irARegistro(emailPrellenado) {
+  document.getElementById('bloque-login').style.display = 'none';
+  document.getElementById('bloque-registro').style.display = '';
+  document.getElementById('modo-titulo').textContent = 'Crear cuenta';
+  if (emailPrellenado) document.getElementById('email-registro').value = emailPrellenado;
+  limpiarMensaje();
+}
 
-  // 1) ¿Ya tiene cuenta con esa contraseña? Si funciona, onAuthStateChange redirige.
-  const login = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
-  if (!login.error) {
+function irALogin(emailPrellenado) {
+  document.getElementById('bloque-registro').style.display = 'none';
+  document.getElementById('bloque-login').style.display = '';
+  document.getElementById('modo-titulo').textContent = 'Iniciar sesión';
+  if (emailPrellenado) document.getElementById('email-login').value = emailPrellenado;
+  limpiarMensaje();
+}
+
+document.getElementById('btn-ir-registro').addEventListener('click', function () { irARegistro(); });
+document.getElementById('btn-ir-login').addEventListener('click', function () { irALogin(); });
+
+document.getElementById('form-login').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const email = document.getElementById('email-login').value.trim();
+  const password = document.getElementById('password-login').value;
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true;
+  btn.textContent = 'Entrando…';
+  limpiarMensaje();
+
+  const { error } = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
+  if (error) {
+    mostrarMensaje('Correo o contraseña incorrectos. Si aún no tienes cuenta, créala abajo.', 'err');
+    btn.disabled = false;
+    btn.textContent = 'Iniciar sesión';
+  }
+  // Si funciona, onAuthStateChange (abajo) se encarga de redirigir.
+});
+
+document.getElementById('form-registro').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const email = document.getElementById('email-registro').value.trim();
+  const pass1 = document.getElementById('password-registro').value;
+  const pass2 = document.getElementById('password-registro2').value;
+  limpiarMensaje();
+
+  if (pass1.length < 8) {
+    mostrarMensaje('La contraseña debe tener al menos 8 caracteres.', 'err');
+    return;
+  }
+  if (pass1 !== pass2) {
+    mostrarMensaje('Las contraseñas no coinciden.', 'err');
     return;
   }
 
-  // 2) No entró. Puede ser correo nuevo (lo creamos) o correo existente con
-  // contraseña equivocada. signUp() con un correo ya registrado y confirmado
-  // no da error — responde "éxito" pero con identities: [] (patrón oficial
-  // de Supabase para no revelar si un correo existe).
-  btn.textContent = 'Un momento…';
-  const registro = await supabaseClient.auth.signUp({
+  const btn = document.getElementById('btn-registro');
+  btn.disabled = true;
+  btn.textContent = 'Creando cuenta…';
+
+  const { data, error } = await supabaseClient.auth.signUp({
     email: email,
-    password: password,
+    password: pass1,
     options: { emailRedirectTo: window.location.origin + '/login-nuevo.html' + window.location.search }
   });
 
-  if (registro.error) {
-    mostrarMensaje('No se pudo continuar: ' + registro.error.message, 'err');
-  } else if (registro.data && registro.data.user && Array.isArray(registro.data.user.identities) && registro.data.user.identities.length === 0) {
-    mostrarMensaje('Ese correo ya tiene cuenta y la contraseña no coincide. Verifica o usa "¿Olvidaste tu contraseña?".', 'err');
+  if (error) {
+    mostrarMensaje('No se pudo crear la cuenta: ' + error.message, 'err');
+  } else if (data && data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+    // signUp() con un correo ya registrado y confirmado no da error -- responde
+    // "éxito" pero con identities: [] (patron oficial de Supabase para no
+    // revelar si un correo existe). Lo mandamos directo a iniciar sesión.
+    irALogin(email);
+    mostrarMensaje('Ese correo ya tiene una cuenta. Inicia sesión en vez de crear una nueva.', 'err');
   } else {
-    mostrarMensaje('Listo — revisa tu correo (' + email + ') y da clic para confirmar tu cuenta nueva. Tu contraseña ya quedó lista, no hace falta crearla de nuevo.', 'ok');
-    document.getElementById('form-unico').reset();
+    mostrarMensaje('Listo — revisa tu correo (' + email + ') y da clic para confirmar tu cuenta nueva.', 'ok');
+    document.getElementById('form-registro').reset();
   }
 
   btn.disabled = false;
-  btn.textContent = 'Continuar';
+  btn.textContent = 'Crear mi cuenta';
 });
 
 supabaseClient.auth.onAuthStateChange(function (event, session) {

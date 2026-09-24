@@ -234,12 +234,20 @@ async function suscribir(plan, btn) {
     .single();
   var plan = perfilResp.data && perfilResp.data.plan;
   if (PLANES_VALIDOS.indexOf(plan) !== -1) {
+    var vieneDePago = new URLSearchParams(window.location.search).get('success') === 'true';
     var msgPlan = document.getElementById('msg-plan-activo');
     if (msgPlan) {
-      msgPlan.textContent = '✓ Ya tienes un plan activo — te llevamos al menú principal en unos segundos…';
+      msgPlan.textContent = vieneDePago
+        ? '✓ Ya tienes un plan activo — te llevamos al menú principal en unos segundos…'
+        : '✓ Ya tienes un plan activo (' + plan + '). Si quieres cambiarte, elige otro plan abajo — o entra al menú principal arriba.';
       msgPlan.style.display = 'block';
     }
-    setTimeout(function () { window.location.href = 'index.html'; }, 5000);
+    // El redirect automatico solo aplica justo despues de pagar (?success=true).
+    // Si el usuario entro por su cuenta con un plan ya activo (ej. para cambiarse
+    // de plan o renovar), debe poder ver y elegir libremente, sin que lo saquen solo.
+    if (vieneDePago) {
+      setTimeout(function () { window.location.href = 'index.html'; }, 5000);
+    }
   }
 })();
 

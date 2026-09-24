@@ -188,6 +188,45 @@ async function suscribir(plan, btn) {
     window.location.href = 'login-nuevo.html?next=planes.html';
     return;
   }
+
+  btn.textContent = 'Verificando tu plan actual…';
+  var perfilResp = await supabaseClient
+    .from('profiles')
+    .select('plan,stripe_subscription_id')
+    .eq('id', session.user.id)
+    .single();
+  var perfil = perfilResp.data;
+
+  // Si ya tiene una suscripcion activa, cambiarla (upgrade/downgrade prorrateado)
+  // en vez de crear una segunda suscripcion en paralelo -- ver api/cambiar-plan.js.
+  if (perfil && perfil.stripe_subscription_id) {
+    if (perfil.plan === plan) {
+      alert('Ya tienes el plan ' + plan + ' activo.');
+      btn.disabled = false;
+      btn.textContent = textoOriginal;
+      return;
+    }
+    btn.textContent = 'Cambiando de plan…';
+    try {
+      var respCambio = await fetch('/api/cambiar-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: plan, userId: session.user.id })
+      });
+      var dataCambio = await respCambio.json();
+      if (respCambio.ok && dataCambio.ok) {
+        window.location.href = 'planes.html?success=true';
+        return;
+      }
+      alert('No se pudo cambiar tu plan: ' + (dataCambio.error || 'error desconocido'));
+    } catch (e) {
+      alert('Error de conexión. Intenta de nuevo.');
+    }
+    btn.disabled = false;
+    btn.textContent = textoOriginal;
+    return;
+  }
+
   btn.textContent = 'Redirigiendo…';
   try {
     var resp = await fetch('/api/create-checkout-session', {

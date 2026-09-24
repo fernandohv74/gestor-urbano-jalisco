@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<!-- ==========================================================
+     GestorUrbano Jalisco AMG / TrazaUrbana
+     (c) 2026 Fernando H. - trazaurbana.mx
+     Todos los derechos reservados.
+     Reproduccion o uso no autorizado esta prohibido.
+
+     configurar-contrasena.html — le permite a un usuario ya logueado
+     (via link magico) establecer una contrasena, para poder entrar
+     despues con signInWithPassword sin depender del correo.
+     ========================================================== -->
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Configurar contraseña — TrazaUrbana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0B0F1A;--bg2:#111827;--bg3:#1A2235;--bg4:#212d42;
+  --text:#E2E8F0;--text2:#94A3B8;--text3:#4B5563;
+  --border:#1E2D45;
+  --accent:#3D7BFF;--accent2:#6699FF;--accentL:#1A3A8F;
+  --green:#10B981;--greenD:#34D399;--red:#F87171;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;font-size:14px;line-height:1.6;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:36px 32px;max-width:380px;width:100%}
+.logo{text-align:center;margin-bottom:6px;font-family:'Outfit','Helvetica Neue',Arial,sans-serif;font-size:22px}
+.logo-sub{text-align:center;font-size:11px;color:var(--text3);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px}
+.email-actual{text-align:center;font-size:12px;color:var(--text2);margin-bottom:28px}
+label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px}
+input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-family:var(--sans);margin-bottom:14px;outline:none;transition:border-color .15s}
+input:focus{border-color:var(--accent)}
+.hint{font-size:11px;color:var(--text3);margin-top:-8px;margin-bottom:14px}
+button{width:100%;padding:11px;border-radius:8px;border:none;font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff;margin-bottom:10px}
+.btn-primary:hover{background:#2D6AEE}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.btn-link{background:none;color:var(--text2);font-size:13px;text-decoration:underline;padding:6px;display:block;text-align:center;width:100%}
+.btn-link:hover{color:var(--accent2)}
+.msg{font-size:13px;padding:10px 12px;border-radius:8px;margin-bottom:14px;display:none}
+.msg.ok{background:#064E3B;border:1px solid #065F46;color:var(--greenD);display:block}
+.msg.err{background:#450A0A;border:1px solid #7F1D1D;color:var(--red);display:block}
+.footer-note{text-align:center;font-size:11px;color:var(--text3);margin-top:20px;font-family:var(--mono)}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo"><span style="font-weight:800;color:var(--text)">Traza</span><span style="font-weight:300;color:#D85A30">Urbana</span></div>
+  <div class="logo-sub">Configurar contraseña</div>
+  <div class="email-actual" id="email-actual">Cargando…</div>
+
+  <div id="msg-box"></div>
+
+  <form id="form-pass">
+    <label for="pass1">Nueva contraseña</label>
+    <input type="password" id="pass1" placeholder="Mínimo 8 caracteres" required autocomplete="new-password" minlength="8">
+    <label for="pass2">Confirmar contraseña</label>
+    <input type="password" id="pass2" placeholder="Repite la contraseña" required autocomplete="new-password" minlength="8">
+    <div class="hint">Con esto podrás entrar directo con tu correo y contraseña, sin esperar el link mágico.</div>
+    <button type="submit" class="btn-primary" id="btn-guardar">Guardar contraseña</button>
+  </form>
+
+  <a href="index.html" class="btn-link">← Volver al menú principal</a>
+
+  <div class="footer-note">TrazaUrbana · Jalisco AMG</div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://bhryrrdygghhospfqgtj.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Ma2gxSyWx4rDHIbDPKGUdg_lO0xZeZr';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+function mostrarMensaje(texto, tipo) {
+  const box = document.getElementById('msg-box');
+  box.innerHTML = '<div class="msg ' + tipo + '">' + texto + '</div>';
+}
+
+(async function verificarSesion() {
+  const { data } = await supabaseClient.auth.getSession();
+  const session = data && data.session;
+  if (!session) {
+    window.location.replace('login-nuevo.html?next=configurar-contrasena.html');
+    return;
+  }
+  document.getElementById('email-actual').textContent = session.user.email;
+})();
+
+document.getElementById('form-pass').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const pass1 = document.getElementById('pass1').value;
+  const pass2 = document.getElementById('pass2').value;
+  if (pass1.length < 8) {
+    mostrarMensaje('La contraseña debe tener al menos 8 caracteres.', 'err');
+    return;
+  }
+  if (pass1 !== pass2) {
+    mostrarMensaje('Las contraseñas no coinciden.', 'err');
+    return;
+  }
+  const btn = document.getElementById('btn-guardar');
+  btn.disabled = true;
+  btn.textContent = 'Guardando…';
+  const { error } = await supabaseClient.auth.updateUser({ password: pass1 });
+  if (error) {
+    mostrarMensaje('No se pudo guardar: ' + error.message, 'err');
+  } else {
+    mostrarMensaje('Listo — ya puedes entrar con tu correo y esta contraseña.', 'ok');
+    document.getElementById('form-pass').reset();
+  }
+  btn.disabled = false;
+  btn.textContent = 'Guardar contraseña';
+});
+</script>
+
+</body>
+</html>

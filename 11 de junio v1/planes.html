@@ -34,7 +34,7 @@ body.light{
   --accent:#2563EB;--accent2:#3B82F6;--accentL:#DBEAFE;
   --teal:#0891B2;--green:#059669;--greenD:#10B981;
 }
-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;transition:background-color .4s ease,border-color .35s ease}
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;position:sticky;top:0;z-index:100;transition:background-color .4s ease,border-color .35s ease}
 .theme-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:11px;padding:5px 12px;border-radius:20px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
 .theme-btn:hover{border-color:var(--accent);color:var(--accent)}
 .logo-sub{font-size:11px;color:var(--text3);letter-spacing:.6px;text-transform:uppercase}
@@ -87,6 +87,7 @@ footer{margin-top:auto;padding:24px 28px;border-top:1px solid var(--border);text
   <div class="hbadge">Modo de prueba</div>
   <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" style="margin-left:auto">🌙 Modo oscuro</button>
   <a href="index.html" class="back-link" id="btn-menu-principal" style="display:none">← Menú principal</a>
+  <button class="theme-btn" id="btn-cerrar-sesion" onclick="guCerrarSesion()" style="display:none">🔒 Cerrar sesión</button>
 </header>
 
 <div class="hero">
@@ -223,6 +224,8 @@ async function suscribir(plan, btn) {
   if (!session) return;
   var btnMenu = document.getElementById('btn-menu-principal');
   if (btnMenu) btnMenu.style.display = '';
+  var btnLogout = document.getElementById('btn-cerrar-sesion');
+  if (btnLogout) btnLogout.style.display = '';
   var PLANES_VALIDOS = ['basico', 'estandar', 'profesional', 'empresarial'];
   var perfilResp = await supabaseClient
     .from('profiles')
@@ -235,6 +238,12 @@ async function suscribir(plan, btn) {
     if (msgPlan) msgPlan.style.display = 'block';
   }
 })();
+
+async function guCerrarSesion(){
+  try{ await supabaseClient.auth.signOut(); }catch(e){}
+  try{ await fetch('/api/auth-logout', {method:'POST'}); }catch(e){}
+  window.location.href = '/login.html';
+}
 
 function applyTheme(theme) {
   document.body.classList.toggle('light', theme === 'light');

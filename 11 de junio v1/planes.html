@@ -86,7 +86,6 @@ footer{margin-top:auto;padding:24px 28px;border-top:1px solid var(--border);text
   </div>
   <div class="hbadge">Modo de prueba</div>
   <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" style="margin-left:auto">🌙 Modo oscuro</button>
-  <a href="configurar-contrasena.html" class="back-link" id="btn-configurar-contrasena" style="display:none">🔑 Contraseña</a>
   <a href="index.html" class="back-link" id="btn-menu-principal" style="display:none">← Menú principal</a>
 </header>
 
@@ -222,8 +221,6 @@ async function suscribir(plan, btn) {
   var sesion = await supabaseClient.auth.getSession();
   var session = sesion.data && sesion.data.session;
   if (!session) return;
-  var btnPass = document.getElementById('btn-configurar-contrasena');
-  if (btnPass) btnPass.style.display = '';
   var btnMenu = document.getElementById('btn-menu-principal');
   if (btnMenu) btnMenu.style.display = '';
   var PLANES_VALIDOS = ['basico', 'estandar', 'profesional', 'empresarial'];

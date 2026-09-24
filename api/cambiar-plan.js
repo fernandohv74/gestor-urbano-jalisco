@@ -1,16 +1,18 @@
 // api/cambiar-plan.js
 // Cambia el plan de una suscripcion de Stripe YA ACTIVA (upgrade/downgrade),
-// en vez de crear una segunda suscripcion en paralelo. Stripe prorratea
-// automaticamente: si subes de plan pagas solo la diferencia del periodo
-// restante, si bajas se te da credito para el siguiente cobro.
-// Si el usuario NO tiene suscripcion activa, este endpoint no aplica -- el
-// frontend debe usar /api/create-checkout-session en ese caso.
+// en vez de crear una segunda suscripcion en paralelo.
+// Politica de cobro (decision explicita de Fernando, no negociable sin
+// confirmar de nuevo): en un upgrade se cobra la diferencia de inmediato;
+// en un downgrade NO se da ningun credito ni devolucion -- el precio nuevo
+// (mas barato) aplica hasta el siguiente cobro normal, sin ajuste. El
+// frontend debe avisar esto explicitamente antes de confirmar un downgrade.
 const PRICE_IDS = {
   basico: 'price_1UIINQ5PXi9prylM0QF9Xcw4',
   estandar: 'price_1UIIP45PXi9prylMOGXRZegH',
   profesional: 'price_1UIIQ55PXi9prylMSwIDorZH',
   empresarial: 'price_1UIIS25PXi9prylMfHSW5dTE'
 };
+const ORDEN_PLANES = { basico: 1, estandar: 2, profesional: 3, empresarial: 4 };
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default async function handler(req, res) {
@@ -86,16 +88,17 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Tu suscripcion en Stripe no tiene un item valido' });
     }
 
-    // 3) Cambiar el price de ese item, con prorrateo cobrado de inmediato.
-    // 'always_invoice' (no 'create_prorations') -- create_prorations solo
-    // ACUMULA el ajuste para la siguiente factura del ciclo normal, sin
-    // cobrar nada en el momento; el usuario ve el cambio como "gratis"
-    // hasta el siguiente corte. always_invoice genera y cobra la factura
-    // de la diferencia ahora mismo.
+    // 3) Cambiar el price de ese item.
+    // Upgrade (plan nuevo mas caro): 'always_invoice' -- genera y cobra de
+    // inmediato la factura de la diferencia, no la deja pendiente.
+    // Downgrade (plan nuevo mas barato): 'none' -- sin prorrateo alguno, no
+    // se genera ningun credito por lo que sobra del plan actual. El precio
+    // nuevo (mas bajo) empieza a aplicar hasta el siguiente cobro normal.
+    const esDowngrade = ORDEN_PLANES[nuevoPlan] < ORDEN_PLANES[perfil.plan];
     const params = new URLSearchParams();
     params.append('items[0][id]', itemId);
     params.append('items[0][price]', nuevoPriceId);
-    params.append('proration_behavior', 'always_invoice');
+    params.append('proration_behavior', esDowngrade ? 'none' : 'always_invoice');
     params.append('metadata[plan]', nuevoPlan);
 
     const updResp = await fetch(`https://api.stripe.com/v1/subscriptions/${subscriptionId}`, {

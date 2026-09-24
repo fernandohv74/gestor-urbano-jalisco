@@ -177,6 +177,8 @@ footer{margin-top:auto;padding:24px 28px;border-top:1px solid var(--border);text
 const SUPABASE_URL = 'https://bhryrrdygghhospfqgtj.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Ma2gxSyWx4rDHIbDPKGUdg_lO0xZeZr';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const ORDEN_PLANES = { basico: 1, estandar: 2, profesional: 3, empresarial: 4 };
+const NOMBRE_PLAN = { basico: 'Básico', estandar: 'Estándar', profesional: 'Profesional', empresarial: 'Empresarial' };
 
 async function suscribir(plan, btn) {
   var textoOriginal = btn.textContent;
@@ -206,6 +208,22 @@ async function suscribir(plan, btn) {
       btn.textContent = textoOriginal;
       return;
     }
+
+    var esDowngrade = ORDEN_PLANES[plan] < ORDEN_PLANES[perfil.plan];
+    if (esDowngrade) {
+      var confirmado = confirm(
+        'Vas a bajar de ' + (NOMBRE_PLAN[perfil.plan] || perfil.plan) + ' a ' + (NOMBRE_PLAN[plan] || plan) + '.\n\n' +
+        'El cambio aplica de inmediato: tus límites de consultas pasan a ser los de ' + (NOMBRE_PLAN[plan] || plan) + ' desde ahora. ' +
+        'No se te devuelve ni se te acredita lo que ya pagaste de más por ' + (NOMBRE_PLAN[perfil.plan] || perfil.plan) + ' este período.\n\n' +
+        '¿Confirmas el cambio?'
+      );
+      if (!confirmado) {
+        btn.disabled = false;
+        btn.textContent = textoOriginal;
+        return;
+      }
+    }
+
     btn.textContent = 'Cambiando de plan…';
     try {
       var respCambio = await fetch('/api/cambiar-plan', {

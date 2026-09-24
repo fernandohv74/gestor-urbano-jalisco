@@ -1047,17 +1047,6 @@ async function verificarAhora(){
     m09MostrarVerifPanel('error', null, null, 'Debes iniciar sesión para usar esta verificación.');
     return;
   }
-  try{
-    const respCuota=await fetch('/api/verificar-consulta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:window.guSesion.user.id})});
-    const dataCuota=await respCuota.json();
-    if(!respCuota.ok||!dataCuota.permitido){
-      m09MostrarVerifPanel('error', null, null, dataCuota.error||'No se pudo verificar tu cuota.');
-      return;
-    }
-  }catch(e){
-    m09MostrarVerifPanel('error', null, null, 'Error de conexión al verificar tu cuota. Intenta de nuevo.');
-    return;
-  }
   btn.innerHTML='<svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="animation:spin 1s linear infinite"><path d="M13.5 2.5A7 7 0 102.5 13.5M13.5 2.5V6.5M13.5 2.5H9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Verificando…';
   btn.disabled=true;
   m09MostrarVerifPanel('loading');

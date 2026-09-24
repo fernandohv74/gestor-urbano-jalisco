@@ -48,6 +48,7 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
 .usage-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s ease}
 .usage-fill.warn{background:#F59E0B}
 .usage-fill.full{background:#F87171}
+.usage-free-note{font-family:var(--mono);font-size:11px;color:var(--text3);text-align:center;max-width:1000px;width:100%;margin:-8px auto 0;padding:0 24px 24px}
 .jump-nav{max-width:1000px;width:100%;margin:0 auto;padding:0 24px 24px;display:flex;flex-wrap:wrap;gap:10px}
 .jump-btn{font-family:var(--sans);font-size:13px;font-weight:500;letter-spacing:normal;text-transform:none;color:var(--text2);background:var(--bg2);border:1px solid var(--border);padding:9px 16px;border-radius:20px;text-decoration:none;display:flex;align-items:center;gap:7px;transition:all .15s;flex-shrink:0}
 .jump-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--bg3)}
@@ -167,6 +168,8 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
     llenarMedidor(datos.analisis_usados || 0, LIMITES_ANALISIS[plan], 'usage-analisis-val', 'usage-analisis-fill');
     var usageRow = document.getElementById('usage-row');
     if (usageRow) usageRow.style.display = '';
+    var usageFreeNote = document.getElementById('usage-free-note');
+    if (usageFreeNote) usageFreeNote.style.display = '';
   })();
 })();
 </script>
@@ -218,6 +221,7 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
     <div class="usage-bar"><div class="usage-fill" id="usage-analisis-fill" style="width:0%"></div></div>
   </div>
 </div>
+<div class="usage-free-note" id="usage-free-note" style="display:none">🎁 Sin costo, uso ilimitado: M07</div>
 
 <div class="jump-nav">
   <a href="#bloque-construccion" class="jump-btn">🏗️ Desarrollo inmobiliario</a>

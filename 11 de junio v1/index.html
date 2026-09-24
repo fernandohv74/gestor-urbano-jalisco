@@ -38,10 +38,15 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
 .hero-title{font-family:'Outfit','Helvetica Neue',Arial,sans-serif;font-size:clamp(28px,5vw,46px);font-weight:600;letter-spacing:-.5px;line-height:1.15;margin-bottom:14px;background:linear-gradient(135deg,var(--text) 40%,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hero-sub{font-size:15px;color:var(--text2);max-width:560px;margin-bottom:10px}
 .hero-muni{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.5px}
-.status-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;max-width:1000px;width:100%;margin:0 auto;padding:0 24px 24px}
-.stat-box{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;transition:background-color .4s ease,border-color .35s ease}
-.stat-val{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--accent2)}
-.stat-lbl{font-size:11px;color:var(--text3);margin-top:2px}
+.usage-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;max-width:1000px;width:100%;margin:0 auto;padding:0 24px 24px}
+.usage-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:background-color .4s ease,border-color .35s ease}
+.usage-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
+.usage-lbl{font-size:12px;color:var(--text2)}
+.usage-val{font-family:var(--mono);font-size:12px;color:var(--accent2);font-weight:600;white-space:nowrap}
+.usage-bar{height:6px;border-radius:3px;background:var(--bg4);overflow:hidden}
+.usage-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s ease}
+.usage-fill.warn{background:#F59E0B}
+.usage-fill.full{background:#F87171}
 .jump-nav{max-width:1000px;width:100%;margin:0 auto;padding:0 24px 24px;display:flex;flex-wrap:wrap;gap:10px}
 .jump-btn{font-family:var(--sans);font-size:13px;font-weight:500;letter-spacing:normal;text-transform:none;color:var(--text2);background:var(--bg2);border:1px solid var(--border);padding:9px 16px;border-radius:20px;text-decoration:none;display:flex;align-items:center;gap:7px;transition:all .15s;flex-shrink:0}
 .jump-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--bg3)}
@@ -119,6 +124,25 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
   var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
   window.supabaseClient = supabaseClient;
   var PLANES_VALIDOS = ['basico', 'estandar', 'profesional', 'empresarial'];
+  var LIMITES_CONSULTAS = { basico: 8, estandar: 30, profesional: 80, empresarial: Infinity };
+  var LIMITES_ANALISIS = { basico: 4, estandar: 8, profesional: 20, empresarial: 100 };
+
+  function llenarMedidor(usados, limite, valId, fillId) {
+    var valEl = document.getElementById(valId);
+    var fillEl = document.getElementById(fillId);
+    if (!valEl || !fillEl) return;
+    if (limite === Infinity) {
+      valEl.textContent = usados + ' usadas · ilimitadas';
+      fillEl.style.width = '100%';
+      fillEl.className = 'usage-fill';
+      return;
+    }
+    var restantes = Math.max(0, limite - usados);
+    valEl.textContent = restantes + ' de ' + limite + ' restantes';
+    var pct = Math.min(100, (usados / limite) * 100);
+    fillEl.style.width = pct + '%';
+    fillEl.className = 'usage-fill' + (pct >= 100 ? ' full' : pct >= 80 ? ' warn' : '');
+  }
 
   (async function verificarAcceso() {
     var sesion = await supabaseClient.auth.getSession();
@@ -129,13 +153,19 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
     }
     var perfilResp = await supabaseClient
       .from('profiles')
-      .select('plan')
+      .select('plan,consultas_usadas,analisis_usados')
       .eq('id', session.user.id)
       .single();
     var plan = perfilResp.data && perfilResp.data.plan;
     if (PLANES_VALIDOS.indexOf(plan) === -1) {
       window.location.replace('planes.html?sinplan=true');
+      return;
     }
+    var datos = perfilResp.data || {};
+    llenarMedidor(datos.consultas_usadas || 0, LIMITES_CONSULTAS[plan], 'usage-consultas-val', 'usage-consultas-fill');
+    llenarMedidor(datos.analisis_usados || 0, LIMITES_ANALISIS[plan], 'usage-analisis-val', 'usage-analisis-fill');
+    var usageRow = document.getElementById('usage-row');
+    if (usageRow) usageRow.style.display = '';
   })();
 })();
 </script>
@@ -175,10 +205,15 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
   <div class="hero-muni">Guadalajara · Zapopan · Tlaquepaque · Tlajomulco · Tonalá</div>
 </div>
 
-<div class="status-row">
-  <div class="stat-box"><div class="stat-val">11</div><div class="stat-lbl">Módulos activos</div></div>
-  <div class="stat-box"><div class="stat-val">5</div><div class="stat-lbl">Municipios cubiertos</div></div>
-  <div class="stat-box"><div class="stat-val">53</div><div class="stat-lbl">Subdistritos GDL</div></div>
+<div class="usage-row" id="usage-row" style="display:none">
+  <div class="usage-box">
+    <div class="usage-top"><span class="usage-lbl">Consultas normales</span><span class="usage-val" id="usage-consultas-val">—</span></div>
+    <div class="usage-bar"><div class="usage-fill" id="usage-consultas-fill" style="width:0%"></div></div>
+  </div>
+  <div class="usage-box">
+    <div class="usage-top"><span class="usage-lbl">Análisis con IA</span><span class="usage-val" id="usage-analisis-val">—</span></div>
+    <div class="usage-bar"><div class="usage-fill" id="usage-analisis-fill" style="width:0%"></div></div>
+  </div>
 </div>
 
 <div class="jump-nav">
@@ -421,6 +456,11 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
 
 <footer>
   <span class="footer-txt">© 2026 TrazaUrbana · Jalisco AMG · trazaurbana.mx · Todos los derechos reservados. · <a href="terminos.html" style="color:inherit">Términos de Servicio</a> · <a href="privacidad.html" style="color:inherit">Aviso de Privacidad</a></span>
+  <div class="footer-stack">
+    <span class="stack-tag">11 módulos</span>
+    <span class="stack-tag">5 municipios</span>
+    <span class="stack-tag">53 subdistritos GDL</span>
+  </div>
 </footer>
 
 <script>

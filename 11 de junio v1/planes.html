@@ -86,7 +86,7 @@ footer{margin-top:auto;padding:24px 28px;border-top:1px solid var(--border);text
   </div>
   <div class="hbadge">Modo de prueba</div>
   <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" style="margin-left:auto">🌙 Modo oscuro</button>
-  <a href="index.html" class="back-link">← Menú principal</a>
+  <a href="index.html" class="back-link" id="btn-menu-principal" style="display:none">← Menú principal</a>
 </header>
 
 <div class="hero">
@@ -108,6 +108,7 @@ footer{margin-top:auto;padding:24px 28px;border-top:1px solid var(--border);text
   <div id="msg-ok" class="msg ok" style="display:none">✓ Pago completado. Gracias por suscribirte a TrazaUrbana.</div>
   <div id="msg-cancel" class="msg cancel" style="display:none">Se canceló el proceso de pago. Puedes intentarlo de nuevo cuando quieras.</div>
   <div id="msg-sinplan" class="msg cancel" style="display:none">Necesitas un plan activo para entrar a la plataforma. Elige uno para continuar.</div>
+  <div id="msg-plan-activo" class="msg ok" style="display:none">✓ Ya tienes un plan activo — dale clic a "← Menú principal" arriba para entrar a los módulos.</div>
 </div>
 
 <div class="plans-grid">
@@ -213,6 +214,25 @@ async function suscribir(plan, btn) {
     document.getElementById('msg-cancel').style.display = 'block';
   } else if (params.get('sinplan') === 'true') {
     document.getElementById('msg-sinplan').style.display = 'block';
+  }
+})();
+
+(async function verificarEstadoUsuario() {
+  var sesion = await supabaseClient.auth.getSession();
+  var session = sesion.data && sesion.data.session;
+  if (!session) return;
+  var btnMenu = document.getElementById('btn-menu-principal');
+  if (btnMenu) btnMenu.style.display = '';
+  var PLANES_VALIDOS = ['basico', 'estandar', 'profesional', 'empresarial'];
+  var perfilResp = await supabaseClient
+    .from('profiles')
+    .select('plan')
+    .eq('id', session.user.id)
+    .single();
+  var plan = perfilResp.data && perfilResp.data.plan;
+  if (PLANES_VALIDOS.indexOf(plan) !== -1) {
+    var msgPlan = document.getElementById('msg-plan-activo');
+    if (msgPlan) msgPlan.style.display = 'block';
   }
 })();
 

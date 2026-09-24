@@ -60,6 +60,23 @@ async function actualizarPerfil(campo, valor, cambios) {
   }
 }
 
+async function registrarHistorial(userId, planAnterior, planNuevo, tipoCambio) {
+  try {
+    await fetch(`${process.env.SUPABASE_URL}/rest/v1/plan_historial`, {
+      method: 'POST',
+      headers: {
+        apikey: process.env.SUPABASE_SECRET_KEY,
+        Authorization: `Bearer ${process.env.SUPABASE_SECRET_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal'
+      },
+      body: JSON.stringify({ user_id: userId, plan_anterior: planAnterior, plan_nuevo: planNuevo, tipo_cambio: tipoCambio })
+    });
+  } catch (error) {
+    console.error('[stripe-webhook] No se pudo registrar en plan_historial:', error.message);
+  }
+}
+
 function hoyISO() {
   return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 }
@@ -106,6 +123,7 @@ export default async function handler(req, res) {
             analisis_usados: 0,
             periodo_actual: hoyISO()
           });
+          await registrarHistorial(userId, null, plan, 'alta');
         } else {
           console.error('[stripe-webhook] checkout.session.completed sin userId/plan validos', { userId, plan });
         }

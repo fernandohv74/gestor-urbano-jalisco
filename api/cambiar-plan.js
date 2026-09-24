@@ -125,6 +125,22 @@ export default async function handler(req, res) {
       // No es fatal para el usuario -- el webhook lo corrige en breve -- pero se registra.
     }
 
+    // 5) Dejar registro en el historial (no bloquea la respuesta al usuario si falla).
+    try {
+      await fetch(`${supabaseUrl}/rest/v1/plan_historial`, {
+        method: 'POST',
+        headers: { ...supaHeaders, Prefer: 'return=minimal' },
+        body: JSON.stringify({
+          user_id: userId,
+          plan_anterior: perfil.plan,
+          plan_nuevo: nuevoPlan,
+          tipo_cambio: esDowngrade ? 'downgrade' : 'upgrade'
+        })
+      });
+    } catch (e) {
+      console.error('[cambiar-plan] No se pudo registrar en plan_historial:', e.message);
+    }
+
     return res.status(200).json({ ok: true, plan: nuevoPlan });
   } catch (error) {
     console.error('[cambiar-plan] Error interno:', error);

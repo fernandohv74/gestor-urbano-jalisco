@@ -117,6 +117,7 @@ body.light .mod-card-top{background:linear-gradient(135deg,var(--bg3) 0%,var(--b
   var SUPABASE_URL = 'https://bhryrrdygghhospfqgtj.supabase.co';
   var SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Ma2gxSyWx4rDHIbDPKGUdg_lO0xZeZr';
   var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  window.supabaseClient = supabaseClient;
   var PLANES_VALIDOS = ['basico', 'estandar', 'profesional', 'empresarial'];
 
   (async function verificarAcceso() {
@@ -429,6 +430,7 @@ function applyTheme(theme) {
   if (btn) btn.textContent = theme === 'light' ? '☀️ Modo claro' : '🌙 Modo oscuro';
 }
 async function guCerrarSesion(){
+  try{ if (window.supabaseClient) await window.supabaseClient.auth.signOut(); }catch(e){}
   try{ await fetch('/api/auth-logout', {method:'POST'}); }catch(e){}
   window.location.href = '/login.html';
 }

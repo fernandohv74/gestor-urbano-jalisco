@@ -1487,6 +1487,27 @@ var SCIAN_A_RPBI = [
   '621211','621212','621910','622111','622112','622211','622212','622311','622312'
 ];
 
+// Respaldo por SECTOR (prefijo de codigo SCIAN) para SEMARNAT, distinto de los
+// respaldos anteriores que son por codigo exacto. M02 tiene 348 giros con uso
+// industrial (sector 31-33 "Industrias manufactureras" del propio catalogo
+// SCIAN/INEGI) contra los ~10 nombres genericos de industria que reconoce M06
+// (ej. 'FABRICAS E INDUSTRIAS') -- casi ninguno hace match exacto. En vez de
+// listar los 348 uno por uno, cualquier codigo de este sector activa semarnat
+// automaticamente si nada mas especifico ya lo cubrio.
+// Deliberadamente NO se usa este mismo respaldo para pcNivel: el deep link de
+// M02 no manda el nivel de intensidad industrial del giro (I1..I5, ese dato
+// vive solo en M02 y no viaja a M06 -- ver irAM06() en M02), y pcNivel:'medio'
+// SI dispara un cobro real de Peritaje PC calculado por superficie en ZPN/TLA/
+// TON/TLQ (no solo un aviso de checklist como en GDL). Sin poder distinguir una
+// tortilleria de una fabrica pesada, aplicar el respaldo tambien a pcNivel
+// cobraria peritaje de mas a manufactura ligera/artesanal -- decision explicita
+// de Fernando (24-sep-2026): solo SEMARNAT por ahora.
+function esSectorManufacturaSCIAN(cod) {
+  if (!cod) return false;
+  var sector = cod.substring(0, 2);
+  return sector === '31' || sector === '32' || sector === '33';
+}
+
 // Giros de consumo de alcohol en el lugar (bar, discoteca, cabaret, etc.) --
 // distinto de rest_baja/rest_alta/fonda_baja (restaurante con alcohol como giro
 // secundario) y de dep_cerveza/dep_vinos/mini_alc/abarro_alc (venta al menudeo).
@@ -2240,6 +2261,7 @@ function calcularGDL() {
   var rpbi     = RPBI_ZPN.indexOf(giroNom) >= 0;
   if (!rpbi) { rpbi = SCIAN_A_RPBI.indexOf(scianCodGDL) >= 0; }
   var semarnat = SEMARNAT_ZPN.indexOf(giroNom) >= 0;
+  if (!semarnat) { semarnat = esSectorManufacturaSCIAN(scianCodGDL); }
   var giro = {
     id: giroNom, nom: giroNom,
     alcohol: !!tipoAlc, tipoAlc: tipoAlc,
@@ -2281,6 +2303,7 @@ function calcularZPN() {
   var rpbi     = RPBI_ZPN.indexOf(giroNom) >= 0;
   if (!rpbi) { rpbi = SCIAN_A_RPBI.indexOf(scianCodZPN) >= 0; }
   var semarnat = SEMARNAT_ZPN.indexOf(giroNom) >= 0;
+  if (!semarnat) { semarnat = esSectorManufacturaSCIAN(scianCodZPN); }
   var giro = {
     id: giroNom, nom: giroNom,
     alcohol: !!tipoAlc, tipoAlc: tipoAlc,
@@ -2319,7 +2342,7 @@ function calcularMunGen() {
   var pcNivel  = PC_NIVEL_ZPN[giroUp] || SCIAN_A_PC[scianCodGen] || 'bajo';
   var cofepris = COFEPRIS_ZPN.indexOf(giroUp) >= 0 || SCIAN_A_COFEPRIS.indexOf(scianCodGen) >= 0;
   var rpbi     = RPBI_ZPN.indexOf(giroUp) >= 0 || SCIAN_A_RPBI.indexOf(scianCodGen) >= 0;
-  var semarnat = SEMARNAT_ZPN.indexOf(giroUp) >= 0;
+  var semarnat = SEMARNAT_ZPN.indexOf(giroUp) >= 0 || esSectorManufacturaSCIAN(scianCodGen);
   var giro = {
     id: giroNom, nom: giroNom,
     alcohol: esAlcohol, tipoAlc: esAlcohol ? tipoAlc : null,

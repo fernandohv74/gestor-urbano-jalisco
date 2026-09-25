@@ -1425,7 +1425,20 @@ var ALC_ZPN = {
 // (d.giroId), asi que sirve de respaldo. Codigos tomados del catalogo GU_SCIAN_GDL
 // de M02: 462112 y 722412 son Bar/Cantina; 722411 agrupa Discoteca+Centro nocturno
 // bajo un mismo codigo y se clasifica como 'cabaret' (el mas restrictivo de los dos).
-var SCIAN_A_TIPOALC = {'462112':'bar', '722412':'bar', '722411':'cabaret'};
+// Ampliado 24-sep-2026 con 5 giros de venta/distribucion de alcohol del catalogo
+// M02 (auditoria de alcance M06) -- se excluyen a proposito los 8 codigos de
+// PRODUCCION industrial (elaboracion de cerveza, vinos, destilados, sector 312xxx):
+// una planta no tramita licencia municipal de venta de alcohol, tramita giro
+// industrial + permisos SEMARNAT/COFEPRIS/IEPS a otro nivel -- meterlos aqui
+// cobraria una tarifa de "bar" a una fabrica sin base normativa para hacerlo.
+var SCIAN_A_TIPOALC = {
+  '462112':'bar', '722412':'bar', '722411':'cabaret',
+  '462111':'alta_deposito', // Licoreria - Vinateria
+  '461211':'alta_deposito', // Licoreria - Vinos y licores
+  '431212':'alta_deposito', // Licores mayoreo - Vinos al mayoreo
+  '431213':'baja_deposito', // Cerveza mayoreo - Distribuidora de cerveza
+  '461212':'baja_deposito'  // Deposito de cervezas - Caguamon
+};
 
 // Mismo respaldo por codigo SCIAN, para el nivel de riesgo de Proteccion Civil
 // (giro.pc). Sin esto, un giro que llega por el deep link de M02 siempre cae al
@@ -1449,6 +1462,30 @@ var SCIAN_A_PC = {
   '561510':'minimo', // Agencia de viajes
   '561520':'minimo'  // Agencia de viajes - Tour operador
 };
+
+// Respaldo por codigo SCIAN para COFEPRIS/RPBI, mismo motivo que SCIAN_A_TIPOALC/
+// SCIAN_A_PC arriba: el deep link de M02 manda el nombre en el formato propio de
+// M02 (ej. "Abarrotes - Miscelanea"), que nunca coincide con las claves en
+// mayusculas de COFEPRIS_ZPN/RPBI_ZPN, asi que sin esto la bandera nunca se
+// activaba llegando desde M02. 30 codigos confirmados contra el catalogo real de
+// M02 (auditoria de alcance M06, 24-sep-2026): alimentos al menudeo/mayoreo y
+// establecimientos de salud humana. Se excluye 434112 (medicamentos veterinarios
+// mayoreo) por duda razonable de jurisdiccion -- ese giro cae bajo SENASICA/SADER,
+// no COFEPRIS, y no hay certeza suficiente para asumir lo contrario.
+var SCIAN_A_COFEPRIS = [
+  '461110','461213','461121','461150','461122','461130','461190', // alimentos menudeo
+  '722330','722512','722517','311830',                             // preparacion de alimentos
+  '431110','431121','431122','431123','431130','431160','431170','431191','431193','433110', // mayoreo
+  '621211','621212','621610','621910','622111','622112','622211','622212','622311','622312','624191','621398' // salud
+];
+
+// Subconjunto de SCIAN_A_COFEPRIS que ademas genera Residuos Peligrosos
+// Biologico-Infecciosos: solo establecimientos de salud con practica clinica
+// (consultorios, hospitales, ambulancias). Los giros de alimentos y "grupos de
+// autoayuda" (624191, no-clinico) quedan fuera a proposito.
+var SCIAN_A_RPBI = [
+  '621211','621212','621910','622111','622112','622211','622212','622311','622312'
+];
 
 // Giros de consumo de alcohol en el lugar (bar, discoteca, cabaret, etc.) --
 // distinto de rest_baja/rest_alta/fonda_baja (restaurante con alcohol como giro
@@ -2199,7 +2236,9 @@ function calcularGDL() {
   var pcNivel  = PC_NIVEL_ZPN[giroNom];
   if (!pcNivel) { pcNivel = SCIAN_A_PC[scianCodGDL] || 'bajo'; }
   var cofepris = COFEPRIS_ZPN.indexOf(giroNom) >= 0;
+  if (!cofepris) { cofepris = SCIAN_A_COFEPRIS.indexOf(scianCodGDL) >= 0; }
   var rpbi     = RPBI_ZPN.indexOf(giroNom) >= 0;
+  if (!rpbi) { rpbi = SCIAN_A_RPBI.indexOf(scianCodGDL) >= 0; }
   var semarnat = SEMARNAT_ZPN.indexOf(giroNom) >= 0;
   var giro = {
     id: giroNom, nom: giroNom,
@@ -2238,7 +2277,9 @@ function calcularZPN() {
   var pcNivel  = PC_NIVEL_ZPN[giroNom];
   if (!pcNivel) { pcNivel = SCIAN_A_PC[scianCodZPN] || 'bajo'; }
   var cofepris = COFEPRIS_ZPN.indexOf(giroNom) >= 0;
+  if (!cofepris) { cofepris = SCIAN_A_COFEPRIS.indexOf(scianCodZPN) >= 0; }
   var rpbi     = RPBI_ZPN.indexOf(giroNom) >= 0;
+  if (!rpbi) { rpbi = SCIAN_A_RPBI.indexOf(scianCodZPN) >= 0; }
   var semarnat = SEMARNAT_ZPN.indexOf(giroNom) >= 0;
   var giro = {
     id: giroNom, nom: giroNom,
@@ -2276,8 +2317,8 @@ function calcularMunGen() {
   var tipoAlc  = ALC_ZPN[giroUp] || SCIAN_A_TIPOALC[scianCodGen] || null;
   var esAlcohol = (tipoAlc !== null) && !!(TARIFAS_ALCOHOL[munNom] && TARIFAS_ALCOHOL[munNom][tipoAlc]);
   var pcNivel  = PC_NIVEL_ZPN[giroUp] || SCIAN_A_PC[scianCodGen] || 'bajo';
-  var cofepris = COFEPRIS_ZPN.indexOf(giroUp) >= 0;
-  var rpbi     = RPBI_ZPN.indexOf(giroUp) >= 0;
+  var cofepris = COFEPRIS_ZPN.indexOf(giroUp) >= 0 || SCIAN_A_COFEPRIS.indexOf(scianCodGen) >= 0;
+  var rpbi     = RPBI_ZPN.indexOf(giroUp) >= 0 || SCIAN_A_RPBI.indexOf(scianCodGen) >= 0;
   var semarnat = SEMARNAT_ZPN.indexOf(giroUp) >= 0;
   var giro = {
     id: giroNom, nom: giroNom,

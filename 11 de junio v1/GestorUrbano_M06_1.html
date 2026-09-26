@@ -2446,16 +2446,19 @@ function leerDeepLink() {
     if (btnEl) selMun(mDef.id, mDef.nom, btnEl);
   }
 
-  // Giro — rellenar autocomplete y calcular
+  // Giro — solo rellenar autocomplete + ficha SCIAN, SIN calcular. Antes este
+  // deep link tambien disparaba btn.click() para mostrar el resultado de
+  // inmediato -- Fernando pidio (25-sep-2026) que ya no lo haga, para que el
+  // resultado (con su costo) solo aparezca cuando el usuario de clic el mismo
+  // en "Calcular requisitos y derechos", igual que el resto de los deep links
+  // del sistema (M01->M02, M01->M08, M04->M05, M05->M08), que solo prellenan.
   var giroNom = d.giroNombre || '';
   if (giroNom) {
     setTimeout(function() {
       if (munNom === 'ZPN') {
         acSeleccionar(giroNom, d.giroId||'', '');
-        setTimeout(function() { var b=document.getElementById('btn-calc-zpn'); if(b) b.click(); }, 150);
       } else if (munNom === 'GDL') {
         acSeleccionarGDL(giroNom, d.giroId||'', '');
-        setTimeout(function() { var b=document.getElementById('btn-calc-gdl'); if(b) b.click(); }, 150);
       } else {
         var inp = document.getElementById('inp-giro-gen');
         if (inp) { inp.value = giroNom; inp.classList.add('has-value'); }

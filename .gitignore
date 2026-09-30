@@ -1,1 +1,6 @@
- 
+# Variables de entorno (claves de Stripe, Supabase, etc.) -- nunca deben
+# subirse al repo. Si exportas un respaldo de Vercel (vercel env pull u
+# otro), guardalo con uno de estos nombres o esta regla no lo protege.
+.env
+.env.*
+!.env.example

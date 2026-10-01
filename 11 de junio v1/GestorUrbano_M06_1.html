@@ -2131,6 +2131,21 @@ function renderResultado(giro, mun, sup, tramiteLabel) {
       dHtml += '<div class="fee-row"><div class="fee-label">Constancia / Dictamen de Protección Civil<div class="fundamento">Confirmar tarifa vigente en Dirección de Protección Civil de ' + (MUN_NOMBRES[mun]||mun) + '</div></div><div class="fee-val" style="font-size:11px;color:var(--text2)">Solicitar en ventanilla</div></div>';
     }
   }
+  // Servicio de recoleccion de residuos a microgeneradores -- confirmado con una
+  // licencia real de consultorio dental en GDL (29-sep-2026, domicilio fuera del
+  // Centro Historico): el recibo cobro $242.64, que es casi exacto 1/3 de $728
+  // (pago ANUAL "a partir de la fecha de emision de dictamen", Art. 56 Fracc.
+  // VII Ley Ingresos GDL 2026 -- se prorratea segun cuando se da de alta, aqui
+  // se muestra el monto anual completo, no el prorrateo real). El articulo no
+  // tiene restriccion geografica (a diferencia del dictamen de $160 del Art. 61
+  // Fracc. XXI num. 9, que si esta ligado a Centro Historico y por eso NO se
+  // incluye aqui -- se descarto tras confirmar que este domicilio no calificaba).
+  // Alcance: solo giros ya marcados rpbi:true, unico caso con evidencia real;
+  // no extendido a semarnat sin otro caso real que lo confirme.
+  if (mun === 'GDL' && giro.rpbi) {
+    dHtml += '<div class="fee-row"><div class="fee-label">Servicio de recolección de residuos a microgeneradores (anual)<div class="fundamento">Art. 56 Fracc. VII, Ley Ingresos GDL 2026 — requiere dictamen previo favorable de microgenerador; el primer pago puede prorratearse según la fecha de trámite</div></div><div class="fee-val">$728</div></div>';
+    total += 728;
+  }
   // El dictamen formal de uso de suelo no aplica parejo para todos los giros --
   // en la mayoria de los casos el uso de suelo se revisa directo en la ventanilla
   // al tramitar la licencia, sin pagar/solicitar este dictamen por separado.
